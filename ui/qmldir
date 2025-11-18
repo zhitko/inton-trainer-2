@@ -1,0 +1,4 @@
+module ui
+pages 1.0 pages/qmldir
+components 1.0 components/qmldir
+cards 1.0 components/cards/qmldir
