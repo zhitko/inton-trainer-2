@@ -1,9 +1,13 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.Material 6.8
+
 import "../components/cards"
 
 Page {
     title: "Home"
+
+    Material.theme: themeSwitch.checked ? Material.Dark : Material.Light
 
     Column {
         anchors.fill: parent
@@ -14,6 +18,7 @@ Page {
             text: "Welcome to IntonTrainer"
             font.pixelSize: 24
             anchors.horizontalCenter: parent.horizontalCenter
+            color: Material.primaryTextColor
         }
 
         Column {
@@ -21,19 +26,28 @@ Page {
             width: parent.width
 
             Card {
-                text: "Templates"
+                title.text: "Templates"
+                icon.font.family: Icons.familySolid
+                icon.font.bold: true
+                icon.text: Icons.faFolderTree
                 width: parent.width
                 onClicked: stackView.push("TemplatesPage.qml")
             }
 
             Card {
-                text: "My Records"
+                title.text: "My Records"
+                icon.font.family: Icons.familySolid
+                icon.font.bold: true
+                icon.text: Icons.faBoxArchive
                 width: parent.width
                 onClicked: stackView.push("RecordsPage.qml")
             }
 
             Card {
-                text: "Settings"
+                title.text: "Settings"
+                icon.font.family: Icons.familySolid
+                icon.font.bold: true
+                icon.text: Icons.faGear
                 width: parent.width
             }
         }

@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls.Material
 
 Column {
     id: fileTreeView
@@ -41,6 +42,7 @@ Column {
             font.bold: false
             font.pointSize: 15
             leftPadding: 10
+            color: Material.primaryTextColor
         }
     }
 

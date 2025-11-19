@@ -1,2 +1,3 @@
 FileTreeView FileTreeView.qml
 PlayButton PlayButton.qml
+MdiIcon MdiIcon.qml

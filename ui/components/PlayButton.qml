@@ -5,8 +5,8 @@ import by.intontrainer.audio 1.0
 RoundButton {
     property string file: ""
 
-    AudioAPI {
-        id: audioAPI
+    AudioApi {
+        id: audioApi
     }
 
     width: 50
@@ -15,16 +15,16 @@ RoundButton {
     visible: file !== ""
 
     background: Image {
-        source: audioAPI.isPlaying ? "../../res/icons/stop.svg" : "../../res/icons/play.svg"
+        source: audioApi.isPlaying ? "../../res/icons/stop.svg" : "../../res/icons/play.svg"
         anchors.fill: parent
         mipmap: true
     }
 
     onClicked: {
-        if (audioAPI.isPlaying) {
-            audioAPI.stopPlayback()
+        if (audioApi.isPlaying) {
+            audioApi.stopPlayback()
         } else {
-            audioAPI.play(file)
+            audioApi.play(file)
         }
     }
 }

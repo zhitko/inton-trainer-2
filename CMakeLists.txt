@@ -22,6 +22,13 @@ target_include_directories(appinton-trainer-2 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/services
 )
 
+set(qml_singletons
+    ui/utils/Icons.qml
+)
+
+set_source_files_properties(${qml_singletons}
+    PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+
 qt_add_qml_module(appinton-trainer-2
     URI inton-trainer-2
     VERSION 1.0
@@ -34,13 +41,17 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/cards/Card.qml
         ui/components/FileTreeView.qml
         ui/components/PlayButton.qml
+        ui/components/MdiIcon.qml
+        ${qml_singletons}
     RESOURCES
-        res/icons/menu.svg
+        res/fonts/fa-brands-400.woff2
+        res/fonts/fa-regular-400.woff2
+        res/fonts/fa-solid-900.woff2
         res/icons/microphone_off.svg
         res/icons/microphone_on.svg
         res/icons/play.svg
         res/icons/stop.svg
-        res/icons/home.svg
+        res/icons/menu.svg
 )
 
 set_target_properties(appinton-trainer-2 PROPERTIES

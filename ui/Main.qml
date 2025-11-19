@@ -1,6 +1,7 @@
 import QtQuick 6.8
 import QtQuick.Controls 6.8
 import QtQuick.Layouts 1.15
+import QtQuick.Controls.Material 6.8
 
 ApplicationWindow {
     id: window
@@ -9,12 +10,15 @@ ApplicationWindow {
     visible: true
     title: qsTr("Inton Trainer")
 
+    Material.theme: themeSwitch.checked ? Material.Dark : Material.Light
+
     header: ToolBar {
         contentHeight: 56
 
         Button {
             id: menuButton
-            icon.source: "../res/icons/menu.svg"
+            font.family: Icons.familyRegular
+            text: Icons.faBars
             width: parent.height
             height: parent.height
             hoverEnabled: true
@@ -35,7 +39,7 @@ ApplicationWindow {
         }
 
         Label {
-            text: "Inton Trainer"
+            text: stackView.currentItem.title
             anchors.centerIn: parent
         }
     }
@@ -57,19 +61,89 @@ ApplicationWindow {
                 padding: 10
             }
             ItemDelegate {
+                id: homeItemDelegate
                 text: "Home"
                 width: parent.width - parent.padding
                 onClicked: {
-                    stackView.pop()
+                    onClicked: stackView.push("pages/HomePage.qml")
                     drawer.close()
+                }
+                contentItem: RowLayout {
+                    spacing: 10
+                    Text {
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                        font.family: Icons.familyRegular
+                        text: Icons.faHome
+                        color: Material.primaryTextColor
+                    }
+                    Text {
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                        Layout.fillWidth: true
+                        text: parent.parent.text
+                        font: parent.parent.font
+                        color: Material.primaryTextColor
+                    }
                 }
             }
             ItemDelegate {
-                text: "Recording"
+                text: "Templates"
                 width: parent.width - parent.padding
                 onClicked: {
-                    stackView.push("pages/RecordingPage.qml")
+                    onClicked: stackView.push("TemplatesPage.qml")
                     drawer.close()
+                }
+                contentItem: RowLayout {
+                    spacing: 10
+                    Text {
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                        font.family: Icons.familySolid
+                        font.bold: true
+                        text: Icons.faFolderTree
+                        color: Material.primaryTextColor
+                    }
+                    Text {
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                        Layout.fillWidth: true
+                        text: parent.parent.text
+                        font: parent.parent.font
+                        color: Material.primaryTextColor
+                    }
+                }
+            }
+            ItemDelegate {
+                text: "My Records"
+                width: parent.width - parent.padding
+                onClicked: {
+                    onClicked: stackView.push("RecordsPage.qml")
+                    drawer.close()
+                }
+                contentItem: RowLayout {
+                    spacing: 10
+                    Text {
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                        font.family: Icons.familySolid
+                        font.bold: true
+                        text: Icons.faBoxArchive
+                        color: Material.primaryTextColor
+                    }
+                    Text {
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                        Layout.fillWidth: true
+                        text: parent.parent.text
+                        font: parent.parent.font
+                        color: Material.primaryTextColor
+                    }
+                }
+            }
+
+            RowLayout {
+                width: parent.width - parent.padding * 2
+                Label {
+                    text: "Dark Mode"
+                }
+                Switch {
+                    id: themeSwitch
+                    checked: false // Default to light mode
                 }
             }
         }
@@ -84,24 +158,20 @@ ApplicationWindow {
 
     footer: TabBar {
         id: tabBar
-        currentIndex: stackView.depth > 1 ? 1 : 0
-        onCurrentIndexChanged: {
-            if (currentIndex === 0) {
-                stackView.pop()
-            }
-        }
 
         TabButton {
             id: homeTabButton
-            padding: 10
-            text: "Home"
-            icon.source: "../res/icons/home.svg"
             onClicked: stackView.push("pages/HomePage.qml")
+            font.family: Icons.familyRegular
+            font.pointSize: 20
+            text: Icons.faHome
         }
         TabButton {
-            text: "Recording"
-            padding: homeTabButton.padding
             onClicked: stackView.push("pages/RecordingPage.qml")
+            font.family: Icons.familySolid
+            font.pointSize: 20
+            font.bold: true
+            text: Icons.faMicrophone
         }
     }
 }

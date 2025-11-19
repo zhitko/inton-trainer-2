@@ -1,10 +1,14 @@
 import QtQuick
 import QtQuick.Controls
 import by.intontrainer.file 1.0
+import QtQuick.Controls.Material 6.8
+
 import "../components"
 
 Page {
     title: "Records"
+
+    Material.theme: themeSwitch.checked ? Material.Dark : Material.Light
 
     FileApi {
         id: fileApi
