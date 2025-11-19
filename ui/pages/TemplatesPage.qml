@@ -22,8 +22,8 @@ Page {
         FileTreeView {
             model: fileApi.getFiles("data/templates", ["*.wav"])
             path: "data/templates"
-            onFileClicked: {
-                console.log("TemplatesPage.FileTreeView.onFileClicked:", filePath)
+            onFileClicked: (filePath) => {
+                console.log("ui/pages/TemplatesPage.qml:onFileClicked:", filePath)
                 stackView.push("TemplatePage.qml", { "filePath": filePath })
             }
         }

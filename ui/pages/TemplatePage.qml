@@ -13,12 +13,14 @@ Page {
 
     title: filePath.substring(filePath.lastIndexOf('/') + 1)
 
-    header: ToolBar {
-        PlayButton {
-            id: playButton
-            width: 32
-            height: 32
-            file: filePath
-        }
+    PlayButton {
+        id: playButton
+        anchors.top: parent.top
+        anchors.topMargin: 10
+        anchors.left: parent.left
+        anchors.leftMargin: 10
+        width: 32
+        height: 32
+        file: filePath
     }
 }

@@ -18,9 +18,10 @@ ApplicationWindow {
         Button {
             id: menuButton
             font.family: Icons.familyRegular
+            font.pointSize: menuButton.hovered ? 18 : 16
             text: Icons.faBars
-            width: parent.height
-            height: parent.height
+            height: window.header.height
+            width: window.header.height
             hoverEnabled: true
             onClicked: drawer.open()
 
@@ -28,11 +29,9 @@ ApplicationWindow {
                 color: "transparent"
             }
 
-            scale: menuButton.hovered ? 2.2 : 2.0
-
             transitions: Transition {
                 NumberAnimation {
-                    property: "scale"
+                    property: "font.pointSize"
                     duration: 100
                 }
             }
