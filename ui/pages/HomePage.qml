@@ -21,9 +21,9 @@ Page {
             color: Material.primaryTextColor
         }
 
-        Column {
-            spacing: 16
+        Flow {
             width: parent.width
+            spacing: 16
 
             Card {
                 title.text: "Templates"

@@ -7,6 +7,7 @@ Column {
     property var name: ""
     property int indent: 0
     property string path: ""
+    signal fileClicked(string filePath)
 
     spacing: 5
 
@@ -24,7 +25,7 @@ Column {
         }
         row.leftPadding = indent * 20
     }
-
+        
     Row {
         id: row
         leftPadding: 0
@@ -36,13 +37,24 @@ Column {
             file: fileTreeView.path
         }
 
-        Text {
+        Label {
             id: title
             text: " "
             font.bold: false
             font.pointSize: 15
             leftPadding: 10
+            rightPadding: 10
             color: Material.primaryTextColor
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    console.log("FileTreeView.title.onClicked:", fileTreeView.name)
+                    if (!fileTreeView.model) {
+                        console.log("FileTreeView.title.onClicked: fileClicked()", fileTreeView.name)
+                        fileTreeView.fileClicked(fileTreeView.path)
+                    }
+                }
+            }
         }
     }
 
@@ -55,12 +67,12 @@ Column {
             Loader {
                 width: parent.width
                 source: "FileTreeView.qml"
-                // visible: fileTreeView.model[modelData] !== null
 
                 onLoaded: {
                     item.path = (fileTreeView.path ? fileTreeView.path + "/" : "") + modelData;
                     item.indent = fileTreeView.indent + 1;
                     item.model = fileTreeView.model[modelData];
+                    item.name = modelData;
                     item.name = modelData;
                 }
             }

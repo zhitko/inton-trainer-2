@@ -38,10 +38,10 @@ qt_add_qml_module(appinton-trainer-2
         ui/pages/HomePage.qml
         ui/pages/RecordsPage.qml
         ui/pages/TemplatesPage.qml
+        ui/pages/TemplatePage.qml
         ui/components/cards/Card.qml
         ui/components/FileTreeView.qml
         ui/components/PlayButton.qml
-        ui/components/MdiIcon.qml
         ${qml_singletons}
     RESOURCES
         res/fonts/fa-brands-400.woff2

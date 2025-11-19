@@ -23,11 +23,14 @@ Page {
         height: 100
         radius: 50
 
-        background: Image {
-            source: audioApi.isRecording ? "../../res/icons/microphone_off.svg" : "../../res/icons/microphone_on.svg"
-            anchors.fill: parent
-            anchors.margins: 15
-            mipmap: true
+        background: Label {
+            font.family: Icons.familySolid
+            font.bold: true
+            text: audioApi.isRecording ? Icons.faMicrophoneSlash : Icons.faMicrophone
+            Material.foreground: audioApi.isRecording ? Material.DeepOrange : Material.primaryTextColor
+            anchors.centerIn: parent
+            font.pixelSize: parent.width / 2
+            horizontalAlignment: Label.AlignHCenter
         }
 
         onClicked: {

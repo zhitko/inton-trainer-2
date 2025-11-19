@@ -14,14 +14,12 @@ Page {
         id: fileApi
     }
 
-    property var fileTree: fileApi.getFiles("data/records", ["*.wav"])
-
     ScrollView {
         anchors.fill: parent
         anchors.margins: 16
 
         FileTreeView {
-            model: fileTree
+            model: fileApi.getFiles("data/records", ["*.wav"])
             path: "data/records"
         }
     }

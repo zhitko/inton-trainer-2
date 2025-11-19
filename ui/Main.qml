@@ -39,7 +39,7 @@ ApplicationWindow {
         }
 
         Label {
-            text: stackView.currentItem.title
+            text: stackView.currentItem.title || qsTr("Inton Trainer")
             anchors.centerIn: parent
         }
     }
@@ -89,7 +89,7 @@ ApplicationWindow {
                 text: "Templates"
                 width: parent.width - parent.padding
                 onClicked: {
-                    onClicked: stackView.push("TemplatesPage.qml")
+                    onClicked: stackView.push("pages/TemplatesPage.qml")
                     drawer.close()
                 }
                 contentItem: RowLayout {
@@ -114,7 +114,7 @@ ApplicationWindow {
                 text: "My Records"
                 width: parent.width - parent.padding
                 onClicked: {
-                    onClicked: stackView.push("RecordsPage.qml")
+                    onClicked: stackView.push("pages/RecordsPage.qml")
                     drawer.close()
                 }
                 contentItem: RowLayout {

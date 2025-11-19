@@ -6,6 +6,7 @@ import QtQuick.Controls.Material 6.8
 import "../components"
 
 Page {
+    id: templatesPage
     title: "Templates"
 
     Material.theme: themeSwitch.checked ? Material.Dark : Material.Light
@@ -14,15 +15,17 @@ Page {
         id: fileApi
     }
 
-    property var fileTree: fileApi.getFiles("data/templates", ["*.wav"])
-
     ScrollView {
         anchors.fill: parent
         anchors.margins: 16
 
         FileTreeView {
-            model: fileTree
+            model: fileApi.getFiles("data/templates", ["*.wav"])
             path: "data/templates"
+            onFileClicked: {
+                console.log("TemplatesPage.FileTreeView.onFileClicked:", filePath)
+                stackView.push("TemplatePage.qml", { "filePath": filePath })
+            }
         }
     }
 }

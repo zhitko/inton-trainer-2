@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import by.intontrainer.audio 1.0
+import QtQuick.Controls.Material 6.8
 
 RoundButton {
     property string file: ""
@@ -14,10 +15,14 @@ RoundButton {
     radius: width/2
     visible: file !== ""
 
-    background: Image {
-        source: audioApi.isPlaying ? "../../res/icons/stop.svg" : "../../res/icons/play.svg"
-        anchors.fill: parent
-        mipmap: true
+    background: Label {
+        font.family: Icons.familySolid
+        font.bold: true
+        text: audioApi.isPlaying ? Icons.faStop : Icons.faPlay
+        Material.foreground: audioApi.isPlaying ? Material.DeepOrange : Material.primaryTextColor
+        anchors.centerIn: parent
+        font.pixelSize: parent.width / 2
+        horizontalAlignment: Label.AlignHCenter
     }
 
     onClicked: {
