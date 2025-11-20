@@ -10,6 +10,7 @@ Rectangle {
     border.color: mouseArea.containsMouse ? Material.primary : Material.dividerColor
     border.width: 1
     scale: mouseArea.containsMouse ? 1.05 : 1.0
+    color: mouseArea.containsMouse ? Material.rippleColor : Material.backgroundColor
 
     Behavior on scale {
         NumberAnimation {
@@ -33,12 +34,14 @@ Rectangle {
         anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: 16
+        color: mouseArea.containsMouse ? Material.accentColor : Material.primaryTextColor
     }
 
     Text {
         id: cardText
         anchors.centerIn: parent
         font.pixelSize: 16
+        color: Material.primaryTextColor
     }
 
     MouseArea {

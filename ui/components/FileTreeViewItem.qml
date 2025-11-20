@@ -15,6 +15,7 @@ Column {
         if (!!fileItem.model) {
             title.font.bold = true
             playButton.visible = false
+            mouseArea.hoverEnabled = false
         }
     }
 
@@ -37,10 +38,13 @@ Column {
             height: title.height
             width: title.height
         }
-        Label {
-            id: title
-            font.pointSize: 14
+        Rectangle {
+            color: Material.backgroundColor
+            height: title.height
+            width: title.width
             MouseArea {
+                id: mouseArea
+                hoverEnabled: true
                 anchors.fill: parent
                 onClicked: {
                     if (!fileItem.model) {
@@ -48,6 +52,16 @@ Column {
                         fileItem.fileClicked(fileItem.path)
                     }
                 }
+                onEntered: {
+                    parent.color = Material.rippleColor
+                }
+                onExited: {
+                    parent.color = Material.backgroundColor
+                }
+            }
+            Text {
+                id: title
+                font.pointSize: 14            
             }
         }
     }
