@@ -14,7 +14,10 @@ qt_add_executable(appinton-trainer-2
     src/api/audioapi.cpp
     src/api/fileapi.h
     src/api/fileapi.cpp
+    src/services/wavfileservice.h
     src/services/wavfileservice.cpp
+    src/helpers/wavFile.h
+    src/helpers/wavFile.cpp
 )
 
 target_include_directories(appinton-trainer-2 PRIVATE 
