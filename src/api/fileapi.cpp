@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QRegularExpression>
+#include <QFile>
 #include <QCoreApplication>
 #include <QDir>
 
@@ -39,6 +40,14 @@ void insert(QVariantMap& map, const QStringList& path, bool isFile) {
 FileApi::FileApi(QObject *parent) : QObject(parent)
 {
 
+}
+
+void FileApi::deleteFile(const QString &file)
+{
+    QString basePath = QCoreApplication::applicationDirPath();
+    QString searchPath = QDir(basePath).filePath(file);
+    QFile f(searchPath);
+    f.remove();
 }
 
 QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilters)

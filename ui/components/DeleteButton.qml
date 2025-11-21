@@ -1,31 +1,33 @@
 import QtQuick
 import QtQuick.Controls
-import by.intontrainer.audio 1.0
 import QtQuick.Controls.Material 6.8
+
+import by.intontrainer.file 1.0
 
 RoundButton {
     id: control
     property string file: ""
-
-    AudioApi {
-        id: audioApi
-    }
 
     width: 50
     height: width
     radius: width/2
     visible: file !== ""
 
+    signal fileDeleted(string filePath)
+
+    FileApi {
+        id: fileApi
+    }
+
     background: Rectangle {
         radius: control.radius
         anchors.fill: parent
         Label {
             id: label
+            anchors.centerIn: parent
             font.family: Icons.familySolid
             font.bold: true
-            text: audioApi.isPlaying ? Icons.faStop : Icons.faPlay
-            Material.foreground: audioApi.isPlaying ? Material.DeepOrange : Material.primaryTextColor
-            anchors.centerIn: parent
+            text: Icons.faTrash
             font.pixelSize: parent.width / 2
             horizontalAlignment: Label.AlignHCenter
         }
@@ -45,10 +47,7 @@ RoundButton {
     }
 
     onClicked: {
-        if (audioApi.isPlaying) {
-            audioApi.stopPlayback()
-        } else {
-            audioApi.play(file)
-        }
+        fileApi.deleteFile(control.file)
+        control.fileDeleted(control.file)
     }
 }

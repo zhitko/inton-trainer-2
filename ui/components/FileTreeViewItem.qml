@@ -7,6 +7,7 @@ Column {
     property var modelItem: ""
     property int indent: 0
     property string path: ""
+    property bool canDelete: false
     signal fileClicked(string filePath)
 
     spacing: 6
@@ -14,6 +15,7 @@ Column {
     onModelChanged: {
         if (!!fileItem.model) {
             title.font.bold = true
+            title.font.pointSize = 16
             playButton.visible = false
             mouseArea.hoverEnabled = false
         }
@@ -29,10 +31,20 @@ Column {
 
     onPathChanged: {
         playButton.file = fileItem.path
+        deleteButton.file = fileItem.path
     }
 
     Row {
         spacing: 6
+        DeleteButton {
+            id: deleteButton
+            height: title.height
+            width: title.height
+            visible: fileItem.canDelete
+            onFileDeleted: {
+                parent.visible = false
+            }
+        }
         PlayButton {
             id: playButton
             height: title.height
@@ -61,7 +73,7 @@ Column {
             }
             Text {
                 id: title
-                font.pointSize: 14            
+                font.pointSize: 15
             }
         }
     }
@@ -71,6 +83,7 @@ Column {
         modelItem: fileItem.modelItem
         indent: fileItem.indent + 1
         model: fileItem.model
+        canDelete: fileItem.canDelete
         onFileClicked: (filePath) => {
             fileItem.fileClicked(filePath)
         }

@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Controls
-import by.intontrainer.file 1.0
 import QtQuick.Controls.Material 6.8
+
+import by.intontrainer.file 1.0
 
 import "../components"
 
@@ -21,6 +22,7 @@ Page {
         FileTreeView {
             model: fileApi.getFiles("data/records", ["*.wav"])
             path: "data/records"
+            canDelete: true
         }
     }
 }

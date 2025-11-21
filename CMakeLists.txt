@@ -46,6 +46,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/FileTreeView.qml
         ui/components/FileTreeViewItem.qml
         ui/components/PlayButton.qml
+        ui/components/DeleteButton.qml
         ${qml_singletons}
     RESOURCES
         res/fonts/fa-brands-400.woff2
