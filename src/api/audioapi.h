@@ -6,12 +6,14 @@
 #include <QAudioFormat>
 #include <QMediaDevices>
 #include "src/services/wavfileservice.h"
+#include "src/helpers/wavFile.h"
 
 #include <QMediaPlayer>
 
 class WavFileService;
+struct WaveFile;
 
-class AudioAPI : public QObject
+class AudioApi : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isRecording READ isRecording NOTIFY isRecordingChanged)
@@ -19,7 +21,7 @@ class AudioAPI : public QObject
     Q_PROPERTY(bool isPlaying READ isPlaying NOTIFY isPlayingChanged)
 
 public:
-    explicit AudioAPI(QObject *parent = nullptr);
+    explicit AudioApi(QObject *parent = nullptr);
 
     bool isRecording() const;
     qreal audioLevel() const;
@@ -28,7 +30,7 @@ public:
 public slots:
     Q_INVOKABLE void startRecording(int durationSeconds = -1);
     Q_INVOKABLE void stopRecording();
-    Q_INVOKABLE QString saveFile(QString fileName = "");
+    Q_INVOKABLE QString saveWavFile(QString fileName = "");
     Q_INVOKABLE void play(const QString& filePath);
     Q_INVOKABLE void stopPlayback();
 

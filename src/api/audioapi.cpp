@@ -14,7 +14,7 @@
 #include <QMediaPlayer>
 #include <QAudioOutput>
 
-AudioAPI::AudioAPI(QObject *parent) : QObject(parent)
+AudioApi::AudioApi(QObject *parent) : QObject(parent)
 {
     m_audioDevice = QMediaDevices::defaultAudioInput();
     m_format.setSampleRate(8000);
@@ -35,35 +35,35 @@ AudioAPI::AudioAPI(QObject *parent) : QObject(parent)
     });
 }
 
-bool AudioAPI::isRecording() const
+bool AudioApi::isRecording() const
 {
     return m_isRecording;
 }
 
-bool AudioAPI::isPlaying() const
+bool AudioApi::isPlaying() const
 {
     return m_isPlaying;
 }
 
-qreal AudioAPI::audioLevel() const
+qreal AudioApi::audioLevel() const
 {
     return m_audioLevel;
 }
 
-void AudioAPI::play(const QString& filePath)
+void AudioApi::play(const QString& filePath)
 {
-    qDebug() << "AudioAPI::play() " << filePath;
+    qDebug() << "AudioApi::play() " << filePath;
     QString fullPath = QDir(QCoreApplication::applicationDirPath()).filePath(filePath);
     m_player->setSource(QUrl::fromLocalFile(fullPath));
     m_player->play();
 }
 
-void AudioAPI::stopPlayback()
+void AudioApi::stopPlayback()
 {
     m_player->stop();
 }
 
-void AudioAPI::setAudioLevel(qreal level)
+void AudioApi::setAudioLevel(qreal level)
 {
     if (qFuzzyCompare(m_audioLevel, level))
         return;
@@ -71,7 +71,7 @@ void AudioAPI::setAudioLevel(qreal level)
     emit isAudioLevelChanged();
 }
 
-void AudioAPI::startRecording(int durationSeconds)
+void AudioApi::startRecording(int durationSeconds)
 {
     if (m_isRecording)
         return;
@@ -115,7 +115,7 @@ void AudioAPI::startRecording(int durationSeconds)
     qDebug() << "Recording started";
 }
 
-void AudioAPI::stopRecording()
+void AudioApi::stopRecording()
 {
     if (!m_isRecording)
         return;
@@ -131,11 +131,18 @@ void AudioAPI::stopRecording()
     qDebug() << "Recording stopped";
 }
 
-QString AudioAPI::saveFile(QString fileName)
+QString AudioApi::saveWavFile(QString fileName)
 {
     if (fileName.isEmpty()) {
         fileName = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH-mm-ss");
     }
 
-    return m_wavFileService->writeWaveFile(fileName, m_buffer, m_format);
-}
+        return m_wavFileService->writeWaveFile(fileName, m_buffer, m_format);
+
+    }
+
+    
+
+
+
+    

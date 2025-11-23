@@ -36,7 +36,7 @@ Page {
         onClicked: {
             if (audioApi.isRecording) {
                 audioApi.stopRecording()
-                lastRecordedFile = audioApi.saveFile()
+                lastRecordedFile = audioApi.saveWavFile()
             } else {
                 lastRecordedFile = ""
                 audioApi.startRecording()

@@ -22,7 +22,7 @@ Column {
     }
 
     onModelItemChanged: {
-        title.text = fileItem.modelItem
+        title.text = fileItem.modelItem.replace(".wav", "")
     }
 
     onIndentChanged: {
