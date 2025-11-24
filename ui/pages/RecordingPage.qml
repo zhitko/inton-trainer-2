@@ -26,7 +26,7 @@ Page {
         background: Label {
             font.family: Icons.familySolid
             font.bold: true
-            text: audioApi.isRecording ? Icons.faMicrophoneSlash : Icons.faMicrophone
+            text: audioApi.isRecording ? Icons.faMicrophoneLines : Icons.faMicrophone
             Material.foreground: audioApi.isRecording ? Material.DeepOrange : Material.primaryTextColor
             anchors.centerIn: parent
             font.pixelSize: parent.width / 2
