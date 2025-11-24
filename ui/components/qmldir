@@ -1,3 +1,5 @@
 FileTreeView FileTreeView.qml
 FileTreeViewItem FileTreeViewItem.qml
 PlayButton PlayButton.qml
+DeleteButton DeleteButton.qml
+WaveFormGraph WaveFormGraph.qml

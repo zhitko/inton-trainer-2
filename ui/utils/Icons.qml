@@ -7,21 +7,21 @@ Item {
     readonly property var fontBrands: loaderBrands.font
     FontLoader {
         id: loaderBrands
-        source: "../../res/fonts/fa-brands-400.woff2"
+        source: "../../res/fonts/fa-brands-400.ttf"
     }
 
     readonly property string familyRegular: loaderRegular.font.family
     readonly property var fontRegular: loaderRegular.font
     FontLoader {
         id: loaderRegular
-        source: "../../res/fonts/fa-regular-400.woff2"
+        source: "../../res/fonts/fa-regular-400.ttf"
     }
 
     readonly property string familySolid: loaderSolid.font.family
     readonly property var fontSolid: loaderSolid.font
     FontLoader {
         id: loaderSolid
-        source: "../../res/fonts/fa-solid-900.woff2"
+        source: "../../res/fonts/fa-solid-900.ttf"
     }
 
     readonly property string faBrandsFirefoxBrowser:  "\ue007"

@@ -49,11 +49,12 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/FileTreeViewItem.qml
         ui/components/PlayButton.qml
         ui/components/DeleteButton.qml
+        ui/components/WaveFormGraph.qml
         ${qml_singletons}
     RESOURCES
-        res/fonts/fa-brands-400.woff2
-        res/fonts/fa-regular-400.woff2
-        res/fonts/fa-solid-900.woff2
+        res/fonts/fa-brands-400.ttf
+        res/fonts/fa-regular-400.ttf
+        res/fonts/fa-solid-900.ttf
         res/icons/microphone_off.svg
         res/icons/microphone_on.svg
         res/icons/play.svg

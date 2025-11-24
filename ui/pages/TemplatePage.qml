@@ -10,7 +10,6 @@ import "../utils"
 
 Page {
     property string filePath: ""
-    property var wavFile: null
 
     title: filePath.substring(filePath.lastIndexOf('/') + 1)
 
@@ -20,19 +19,29 @@ Page {
 
     Component.onCompleted: {
         let wavFile = wavFileApi.openWavFile(filePath)
-        console.log("ui/pages/TemplatePage.qml:onCompleted wavFile", filePath)
         let cuePoints = wavFileApi.getCuePoints(wavFile)
-        console.log("ui/pages/TemplatePage.qml:onCompleted cuePoints", cuePoints)
+        let waveData = wavFileApi.getWaveData(wavFile)
+        waveFormGraph.waveData = waveData
+        waveFormGraph.cuePoints = cuePoints
     }
 
-    PlayButton {
-        id: playButton
-        anchors.top: parent.top
-        anchors.topMargin: 10
-        anchors.left: parent.left
-        anchors.leftMargin: 10
-        width: 32
-        height: 32
-        file: filePath
+    Column {
+        anchors.fill: parent
+        anchors.margins: 10
+        spacing: 10
+
+        PlayButton {
+            id: playButton
+            width: 32
+            height: 32
+            file: filePath
+        }
+
+        WaveFormGraph {
+            id: waveFormGraph
+            width: parent.width
+            height: 400
+        }
     }
+
 }
