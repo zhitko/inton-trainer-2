@@ -23,6 +23,10 @@ Page {
             model: fileApi.getFiles("data/records", ["*.wav"])
             path: "data/records"
             canDelete: true
+            onFileClicked: (filePath) => {
+                console.log("ui/pages/RecordsPage.qml:onFileClicked:", filePath)
+                stackView.push("TemplatePage.qml", { "filePath": filePath })
+            }
         }
     }
 }

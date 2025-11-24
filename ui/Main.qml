@@ -5,8 +5,8 @@ import QtQuick.Controls.Material 6.8
 
 ApplicationWindow {
     id: window
-    width: 412
-    height: 732
+    width: 400
+    height: 600
     visible: true
     title: qsTr("Inton Trainer")
 
@@ -54,10 +54,31 @@ ApplicationWindow {
             spacing: 10
             padding: 10
 
-            Label {
-                text: "Menu"
-                font.pixelSize: 24
-                padding: 10
+            RowLayout {
+
+                RoundButton {
+                    id: drawerCloseButton
+                    font.family: Icons.familySolid
+                    font.pixelSize: 24
+                    font.bold: true
+                    text: Icons.faAngleLeft
+                    onClicked: drawer.close()
+                    hoverEnabled: true
+                    Layout.fillWidth: false
+                    Layout.minimumWidth: height
+                    Layout.maximumWidth: height
+
+                    background: Rectangle {
+                        anchors.fill: parent
+                        radius: parent.radius
+                        color: drawerCloseButton.hovered ? Material.rippleColor : "transparent"
+                    }
+                }
+                Label {
+                    text: "Menu"
+                    font.pixelSize: 24
+                    Layout.fillWidth: true
+                }
             }
             ItemDelegate {
                 id: homeItemDelegate

@@ -49,13 +49,13 @@ Item {
                 var x = scaleX(cue.position);
                 var width = scaleX(cue.position + cue.sampleLength) - x;
 
-                if (cue.label.startsWith("P")) {
+                if (cue.label.toUpperCase().startsWith("P")) {
                     ctx.fillStyle = "rgba(237, 106, 90, 0.3)";
                     ctx.strokeStyle = "#ed6a5a";
-                } else if (cue.label.startsWith("N")) {
+                } else if (cue.label.toUpperCase().startsWith("N")) {
                     ctx.fillStyle = "rgba(244, 241, 187, 0.3)";
                     ctx.strokeStyle = "#f4f1bb";
-                } else if (cue.label.startsWith("T")) {
+                } else if (cue.label.toUpperCase().startsWith("T")) {
                     ctx.fillStyle = "rgba(155, 193, 188, 0.3)";
                     ctx.strokeStyle = "#9bc1bc";
                 } else {
