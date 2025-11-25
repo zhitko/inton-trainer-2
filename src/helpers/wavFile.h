@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <vector>
+#include <string>
 
 
 // The header of a wave file
@@ -107,7 +108,7 @@ WaveFile * initWaveFile();
 
 // Open WaveFile
 WaveFile * waveOpenHFile(int);
-WaveFile * waveOpenFile(const char*);
+WaveFile * waveOpenFile(const std::string&);
 
 // Create WaveFile functions
 WaveFile * makeWaveFile(
@@ -177,7 +178,7 @@ LablChunk * makeLablChunk(
 );
 
 // Save WaveFile
-void saveWaveFile(WaveFile *waveFile, const char *filePath);
+void saveWaveFile(WaveFile *waveFile, const std::string &filePath);
 
 // Close WaveFile
 void waveCloseFile(WaveFile*);

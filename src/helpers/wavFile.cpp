@@ -1,16 +1,16 @@
 #include "wavFile.h"
 
-#include <QDebug>
+#include <iostream>
 
 #include <string.h>
 #include <limits.h>
 #include <cfloat>
 
 
+
+
 #define INT32 littleEndianBytesToUInt32
 #define INT16 littleEndianBytesToUInt16
-#define CH4(c) c[0], c[1], c[2], c[3]
-#define CH2(c) c[0], c[1]
 
 #define INT3_MAX   8388607
 #define INT3_MIN   (-8388608)
@@ -48,7 +48,7 @@ WaveFile * waveOpenHFile(int handle)
     WaveFile * waveFile = initWaveFile();
     if(waveFile == nullptr)
     {
-        qDebug() << "[waveOpenHFile] Memory Allocation Error: Could not allocate memory for Wave File";
+        std::cout << "[waveOpenHFile] Memory Allocation Error: Could not allocate memory for Wave File" << std::endl;
         return nullptr;
     }
 
@@ -57,29 +57,30 @@ WaveFile * waveOpenHFile(int handle)
     waveFile->file = fdopen(handle, "rb");
     if(waveFile->file == nullptr)
     {
-        qDebug() << "[waveOpenHFile] Could not open input file " << waveFile->filePath;
+        std::cout << "[waveOpenHFile] Could not open input file " << waveFile->filePath << std::endl;
         waveCloseFile(waveFile);
         return nullptr;
     }
     return processFile(waveFile);
 }
 
-WaveFile * waveOpenFile(const char* path)
-{    
+WaveFile * waveOpenFile(const std::string& path)
+{
     WaveFile * waveFile = initWaveFile();
     if(waveFile == nullptr)
     {
-        qDebug() << "[waveOpenFile] Memory Allocation Error: Could not allocate memory for Wave File";
+        std::cout << "[waveOpenFile] Memory Allocation Error: Could not allocate memory for Wave File" << std::endl;
         return nullptr;
     }
 
-    waveFile->filePath = (char *)calloc(strlen(path)+1, sizeof(char));
-    strncpy(waveFile->filePath, path, strlen(path));
+    waveFile->filePath = (char *)calloc(path.length()+1, sizeof(char));
+    strncpy(waveFile->filePath, path.c_str(), path.length());
 
-    waveFile->file = fopen(waveFile->filePath, "rb");
+    waveFile->file = fopen(path.c_str(), "rb");
+
     if(waveFile->file == nullptr)
     {
-        qDebug() << "[waveOpenFile] Could not open input file " << waveFile->filePath;
+        std::cout << "[waveOpenFile] Could not open input file " << waveFile->filePath << std::endl;
         waveCloseFile(waveFile);
         return nullptr;
     }
@@ -94,7 +95,6 @@ WaveFile * waveOpenFile(const char* path)
 
     return waveFile;
 }
-
 WaveFile * processFile(WaveFile * waveFile)
 {
     ChunkLocation formatChunkExtraBytes = {0,0};
@@ -104,28 +104,28 @@ WaveFile * processFile(WaveFile * waveFile)
     waveFile->waveHeader = (WaveHeader *) malloc(sizeof(WaveHeader));
     if(waveFile->waveHeader == nullptr)
     {
-        qDebug() << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Header";
+        std::cout << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Header" << std::endl;
         waveCloseFile(waveFile);
         return nullptr;
     }
     fread(waveFile->waveHeader, sizeof(WaveHeader), 1, waveFile->file);
     if (ferror(waveFile->file) != 0)
     {
-        qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+        std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
         waveCloseFile(waveFile);
         return nullptr;
     }
 
     if (strncmp(&(waveFile->waveHeader->chunkID[0]), "RIFF", 4) != 0)
     {
-        qDebug() << "[processFile] Input file is not a RIFF file";
+        std::cout << "[processFile] Input file is not a RIFF file" << std::endl;
         waveCloseFile(waveFile);
         return nullptr;
     }
 
     if (strncmp(&(waveFile->waveHeader->riffType[0]), "WAVE", 4) != 0)
     {
-        qDebug() << "[processFile] Input file is not a WAVE file";
+        std::cout << "[processFile] Input file is not a WAVE file" << std::endl;
         waveCloseFile(waveFile);
         return nullptr;
     }
@@ -135,7 +135,7 @@ WaveFile * processFile(WaveFile * waveFile)
 
     if (size <= 0)
     {
-        qDebug() << "[processFile] Input file is an empty WAVE file";
+        std::cout << "[processFile] Input file is an empty WAVE file" << std::endl;
         waveCloseFile(waveFile);
         return nullptr;
     }
@@ -155,18 +155,18 @@ WaveFile * processFile(WaveFile * waveFile)
 
         if (ferror(waveFile->file) != 0)
         {
-            qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+            std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
             waveCloseFile(waveFile);
             return nullptr;
         }
 
         if (strncmp(&nextChunkID[0], "fmt ", 4) == 0)
         {
-            qDebug() << "[processFile] Found FMT chunk";
+            std::cout << "[processFile] Found FMT chunk" << std::endl;
             waveFile->formatChunk = (FormatChunk *)malloc(sizeof(FormatChunk));
             if (waveFile->formatChunk == NULL)
             {
-                qDebug() << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Format Chunk";
+                std::cout << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Format Chunk" << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -175,14 +175,14 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(waveFile->formatChunk, sizeof(FormatChunk), 1, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
 
             if (littleEndianBytesToUInt16(waveFile->formatChunk->compressionCode) != (uint16_t)1)
             {
-                qDebug() << "[processFile] Compressed audio formats are not supported";
+                std::cout << "[processFile] Compressed audio formats are not supported" << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -207,12 +207,12 @@ WaveFile * processFile(WaveFile * waveFile)
 
         else if (strncmp(&nextChunkID[0], "data", 4) == 0)
         {
-            qDebug() << "[processFile] Found DATA chunk";
+            std::cout << "[processFile] Found DATA chunk" << std::endl;
 
             waveFile->dataChunk = (DataChunk *)malloc(sizeof(DataChunk));
             if (waveFile->dataChunk == nullptr)
             {
-                qDebug() << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Data Chunk";
+                std::cout << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Data Chunk" << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -229,7 +229,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(sampleDataSizeBytes, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -244,7 +244,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(waveFile->dataChunk->waveformData, sampleDataSize, 1, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -258,13 +258,13 @@ WaveFile * processFile(WaveFile * waveFile)
 
         else if (strncmp(&nextChunkID[0], "cue ", 4) == 0)
         {
-            qDebug() << "[processFile] Found CUE chunk";
+            std::cout << "[processFile] Found CUE chunk" << std::endl;
 
             char cueChunkDataSizeBytes[4];
             fread(cueChunkDataSizeBytes, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -274,7 +274,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(cuePointsCountBytes, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -285,28 +285,28 @@ WaveFile * processFile(WaveFile * waveFile)
             for (uint32_t cuePointIndex = 0; cuePointIndex < cuePointsCount; cuePointIndex++)
             {
                 CuePoint * cue_point = &existingCuePoints[cuePointIndex];
-                qDebug() << "[processFile] Found CUE POINT " << cuePointIndex;
+                std::cout << "[processFile] Found CUE POINT " << cuePointIndex << std::endl;
                 fread(cue_point, sizeof(CuePoint), 1, waveFile->file);
                 if (ferror(waveFile->file) != 0)
                 {
-                    qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                    std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                     waveCloseFile(waveFile);
                     free(existingCuePoints);
                     return nullptr;
                 }
-                qDebug() << "[processFile] Read CUE POINT cuePointID " << INT32(cue_point->cuePointID);
-                qDebug() << "[processFile] Read CUE POINT playOrderPosition " << INT32(cue_point->playOrderPosition);
-                qDebug() << "[processFile] Read CUE POINT dataChunkID " << CH4(cue_point->dataChunkID);
-                qDebug() << "[processFile] Read CUE POINT chunkStart " << INT32(cue_point->chunkStart);
-                qDebug() << "[processFile] Read CUE POINT blockStart " << INT32(cue_point->blockStart);
-                qDebug() << "[processFile] Read CUE POINT frameOffset " << INT32(cue_point->frameOffset);
+                std::cout << "[processFile] Read CUE POINT cuePointID " << INT32(cue_point->cuePointID) << std::endl;
+                std::cout << "[processFile] Read CUE POINT playOrderPosition " << INT32(cue_point->playOrderPosition) << std::endl;
+                std::cout << "[processFile] Read CUE POINT dataChunkID " << cue_point->dataChunkID[0] << cue_point->dataChunkID[1] << cue_point->dataChunkID[2] << cue_point->dataChunkID[3] << std::endl;
+                std::cout << "[processFile] Read CUE POINT chunkStart " << INT32(cue_point->chunkStart) << std::endl;
+                std::cout << "[processFile] Read CUE POINT blockStart " << INT32(cue_point->blockStart) << std::endl;
+                std::cout << "[processFile] Read CUE POINT frameOffset " << INT32(cue_point->frameOffset) << std::endl;
             }
 
             // Populate the existingCueChunk struct
             waveFile->cueChunk = (CueChunk *) malloc(sizeof(CueChunk));
             if (waveFile->dataChunk == nullptr)
             {
-                qDebug() << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Cue Chunk";
+                std::cout << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Cue Chunk" << std::endl;
                 waveCloseFile(waveFile);
                 free(existingCuePoints);
                 return nullptr;
@@ -319,13 +319,13 @@ WaveFile * processFile(WaveFile * waveFile)
             uint32ToLittleEndianBytes(cuePointsCount, waveFile->cueChunk->cuePointsCount);
             waveFile->cueChunk->cuePoints = existingCuePoints;
 
-            qDebug() << "[processFile] Read CUE chunkID " << CH4(waveFile->cueChunk->chunkID);
-            qDebug() << "[processFile] Read CUE chunkDataSize " << INT32(waveFile->cueChunk->chunkDataSize);
-            qDebug() << "[processFile] Read CUE cuePointsCount " << INT32(waveFile->cueChunk->cuePointsCount);
+            std::cout << "[processFile] Read CUE chunkID " << waveFile->cueChunk->chunkID[0] << waveFile->cueChunk->chunkID[1] << waveFile->cueChunk->chunkID[2] << waveFile->cueChunk->chunkID[3] << std::endl;
+            std::cout << "[processFile] Read CUE chunkDataSize " << INT32(waveFile->cueChunk->chunkDataSize) << std::endl;
+            std::cout << "[processFile] Read CUE cuePointsCount " << INT32(waveFile->cueChunk->cuePointsCount) << std::endl;
         }
         else if (strncmp(&nextChunkID[0], "LIST", 4) == 0)
         {
-            qDebug() << "[processFile] Found LIST chunk";
+            std::cout << "[processFile] Found LIST chunk" << std::endl;
             // We found an existing List Chunk
             waveFile->listChunks = (ListChunk*)realloc(waveFile->listChunks, sizeof(ListChunk)*(waveFile->listCount+1));
 
@@ -335,7 +335,7 @@ WaveFile * processFile(WaveFile * waveFile)
 
             if (waveFile->dataChunk == nullptr)
             {
-                qDebug() << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Cue Chunk";
+                std::cout << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File Cue Chunk" << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -353,7 +353,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(listChunkDataSizeBytes, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -363,19 +363,19 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(listChunk->typeID, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
-            qDebug() << "[processFile] Read LIST chunkID " << CH4(listChunk->chunkID);
-            qDebug() << "[processFile] Read LIST chunkDataSize " << INT32(listChunk->chunkDataSize);
-            qDebug() << "[processFile] Read LIST typeID " << CH4(listChunk->typeID);
+            std::cout << "[processFile] Read LIST chunkID " << listChunk->chunkID[0] << listChunk->chunkID[1] << listChunk->chunkID[2] << listChunk->chunkID[3] << std::endl;
+            std::cout << "[processFile] Read LIST chunkDataSize " << INT32(listChunk->chunkDataSize) << std::endl;
+            std::cout << "[processFile] Read LIST typeID " << listChunk->typeID[0] << listChunk->typeID[1] << listChunk->typeID[2] << listChunk->typeID[3] << std::endl;
         }
         else if (strncmp(&nextChunkID[0], "ltxt", 4) == 0)
         {
-            qDebug() << "[processFile] Found LTXT chunk";
+            std::cout << "[processFile] Found LTXT chunk" << std::endl;
             ListChunk * listChunk = &(waveFile->listChunks[waveFile->listCount-1]);
-            qDebug() << "[processFile] listCount " << waveFile->listCount;
+            std::cout << "[processFile] listCount " << waveFile->listCount << std::endl;
 
             // We found an existing LTXT chunk in LIST chunk
             listChunk->ltxtChunks = (LtxtChunk *)realloc(listChunk->ltxtChunks, sizeof(LtxtChunk)*(listChunk->ltxtCount+1));
@@ -386,7 +386,7 @@ WaveFile * processFile(WaveFile * waveFile)
 
             if (ltxtChunk == nullptr)
             {
-                qDebug() << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File LABL chunk";
+                std::cout << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File LABL chunk" << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -399,7 +399,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(ltxtChunkDataSizeBytes, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -409,7 +409,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(ltxtChunk->cuePointID, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -417,7 +417,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(ltxtChunk->sampleLength, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -425,7 +425,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(ltxtChunk->purposeID, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -433,7 +433,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(ltxtChunk->country, sizeof(char), 2, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -441,7 +441,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(ltxtChunk->language, sizeof(char), 2, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -449,7 +449,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(ltxtChunk->dialect, sizeof(char), 2, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -457,12 +457,12 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(ltxtChunk->codePage, sizeof(char), 2, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
 
-            qDebug() << "[processFile] LTXT dataSize " << ltxtChunkDataSize;
+            std::cout << "[processFile] LTXT dataSize " << ltxtChunkDataSize << std::endl;
 
             ltxtChunkDataSize = to_odd(ltxtChunkDataSize);
 
@@ -470,25 +470,25 @@ WaveFile * processFile(WaveFile * waveFile)
                 ltxtChunk->text = (char *) malloc(ltxtChunkDataSize-20);
                 fread(ltxtChunk->text, ltxtChunkDataSize-20, 1, waveFile->file);
 
-                qDebug() << "[processFile] LTXT text " << ltxtChunk->text;
+                std::cout << "[processFile] LTXT text " << ltxtChunk->text << std::endl;
             } else {
                 ltxtChunk->text = nullptr;
 
-                qDebug() << "[processFile] LTXT text <skip>";
+                std::cout << "[processFile] LTXT text <skip>" << std::endl;
             }
-            qDebug() << "[processFile] Read LTXT chunkID " << CH4(ltxtChunk->chunkID);
-            qDebug() << "[processFile] Read LTXT chunkDataSize " << INT32(ltxtChunk->chunkDataSize);
-            qDebug() << "[processFile] Read LTXT cuePointID " << INT32(ltxtChunk->cuePointID);
-            qDebug() << "[processFile] Read LTXT sampleLength " << INT32(ltxtChunk->sampleLength);
-            qDebug() << "[processFile] Read LTXT purposeID " << CH4(ltxtChunk->purposeID);
-            qDebug() << "[processFile] Read LTXT country " << INT16(ltxtChunk->country);
-            qDebug() << "[processFile] Read LTXT language " << INT16(ltxtChunk->language);
-            qDebug() << "[processFile] Read LTXT dialect " << INT16(ltxtChunk->dialect);
-            qDebug() << "[processFile] Read LTXT codePage " << INT16(ltxtChunk->codePage);
+            std::cout << "[processFile] Read LTXT chunkID " << ltxtChunk->chunkID[0] << ltxtChunk->chunkID[1] << ltxtChunk->chunkID[2] << ltxtChunk->chunkID[3] << std::endl;
+            std::cout << "[processFile] Read LTXT chunkDataSize " << INT32(ltxtChunk->chunkDataSize) << std::endl;
+            std::cout << "[processFile] Read LTXT cuePointID " << INT32(ltxtChunk->cuePointID) << std::endl;
+            std::cout << "[processFile] Read LTXT sampleLength " << INT32(ltxtChunk->sampleLength) << std::endl;
+            std::cout << "[processFile] Read LTXT purposeID " << ltxtChunk->purposeID[0] << ltxtChunk->purposeID[1] << ltxtChunk->purposeID[2] << ltxtChunk->purposeID[3] << std::endl;
+            std::cout << "[processFile] Read LTXT country " << INT16(ltxtChunk->country) << std::endl;
+            std::cout << "[processFile] Read LTXT language " << INT16(ltxtChunk->language) << std::endl;
+            std::cout << "[processFile] Read LTXT dialect " << INT16(ltxtChunk->dialect) << std::endl;
+            std::cout << "[processFile] Read LTXT codePage " << INT16(ltxtChunk->codePage) << std::endl;
         }
         else if (strncmp(&nextChunkID[0], "labl", 4) == 0)
         {
-            qDebug() << "[processFile] Found LABL chunk";
+            std::cout << "[processFile] Found LABL chunk" << std::endl;
             ListChunk * listChunk = &waveFile->listChunks[waveFile->listCount-1];
 
             // We found an existing LABL chunk in LIST chunk
@@ -500,7 +500,7 @@ WaveFile * processFile(WaveFile * waveFile)
 
             if (lablChunk == nullptr)
             {
-                qDebug() << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File LABL chunk";
+                std::cout << "[processFile] Memory Allocation Error: Could not allocate memory for Wave File LABL chunk" << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -513,7 +513,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(lablChunkDataSizeBytes, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -523,12 +523,12 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(lablChunk->cuePointID, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
 
-            qDebug() << "[processFile] LABL dataSize " << lablChunkDataSize;
+            std::cout << "[processFile] LABL dataSize " << lablChunkDataSize << std::endl;
 
             lablChunkDataSize = to_odd(lablChunkDataSize);
 
@@ -537,19 +537,19 @@ WaveFile * processFile(WaveFile * waveFile)
                 lablChunk->text = (char *) malloc(lablChunkDataSize - 4);
                 fread(lablChunk->text, sizeof(char), lablChunkDataSize - 4, waveFile->file);
 
-                qDebug() << "[processFile] LABL text " << lablChunk->text;
+                std::cout << "[processFile] LABL text " << lablChunk->text << std::endl;
             } else {
                 lablChunk->text = nullptr;
 
-                qDebug() << "[processFile] LABL text <skip>";
+                std::cout << "[processFile] LABL text <skip>" << std::endl;
             }
-            qDebug() << "[processFile] Read LABL chunkID " << CH4(lablChunk->chunkID);
-            qDebug() << "[processFile] Read LABL chunkDataSize " << INT32(lablChunk->chunkDataSize);
-            qDebug() << "[processFile] Read LABL cuePointID " << INT32(lablChunk->cuePointID);
+            std::cout << "[processFile] Read LABL chunkID " << lablChunk->chunkID[0] << lablChunk->chunkID[1] << lablChunk->chunkID[2] << lablChunk->chunkID[3] << std::endl;
+            std::cout << "[processFile] Read LABL chunkDataSize " << INT32(lablChunk->chunkDataSize) << std::endl;
+            std::cout << "[processFile] Read LABL cuePointID " << INT32(lablChunk->cuePointID) << std::endl;
         }
         else
         {
-            qDebug() << "[processFile] Found unsuppoted chunk " << nextChunkID;
+            std::cout << "[processFile] Found unsuppoted chunk " << nextChunkID << std::endl;
             // We have found a chunk type that we are not going to work with.
             // ISFTL
             // IENGL
@@ -560,7 +560,7 @@ WaveFile * processFile(WaveFile * waveFile)
             fread(chunkDataSizeBytes, sizeof(char), 4, waveFile->file);
             if (ferror(waveFile->file) != 0)
             {
-                qDebug() << "[processFile] Error reading input file " << waveFile->filePath;
+                std::cout << "[processFile] Error reading input file " << waveFile->filePath << std::endl;
                 waveCloseFile(waveFile);
                 return nullptr;
             }
@@ -1006,62 +1006,65 @@ WaveFile * makeWaveFileFromRawData(
     );
 }
 
-void saveWaveFile(WaveFile *waveFile, const char *filePath)
+void saveWaveFile(WaveFile *waveFile, const std::string &filePath)
 {
-    if (filePath != nullptr)
+    if (!filePath.empty())
     {
-        waveFile->filePath = (char *)malloc(1 + strlen(filePath));
-        strcpy(waveFile->filePath, filePath);
+        waveFile->filePath = (char *)malloc(1 + filePath.length());
+        strcpy(waveFile->filePath, filePath.c_str());
     }
-    if (waveFile->file == nullptr) waveFile->file = fopen(filePath, "wb");
     if (waveFile->file == nullptr)
     {
-        qDebug() << "[saveWaveFile] Could not open output file " << filePath;
+        waveFile->file = fopen(filePath.c_str(), "wb");
+    }
+    if (waveFile->file == nullptr)
+    {
+        std::cerr << "[saveWaveFile] Could not open output file " << filePath << std::endl;
         return;
     }
     if (waveFile->waveHeader != nullptr)
     {
-        qDebug() << "[saveWaveFile] Write HEADER chunk";
+        std::cout << "[saveWaveFile] Write HEADER chunk" << std::endl;
         if (fwrite(waveFile->waveHeader, sizeof(WaveHeader), 1, waveFile->file) < 1)
         {
-            qDebug() << "[saveWaveFile] Error writing header to output file";
+            std::cerr << "[saveWaveFile] Error writing header to output file" << std::endl;
             return;
         }
     }
     if (waveFile->formatChunk != nullptr)
     {
-        qDebug() << "[saveWaveFile] Write FMT chunk";
+        std::cout << "[saveWaveFile] Write FMT chunk" << std::endl;
         if (fwrite(waveFile->formatChunk, sizeof(FormatChunk), 1, waveFile->file) < 1)
         {
-            qDebug() << "[saveWaveFile] Error writing format chunk to output file";
+            std::cerr << "[saveWaveFile] Error writing format chunk to output file" << std::endl;
             return;
         }
     }
     if (waveFile->dataChunk != nullptr)
     {
-        qDebug() << "[saveWaveFile] Write DATA chunk";
+        std::cout << "[saveWaveFile] Write DATA chunk" << std::endl;
         uint32_t dataChunkSize = littleEndianBytesToUInt32(waveFile->dataChunk->chunkDataSize);
         if (fwrite(waveFile->dataChunk->chunkID, sizeof(char), 4, waveFile->file) < 1)
         {
-            qDebug() << "[saveWaveFile] Error writing data chunk (chunkID) to output file";
+            std::cerr << "[saveWaveFile] Error writing data chunk (chunkID) to output file" << std::endl;
             return;
         }
         if (fwrite(waveFile->dataChunk->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
         {
-            qDebug() << "[saveWaveFile] Error writing data chunk (chunkDataSize) to output file";
+            std::cerr << "[saveWaveFile] Error writing data chunk (chunkDataSize) to output file" << std::endl;
             return;
         }
         if (fwrite(waveFile->dataChunk->waveformData, dataChunkSize, 1, waveFile->file) < 1)
         {
-            qDebug() << "[saveWaveFile] Size data chunk (waveformData) " << dataChunkSize;
-            qDebug() << "[saveWaveFile] Error writing data chunk (waveformData) to output file";
+            std::cerr << "[saveWaveFile] Size data chunk (waveformData) " << dataChunkSize << std::endl;
+            std::cerr << "[saveWaveFile] Error writing data chunk (waveformData) to output file" << std::endl;
             return;
         }
         if (dataChunkSize % 2 != 0)
         {
             if (fwrite("\0", sizeof(char), 1, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing padding character to output file";
+                std::cerr << "[saveWaveFile] Error writing padding character to output file" << std::endl;
                 return;
 
             }
@@ -1069,228 +1072,228 @@ void saveWaveFile(WaveFile *waveFile, const char *filePath)
     }
     if  (waveFile->cueChunk != nullptr)
     {
-        qDebug() << "[saveWaveFile] Write CUE chunk";
+        std::cout << "[saveWaveFile] Write CUE chunk" << std::endl;
         CueChunk * cue_chunk = waveFile->cueChunk;
 
-        qDebug() << "[saveWaveFile] Write CUE chunkID " << CH4(cue_chunk->chunkID);
+        std::cout << "[saveWaveFile] Write CUE chunkID " << cue_chunk->chunkID[0] << cue_chunk->chunkID[1] << cue_chunk->chunkID[2] << cue_chunk->chunkID[3] << std::endl;
         if (fwrite(cue_chunk->chunkID, sizeof(char), 4, waveFile->file) < 1)
         {
-            qDebug() << "[saveWaveFile] Error writing cue chunk (chunkID) to output file";
+            std::cerr << "[saveWaveFile] Error writing cue chunk (chunkID) to output file" << std::endl;
             return;
         }
 
-        qDebug() << "[saveWaveFile] Write CUE chunkDataSize " << INT32(cue_chunk->chunkDataSize);
+        std::cout << "[saveWaveFile] Write CUE chunkDataSize " << INT32(cue_chunk->chunkDataSize) << std::endl;
         if (fwrite(cue_chunk->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
         {
-            qDebug() << "[saveWaveFile] Error writing cue chunk (chunkDataSize) to output file";
+            std::cerr << "[saveWaveFile] Error writing cue chunk (chunkDataSize) to output file" << std::endl;
             return;
         }
 
-        qDebug() << "[saveWaveFile] Write CUE cuePointsCount " << INT32(cue_chunk->cuePointsCount);
+        std::cout << "[saveWaveFile] Write CUE cuePointsCount " << INT32(cue_chunk->cuePointsCount) << std::endl;
         if (fwrite(cue_chunk->cuePointsCount, sizeof(char), 4, waveFile->file) < 1)
         {
-            qDebug() << "[saveWaveFile] Error writing cue chunk (cuePointsCount) to output file";
+            std::cerr << "[saveWaveFile] Error writing cue chunk (cuePointsCount) to output file" << std::endl;
             return;
         }
 
         uint32_t cuePointsCount = littleEndianBytesToUInt32(cue_chunk->cuePointsCount);
         for (uint32_t i=0; i<cuePointsCount; i++)
         {
-            qDebug() << "[saveWaveFile] Write CUE POINT " << i;
+            std::cout << "[saveWaveFile] Write CUE POINT " << i << std::endl;
             CuePoint * cue_point = &cue_chunk->cuePoints[i];
 
-            qDebug() << "[saveWaveFile] Write CUE POINT cuePointID " << INT32(cue_point->cuePointID);
+            std::cout << "[saveWaveFile] Write CUE POINT cuePointID " << INT32(cue_point->cuePointID) << std::endl;
             if (fwrite(cue_point->cuePointID, sizeof(char), 4, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing cue point (cuePointID) to output file";
+                std::cerr << "[saveWaveFile] Error writing cue point (cuePointID) to output file" << std::endl;
                 return;
             }
 
-            qDebug() << "[saveWaveFile] Write CUE POINT playOrderPosition " << INT32(cue_point->playOrderPosition);
+            std::cout << "[saveWaveFile] Write CUE POINT playOrderPosition " << INT32(cue_point->playOrderPosition) << std::endl;
             if (fwrite(cue_point->playOrderPosition, sizeof(char), 4, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing cue point (playOrderPosition) to output file";
+                std::cerr << "[saveWaveFile] Error writing cue point (playOrderPosition) to output file" << std::endl;
                 return;
             }
 
-            qDebug() << "[saveWaveFile] Write CUE POINT dataChunkID " << CH4(cue_point->dataChunkID);
+            std::cout << "[saveWaveFile] Write CUE POINT dataChunkID " << cue_point->dataChunkID[0] << cue_point->dataChunkID[1] << cue_point->dataChunkID[2] << cue_point->dataChunkID[3] << std::endl;
             if (fwrite(cue_point->dataChunkID, sizeof(char), 4, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing cue point (dataChunkID) to output file";
+                std::cerr << "[saveWaveFile] Error writing cue point (dataChunkID) to output file" << std::endl;
                 return;
             }
 
-            qDebug() << "[saveWaveFile] Write CUE POINT chunkStart " << INT32(cue_point->chunkStart);
+            std::cout << "[saveWaveFile] Write CUE POINT chunkStart " << INT32(cue_point->chunkStart) << std::endl;
             if (fwrite(cue_point->chunkStart, sizeof(char), 4, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing cue point (chunkStart) to output file";
+                std::cerr << "[saveWaveFile] Error writing cue point (chunkStart) to output file" << std::endl;
                 return;
             }
 
-            qDebug() << "[saveWaveFile] Write CUE POINT blockStart " << INT32(cue_point->blockStart);
+            std::cout << "[saveWaveFile] Write CUE POINT blockStart " << INT32(cue_point->blockStart) << std::endl;
             if (fwrite(cue_point->blockStart, sizeof(char), 4, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing cue point (blockStart) to output file";
+                std::cerr << "[saveWaveFile] Error writing cue point (blockStart) to output file" << std::endl;
                 return;
             }
 
-            qDebug() << "[saveWaveFile] Write CUE POINT frameOffset " << INT32(cue_point->frameOffset);
+            std::cout << "[saveWaveFile] Write CUE POINT frameOffset " << INT32(cue_point->frameOffset) << std::endl;
             if (fwrite(cue_point->frameOffset, sizeof(char), 4, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing cue point (frameOffset) to output file";
+                std::cerr << "[saveWaveFile] Error writing cue point (frameOffset) to output file" << std::endl;
                 return;
             }
         }
     }
     if  (waveFile->listChunks != nullptr)
     {
-        qDebug() << "[saveWaveFile] Write LIST chunk";
+        std::cout << "[saveWaveFile] Write LIST chunk" << std::endl;
         for (int listChunkIndex=0; listChunkIndex<waveFile->listCount; listChunkIndex++)
         {
             ListChunk * list_chunk = &waveFile->listChunks[listChunkIndex];
 
             if (list_chunk->lablCount == 0 && list_chunk->ltxtCount == 0) continue;
 
-            qDebug() << "[saveWaveFile] Write LIST chunkID " << CH4(list_chunk->chunkID);
+            std::cout << "[saveWaveFile] Write LIST chunkID " << list_chunk->chunkID[0] << list_chunk->chunkID[1] << list_chunk->chunkID[2] << list_chunk->chunkID[3] << std::endl;
             if (fwrite(list_chunk->chunkID, sizeof(char), 4, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing list chunk (chunkID) to output file";
+                std::cerr << "[saveWaveFile] Error writing list chunk (chunkID) to output file" << std::endl;
                 return;
             }
 
-            qDebug() << "[saveWaveFile] Write LIST chunkDataSize " << INT32(list_chunk->chunkDataSize);
+            std::cout << "[saveWaveFile] Write LIST chunkDataSize " << INT32(list_chunk->chunkDataSize) << std::endl;
             if (fwrite(list_chunk->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing list chunk (chunkDataSize) to output file";
+                std::cerr << "[saveWaveFile] Error writing list chunk (chunkDataSize) to output file" << std::endl;
                 return;
             }
 
-            qDebug() << "[saveWaveFile] Write LIST typeID " << CH4(list_chunk->typeID);
+            std::cout << "[saveWaveFile] Write LIST typeID " << list_chunk->typeID[0] << list_chunk->typeID[1] << list_chunk->typeID[2] << list_chunk->typeID[3] << std::endl;
             if (fwrite(list_chunk->typeID, sizeof(char), 4, waveFile->file) < 1)
             {
-                qDebug() << "[saveWaveFile] Error writing list chunk (typeID) to output file";
+                std::cerr << "[saveWaveFile] Error writing list chunk (typeID) to output file" << std::endl;
                 return;
             }
 
             for( int i=0; i<list_chunk->ltxtCount; i++)
             {
-                qDebug() << "[saveWaveFile] Write LTXT chunk " << i;
+                std::cout << "[saveWaveFile] Write LTXT chunk " << i << std::endl;
                 LtxtChunk * ltxt_chank = &list_chunk->ltxtChunks[i];
 
-                qDebug() << "[saveWaveFile] Write LTXT chunkID " << CH4(ltxt_chank->chunkID);
+                std::cout << "[saveWaveFile] Write LTXT chunkID " << ltxt_chank->chunkID[0] << ltxt_chank->chunkID[1] << ltxt_chank->chunkID[2] << ltxt_chank->chunkID[3] << std::endl;
                 if (fwrite(ltxt_chank->chunkID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LTXT chunk (chunkID) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (chunkID) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LTXT chunkDataSize " << INT32(ltxt_chank->chunkDataSize);
+                std::cout << "[saveWaveFile] Write LTXT chunkDataSize " << INT32(ltxt_chank->chunkDataSize) << std::endl;
                 if (fwrite(ltxt_chank->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LTXT chunk (chunkDataSize) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (chunkDataSize) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LTXT cuePointID " << INT32(ltxt_chank->cuePointID);
+                std::cout << "[saveWaveFile] Write LTXT cuePointID " << INT32(ltxt_chank->cuePointID) << std::endl;
                 if (fwrite(ltxt_chank->cuePointID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LTXT chunk (cuePointID) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (cuePointID) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LTXT sampleLength " << INT32(ltxt_chank->sampleLength);
+                std::cout << "[saveWaveFile] Write LTXT sampleLength " << INT32(ltxt_chank->sampleLength) << std::endl;
                 if (fwrite(ltxt_chank->sampleLength, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LTXT chunk (sampleLength) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (sampleLength) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LTXT purposeID " << CH4(ltxt_chank->purposeID);
+                std::cout << "[saveWaveFile] Write LTXT purposeID " << ltxt_chank->purposeID[0] << ltxt_chank->purposeID[1] << ltxt_chank->purposeID[2] << ltxt_chank->purposeID[3] << std::endl;
                 if (fwrite(ltxt_chank->purposeID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LTXT chunk (purposeID) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (purposeID) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LTXT country " << INT16(ltxt_chank->country);
+                std::cout << "[saveWaveFile] Write LTXT country " << INT16(ltxt_chank->country) << std::endl;
                 if (fwrite(ltxt_chank->country, sizeof(char), 2, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LTXT chunk (country) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (country) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LTXT language " << INT16(ltxt_chank->language);
+                std::cout << "[saveWaveFile] Write LTXT language " << INT16(ltxt_chank->language) << std::endl;
                 if (fwrite(ltxt_chank->language, sizeof(char), 2, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LTXT chunk (language) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (language) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LTXT dialect " << INT16(ltxt_chank->dialect);
+                std::cout << "[saveWaveFile] Write LTXT dialect " << INT16(ltxt_chank->dialect) << std::endl;
                 if (fwrite(ltxt_chank->dialect, sizeof(char), 2, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LTXT chunk (dialect) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (dialect) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LTXT codePage " << INT16(ltxt_chank->codePage);
+                std::cout << "[saveWaveFile] Write LTXT codePage " << INT16(ltxt_chank->codePage) << std::endl;
                 if (fwrite(ltxt_chank->codePage, sizeof(char), 2, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LTXT chunk (codePage) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (codePage) to output file" << std::endl;
                     return;
                 }
 
                 if (ltxt_chank->text)
                 {
-                    qDebug() << "[saveWaveFile] Write LTXT text " << ltxt_chank->text;
+                    std::cout << "[saveWaveFile] Write LTXT text " << ltxt_chank->text << std::endl;
                     uint32_t size = littleEndianBytesToUInt32(ltxt_chank->chunkDataSize) - 20;
                     if (fwrite(ltxt_chank->text, sizeof(char), size, waveFile->file) < 1)
                     {
-                        qDebug() << "[saveWaveFile] Error writing LTXT chunk (text) to output file";
+                        std::cerr << "[saveWaveFile] Error writing LTXT chunk (text) to output file" << std::endl;
                         return;
                     }
                 } else {
-                    qDebug() << "[saveWaveFile] LTXT text <skip>";
+                    std::cout << "[saveWaveFile] LTXT text <skip>" << std::endl;
                 }
             }
 
             for(int i=0; i<list_chunk->lablCount; i++)
             {
-                qDebug() << "[saveWaveFile] Write LABL chunk " << i;
+                std::cout << "[saveWaveFile] Write LABL chunk " << i << std::endl;
                 LablChunk * labl_chank = &list_chunk->lablChunks[i];
 
-                qDebug() << "[saveWaveFile] Write LABL chunkID " << CH4(labl_chank->chunkID);
+                std::cout << "[saveWaveFile] Write LABL chunkID " << labl_chank->chunkID[0] << labl_chank->chunkID[1] << labl_chank->chunkID[2] << labl_chank->chunkID[3] << std::endl;
                 if (fwrite(labl_chank->chunkID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LABL chunk (chunkID) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LABL chunk (chunkID) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LABL chunkDataSize " << INT32(labl_chank->chunkDataSize);
+                std::cout << "[saveWaveFile] Write LABL chunkDataSize " << INT32(labl_chank->chunkDataSize) << std::endl;
                 if (fwrite(labl_chank->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LABL chunk (chunkDataSize) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LABL chunk (chunkDataSize) to output file" << std::endl;
                     return;
                 }
 
-                qDebug() << "[saveWaveFile] Write LABL cuePointID " << INT32(labl_chank->cuePointID);
+                std::cout << "[saveWaveFile] Write LABL cuePointID " << INT32(labl_chank->cuePointID) << std::endl;
                 if (fwrite(labl_chank->cuePointID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    qDebug() << "[saveWaveFile] Error writing LABL chunk (cuePointID) to output file";
+                    std::cerr << "[saveWaveFile] Error writing LABL chunk (cuePointID) to output file" << std::endl;
                     return;
                 }
 
                 if (labl_chank->text)
                 {
-                    qDebug() << "[saveWaveFile] Write LABL text " << labl_chank->text;
+                    std::cout << "[saveWaveFile] Write LABL text " << labl_chank->text << std::endl;
                     uint32_t size = littleEndianBytesToUInt32(labl_chank->chunkDataSize) - 4;
                     if(fwrite(labl_chank->text, sizeof(char), size, waveFile->file) < 1)
                     {
-                        qDebug() << "[saveWaveFile] Error writing LABL chunk (text) to output file";
+                        std::cerr << "[saveWaveFile] Error writing LABL chunk (text) to output file" << std::endl;
                         return;
                     }
                 } else {
-                    qDebug() << "[saveWaveFile] LABL text <skip>";
+                    std::cout << "[saveWaveFile] LABL text <skip>" << std::endl;
                 }
             }
         }
@@ -1414,19 +1417,19 @@ std::vector<double> waveformDataToVector(void *data, uint32_t byteSize, uint16_t
     int numSamples = byteSize / (bitDepth / 8);
 
     if (bitDepth == 16) {
-        qDebug() << "bit depth" << bitDepth;
+        std::cout << "bit depth" << bitDepth << std::endl;
         int16_t *data_int16 = static_cast<int16_t*>(data);
         for (int i = 0; i < numSamples; i++) {
             samples.push_back(static_cast<double>(data_int16[i]) / 32768.0);
         }
     } else if (bitDepth == 8) {
-        qDebug() << "bit depth" << bitDepth;
+        std::cout << "bit depth" << bitDepth << std::endl;
         uint8_t *data_int8 = static_cast<uint8_t*>(data);
         for (int i = 0; i < numSamples; i++) {
             samples.push_back((static_cast<double>(data_int8[i]) - 128.0) / 128.0);
         }
     } else if (bitDepth == 24) {
-        qDebug() << "bit depth" << bitDepth;
+        std::cout << "bit depth" << bitDepth << std::endl;
         int8_t* data_int8 = static_cast<int8_t*>(data);
         for (int i = 0; i < numSamples; i++)
         {
@@ -1441,13 +1444,13 @@ std::vector<double> waveformDataToVector(void *data, uint32_t byteSize, uint16_t
             samples.push_back(static_cast<double>(value) / 8388608.0);
         }
     } else if (bitDepth == 32) {
-        qDebug() << "bit depth" << bitDepth;
+        std::cout << "bit depth" << bitDepth << std::endl;
         int32_t *data_int32 = static_cast<int32_t*>(data);
         for (int i = 0; i < numSamples; i++) {
             samples.push_back(static_cast<double>(data_int32[i]) / 2147483648.0);
         }
     } else {
-        qDebug() << "Unsupported bit depth:" << bitDepth;
+        std::cout << "Unsupported bit depth:" << bitDepth << std::endl;
     }
 
     return samples;

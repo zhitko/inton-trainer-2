@@ -1,6 +1,6 @@
 #include "wavfileservice.h"
 #include "../helpers/wavFile.h"
-#include <QDebug>
+#include <iostream>
 #include <QDir>
 #include <QCoreApplication>
 
@@ -55,9 +55,9 @@ QString WavFileService::writeWaveFile(const QString &fileName, const QByteArray 
         0
     );
 
-    saveWaveFile(waveFile, absoluteFilePath.toStdString().c_str());
+    saveWaveFile(waveFile, absoluteFilePath.toStdString());
     waveCloseFile(waveFile);
 
-    qDebug() << "Saved to:" << absoluteFilePath;
+    std::cout << "Saved to:" << absoluteFilePath.toStdString() << std::endl;
     return relativeFilePath;
 }
