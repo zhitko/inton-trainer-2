@@ -6,6 +6,13 @@
 #include <limits.h>
 #include <cfloat>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <string>
+#include <codecvt>
+#include <locale>
+#endif
+
 
 
 
@@ -76,7 +83,13 @@ WaveFile * waveOpenFile(const std::string& path)
     waveFile->filePath = (char *)calloc(path.length()+1, sizeof(char));
     strncpy(waveFile->filePath, path.c_str(), path.length());
 
+#ifdef _WIN32
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring wide_path = converter.from_bytes(path);
+    waveFile->file = _wfopen(wide_path.c_str(), L"rb");
+#else
     waveFile->file = fopen(path.c_str(), "rb");
+#endif
 
     if(waveFile->file == nullptr)
     {
@@ -1015,7 +1028,13 @@ void saveWaveFile(WaveFile *waveFile, const std::string &filePath)
     }
     if (waveFile->file == nullptr)
     {
+#ifdef _WIN32
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+        std::wstring wide_path = converter.from_bytes(filePath);
+        waveFile->file = _wfopen(wide_path.c_str(), L"wb");
+#else
         waveFile->file = fopen(filePath.c_str(), "wb");
+#endif
     }
     if (waveFile->file == nullptr)
     {
