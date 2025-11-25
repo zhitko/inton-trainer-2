@@ -23,13 +23,15 @@ Page {
         height: 100
         radius: 50
 
+        hoverEnabled: true
+
         background: Label {
             font.family: Icons.familySolid
             font.bold: true
             text: audioApi.isRecording ? Icons.faMicrophoneLines : Icons.faMicrophone
             Material.foreground: audioApi.isRecording ? Material.DeepOrange : Material.primaryTextColor
             anchors.centerIn: parent
-            font.pixelSize: parent.width / 2
+            font.pixelSize: recordButton.hovered ? parent.width / 2 + 5 : parent.width / 2
             horizontalAlignment: Label.AlignHCenter
         }
 
@@ -55,11 +57,29 @@ Page {
     }
 
     PlayButton {
+        id: playButton
         anchors.top: volumeIndicator.bottom
         anchors.topMargin: 5
         anchors.horizontalCenter: parent.horizontalCenter
         width: 50
         height: 50
         file: lastRecordedFile
+        showLabel: true
+    }
+
+    CustomButton {
+        id: openButton
+        anchors.top: playButton.bottom
+        anchors.topMargin: 5
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: 50
+        height: 50
+        visible: !!lastRecordedFile
+        showLabel: true
+        label: Icons.faWaveSquare + " Open"
+        onClicked: {
+            console.log("ui/pages/RecordsPage.qml:onFileClicked:", lastRecordedFile)
+            stackView.push("TemplatePage.qml", { "filePath": lastRecordedFile })
+        }
     }
 }

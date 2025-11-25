@@ -35,6 +35,7 @@ Page {
             width: 32
             height: 32
             file: filePath
+            showLabel: true
         }
 
         WaveFormGraph {

@@ -48,6 +48,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/FileTreeView.qml
         ui/components/FileTreeViewItem.qml
         ui/components/PlayButton.qml
+        ui/components/CustomButton.qml
         ui/components/DeleteButton.qml
         ui/components/WaveFormGraph.qml
         ${qml_singletons}
