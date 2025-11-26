@@ -18,67 +18,34 @@ QVariantList WavFileApi::getCuePoints(WaveFile* waveFile)
 {
     qDebug() << "getCuePoints called";
     QVariantList cuePoints;
-    if (!waveFile || !waveFile->cueChunk) {
-        qDebug() << "WaveFile or CueChunk is null";
-        return cuePoints;
-    }
+    
+    std::vector<CuePointData> points = WavFileService::readCuePoints(waveFile);
+    qDebug() << "Found" << points.size() << "cue points";
 
-    uint32_t cuePointsCount = littleEndianBytesToUInt32(waveFile->cueChunk->cuePointsCount);
-    qDebug() << "Found" << cuePointsCount << "cue points";
-    for (uint32_t i = 0; i < cuePointsCount; ++i) {
+    for (const auto& cp : points) {
         QVariantMap cuePoint;
-        CuePoint *cp = &waveFile->cueChunk->cuePoints[i];
-        uint32_t cuePointID = littleEndianBytesToUInt32(cp->cuePointID);
-        cuePoint["id"] = cuePointID;
-        cuePoint["position"] = littleEndianBytesToUInt32(cp->playOrderPosition);
-        cuePoint["chunkStart"] = littleEndianBytesToUInt32(cp->chunkStart);
-        cuePoint["blockStart"] = littleEndianBytesToUInt32(cp->blockStart);
-        cuePoint["frameOffset"] = littleEndianBytesToUInt32(cp->frameOffset);
-
-        // Find associated label
-        QString label = "";
-        bool ltxtFound = false;
-        if (waveFile->listCount > 0) {
-            for (uint32_t j = 0; j < waveFile->listCount; ++j) {
-                ListChunk *listChunk = &waveFile->listChunks[j];
-                if (label.isEmpty()) {
-                    for (uint32_t k = 0; k < listChunk->lablCount; ++k) {
-                        LablChunk *lablChunk = &listChunk->lablChunks[k];
-                        if (littleEndianBytesToUInt32(lablChunk->cuePointID) == cuePointID) {
-                            label = QString(lablChunk->text);
-                            break;
-                        }
-                    }
-                }
-
-                if (!ltxtFound) {
-                    for (uint32_t k = 0; k < listChunk->ltxtCount; ++k) {
-                        LtxtChunk *ltxtChunk = &listChunk->ltxtChunks[k];
-                        if (littleEndianBytesToUInt32(ltxtChunk->cuePointID) == cuePointID) {
-                            cuePoint["sampleLength"] = littleEndianBytesToUInt32(ltxtChunk->sampleLength);
-                            cuePoint["purposeID"] = QString(QByteArray(ltxtChunk->purposeID, 4));
-                            cuePoint["country"] = littleEndianBytesToUInt16(ltxtChunk->country);
-                            cuePoint["language"] = littleEndianBytesToUInt16(ltxtChunk->language);
-                            cuePoint["dialect"] = littleEndianBytesToUInt16(ltxtChunk->dialect);
-                            cuePoint["codePage"] = littleEndianBytesToUInt16(ltxtChunk->codePage);
-                            cuePoint["text"] = QString(ltxtChunk->text);
-                            ltxtFound = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!label.isEmpty() && ltxtFound) {
-                    break;
-                }
-            }
+        cuePoint["id"] = cp.id;
+        cuePoint["position"] = cp.position;
+        cuePoint["chunkStart"] = cp.chunkStart;
+        cuePoint["blockStart"] = cp.blockStart;
+        cuePoint["frameOffset"] = cp.frameOffset;
+        cuePoint["label"] = QString::fromStdString(cp.label);
+        
+        if (cp.sampleLength > 0 || !cp.text.empty()) {
+             cuePoint["sampleLength"] = cp.sampleLength;
+             cuePoint["purposeID"] = QString::fromStdString(cp.purposeID);
+             cuePoint["country"] = cp.country;
+             cuePoint["language"] = cp.language;
+             cuePoint["dialect"] = cp.dialect;
+             cuePoint["codePage"] = cp.codePage;
+             cuePoint["text"] = QString::fromStdString(cp.text);
         }
-        cuePoint["label"] = label;
-        qDebug() << "Cue Point" << i 
-                 << ": ID=" << cuePointID 
-                 << "Label=" << label 
-                 << "Position=" << cuePoint["position"].toUInt()
-                 << "Sample Length=" << cuePoint["sampleLength"].toUInt();
+
+        qDebug() << "Cue Point" 
+                 << ": ID=" << cp.id
+                 << "Label=" << cuePoint["label"].toString()
+                 << "Position=" << cp.position
+                 << "Sample Length=" << cp.sampleLength;
 
         cuePoints.append(cuePoint);
     }

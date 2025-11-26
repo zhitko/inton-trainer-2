@@ -64,3 +64,88 @@ std::vector<double> WavFileService::readWaveData(WaveFile *waveFile)
     samples = waveformDataToVector(data, dataSize, bitDepth);
     return samples;
 }
+
+std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
+{
+    std::cout << "readCuePoints called" << std::endl;
+    std::vector<CuePointData> cuePoints;
+    if (!waveFile || !waveFile->cueChunk) {
+        std::cout << "WaveFile or CueChunk is null" << std::endl;
+        return cuePoints;
+    }
+
+    uint32_t cuePointsCount = littleEndianBytesToUInt32(waveFile->cueChunk->cuePointsCount);
+    std::cout << "Found " << cuePointsCount << " cue points" << std::endl;
+
+    for (uint32_t i = 0; i < cuePointsCount; ++i) {
+        CuePointData cuePoint;
+        CuePoint *cp = &waveFile->cueChunk->cuePoints[i];
+        
+        cuePoint.id = littleEndianBytesToUInt32(cp->cuePointID);
+        cuePoint.position = littleEndianBytesToUInt32(cp->playOrderPosition);
+        cuePoint.chunkStart = littleEndianBytesToUInt32(cp->chunkStart);
+        cuePoint.blockStart = littleEndianBytesToUInt32(cp->blockStart);
+        cuePoint.frameOffset = littleEndianBytesToUInt32(cp->frameOffset);
+        
+        // Initialize optional fields
+        cuePoint.sampleLength = 0;
+        cuePoint.country = 0;
+        cuePoint.language = 0;
+        cuePoint.dialect = 0;
+        cuePoint.codePage = 0;
+
+        // Find associated label
+        std::string label = "";
+        bool ltxtFound = false;
+        if (waveFile->listCount > 0) {
+            for (uint32_t j = 0; j < waveFile->listCount; ++j) {
+                ListChunk *listChunk = &waveFile->listChunks[j];
+                if (label.empty()) {
+                    for (uint32_t k = 0; k < listChunk->lablCount; ++k) {
+                        LablChunk *lablChunk = &listChunk->lablChunks[k];
+                        if (littleEndianBytesToUInt32(lablChunk->cuePointID) == cuePoint.id) {
+                            if (lablChunk->text) {
+                                label = std::string(lablChunk->text);
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if (!ltxtFound) {
+                    for (uint32_t k = 0; k < listChunk->ltxtCount; ++k) {
+                        LtxtChunk *ltxtChunk = &listChunk->ltxtChunks[k];
+                        if (littleEndianBytesToUInt32(ltxtChunk->cuePointID) == cuePoint.id) {
+                            cuePoint.sampleLength = littleEndianBytesToUInt32(ltxtChunk->sampleLength);
+                            cuePoint.purposeID = std::string(ltxtChunk->purposeID, 4);
+                            cuePoint.country = littleEndianBytesToUInt16(ltxtChunk->country);
+                            cuePoint.language = littleEndianBytesToUInt16(ltxtChunk->language);
+                            cuePoint.dialect = littleEndianBytesToUInt16(ltxtChunk->dialect);
+                            cuePoint.codePage = littleEndianBytesToUInt16(ltxtChunk->codePage);
+                            if (ltxtChunk->text) {
+                                cuePoint.text = std::string(ltxtChunk->text);
+                            }
+                            ltxtFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!label.empty() && ltxtFound) {
+                    break;
+                }
+            }
+        }
+        cuePoint.label = label;
+        
+        std::cout << "Cue Point " << i 
+                  << ": ID=" << cuePoint.id 
+                  << " Label=" << cuePoint.label 
+                  << " Position=" << cuePoint.position
+                  << " Sample Length=" << cuePoint.sampleLength << std::endl;
+
+        cuePoints.push_back(cuePoint);
+    }
+
+    return cuePoints;
+}
