@@ -48,3 +48,19 @@ std::string WavFileService::writeWaveFile(const std::string &fileName, const std
     std::cout << "Saved to:" << absoluteFilePath.string() << std::endl;
     return relativePath.string();
 }
+
+std::vector<double> WavFileService::readWaveData(WaveFile *waveFile)
+{
+    std::vector<double> samples;
+    if (!waveFile || !waveFile->dataChunk) {
+        std::cerr << "WaveFile or DataChunk is null" << std::endl;
+        return samples;
+    }
+
+    void *data = waveFile->dataChunk->waveformData;
+    uint32_t dataSize = littleEndianBytesToUInt32(waveFile->dataChunk->chunkDataSize);
+    uint16_t bitDepth = littleEndianBytesToUInt16(waveFile->formatChunk->significantBitsPerSample);
+
+    samples = waveformDataToVector(data, dataSize, bitDepth);
+    return samples;
+}

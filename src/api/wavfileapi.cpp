@@ -1,4 +1,5 @@
 #include "wavfileapi.h"
+#include "src/services/wavfileservice.h"
 #include <QDebug>
 #include <QPointF>
 
@@ -90,16 +91,8 @@ QVariantList WavFileApi::getWaveData(WaveFile* waveFile)
 {
     qDebug() << "getWaveData called";
     QVariantList waveData;
-    if (!waveFile || !waveFile->dataChunk) {
-        qDebug() << "WaveFile or DataChunk is null";
-        return waveData;
-    }
-
-    void *data = waveFile->dataChunk->waveformData;
-    uint32_t dataSize = littleEndianBytesToUInt32(waveFile->dataChunk->chunkDataSize);
-    uint16_t bitDepth = littleEndianBytesToUInt16(waveFile->formatChunk->significantBitsPerSample);
-
-    std::vector<double> samples = waveformDataToVector(data, dataSize, bitDepth);
+    
+    std::vector<double> samples = WavFileService::readWaveData(waveFile);
     
     for (size_t i = 0; i < samples.size(); ++i) {
         waveData.append(QPointF(i, samples[i]));
