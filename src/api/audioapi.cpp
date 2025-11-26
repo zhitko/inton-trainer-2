@@ -20,7 +20,7 @@ AudioApi::AudioApi(QObject *parent) : QObject(parent)
     m_format.setSampleRate(8000);
     m_format.setChannelCount(1);
     m_format.setSampleFormat(QAudioFormat::Int16);
-    m_wavFileService = new WavFileService(this);
+    m_wavFileService = std::make_unique<WavFileService>(QCoreApplication::applicationDirPath().toStdString());
 
     m_player = new QMediaPlayer(this);
     QAudioOutput *audioOutput = new QAudioOutput(this);
@@ -137,9 +137,25 @@ QString AudioApi::saveWavFile(QString fileName)
         fileName = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH-mm-ss");
     }
 
-        return m_wavFileService->writeWaveFile(fileName, m_buffer, m_format);
-
+    std::vector<char> buffer(m_buffer.begin(), m_buffer.end());
+    
+    int bitsPerSample = 16;
+    switch (m_format.sampleFormat()) {
+        case QAudioFormat::UInt8: bitsPerSample = 8; break;
+        case QAudioFormat::Int16: bitsPerSample = 16; break;
+        case QAudioFormat::Int32: bitsPerSample = 32; break;
+        case QAudioFormat::Float: bitsPerSample = 32; break;
+        default: bitsPerSample = 16;
     }
+
+    AudioFormat format;
+    format.sampleRate = m_format.sampleRate();
+    format.channelCount = m_format.channelCount();
+    format.bitsPerSample = bitsPerSample;
+
+    std::string result = m_wavFileService->writeWaveFile(fileName.toStdString(), buffer, format);
+    return QString::fromStdString(result);
+}
 
     
 

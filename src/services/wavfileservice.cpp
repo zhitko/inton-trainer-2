@@ -1,48 +1,35 @@
 #include "wavfileservice.h"
 #include "../helpers/wavFile.h"
 #include <iostream>
-#include <QDir>
-#include <QCoreApplication>
+#include <filesystem>
 
-WavFileService::WavFileService(QObject *parent) : QObject(parent)
+namespace fs = std::filesystem;
+
+WavFileService::WavFileService(const std::string &rootPath) : m_rootPath(rootPath)
 {
-
 }
 
-uint16_t sampleFormatToBitsPerSample(QAudioFormat::SampleFormat sampleFormat)
+std::string WavFileService::writeWaveFile(const std::string &fileName, const std::vector<char> &buffer, const AudioFormat &format)
 {
-    switch (sampleFormat) {
-    case QAudioFormat::UInt8:
-        return 8;
-    case QAudioFormat::Int16:
-        return 16;
-    case QAudioFormat::Int32:
-        return 32;
-    case QAudioFormat::Float:
-        return 32;
-    default:
-        return 0;
-    }
-}
+    fs::path appDir(m_rootPath);
+    fs::path recordsDir = appDir / "data" / "records";
 
-QString WavFileService::writeWaveFile(const QString &fileName, const QByteArray &buffer, const QAudioFormat &format)
-{
-    QDir appDir(QCoreApplication::applicationDirPath());
-    QString recordsPath = "data/records";
-    if (!appDir.exists(recordsPath)) {
-        appDir.mkpath(recordsPath);
+    if (!fs::exists(recordsDir)) {
+        fs::create_directories(recordsDir);
     }
 
-    QString relativeFilePath = recordsPath + "/" + fileName + ".wav";
-    QString absoluteFilePath = appDir.filePath(relativeFilePath);
+    fs::path relativePath = fs::path("data") / "records" / (fileName + ".wav");
+    fs::path absoluteFilePath = appDir / relativePath;
 
     WaveHeader *waveHeader = makeWaveHeader(buffer.size());
     FormatChunk *formatChunk = makeFormatChunk(
-        format.channelCount(),
-        format.sampleRate(),
-        sampleFormatToBitsPerSample(format.sampleFormat())
+        format.channelCount,
+        format.sampleRate,
+        format.bitsPerSample
     );
-    DataChunk *dataChunk = makeDataChunk(buffer.size(), (char*)buffer.data());
+    
+    // Cast constness away because makeDataChunk expects char* but likely doesn't modify it (it copies).
+    DataChunk *dataChunk = makeDataChunk(buffer.size(), const_cast<char*>(buffer.data()));
 
     WaveFile *waveFile = makeWaveFile(
         waveHeader,
@@ -55,9 +42,9 @@ QString WavFileService::writeWaveFile(const QString &fileName, const QByteArray 
         0
     );
 
-    saveWaveFile(waveFile, absoluteFilePath.toStdString());
+    saveWaveFile(waveFile, absoluteFilePath.string());
     waveCloseFile(waveFile);
 
-    std::cout << "Saved to:" << absoluteFilePath.toStdString() << std::endl;
-    return relativeFilePath;
+    std::cout << "Saved to:" << absoluteFilePath.string() << std::endl;
+    return relativePath.string();
 }

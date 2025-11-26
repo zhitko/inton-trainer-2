@@ -7,6 +7,7 @@
 #include <QMediaDevices>
 #include "src/services/wavfileservice.h"
 #include "src/helpers/wavFile.h"
+#include <memory>
 
 #include <QMediaPlayer>
 
@@ -48,7 +49,7 @@ private:
     QByteArray m_buffer;
     bool m_isRecording = false;
     qreal m_audioLevel = 0.0;
-    WavFileService *m_wavFileService;
+    std::unique_ptr<WavFileService> m_wavFileService;
     QMediaPlayer *m_player = nullptr;
     bool m_isPlaying = false;
 };

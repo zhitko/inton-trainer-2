@@ -1,19 +1,25 @@
 #ifndef WAVFILESERVICE_H
 #define WAVFILESERVICE_H
 
-#include <QObject>
-#include <QFile>
-#include <QAudioFormat>
+#include <string>
+#include <vector>
+#include <cstdint>
 
-class WavFileService : public QObject
+struct AudioFormat {
+    int sampleRate;
+    int channelCount;
+    int bitsPerSample;
+};
+
+class WavFileService
 {
-    Q_OBJECT
 public:
-    explicit WavFileService(QObject *parent = nullptr);
+    explicit WavFileService(const std::string &rootPath);
 
-    Q_INVOKABLE QString writeWaveFile(const QString &fileName, const QByteArray &buffer, const QAudioFormat &format);
+    std::string writeWaveFile(const std::string &fileName, const std::vector<char> &buffer, const AudioFormat &format);
+
 private:
-    void writeWavHeader(QIODevice *device, const QAudioFormat &format, qint64 dataSize);
+    std::string m_rootPath;
 };
 
 #endif // WAVFILESERVICE_H
