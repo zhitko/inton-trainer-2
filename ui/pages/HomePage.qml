@@ -7,7 +7,7 @@ import "../components/cards"
 Page {
     title: "Home"
 
-    Material.theme: themeSwitch.checked ? Material.Dark : Material.Light
+    Material.theme: window.theme
 
     Column {
         anchors.fill: parent
@@ -49,6 +49,7 @@ Page {
                 icon.font.bold: true
                 icon.text: Icons.faGear
                 width: parent.width
+                onClicked: stackView.push("SettingsPage.qml")
             }
         }
     }

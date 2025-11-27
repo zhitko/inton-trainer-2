@@ -3,6 +3,8 @@ import QtQuick.Controls 6.8
 import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material 6.8
 
+import by.intontrainer.settings 1.0
+
 ApplicationWindow {
     id: window
     width: 400
@@ -10,7 +12,22 @@ ApplicationWindow {
     visible: true
     title: qsTr("Inton Trainer")
 
-    Material.theme: themeSwitch.checked ? Material.Dark : Material.Light
+    SettingsApi {
+        id: settingsApi
+        onThemeChanged: {
+            window.theme = getTheme();
+        }
+    }
+
+    property alias settingsApi: settingsApi
+
+    function getTheme() {
+        return settingsApi.theme === "dark" ? Material.Dark : (settingsApi.theme === "light" ? Material.Light : Material.System);
+    }
+
+    property var theme: getTheme()
+
+    Material.theme: window.theme
 
     header: ToolBar {
         contentHeight: 56
@@ -85,8 +102,8 @@ ApplicationWindow {
                 text: "Home"
                 width: parent.width - parent.padding
                 onClicked: {
-                    onClicked: stackView.push("pages/HomePage.qml")
-                    drawer.close()
+                    onClicked: stackView.push("pages/HomePage.qml");
+                    drawer.close();
                 }
                 contentItem: RowLayout {
                     spacing: 10
@@ -109,8 +126,8 @@ ApplicationWindow {
                 text: "Templates"
                 width: parent.width - parent.padding
                 onClicked: {
-                    onClicked: stackView.push("pages/TemplatesPage.qml")
-                    drawer.close()
+                    onClicked: stackView.push("pages/TemplatesPage.qml");
+                    drawer.close();
                 }
                 contentItem: RowLayout {
                     spacing: 10
@@ -134,8 +151,8 @@ ApplicationWindow {
                 text: "My Records"
                 width: parent.width - parent.padding
                 onClicked: {
-                    onClicked: stackView.push("pages/RecordsPage.qml")
-                    drawer.close()
+                    onClicked: stackView.push("pages/RecordsPage.qml");
+                    drawer.close();
                 }
                 contentItem: RowLayout {
                     spacing: 10
@@ -155,6 +172,31 @@ ApplicationWindow {
                     }
                 }
             }
+            ItemDelegate {
+                text: "Settings"
+                width: parent.width - parent.padding
+                onClicked: {
+                    stackView.push("pages/SettingsPage.qml");
+                    drawer.close();
+                }
+                contentItem: RowLayout {
+                    spacing: 10
+                    Text {
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                        font.family: Icons.familySolid
+                        font.bold: true
+                        text: Icons.faGear
+                        color: Material.primaryTextColor
+                    }
+                    Text {
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                        Layout.fillWidth: true
+                        text: parent.parent.text
+                        font: parent.parent.font
+                        color: Material.primaryTextColor
+                    }
+                }
+            }
 
             RowLayout {
                 width: parent.width - parent.padding * 2
@@ -162,8 +204,11 @@ ApplicationWindow {
                     text: "Dark Mode"
                 }
                 Switch {
-                    id: themeSwitch
-                    checked: false // Default to light mode
+                    checked: window.theme === Material.Dark
+                    onCheckedChanged: {
+                        settingsApi.theme = checked ? "dark" : "light";
+                        settingsApi.save();
+                    }
                 }
             }
         }

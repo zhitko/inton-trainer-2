@@ -24,14 +24,7 @@ Page {
         waveFormGraph.cuePoints = cuePoints;
 
         // Extract pitch data
-        let pitchData = wavFileApi.getPitch(wavFile, "Harvest"      // algorithm
-        , 80.0        // frame shift
-        , 16000.0     // sample rate
-        , 20.0        // min F0
-        , 600.0       // max F0
-        , 0.3         // voicing threshold
-        , "PITCH"         // output format
-        );
+        let pitchData = wavFileApi.getPitch(wavFile, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH");
         pitchWaveFormGraph.waveData = pitchData;
     }
 

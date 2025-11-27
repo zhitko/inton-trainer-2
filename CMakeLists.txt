@@ -16,6 +16,10 @@ qt_add_executable(appinton-trainer-2
     src/api/fileapi.cpp
     src/api/wavfileapi.h
     src/api/wavfileapi.cpp
+    src/api/settingsapi.h
+    src/api/settingsapi.cpp
+    src/api/helpers/settings.h
+    src/api/helpers/settings.cpp
     src/services/wavfileservice.h
     src/services/wavfileservice.cpp
     src/services/pitchservice.h
@@ -51,6 +55,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/pages/RecordsPage.qml
         ui/pages/TemplatesPage.qml
         ui/pages/TemplatePage.qml
+        ui/pages/SettingsPage.qml
         ui/components/cards/Card.qml
         ui/components/FileTreeView.qml
         ui/components/FileTreeViewItem.qml

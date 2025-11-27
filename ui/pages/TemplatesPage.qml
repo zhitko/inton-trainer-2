@@ -9,7 +9,7 @@ Page {
     id: templatesPage
     title: "Templates"
 
-    Material.theme: themeSwitch.checked ? Material.Dark : Material.Light
+    Material.theme: window.theme
 
     FileApi {
         id: fileApi
@@ -22,9 +22,11 @@ Page {
         FileTreeView {
             model: fileApi.getFiles("data/templates", ["*.wav"])
             path: "data/templates"
-            onFileClicked: (filePath) => {
-                console.log("ui/pages/TemplatesPage.qml:onFileClicked:", filePath)
-                stackView.push("TemplatePage.qml", { "filePath": filePath })
+            onFileClicked: filePath => {
+                console.log("ui/pages/TemplatesPage.qml:onFileClicked:", filePath);
+                stackView.push("TemplatePage.qml", {
+                    "filePath": filePath
+                });
             }
         }
     }

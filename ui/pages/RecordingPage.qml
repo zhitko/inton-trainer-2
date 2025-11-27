@@ -10,7 +10,7 @@ import "../components"
 Page {
     property string lastRecordedFile: ""
 
-    Material.theme: themeSwitch.checked ? Material.Dark : Material.Light
+    Material.theme: window.theme
 
     AudioApi {
         id: audioApi
