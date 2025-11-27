@@ -1,0 +1,102 @@
+#include "pitchservice.h"
+#include <iostream>
+#include <cmath>
+#include "SPTK/analysis/pitch_extraction.h"
+
+PitchService::PitchService() {
+}
+
+PitchService::~PitchService() {
+}
+
+std::vector<double> PitchService::getPitch(
+    const std::vector<double>& inputWaveData,
+    PitchAlgorithm algorithm,
+    double frameShift,
+    double sampleRate,
+    double minF0,
+    double maxF0,
+    double voicingThreshold,
+    PitchOutputFormat outputFormat
+) {
+    std::vector<double> result;
+
+    // Map PitchAlgorithm to SPTK's Algorithms
+    sptk::PitchExtraction::Algorithms sptkAlgorithm;
+    switch (algorithm) {
+        case PitchAlgorithm::RAPT:
+            sptkAlgorithm = sptk::PitchExtraction::kRapt;
+            break;
+        case PitchAlgorithm::SWIPE:
+            sptkAlgorithm = sptk::PitchExtraction::kSwipe;
+            break;
+        case PitchAlgorithm::REAPER:
+            sptkAlgorithm = sptk::PitchExtraction::kReaper;
+            break;
+        case PitchAlgorithm::DIO:
+            sptkAlgorithm = sptk::PitchExtraction::kDio;
+            break;
+        case PitchAlgorithm::Harvest:
+            sptkAlgorithm = sptk::PitchExtraction::kHarvest;
+            break;
+        case PitchAlgorithm::NumAlgorithm:
+            sptkAlgorithm = sptk::PitchExtraction::kNumAlgorithms;
+            break;
+        default:
+            std::cerr << "Unknown algorithm" << std::endl;
+            return result;
+    }
+
+    // Create PitchExtraction instance
+    // Note: frame_shift is in samples (points)
+    int frameShiftSamples = static_cast<int>(frameShift);
+    sptk::PitchExtraction pitchExtractor(
+        frameShiftSamples,
+        sampleRate,
+        minF0,
+        maxF0,
+        voicingThreshold,
+        sptkAlgorithm
+    );
+
+    if (!pitchExtractor.IsValid()) {
+        std::cerr << "PitchExtraction initialization failed" << std::endl;
+        return result;
+    }
+
+    // Run pitch extraction
+    std::vector<double> f0;
+    std::vector<double> epochs;
+    sptk::PitchExtractionInterface::Polarity polarity;
+    
+    if (!pitchExtractor.Run(inputWaveData, &f0, &epochs, &polarity)) {
+        std::cerr << "Pitch extraction failed" << std::endl;
+        return result;
+    }
+
+    // Convert output format
+    switch (outputFormat) {
+        case PitchOutputFormat::PITCH:
+        case PitchOutputFormat::F0:
+            // F0 values are already in Hz, return as is
+            result = f0;
+            break;
+        case PitchOutputFormat::LOG_F0:
+            // Convert to log(F0)
+            result.reserve(f0.size());
+            for (double value : f0) {
+                if (value > 0.0) {
+                    result.push_back(std::log(value));
+                } else {
+                    // For unvoiced frames (F0 = 0), keep as 0 or use a sentinel value
+                    result.push_back(0.0);
+                }
+            }
+            break;
+        default:
+            std::cerr << "Unknown output format" << std::endl;
+            return result;
+    }
+
+    return result;
+}

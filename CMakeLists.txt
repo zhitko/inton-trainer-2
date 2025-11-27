@@ -18,6 +18,8 @@ qt_add_executable(appinton-trainer-2
     src/api/wavfileapi.cpp
     src/services/wavfileservice.h
     src/services/wavfileservice.cpp
+    src/services/pitchservice.h
+    src/services/pitchservice.cpp
     src/helpers/wavFile.h
     src/helpers/wavFile.cpp
 )
@@ -26,6 +28,9 @@ target_include_directories(appinton-trainer-2 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/api
     ${CMAKE_CURRENT_SOURCE_DIR}/src/services
 )
+
+set(SPTK_BUILD_COMMANDS OFF CACHE BOOL "Build SPTK commands" FORCE)
+add_subdirectory(3rdparty/SPTK)
 
 set(qml_singletons
     ui/utils/Icons.qml
@@ -66,7 +71,7 @@ set_target_properties(appinton-trainer-2 PROPERTIES
 )
 
 target_link_libraries(appinton-trainer-2
-    PRIVATE Qt6::Quick Qt6::Multimedia
+    PRIVATE Qt6::Quick Qt6::Multimedia sptk
 )
 
 include(GNUInstallDirs)

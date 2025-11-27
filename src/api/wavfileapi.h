@@ -17,6 +17,14 @@ public slots:
     Q_INVOKABLE WaveFile* openWavFile(const QString& filePath);
     Q_INVOKABLE QVariantList getCuePoints(WaveFile* waveFile);
     Q_INVOKABLE QVariantList getWaveData(WaveFile* waveFile);
+    Q_INVOKABLE QVariantList getPitch(WaveFile* waveFile,
+                                      const QString& algorithm,
+                                      double frameShift,
+                                      double sampleRate,
+                                      double minF0,
+                                      double maxF0,
+                                      double voicingThreshold,
+                                      const QString& outputFormat);
 };
 
 #endif // WAVFILEAPI_H
