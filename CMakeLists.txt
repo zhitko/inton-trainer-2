@@ -22,6 +22,8 @@ qt_add_executable(appinton-trainer-2
     src/services/pitchservice.cpp
     src/services/helpers/wavFile.h
     src/services/helpers/wavFile.cpp
+    src/services/helpers/vectorutils.h
+    src/services/helpers/vectorutils.cpp
 )
 
 target_include_directories(appinton-trainer-2 PRIVATE 

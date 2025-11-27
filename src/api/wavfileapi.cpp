@@ -1,6 +1,7 @@
 #include "wavfileapi.h"
 #include "src/services/wavfileservice.h"
 #include "src/services/pitchservice.h"
+#include "src/services/helpers/vectorutils.h"
 #include <QDebug>
 #include <QPointF>
 #include <limits>
@@ -140,37 +141,12 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
         format
     );
     
-    // Normalize pitch data to 0-1 range
+    // Normalize pitch data to 0-1 range using VectorUtils
     if (!pitch.empty()) {
-        // Find min and max values (excluding zeros for unvoiced frames)
-        double minVal = std::numeric_limits<double>::max();
-        double maxVal = std::numeric_limits<double>::lowest();
+        std::vector<double> normalizedPitch = VectorUtils::normalizeTo(1.0, pitch);
         
-        for (double value : pitch) {
-            if (value > 0.0) {  // Only consider voiced frames
-                if (value < minVal) minVal = value;
-                if (value > maxVal) maxVal = value;
-            }
-        }
-        
-        // Normalize if we have valid range
-        if (minVal < maxVal) {
-            for (size_t i = 0; i < pitch.size(); ++i) {
-                double normalizedValue;
-                if (pitch[i] > 0.0) {
-                    // Normalize voiced frames to 0-1 range
-                    normalizedValue = (pitch[i] - minVal) / (maxVal - minVal);
-                } else {
-                    // Keep unvoiced frames at 0
-                    normalizedValue = 0.0;
-                }
-                pitchData.append(QPointF(i, normalizedValue));
-            }
-        } else {
-            // All values are the same or all unvoiced, keep as-is
-            for (size_t i = 0; i < pitch.size(); ++i) {
-                pitchData.append(QPointF(i, pitch[i]));
-            }
+        for (size_t i = 0; i < normalizedPitch.size(); ++i) {
+            pitchData.append(QPointF(i, normalizedPitch[i]));
         }
     }
     
