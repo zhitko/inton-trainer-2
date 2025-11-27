@@ -1,5 +1,5 @@
 #include "wavfileservice.h"
-#include "../helpers/wavFile.h"
+#include "helpers/wavFile.h"
 #include <iostream>
 #include <filesystem>
 

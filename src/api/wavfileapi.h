@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QVariant>
-#include "src/helpers/wavFile.h"
+#include "src/services/helpers/wavFile.h"
 
 struct WaveFile;
 

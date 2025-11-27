@@ -6,7 +6,7 @@
 #include <QAudioFormat>
 #include <QMediaDevices>
 #include "src/services/wavfileservice.h"
-#include "src/helpers/wavFile.h"
+#include "src/services/helpers/wavFile.h"
 #include <memory>
 
 #include <QMediaPlayer>
