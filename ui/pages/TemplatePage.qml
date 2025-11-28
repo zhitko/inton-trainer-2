@@ -28,35 +28,40 @@ Page {
         pitchWaveFormGraph.waveData = pitchData;
     }
 
-    Column {
+    ScrollView {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 10
+        contentWidth: availableWidth
 
-        PlayButton {
-            id: playButton
-            width: 32
-            height: 32
-            file: filePath
-            showLabel: true
-        }
-
-        WaveFormGraph {
-            id: waveFormGraph
+        Column {
             width: parent.width
-            height: 300
-        }
+            spacing: 10
 
-        Text {
-            text: "Pitch (F0)"
-            font.pixelSize: 14
-            font.bold: true
-        }
+            PlayButton {
+                id: playButton
+                width: 32
+                height: 32
+                file: filePath
+                showLabel: true
+            }
 
-        WaveFormGraph {
-            id: pitchWaveFormGraph
-            width: parent.width
-            height: 200
+            WaveFormGraph {
+                id: waveFormGraph
+                width: parent.width
+                height: 300
+            }
+
+            Text {
+                text: "Pitch (F0)"
+                font.pixelSize: 14
+                font.bold: true
+            }
+
+            WaveFormGraph {
+                id: pitchWaveFormGraph
+                width: parent.width
+                height: 200
+            }
         }
     }
 }
