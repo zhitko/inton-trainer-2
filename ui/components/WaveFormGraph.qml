@@ -24,10 +24,10 @@ Item {
             // Find min/max for scaling
             var minX = root.waveData[0].x;
             var maxX = root.waveData[root.waveData.length - 1].x;
-            
+
             // Assuming audio sample values are normalized between -1 and 1
-            var minY = -1.0;
-            var maxY = 1.0;
+            var minY = -0.1;
+            var maxY = 1.1;
 
             function scaleX(x) {
                 return (x - minX) / (maxX - minX) * canvas.width;
@@ -38,7 +38,7 @@ Item {
                 var scaledY = (y - minY) / (maxY - minY);
                 return canvas.height * (1 - scaledY);
             }
-            
+
             // Draw cue points
             ctx.lineWidth = 1;
             ctx.font = "10px sans-serif";
@@ -74,11 +74,11 @@ Item {
                 ctx.fillStyle = "black";
                 ctx.fillText(cue.label, x + width / 2, canvas.height - 5);
             }
-            
+
             ctx.beginPath();
             ctx.moveTo(scaleX(root.waveData[0].x), scaleY(root.waveData[0].y));
 
-            for (var i = 1; i < root.waveData.length; i+=8) {
+            for (var i = 1; i < root.waveData.length; i += 2) {
                 ctx.lineTo(scaleX(root.waveData[i].x), scaleY(root.waveData[i].y));
             }
 

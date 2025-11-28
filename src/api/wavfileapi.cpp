@@ -63,9 +63,10 @@ QVariantList WavFileApi::getWaveData(WaveFile* waveFile)
     QVariantList waveData;
     
     std::vector<double> samples = WavFileService::readWaveData(waveFile);
+    std::vector<double> normalizedSamples = VectorUtils::normalizeFromTo(0.0, 1.0, samples);
     
-    for (size_t i = 0; i < samples.size(); ++i) {
-        waveData.append(QPointF(i, samples[i]));
+    for (size_t i = 0; i < normalizedSamples.size(); ++i) {
+        waveData.append(QPointF(i, normalizedSamples[i]));
     }
     
     qDebug() << "getWaveData finished";

@@ -1437,15 +1437,17 @@ std::vector<double> waveformDataToVector(void *data, uint32_t byteSize, uint16_t
 
     if (bitDepth == 16) {
         std::cout << "bit depth" << bitDepth << std::endl;
-        int16_t *data_int16 = static_cast<int16_t*>(data);
+        uint8_t *data_bytes = static_cast<uint8_t*>(data);
         for (int i = 0; i < numSamples; i++) {
-            samples.push_back(static_cast<double>(data_int16[i]) / 32768.0);
+            // Read 16-bit value byte-by-byte (little-endian)
+            int16_t value = static_cast<int16_t>(data_bytes[i*2] | (data_bytes[i*2+1] << 8));
+            samples.push_back(static_cast<double>(value));
         }
     } else if (bitDepth == 8) {
         std::cout << "bit depth" << bitDepth << std::endl;
         uint8_t *data_int8 = static_cast<uint8_t*>(data);
         for (int i = 0; i < numSamples; i++) {
-            samples.push_back((static_cast<double>(data_int8[i]) - 128.0) / 128.0);
+            samples.push_back(static_cast<double>(data_int8[i]) - 128.0);
         }
     } else if (bitDepth == 24) {
         std::cout << "bit depth" << bitDepth << std::endl;
@@ -1460,13 +1462,13 @@ std::vector<double> waveformDataToVector(void *data, uint32_t byteSize, uint16_t
             {
                 value |= ~0xffffff;
             }
-            samples.push_back(static_cast<double>(value) / 8388608.0);
+            samples.push_back(static_cast<double>(value));
         }
     } else if (bitDepth == 32) {
         std::cout << "bit depth" << bitDepth << std::endl;
         int32_t *data_int32 = static_cast<int32_t*>(data);
         for (int i = 0; i < numSamples; i++) {
-            samples.push_back(static_cast<double>(data_int32[i]) / 2147483648.0);
+            samples.push_back(static_cast<double>(data_int32[i]));
         }
     } else {
         std::cout << "Unsupported bit depth:" << bitDepth << std::endl;
