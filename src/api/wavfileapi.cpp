@@ -12,9 +12,8 @@ WavFileApi::WavFileApi(QObject *parent) : QObject(parent)
 
 WaveFile* WavFileApi::openWavFile(const QString& filePath)
 {
-    QByteArray ba = filePath.toLocal8Bit();
-    const char *c_filePath = ba.data();
-    return waveOpenFile(c_filePath);
+    std::string stdPath = filePath.toStdString();
+    return waveOpenFile(stdPath);
 }
 
 QVariantList WavFileApi::getCuePoints(WaveFile* waveFile)

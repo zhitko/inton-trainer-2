@@ -7,14 +7,12 @@
 #include <cfloat>
 
 #ifdef _WIN32
-#include <windows.h>
-#include <string>
-#include <codecvt>
-#include <locale>
+#include <string.h>
+#include <stringapiset.h>
 #endif
 
-
-
+#include <filesystem>
+namespace fs = std::filesystem;
 
 #define INT32 littleEndianBytesToUInt32
 #define INT16 littleEndianBytesToUInt16
@@ -71,6 +69,8 @@ WaveFile * waveOpenHFile(int handle)
     return processFile(waveFile);
 }
 
+
+
 WaveFile * waveOpenFile(const std::string& path)
 {
     WaveFile * waveFile = initWaveFile();
@@ -84,9 +84,13 @@ WaveFile * waveOpenFile(const std::string& path)
     strncpy(waveFile->filePath, path.c_str(), path.length());
 
 #ifdef _WIN32
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring wide_path = converter.from_bytes(path);
-    waveFile->file = _wfopen(wide_path.c_str(), L"rb");
+    try {
+        fs::path path_fs = fs::u8path(path);
+        waveFile->file = _wfopen(path_fs.c_str(), L"rb");
+    } catch (const std::exception& e) {
+        std::cerr << "[waveOpenFile] Error converting path: " << e.what() << std::endl;
+        waveFile->file = nullptr;
+    }
 #else
     waveFile->file = fopen(path.c_str(), "rb");
 #endif
@@ -1029,9 +1033,13 @@ void saveWaveFile(WaveFile *waveFile, const std::string &filePath)
     if (waveFile->file == nullptr)
     {
 #ifdef _WIN32
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        std::wstring wide_path = converter.from_bytes(filePath);
-        waveFile->file = _wfopen(wide_path.c_str(), L"wb");
+        try {
+            fs::path path_fs = fs::u8path(filePath);
+            waveFile->file = _wfopen(path_fs.c_str(), L"wb");
+        } catch (const std::exception& e) {
+            std::cerr << "[saveWaveFile] Error converting path: " << e.what() << std::endl;
+            waveFile->file = nullptr;
+        }
 #else
         waveFile->file = fopen(filePath.c_str(), "wb");
 #endif
