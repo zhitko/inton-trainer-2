@@ -7,7 +7,7 @@ import "../components"
 
 Page {
     id: templatesPage
-    title: "Templates"
+    title: qsTr("Templates")
 
     Material.theme: window.theme
 

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "src/api/helpers/settings.h"
+#include <QTranslator>
 
 class SettingsApi : public QObject
 {
@@ -58,6 +59,9 @@ signals:
 
 private:
     AppSettings m_settings;
+    QTranslator m_translator;
+
+    void updateTranslator();
 };
 
 #endif // SETTINGSAPI_H

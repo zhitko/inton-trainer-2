@@ -4,9 +4,9 @@ project(inton-trainer-2 VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Quick Multimedia)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Quick Multimedia LinguistTools)
 
-qt_standard_project_setup(REQUIRES 6.8)
+qt_standard_project_setup(REQUIRES 6.8 I18N_TRANSLATED_LANGUAGES en ru)
 
 qt_add_executable(appinton-trainer-2
     main.cpp
@@ -68,6 +68,14 @@ qt_add_qml_module(appinton-trainer-2
         res/fonts/fa-brands-400.ttf
         res/fonts/fa-regular-400.ttf
         res/fonts/fa-solid-900.ttf
+)
+
+qt_add_translations(appinton-trainer-2
+    TS_FILES
+        i18n/inton-trainer-2_en.ts
+        i18n/inton-trainer-2_ru.ts
+    QM_FILES_OUTPUT_VARIABLE
+        qm_files
 )
 
 set_target_properties(appinton-trainer-2 PROPERTIES

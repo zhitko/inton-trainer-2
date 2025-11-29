@@ -6,7 +6,6 @@ import QtQuick.Controls.Material 6.8
 
 import "../components"
 
-
 Page {
     property string lastRecordedFile: ""
 
@@ -37,11 +36,11 @@ Page {
 
         onClicked: {
             if (audioApi.isRecording) {
-                audioApi.stopRecording()
-                lastRecordedFile = audioApi.saveWavFile()
+                audioApi.stopRecording();
+                lastRecordedFile = audioApi.saveWavFile();
             } else {
-                lastRecordedFile = ""
-                audioApi.startRecording()
+                lastRecordedFile = "";
+                audioApi.startRecording();
             }
         }
     }
@@ -76,10 +75,12 @@ Page {
         height: 50
         visible: !!lastRecordedFile
         showLabel: true
-        label: Icons.faWaveSquare + " Open"
+        label: Icons.faWaveSquare + " " + qsTr("Open")
         onClicked: {
-            console.log("ui/pages/RecordsPage.qml:onFileClicked:", lastRecordedFile)
-            stackView.push("TemplatePage.qml", { "filePath": lastRecordedFile })
+            console.log("ui/pages/RecordsPage.qml:onFileClicked:", lastRecordedFile);
+            stackView.push("TemplatePage.qml", {
+                "filePath": lastRecordedFile
+            });
         }
     }
 }

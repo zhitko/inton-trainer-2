@@ -7,7 +7,7 @@ import by.intontrainer.file 1.0
 import "../components"
 
 Page {
-    title: "Records"
+    title: qsTr("Records")
 
     Material.theme: window.theme
 

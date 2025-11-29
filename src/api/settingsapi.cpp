@@ -1,5 +1,7 @@
 #include "settingsapi.h"
 #include <QDebug>
+#include <QCoreApplication>
+#include <QQmlEngine>
 
 SettingsApi::SettingsApi(QObject *parent) : QObject(parent)
 {
@@ -16,6 +18,7 @@ void SettingsApi::setLanguage(const QString &language)
     if (m_settings.language != language.toStdString()) {
         m_settings.language = language.toStdString();
         save();
+        updateTranslator();
         emit languageChanged();
     }
 }
@@ -121,6 +124,7 @@ void SettingsApi::setVoicingThreshold(double voicingThreshold)
 void SettingsApi::load()
 {
     m_settings = Settings::loadSettings();
+    updateTranslator();
     emit languageChanged();
     emit themeChanged();
     emit algorithmChanged();
@@ -134,4 +138,19 @@ void SettingsApi::load()
 void SettingsApi::save()
 {
     Settings::saveSettings(m_settings);
+}
+
+void SettingsApi::updateTranslator()
+{
+    QCoreApplication::removeTranslator(&m_translator);
+    QString lang = QString::fromStdString(m_settings.language);
+    if (m_translator.load("inton-trainer-2_" + lang, QCoreApplication::applicationDirPath())) {
+        QCoreApplication::installTranslator(&m_translator);
+        QQmlEngine *engine = qmlEngine(this);
+        if (engine) {
+            engine->retranslate();
+        }
+    } else {
+        qDebug() << "Failed to load translation for" << lang;
+    }
 }

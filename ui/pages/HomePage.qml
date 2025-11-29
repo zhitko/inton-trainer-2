@@ -5,7 +5,7 @@ import QtQuick.Controls.Material 6.8
 import "../components/cards"
 
 Page {
-    title: "Home"
+    title: qsTr("Home")
 
     Material.theme: window.theme
 
@@ -15,7 +15,7 @@ Page {
         spacing: 16
 
         Text {
-            text: "Welcome to IntonTrainer"
+            text: qsTr("Welcome to IntonTrainer")
             font.pixelSize: 24
             anchors.horizontalCenter: parent.horizontalCenter
             color: Material.primaryTextColor
@@ -26,7 +26,7 @@ Page {
             spacing: 16
 
             Card {
-                title.text: "Templates"
+                title.text: qsTr("Templates")
                 icon.font.family: Icons.familySolid
                 icon.font.bold: true
                 icon.text: Icons.faFolderTree
@@ -35,7 +35,7 @@ Page {
             }
 
             Card {
-                title.text: "My Records"
+                title.text: qsTr("My Records")
                 icon.font.family: Icons.familySolid
                 icon.font.bold: true
                 icon.text: Icons.faBoxArchive
@@ -44,7 +44,7 @@ Page {
             }
 
             Card {
-                title.text: "Settings"
+                title.text: qsTr("Settings")
                 icon.font.family: Icons.familySolid
                 icon.font.bold: true
                 icon.text: Icons.faGear

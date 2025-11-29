@@ -52,7 +52,7 @@ Page {
             }
 
             Text {
-                text: "Pitch (F0)"
+                text: qsTr("Pitch (F0)")
                 font.pixelSize: 14
                 font.bold: true
             }

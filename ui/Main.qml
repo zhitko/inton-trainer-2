@@ -92,14 +92,14 @@ ApplicationWindow {
                     }
                 }
                 Label {
-                    text: "Menu"
+                    text: qsTr("Menu")
                     font.pixelSize: 24
                     Layout.fillWidth: true
                 }
             }
             ItemDelegate {
                 id: homeItemDelegate
-                text: "Home"
+                text: qsTr("Home")
                 width: parent.width - parent.padding
                 onClicked: {
                     onClicked: stackView.push("pages/HomePage.qml");
@@ -123,7 +123,7 @@ ApplicationWindow {
                 }
             }
             ItemDelegate {
-                text: "Templates"
+                text: qsTr("Templates")
                 width: parent.width - parent.padding
                 onClicked: {
                     onClicked: stackView.push("pages/TemplatesPage.qml");
@@ -148,7 +148,7 @@ ApplicationWindow {
                 }
             }
             ItemDelegate {
-                text: "My Records"
+                text: qsTr("My Records")
                 width: parent.width - parent.padding
                 onClicked: {
                     onClicked: stackView.push("pages/RecordsPage.qml");
@@ -173,7 +173,7 @@ ApplicationWindow {
                 }
             }
             ItemDelegate {
-                text: "Settings"
+                text: qsTr("Settings")
                 width: parent.width - parent.padding
                 onClicked: {
                     stackView.push("pages/SettingsPage.qml");
@@ -201,7 +201,7 @@ ApplicationWindow {
             RowLayout {
                 width: parent.width - parent.padding * 2
                 Label {
-                    text: "Dark Mode"
+                    text: qsTr("Dark Mode")
                 }
                 Switch {
                     checked: window.theme === Material.Dark

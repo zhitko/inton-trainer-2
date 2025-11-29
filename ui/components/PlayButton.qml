@@ -14,7 +14,7 @@ RoundButton {
 
     width: 50
     height: width
-    radius: width/2
+    radius: width / 2
     visible: file !== ""
 
     background: Rectangle {
@@ -24,11 +24,7 @@ RoundButton {
             id: label
             font.family: Icons.familySolid
             font.bold: true
-            text: audioApi.isPlaying ? (
-                Icons.faStop + (control.showLabel ? " Stop" : "")
-            ) : (
-                Icons.faPlay + (control.showLabel ? " Play" : "")
-            )
+            text: audioApi.isPlaying ? (Icons.faStop + " " + (control.showLabel ? qsTr("Stop") : "")) : (Icons.faPlay + " " + (control.showLabel ? qsTr("Play") : ""))
             Material.foreground: audioApi.isPlaying ? Material.DeepOrange : Material.primaryTextColor
             anchors.left: parent.left
             anchors.leftMargin: parent.width / 3
@@ -42,21 +38,21 @@ RoundButton {
             anchors.fill: parent
             hoverEnabled: true
             onEntered: {
-                parent.color = Material.rippleColor
-                label.font.pixelSize+=4
+                parent.color = Material.rippleColor;
+                label.font.pixelSize += 4;
             }
             onExited: {
-                parent.color = Material.backgroundColor
-                label.font.pixelSize-=4
+                parent.color = Material.backgroundColor;
+                label.font.pixelSize -= 4;
             }
         }
     }
 
     onClicked: {
         if (audioApi.isPlaying) {
-            audioApi.stopPlayback()
+            audioApi.stopPlayback();
         } else {
-            audioApi.play(file)
+            audioApi.play(file);
         }
     }
 }
