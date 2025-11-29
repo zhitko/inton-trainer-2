@@ -158,10 +158,21 @@ Page {
                             color: Material.primaryTextColor
                         }
                         TextField {
-                            text: window.settingsApi.voicingThreshold.toString()                            
+                            text: window.settingsApi.voicingThreshold.toString()
                             onEditingFinished: window.settingsApi.voicingThreshold = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
+                        }
+
+                        Label {
+                            text: qsTr("Pitch Normalization")
+                            color: Material.primaryTextColor
+                        }
+                        ComboBox {
+                            model: ["max", "min_max", "mean", "mean_deviation"]
+                            currentIndex: model.indexOf(window.settingsApi.pitchNormalization)
+                            onActivated: window.settingsApi.pitchNormalization = currentText
+                            Layout.fillWidth: true
                         }
                     }
                 }

@@ -3,7 +3,7 @@
 #include <cmath>
 #include <limits>
 
-std::vector<double> VectorUtils::normalizeFromTo(double from, double to, const std::vector<double>& data) {
+std::vector<double> VectorUtils::normalizeByMinMax(double from, double to, const std::vector<double>& data) {
     if (data.empty()) {
         return {};
     }
@@ -35,7 +35,7 @@ std::vector<double> VectorUtils::normalizeFromTo(double from, double to, const s
     return result;
 }
 
-std::vector<double> VectorUtils::normalizeTo(double to, const std::vector<double>& data) {
+std::vector<double> VectorUtils::normalizeByMax(double to, const std::vector<double>& data) {
     if (data.empty()) {
         return {};
     }
@@ -55,6 +55,59 @@ std::vector<double> VectorUtils::normalizeTo(double to, const std::vector<double
 
     for (double val : data) {
         result.push_back((val / maxVal) * to);
+    }
+
+    return result;
+}
+
+std::vector<double> VectorUtils::normalizeByMean(const std::vector<double>& data) {
+    if (data.empty()) {
+        return {};
+    }
+
+    double sum = 0.0;
+    for (double val : data) {
+        sum += val;
+    }
+    double mean = sum / data.size();
+
+    std::vector<double> result;
+    result.reserve(data.size());
+
+    for (double val : data) {
+        result.push_back(val - mean);
+    }
+
+    return result;
+}
+
+std::vector<double> VectorUtils::normalizeByMeanDeviation(const std::vector<double>& data) {
+    if (data.empty()) {
+        return {};
+    }
+
+    double sum = 0.0;
+    for (double val : data) {
+        sum += val;
+    }
+    double mean = sum / data.size();
+
+    double deviationSum = 0.0;
+    for (double val : data) {
+        deviationSum += std::abs(val - mean);
+    }
+    double deviation = deviationSum / data.size();
+
+    if (std::abs(deviation) < std::numeric_limits<double>::epsilon()) {
+        // Deviation is 0 (all values are the same), return 0s
+        return std::vector<double>(data.size(), 0.0);
+    }
+
+    std::vector<double> result;
+    result.reserve(data.size());
+
+    for (double val : data) {
+        result.push_back((val - mean) / deviation);
     }
 
     return result;

@@ -121,6 +121,20 @@ void SettingsApi::setVoicingThreshold(double voicingThreshold)
     }
 }
 
+QString SettingsApi::pitchNormalization() const
+{
+    return QString::fromStdString(m_settings.pitchNormalization);
+}
+
+void SettingsApi::setPitchNormalization(const QString &pitchNormalization)
+{
+    if (m_settings.pitchNormalization != pitchNormalization.toStdString()) {
+        m_settings.pitchNormalization = pitchNormalization.toStdString();
+        save();
+        emit pitchNormalizationChanged();
+    }
+}
+
 void SettingsApi::load()
 {
     m_settings = Settings::loadSettings();
@@ -133,6 +147,7 @@ void SettingsApi::load()
     emit minF0Changed();
     emit maxF0Changed();
     emit voicingThresholdChanged();
+    emit pitchNormalizationChanged();
 }
 
 void SettingsApi::save()

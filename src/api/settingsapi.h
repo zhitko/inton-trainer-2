@@ -16,6 +16,7 @@ class SettingsApi : public QObject
     Q_PROPERTY(double minF0 READ minF0 WRITE setMinF0 NOTIFY minF0Changed)
     Q_PROPERTY(double maxF0 READ maxF0 WRITE setMaxF0 NOTIFY maxF0Changed)
     Q_PROPERTY(double voicingThreshold READ voicingThreshold WRITE setVoicingThreshold NOTIFY voicingThresholdChanged)
+    Q_PROPERTY(QString pitchNormalization READ pitchNormalization WRITE setPitchNormalization NOTIFY pitchNormalizationChanged)
 
 public:
     explicit SettingsApi(QObject *parent = nullptr);
@@ -44,6 +45,9 @@ public:
     double voicingThreshold() const;
     void setVoicingThreshold(double voicingThreshold);
 
+    QString pitchNormalization() const;
+    void setPitchNormalization(const QString &pitchNormalization);
+
     Q_INVOKABLE void load();
     Q_INVOKABLE void save();
 
@@ -56,6 +60,7 @@ signals:
     void minF0Changed();
     void maxF0Changed();
     void voicingThresholdChanged();
+    void pitchNormalizationChanged();
 
 private:
     AppSettings m_settings;

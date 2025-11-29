@@ -62,7 +62,7 @@ QVariantList WavFileApi::getWaveData(WaveFile* waveFile)
     QVariantList waveData;
     
     std::vector<double> samples = WavFileService::readWaveData(waveFile);
-    std::vector<double> normalizedSamples = VectorUtils::normalizeFromTo(0.0, 1.0, samples);
+    std::vector<double> normalizedSamples = VectorUtils::normalizeByMinMax(0.0, 1.0, samples);
     
     for (size_t i = 0; i < normalizedSamples.size(); ++i) {
         waveData.append(QPointF(i, normalizedSamples[i]));
@@ -79,9 +79,10 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
                                   double minF0,
                                   double maxF0,
                                   double voicingThreshold,
-                                  const QString& outputFormat)
+                                  const QString& outputFormat,
+                                  const QString& normalizationMode)
 {
-    qDebug() << "getPitch called";
+    qDebug() << "getPitch called with normalization:" << normalizationMode;
     QVariantList pitchData;
     
     if (!waveFile) {
@@ -141,9 +142,23 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
         format
     );
     
-    // Normalize pitch data to 0-1 range using VectorUtils
+    // Normalize pitch data using VectorUtils based on mode
     if (!pitch.empty()) {
-        std::vector<double> normalizedPitch = VectorUtils::normalizeTo(1.0, pitch);
+        std::vector<double> normalizedPitch;
+        
+        if (normalizationMode == "max") {
+            normalizedPitch = VectorUtils::normalizeByMax(1.0, pitch);
+        } else if (normalizationMode == "min_max") {
+            normalizedPitch = VectorUtils::normalizeByMinMax(0.0, 1.0, pitch);
+        } else if (normalizationMode == "mean") {
+            normalizedPitch = VectorUtils::normalizeByMean(pitch);
+        } else if (normalizationMode == "mean_deviation") {
+            normalizedPitch = VectorUtils::normalizeByMeanDeviation(pitch);
+        } else {
+            // Default to by max if unknown
+            qDebug() << "Unknown normalization mode:" << normalizationMode << ", defaulting to max";
+            normalizedPitch = VectorUtils::normalizeByMax(1.0, pitch);
+        }
         
         for (size_t i = 0; i < normalizedPitch.size(); ++i) {
             pitchData.append(QPointF(i, normalizedPitch[i]));

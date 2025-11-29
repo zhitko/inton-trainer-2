@@ -12,7 +12,7 @@ public:
      * @param data Input vector.
      * @return Normalized vector.
      */
-    static std::vector<double> normalizeFromTo(double from, double to, const std::vector<double>& data);
+    static std::vector<double> normalizeByMinMax(double from, double to, const std::vector<double>& data);
 
     /**
      * @brief Normalizes data by scaling the maximum value to 'to'.
@@ -20,7 +20,21 @@ public:
      * @param data Input vector.
      * @return Normalized vector.
      */
-    static std::vector<double> normalizeTo(double to, const std::vector<double>& data);
+    static std::vector<double> normalizeByMax(double to, const std::vector<double>& data);
+
+    /**
+     * @brief Normalizes data by subtracting the mean from each element.
+     * @param data Input vector.
+     * @return Normalized vector.
+     */
+    static std::vector<double> normalizeByMean(const std::vector<double>& data);
+
+    /**
+     * @brief Normalizes data by subtracting the mean and dividing by the mean absolute deviation.
+     * @param data Input vector.
+     * @return Normalized vector.
+     */
+    static std::vector<double> normalizeByMeanDeviation(const std::vector<double>& data);
 };
 
 #endif // VECTORUTILS_H

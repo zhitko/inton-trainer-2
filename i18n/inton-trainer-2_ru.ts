@@ -16,7 +16,7 @@
     <message>
         <location filename="../ui/pages/HomePage.qml" line="29"/>
         <source>Templates</source>
-        <translation>Шаблоны</translation>
+        <translation>Образцы</translation>
     </message>
     <message>
         <location filename="../ui/pages/HomePage.qml" line="38"/>
@@ -50,7 +50,7 @@
     <message>
         <location filename="../ui/Main.qml" line="126"/>
         <source>Templates</source>
-        <translation>Шаблоны</translation>
+        <translation>Образцы</translation>
     </message>
     <message>
         <location filename="../ui/Main.qml" line="151"/>
@@ -180,7 +180,7 @@
     <message>
         <location filename="../ui/pages/TemplatesPage.qml" line="10"/>
         <source>Templates</source>
-        <translation>Шаблоны</translation>
+        <translation>Образцы</translation>
     </message>
 </context>
 </TS>

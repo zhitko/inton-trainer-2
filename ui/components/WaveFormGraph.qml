@@ -25,24 +25,69 @@ Item {
             var minX = root.waveData[0].x;
             var maxX = root.waveData[root.waveData.length - 1].x;
 
-            // Assuming audio sample values are normalized between -1 and 1
-            var minY = -0.1;
-            var maxY = 1.1;
+            // Calculate min/max Y from data
+            var minY = root.waveData[0].y;
+            var maxY = root.waveData[0].y;
+
+            for (var i = 1; i < root.waveData.length; i++) {
+                var y = root.waveData[i].y;
+                if (y < minY)
+                    minY = y;
+                if (y > maxY)
+                    maxY = y;
+            }
+
+            // Add some padding
+            var range = maxY - minY;
+            if (range === 0) {
+                range = 1.0;
+            }
+
+            // Reserve space for Y axis and paddings
+            var leftMargin = 40;
+            var topPadding = 10;
+            var bottomPadding = 20;
+            var graphWidth = canvas.width - leftMargin;
+            var graphHeight = canvas.height - topPadding - bottomPadding;
 
             function scaleX(x) {
-                return (x - minX) / (maxX - minX) * canvas.width;
+                return leftMargin + (x - minX) / (maxX - minX) * graphWidth;
             }
 
             function scaleY(y) {
                 // Y is inverted in canvas, so we subtract from height
                 var scaledY = (y - minY) / (maxY - minY);
-                return canvas.height * (1 - scaledY);
+                return topPadding + graphHeight * (1 - scaledY);
             }
+
+            // Draw Y axis
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(leftMargin, topPadding);
+            ctx.lineTo(leftMargin, canvas.height - bottomPadding);
+            ctx.stroke();
+
+            // Draw Y axis marks
+            ctx.beginPath();
+            ctx.moveTo(leftMargin, topPadding);
+            ctx.lineTo(leftMargin - 5, topPadding);
+            ctx.moveTo(leftMargin, canvas.height - bottomPadding);
+            ctx.lineTo(leftMargin - 5, canvas.height - bottomPadding);
+            ctx.stroke();
+
+            // Draw Y axis labels
+            ctx.fillStyle = "black";
+            ctx.font = "10px sans-serif";
+            ctx.textAlign = "right";
+            ctx.textBaseline = "middle";
+            ctx.fillText(maxY.toFixed(2), leftMargin - 8, topPadding);
+            ctx.fillText(minY.toFixed(2), leftMargin - 8, canvas.height - bottomPadding);
 
             // Draw cue points
             ctx.lineWidth = 1;
-            ctx.font = "10px sans-serif";
             ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
 
             for (var i = 0; i < root.cuePoints.length; i++) {
                 var cue = root.cuePoints[i];
@@ -63,16 +108,15 @@ Item {
                     ctx.strokeStyle = "red";
                 }
 
-                var labelHeight = 20;
                 // Draw rectangle
                 ctx.beginPath();
-                ctx.rect(x, 0, width, canvas.height - labelHeight);
+                ctx.rect(x, topPadding, width, graphHeight);
                 ctx.fill();
                 ctx.stroke();
 
                 // Draw label
                 ctx.fillStyle = "black";
-                ctx.fillText(cue.label, x + width / 2, canvas.height - 5);
+                ctx.fillText(cue.label, x + width / 2, canvas.height - bottomPadding / 2);
             }
 
             ctx.beginPath();

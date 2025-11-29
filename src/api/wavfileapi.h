@@ -24,7 +24,8 @@ public slots:
                                       double minF0,
                                       double maxF0,
                                       double voicingThreshold,
-                                      const QString& outputFormat);
+                                      const QString& outputFormat,
+                                      const QString& normalizationMode);
 };
 
 #endif // WAVFILEAPI_H
