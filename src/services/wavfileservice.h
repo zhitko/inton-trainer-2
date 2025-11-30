@@ -14,17 +14,8 @@ struct AudioFormat {
 struct CuePointData {
     uint32_t id;
     uint32_t position;
-    uint32_t chunkStart;
-    uint32_t blockStart;
-    uint32_t frameOffset;
-    uint32_t sampleLength;
+    uint32_t length;
     std::string label;
-    std::string purposeID;
-    uint16_t country;
-    uint16_t language;
-    uint16_t dialect;
-    uint16_t codePage;
-    std::string text;
 };
 
 struct WaveFile;

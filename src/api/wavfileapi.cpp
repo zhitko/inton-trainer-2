@@ -28,26 +28,17 @@ QVariantList WavFileApi::getCuePoints(WaveFile* waveFile)
         QVariantMap cuePoint;
         cuePoint["id"] = cp.id;
         cuePoint["position"] = cp.position;
-        cuePoint["chunkStart"] = cp.chunkStart;
-        cuePoint["blockStart"] = cp.blockStart;
-        cuePoint["frameOffset"] = cp.frameOffset;
         cuePoint["label"] = QString::fromStdString(cp.label);
         
-        if (cp.sampleLength > 0 || !cp.text.empty()) {
-             cuePoint["sampleLength"] = cp.sampleLength;
-             cuePoint["purposeID"] = QString::fromStdString(cp.purposeID);
-             cuePoint["country"] = cp.country;
-             cuePoint["language"] = cp.language;
-             cuePoint["dialect"] = cp.dialect;
-             cuePoint["codePage"] = cp.codePage;
-             cuePoint["text"] = QString::fromStdString(cp.text);
+        if (cp.length > 0) {
+             cuePoint["length"] = cp.length;
         }
 
         qDebug() << "Cue Point" 
                  << ": ID=" << cp.id
                  << "Label=" << cuePoint["label"].toString()
                  << "Position=" << cp.position
-                 << "Sample Length=" << cp.sampleLength;
+                 << "Length=" << cp.length;
 
         cuePoints.append(cuePoint);
     }

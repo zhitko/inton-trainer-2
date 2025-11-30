@@ -83,16 +83,9 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
         
         cuePoint.id = littleEndianBytesToUInt32(cp->cuePointID);
         cuePoint.position = littleEndianBytesToUInt32(cp->playOrderPosition);
-        cuePoint.chunkStart = littleEndianBytesToUInt32(cp->chunkStart);
-        cuePoint.blockStart = littleEndianBytesToUInt32(cp->blockStart);
-        cuePoint.frameOffset = littleEndianBytesToUInt32(cp->frameOffset);
         
         // Initialize optional fields
-        cuePoint.sampleLength = 0;
-        cuePoint.country = 0;
-        cuePoint.language = 0;
-        cuePoint.dialect = 0;
-        cuePoint.codePage = 0;
+        cuePoint.length = 0;
 
         // Find associated label
         std::string label = "";
@@ -116,15 +109,7 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
                     for (uint32_t k = 0; k < listChunk->ltxtCount; ++k) {
                         LtxtChunk *ltxtChunk = &listChunk->ltxtChunks[k];
                         if (littleEndianBytesToUInt32(ltxtChunk->cuePointID) == cuePoint.id) {
-                            cuePoint.sampleLength = littleEndianBytesToUInt32(ltxtChunk->sampleLength);
-                            cuePoint.purposeID = std::string(ltxtChunk->purposeID, 4);
-                            cuePoint.country = littleEndianBytesToUInt16(ltxtChunk->country);
-                            cuePoint.language = littleEndianBytesToUInt16(ltxtChunk->language);
-                            cuePoint.dialect = littleEndianBytesToUInt16(ltxtChunk->dialect);
-                            cuePoint.codePage = littleEndianBytesToUInt16(ltxtChunk->codePage);
-                            if (ltxtChunk->text) {
-                                cuePoint.text = std::string(ltxtChunk->text);
-                            }
+                            cuePoint.length = littleEndianBytesToUInt32(ltxtChunk->sampleLength);
                             ltxtFound = true;
                             break;
                         }
@@ -142,7 +127,7 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
                   << ": ID=" << cuePoint.id 
                   << " Label=" << cuePoint.label 
                   << " Position=" << cuePoint.position
-                  << " Sample Length=" << cuePoint.sampleLength << std::endl;
+                  << " Length=" << cuePoint.length << std::endl;
 
         cuePoints.push_back(cuePoint);
     }

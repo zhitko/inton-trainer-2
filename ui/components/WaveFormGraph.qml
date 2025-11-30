@@ -92,7 +92,7 @@ Item {
             for (var i = 0; i < root.cuePoints.length; i++) {
                 var cue = root.cuePoints[i];
                 var x = scaleX(cue.position);
-                var width = scaleX(cue.position + cue.sampleLength) - x;
+                var width = scaleX(cue.position + cue.length) - x;
 
                 if (cue.label.toUpperCase().startsWith("P")) {
                     ctx.fillStyle = "rgba(237, 106, 90, 0.3)";
