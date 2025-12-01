@@ -26,6 +26,11 @@ Page {
         // Extract pitch data
         let pitchData = wavFileApi.getPitch(wavFile, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization);
         pitchWaveFormGraph.waveData = pitchData;
+
+        // Calculate UMP
+        let umpResult = wavFileApi.getUMP(pitchData, cuePoints, 100, waveData.length);
+        umpWaveFormGraph.waveData = umpResult.ump;
+        umpWaveFormGraph.cuePoints = umpResult.cuePoints;
     }
 
     ScrollView {
@@ -59,6 +64,18 @@ Page {
 
             WaveFormGraph {
                 id: pitchWaveFormGraph
+                width: parent.width
+                height: 200
+            }
+
+            Text {
+                text: qsTr("UMP")
+                font.pixelSize: 14
+                font.bold: true
+            }
+
+            WaveFormGraph {
+                id: umpWaveFormGraph
                 width: parent.width
                 height: 200
             }

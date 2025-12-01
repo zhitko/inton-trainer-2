@@ -112,3 +112,37 @@ std::vector<double> VectorUtils::normalizeByMeanDeviation(const std::vector<doub
 
     return result;
 }
+
+std::vector<double> VectorUtils::linearInterpolation(const std::vector<double>& data, int targetLength) {
+    if (data.empty() || targetLength <= 0) {
+        return {};
+    }
+
+    if (targetLength == 1) {
+        return {data[0]};
+    }
+
+    int inputSize = data.size();
+    if (inputSize == 1) {
+        return std::vector<double>(targetLength, data[0]);
+    }
+
+    std::vector<double> result;
+    result.reserve(targetLength);
+
+    for (int i = 0; i < targetLength; ++i) {
+        double t = static_cast<double>(i) * (inputSize - 1) / (targetLength - 1);
+        int idx = static_cast<int>(std::floor(t));
+        double frac = t - idx;
+
+        if (idx >= inputSize - 1) {
+            // This handles the last point or precision issues
+            result.push_back(data[std::min(idx, inputSize - 1)]);
+        } else {
+            double val = data[idx] * (1.0 - frac) + data[idx + 1] * frac;
+            result.push_back(val);
+        }
+    }
+
+    return result;
+}

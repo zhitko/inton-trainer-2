@@ -24,6 +24,8 @@ qt_add_executable(appinton-trainer-2
     src/services/wavfileservice.cpp
     src/services/pitchservice.h
     src/services/pitchservice.cpp
+    src/services/umpservice.h
+    src/services/umpservice.cpp
     src/services/helpers/wavFile.h
     src/services/helpers/wavFile.cpp
     src/services/helpers/vectorutils.h

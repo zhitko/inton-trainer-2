@@ -35,6 +35,14 @@ public:
      * @return Normalized vector.
      */
     static std::vector<double> normalizeByMeanDeviation(const std::vector<double>& data);
+
+    /**
+     * @brief Resamples the input vector to the target length using linear interpolation.
+     * @param data Input vector.
+     * @param targetLength Target length of the output vector.
+     * @return Resampled vector.
+     */
+    static std::vector<double> linearInterpolation(const std::vector<double>& data, int targetLength);
 };
 
 #endif // VECTORUTILS_H

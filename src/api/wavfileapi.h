@@ -26,6 +26,11 @@ public slots:
                                       double voicingThreshold,
                                       const QString& outputFormat,
                                       const QString& normalizationMode);
+
+    Q_INVOKABLE QVariantMap getUMP(const QVariantList& pitch,
+                                   const QVariantList& cuePoints,
+                                   int length,
+                                   int waveDataSize);
 };
 
 #endif // WAVFILEAPI_H

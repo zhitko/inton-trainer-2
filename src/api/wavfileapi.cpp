@@ -1,6 +1,7 @@
 #include "wavfileapi.h"
 #include "src/services/wavfileservice.h"
 #include "src/services/pitchservice.h"
+#include "src/services/umpservice.h"
 #include "src/services/helpers/vectorutils.h"
 #include <QDebug>
 #include <QPointF>
@@ -158,5 +159,82 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
     
     qDebug() << "getPitch finished with" << pitch.size() << "frames";
     return pitchData;
+}
+
+QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
+                               const QVariantList& cuePoints,
+                               int length,
+                               int waveDataSize)
+{
+    qDebug() << "getUMP called";
+    qDebug() << "  Input pitch size:" << pitch.size();
+    qDebug() << "  Input cuePoints count:" << cuePoints.size();
+    qDebug() << "  Target segment length:" << length;
+    qDebug() << "  Wave data size:" << waveDataSize;
+    
+    QVariantMap result;
+
+    // Convert pitch QVariantList to std::vector<double>
+    std::vector<double> pitchVec;
+    pitchVec.reserve(pitch.size());
+    for (const auto& val : pitch) {
+        if (val.canConvert<QPointF>()) {
+            pitchVec.push_back(val.toPointF().y());
+        } else {
+             // Fallback if it's just a list of numbers
+             pitchVec.push_back(val.toDouble());
+        }
+    }
+    qDebug() << "  Converted pitch vector size:" << pitchVec.size();
+
+    // Convert cuePoints QVariantList to std::vector<CuePointData>
+    std::vector<CuePointData> cuePointsVec;
+    cuePointsVec.reserve(cuePoints.size());
+    for (const auto& val : cuePoints) {
+        QVariantMap cpMap = val.toMap();
+        CuePointData cp;
+        cp.id = cpMap["id"].toUInt();
+        cp.position = cpMap["position"].toUInt();
+        cp.length = cpMap["length"].toUInt();
+        cp.label = cpMap["label"].toString().toStdString();
+        cuePointsVec.push_back(cp);
+        
+        qDebug() << "  Cue point" << cp.id << ":" 
+                 << "position=" << cp.position 
+                 << "length=" << cp.length 
+                 << "label=" << QString::fromStdString(cp.label);
+    }
+
+    // Call UMPService
+    qDebug() << "  Calling UMPService::getUMP...";
+    std::vector<double> umpVec = UMPService::getUMP(pitchVec, cuePointsVec, length, waveDataSize);
+    qDebug() << "  UMP result size:" << umpVec.size();
+
+    // Convert result back to QVariantList (as QPointF for graph)
+    QVariantList umpData;
+    for (size_t i = 0; i < umpVec.size(); ++i) {
+        umpData.append(QPointF(i, umpVec[i]));
+    }
+    result["ump"] = umpData;
+    qDebug() << "  UMP data points created:" << umpData.size();
+
+    // Create modified cue points
+    QVariantList modifiedCuePoints;
+    for (size_t i = 0; i < cuePointsVec.size(); ++i) {
+        QVariantMap cpMap;
+        cpMap["id"] = cuePointsVec[i].id;
+        cpMap["label"] = QString::fromStdString(cuePointsVec[i].label);
+        cpMap["position"] = static_cast<uint>(i * length);
+        cpMap["length"] = static_cast<uint>(length);
+        modifiedCuePoints.append(cpMap);
+        
+        qDebug() << "  Modified cue point" << cpMap["id"].toUInt() << ":" 
+                 << "position=" << cpMap["position"].toUInt() 
+                 << "length=" << cpMap["length"].toUInt();
+    }
+    result["cuePoints"] = modifiedCuePoints;
+
+    qDebug() << "getUMP finished";
+    return result;
 }
 

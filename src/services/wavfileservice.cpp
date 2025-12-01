@@ -2,6 +2,7 @@
 #include "helpers/wavFile.h"
 #include <iostream>
 #include <filesystem>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 
@@ -131,6 +132,10 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
 
         cuePoints.push_back(cuePoint);
     }
+
+    std::sort(cuePoints.begin(), cuePoints.end(), [](const CuePointData& a, const CuePointData& b) {
+        return a.position < b.position;
+    });
 
     return cuePoints;
 }
