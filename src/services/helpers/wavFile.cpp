@@ -1039,7 +1039,7 @@ void saveWaveFile(WaveFile *waveFile, const std::string &filePath)
             fs::path path_fs = fs::u8path(filePath);
             waveFile->file = _wfopen(path_fs.c_str(), L"wb");
         } catch (const std::exception& e) {
-            std::cerr << "[saveWaveFile] Error converting path: " << e.what() << std::endl;
+            LOG_CRITICAL() << "[saveWaveFile] Error converting path: " << e.what();
             waveFile->file = nullptr;
         }
 #else
@@ -1048,52 +1048,52 @@ void saveWaveFile(WaveFile *waveFile, const std::string &filePath)
     }
     if (waveFile->file == nullptr)
     {
-        std::cerr << "[saveWaveFile] Could not open output file " << filePath << std::endl;
+        LOG_CRITICAL() << "[saveWaveFile] Could not open output file " << filePath;
         return;
     }
     if (waveFile->waveHeader != nullptr)
     {
-        std::cout << "[saveWaveFile] Write HEADER chunk" << std::endl;
+        LOG_DEBUG() << "[saveWaveFile] Write HEADER chunk";
         if (fwrite(waveFile->waveHeader, sizeof(WaveHeader), 1, waveFile->file) < 1)
         {
-            std::cerr << "[saveWaveFile] Error writing header to output file" << std::endl;
+            LOG_CRITICAL() << "[saveWaveFile] Error writing header to output file";
             return;
         }
     }
     if (waveFile->formatChunk != nullptr)
     {
-        std::cout << "[saveWaveFile] Write FMT chunk" << std::endl;
+        LOG_DEBUG() << "[saveWaveFile] Write FMT chunk";
         if (fwrite(waveFile->formatChunk, sizeof(FormatChunk), 1, waveFile->file) < 1)
         {
-            std::cerr << "[saveWaveFile] Error writing format chunk to output file" << std::endl;
+            LOG_CRITICAL() << "[saveWaveFile] Error writing format chunk to output file";
             return;
         }
     }
     if (waveFile->dataChunk != nullptr)
     {
-        std::cout << "[saveWaveFile] Write DATA chunk" << std::endl;
+        LOG_DEBUG() << "[saveWaveFile] Write DATA chunk";
         uint32_t dataChunkSize = littleEndianBytesToUInt32(waveFile->dataChunk->chunkDataSize);
         if (fwrite(waveFile->dataChunk->chunkID, sizeof(char), 4, waveFile->file) < 1)
         {
-            std::cerr << "[saveWaveFile] Error writing data chunk (chunkID) to output file" << std::endl;
+            LOG_CRITICAL() << "[saveWaveFile] Error writing data chunk (chunkID) to output file";
             return;
         }
         if (fwrite(waveFile->dataChunk->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
         {
-            std::cerr << "[saveWaveFile] Error writing data chunk (chunkDataSize) to output file" << std::endl;
+            LOG_CRITICAL() << "[saveWaveFile] Error writing data chunk (chunkDataSize) to output file";
             return;
         }
         if (fwrite(waveFile->dataChunk->waveformData, dataChunkSize, 1, waveFile->file) < 1)
         {
-            std::cerr << "[saveWaveFile] Size data chunk (waveformData) " << dataChunkSize << std::endl;
-            std::cerr << "[saveWaveFile] Error writing data chunk (waveformData) to output file" << std::endl;
+            LOG_CRITICAL() << "[saveWaveFile] Size data chunk (waveformData) " << dataChunkSize;
+            LOG_CRITICAL() << "[saveWaveFile] Error writing data chunk (waveformData) to output file";
             return;
         }
         if (dataChunkSize % 2 != 0)
         {
             if (fwrite("\0", sizeof(char), 1, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing padding character to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing padding character to output file";
                 return;
 
             }
@@ -1101,228 +1101,228 @@ void saveWaveFile(WaveFile *waveFile, const std::string &filePath)
     }
     if  (waveFile->cueChunk != nullptr)
     {
-        std::cout << "[saveWaveFile] Write CUE chunk" << std::endl;
+        LOG_DEBUG() << "[saveWaveFile] Write CUE chunk";
         CueChunk * cue_chunk = waveFile->cueChunk;
 
-        std::cout << "[saveWaveFile] Write CUE chunkID " << cue_chunk->chunkID[0] << cue_chunk->chunkID[1] << cue_chunk->chunkID[2] << cue_chunk->chunkID[3] << std::endl;
+        LOG_DEBUG() << "[saveWaveFile] Write CUE chunkID " << cue_chunk->chunkID[0] << cue_chunk->chunkID[1] << cue_chunk->chunkID[2] << cue_chunk->chunkID[3];
         if (fwrite(cue_chunk->chunkID, sizeof(char), 4, waveFile->file) < 1)
         {
-            std::cerr << "[saveWaveFile] Error writing cue chunk (chunkID) to output file" << std::endl;
+            LOG_CRITICAL() << "[saveWaveFile] Error writing cue chunk (chunkID) to output file";
             return;
         }
 
-        std::cout << "[saveWaveFile] Write CUE chunkDataSize " << INT32(cue_chunk->chunkDataSize) << std::endl;
+        LOG_DEBUG() << "[saveWaveFile] Write CUE chunkDataSize " << INT32(cue_chunk->chunkDataSize);
         if (fwrite(cue_chunk->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
         {
-            std::cerr << "[saveWaveFile] Error writing cue chunk (chunkDataSize) to output file" << std::endl;
+            LOG_CRITICAL() << "[saveWaveFile] Error writing cue chunk (chunkDataSize) to output file";
             return;
         }
 
-        std::cout << "[saveWaveFile] Write CUE cuePointsCount " << INT32(cue_chunk->cuePointsCount) << std::endl;
+        LOG_DEBUG() << "[saveWaveFile] Write CUE cuePointsCount " << INT32(cue_chunk->cuePointsCount);
         if (fwrite(cue_chunk->cuePointsCount, sizeof(char), 4, waveFile->file) < 1)
         {
-            std::cerr << "[saveWaveFile] Error writing cue chunk (cuePointsCount) to output file" << std::endl;
+            LOG_CRITICAL() << "[saveWaveFile] Error writing cue chunk (cuePointsCount) to output file";
             return;
         }
 
         uint32_t cuePointsCount = littleEndianBytesToUInt32(cue_chunk->cuePointsCount);
         for (uint32_t i=0; i<cuePointsCount; i++)
         {
-            std::cout << "[saveWaveFile] Write CUE POINT " << i << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write CUE POINT " << i;
             CuePoint * cue_point = &cue_chunk->cuePoints[i];
 
-            std::cout << "[saveWaveFile] Write CUE POINT cuePointID " << INT32(cue_point->cuePointID) << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write CUE POINT cuePointID " << INT32(cue_point->cuePointID);
             if (fwrite(cue_point->cuePointID, sizeof(char), 4, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing cue point (cuePointID) to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing cue point (cuePointID) to output file";
                 return;
             }
 
-            std::cout << "[saveWaveFile] Write CUE POINT playOrderPosition " << INT32(cue_point->playOrderPosition) << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write CUE POINT playOrderPosition " << INT32(cue_point->playOrderPosition);
             if (fwrite(cue_point->playOrderPosition, sizeof(char), 4, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing cue point (playOrderPosition) to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing cue point (playOrderPosition) to output file";
                 return;
             }
 
-            std::cout << "[saveWaveFile] Write CUE POINT dataChunkID " << cue_point->dataChunkID[0] << cue_point->dataChunkID[1] << cue_point->dataChunkID[2] << cue_point->dataChunkID[3] << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write CUE POINT dataChunkID " << cue_point->dataChunkID[0] << cue_point->dataChunkID[1] << cue_point->dataChunkID[2] << cue_point->dataChunkID[3];
             if (fwrite(cue_point->dataChunkID, sizeof(char), 4, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing cue point (dataChunkID) to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing cue point (dataChunkID) to output file";
                 return;
             }
 
-            std::cout << "[saveWaveFile] Write CUE POINT chunkStart " << INT32(cue_point->chunkStart) << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write CUE POINT chunkStart " << INT32(cue_point->chunkStart);
             if (fwrite(cue_point->chunkStart, sizeof(char), 4, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing cue point (chunkStart) to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing cue point (chunkStart) to output file";
                 return;
             }
 
-            std::cout << "[saveWaveFile] Write CUE POINT blockStart " << INT32(cue_point->blockStart) << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write CUE POINT blockStart " << INT32(cue_point->blockStart);
             if (fwrite(cue_point->blockStart, sizeof(char), 4, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing cue point (blockStart) to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing cue point (blockStart) to output file";
                 return;
             }
 
-            std::cout << "[saveWaveFile] Write CUE POINT frameOffset " << INT32(cue_point->frameOffset) << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write CUE POINT frameOffset " << INT32(cue_point->frameOffset);
             if (fwrite(cue_point->frameOffset, sizeof(char), 4, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing cue point (frameOffset) to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing cue point (frameOffset) to output file";
                 return;
             }
         }
     }
     if  (waveFile->listChunks != nullptr)
     {
-        std::cout << "[saveWaveFile] Write LIST chunk" << std::endl;
+        LOG_DEBUG() << "[saveWaveFile] Write LIST chunk";
         for (int listChunkIndex=0; listChunkIndex<waveFile->listCount; listChunkIndex++)
         {
             ListChunk * list_chunk = &waveFile->listChunks[listChunkIndex];
 
             if (list_chunk->lablCount == 0 && list_chunk->ltxtCount == 0) continue;
 
-            std::cout << "[saveWaveFile] Write LIST chunkID " << list_chunk->chunkID[0] << list_chunk->chunkID[1] << list_chunk->chunkID[2] << list_chunk->chunkID[3] << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write LIST chunkID " << list_chunk->chunkID[0] << list_chunk->chunkID[1] << list_chunk->chunkID[2] << list_chunk->chunkID[3];
             if (fwrite(list_chunk->chunkID, sizeof(char), 4, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing list chunk (chunkID) to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing list chunk (chunkID) to output file";
                 return;
             }
 
-            std::cout << "[saveWaveFile] Write LIST chunkDataSize " << INT32(list_chunk->chunkDataSize) << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write LIST chunkDataSize " << INT32(list_chunk->chunkDataSize);
             if (fwrite(list_chunk->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing list chunk (chunkDataSize) to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing list chunk (chunkDataSize) to output file";
                 return;
             }
 
-            std::cout << "[saveWaveFile] Write LIST typeID " << list_chunk->typeID[0] << list_chunk->typeID[1] << list_chunk->typeID[2] << list_chunk->typeID[3] << std::endl;
+            LOG_DEBUG() << "[saveWaveFile] Write LIST typeID " << list_chunk->typeID[0] << list_chunk->typeID[1] << list_chunk->typeID[2] << list_chunk->typeID[3];
             if (fwrite(list_chunk->typeID, sizeof(char), 4, waveFile->file) < 1)
             {
-                std::cerr << "[saveWaveFile] Error writing list chunk (typeID) to output file" << std::endl;
+                LOG_CRITICAL() << "[saveWaveFile] Error writing list chunk (typeID) to output file";
                 return;
             }
 
             for( int i=0; i<list_chunk->ltxtCount; i++)
             {
-                std::cout << "[saveWaveFile] Write LTXT chunk " << i << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT chunk " << i;
                 LtxtChunk * ltxt_chank = &list_chunk->ltxtChunks[i];
 
-                std::cout << "[saveWaveFile] Write LTXT chunkID " << ltxt_chank->chunkID[0] << ltxt_chank->chunkID[1] << ltxt_chank->chunkID[2] << ltxt_chank->chunkID[3] << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT chunkID " << ltxt_chank->chunkID[0] << ltxt_chank->chunkID[1] << ltxt_chank->chunkID[2] << ltxt_chank->chunkID[3];
                 if (fwrite(ltxt_chank->chunkID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (chunkID) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (chunkID) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LTXT chunkDataSize " << INT32(ltxt_chank->chunkDataSize) << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT chunkDataSize " << INT32(ltxt_chank->chunkDataSize);
                 if (fwrite(ltxt_chank->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (chunkDataSize) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (chunkDataSize) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LTXT cuePointID " << INT32(ltxt_chank->cuePointID) << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT cuePointID " << INT32(ltxt_chank->cuePointID);
                 if (fwrite(ltxt_chank->cuePointID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (cuePointID) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (cuePointID) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LTXT sampleLength " << INT32(ltxt_chank->sampleLength) << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT sampleLength " << INT32(ltxt_chank->sampleLength);
                 if (fwrite(ltxt_chank->sampleLength, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (sampleLength) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (sampleLength) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LTXT purposeID " << ltxt_chank->purposeID[0] << ltxt_chank->purposeID[1] << ltxt_chank->purposeID[2] << ltxt_chank->purposeID[3] << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT purposeID " << ltxt_chank->purposeID[0] << ltxt_chank->purposeID[1] << ltxt_chank->purposeID[2] << ltxt_chank->purposeID[3];
                 if (fwrite(ltxt_chank->purposeID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (purposeID) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (purposeID) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LTXT country " << INT16(ltxt_chank->country) << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT country " << INT16(ltxt_chank->country);
                 if (fwrite(ltxt_chank->country, sizeof(char), 2, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (country) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (country) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LTXT language " << INT16(ltxt_chank->language) << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT language " << INT16(ltxt_chank->language);
                 if (fwrite(ltxt_chank->language, sizeof(char), 2, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (language) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (language) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LTXT dialect " << INT16(ltxt_chank->dialect) << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT dialect " << INT16(ltxt_chank->dialect);
                 if (fwrite(ltxt_chank->dialect, sizeof(char), 2, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (dialect) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (dialect) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LTXT codePage " << INT16(ltxt_chank->codePage) << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LTXT codePage " << INT16(ltxt_chank->codePage);
                 if (fwrite(ltxt_chank->codePage, sizeof(char), 2, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LTXT chunk (codePage) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (codePage) to output file";
                     return;
                 }
 
                 if (ltxt_chank->text)
                 {
-                    std::cout << "[saveWaveFile] Write LTXT text " << ltxt_chank->text << std::endl;
+                    LOG_DEBUG() << "[saveWaveFile] Write LTXT text " << ltxt_chank->text;
                     uint32_t size = littleEndianBytesToUInt32(ltxt_chank->chunkDataSize) - 20;
                     if (fwrite(ltxt_chank->text, sizeof(char), size, waveFile->file) < 1)
                     {
-                        std::cerr << "[saveWaveFile] Error writing LTXT chunk (text) to output file" << std::endl;
+                        LOG_CRITICAL() << "[saveWaveFile] Error writing LTXT chunk (text) to output file";
                         return;
                     }
                 } else {
-                    std::cout << "[saveWaveFile] LTXT text <skip>" << std::endl;
+                    LOG_DEBUG() << "[saveWaveFile] LTXT text <skip>";
                 }
             }
 
             for(int i=0; i<list_chunk->lablCount; i++)
             {
-                std::cout << "[saveWaveFile] Write LABL chunk " << i << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LABL chunk " << i;
                 LablChunk * labl_chank = &list_chunk->lablChunks[i];
 
-                std::cout << "[saveWaveFile] Write LABL chunkID " << labl_chank->chunkID[0] << labl_chank->chunkID[1] << labl_chank->chunkID[2] << labl_chank->chunkID[3] << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LABL chunkID " << labl_chank->chunkID[0] << labl_chank->chunkID[1] << labl_chank->chunkID[2] << labl_chank->chunkID[3];
                 if (fwrite(labl_chank->chunkID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LABL chunk (chunkID) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LABL chunk (chunkID) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LABL chunkDataSize " << INT32(labl_chank->chunkDataSize) << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LABL chunkDataSize " << INT32(labl_chank->chunkDataSize);
                 if (fwrite(labl_chank->chunkDataSize, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LABL chunk (chunkDataSize) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LABL chunk (chunkDataSize) to output file";
                     return;
                 }
 
-                std::cout << "[saveWaveFile] Write LABL cuePointID " << INT32(labl_chank->cuePointID) << std::endl;
+                LOG_DEBUG() << "[saveWaveFile] Write LABL cuePointID " << INT32(labl_chank->cuePointID);
                 if (fwrite(labl_chank->cuePointID, sizeof(char), 4, waveFile->file) < 1)
                 {
-                    std::cerr << "[saveWaveFile] Error writing LABL chunk (cuePointID) to output file" << std::endl;
+                    LOG_CRITICAL() << "[saveWaveFile] Error writing LABL chunk (cuePointID) to output file";
                     return;
                 }
 
                 if (labl_chank->text)
                 {
-                    std::cout << "[saveWaveFile] Write LABL text " << labl_chank->text << std::endl;
+                    LOG_DEBUG() << "[saveWaveFile] Write LABL text " << labl_chank->text;
                     uint32_t size = littleEndianBytesToUInt32(labl_chank->chunkDataSize) - 4;
                     if(fwrite(labl_chank->text, sizeof(char), size, waveFile->file) < 1)
                     {
-                        std::cerr << "[saveWaveFile] Error writing LABL chunk (text) to output file" << std::endl;
+                        LOG_CRITICAL() << "[saveWaveFile] Error writing LABL chunk (text) to output file";
                         return;
                     }
                 } else {
-                    std::cout << "[saveWaveFile] LABL text <skip>" << std::endl;
+                    LOG_DEBUG() << "[saveWaveFile] LABL text <skip>";
                 }
             }
         }
@@ -1446,7 +1446,7 @@ std::vector<double> waveformDataToVector(void *data, uint32_t byteSize, uint16_t
     int numSamples = byteSize / (bitDepth / 8);
 
     if (bitDepth == 16) {
-        std::cout << "bit depth" << bitDepth << std::endl;
+        LOG_DEBUG() << "bit depth" << bitDepth;
         uint8_t *data_bytes = static_cast<uint8_t*>(data);
         for (int i = 0; i < numSamples; i++) {
             // Read 16-bit value byte-by-byte (little-endian)
@@ -1454,13 +1454,13 @@ std::vector<double> waveformDataToVector(void *data, uint32_t byteSize, uint16_t
             samples.push_back(static_cast<double>(value));
         }
     } else if (bitDepth == 8) {
-        std::cout << "bit depth" << bitDepth << std::endl;
+        LOG_DEBUG() << "bit depth" << bitDepth;
         uint8_t *data_int8 = static_cast<uint8_t*>(data);
         for (int i = 0; i < numSamples; i++) {
             samples.push_back(static_cast<double>(data_int8[i]) - 128.0);
         }
     } else if (bitDepth == 24) {
-        std::cout << "bit depth" << bitDepth << std::endl;
+        LOG_DEBUG() << "bit depth" << bitDepth;
         int8_t* data_int8 = static_cast<int8_t*>(data);
         for (int i = 0; i < numSamples; i++)
         {
@@ -1475,13 +1475,13 @@ std::vector<double> waveformDataToVector(void *data, uint32_t byteSize, uint16_t
             samples.push_back(static_cast<double>(value));
         }
     } else if (bitDepth == 32) {
-        std::cout << "bit depth" << bitDepth << std::endl;
+        LOG_DEBUG() << "bit depth" << bitDepth;
         int32_t *data_int32 = static_cast<int32_t*>(data);
         for (int i = 0; i < numSamples; i++) {
             samples.push_back(static_cast<double>(data_int32[i]));
         }
     } else {
-        std::cout << "Unsupported bit depth:" << bitDepth << std::endl;
+        LOG_WARNING() << "Unsupported bit depth:" << bitDepth;
     }
 
     return samples;
