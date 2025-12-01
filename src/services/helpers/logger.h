@@ -17,7 +17,7 @@ public:
         CRITICAL
     };
 
-    static void log(Level level, const std::string& file, int line, const std::string& message) {
+    static void log(Level level, const std::string& file, int line, const std::string& function, const std::string& message) {
         auto now = std::chrono::system_clock::now();
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
@@ -36,7 +36,7 @@ public:
 
         std::cout << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S")
                   << "." << std::setfill('0') << std::setw(3) << ms.count() << " "
-                  << filename << ":" << line << " "
+                  << filename << ":" << line << " [" << function << "] "
                   << message << std::endl;
     }
 };
@@ -44,11 +44,11 @@ public:
 // LogStream helper class for stream-style logging
 class LogStream {
 public:
-    LogStream(Logger::Level level, const std::string& file, int line)
-        : m_level(level), m_file(file), m_line(line) {}
+    LogStream(Logger::Level level, const std::string& file, int line, const std::string& function)
+        : m_level(level), m_file(file), m_line(line), m_function(function) {}
 
     ~LogStream() {
-        Logger::log(m_level, m_file, m_line, m_stream.str());
+        Logger::log(m_level, m_file, m_line, m_function, m_stream.str());
     }
 
     template <typename T>
@@ -61,13 +61,14 @@ private:
     Logger::Level m_level;
     std::string m_file;
     int m_line;
+    std::string m_function;
     std::ostringstream m_stream;
 };
 
 // Macros to make it easier to use with stream-style syntax
-#define LOG_DEBUG() LogStream(Logger::Level::DEBUG, __FILE__, __LINE__)
-#define LOG_INFO() LogStream(Logger::Level::INFO, __FILE__, __LINE__)
-#define LOG_WARNING() LogStream(Logger::Level::WARNING, __FILE__, __LINE__)
-#define LOG_CRITICAL() LogStream(Logger::Level::CRITICAL, __FILE__, __LINE__)
+#define LOG_DEBUG() LogStream(Logger::Level::DEBUG, __FILE__, __LINE__, __FUNCTION__)
+#define LOG_INFO() LogStream(Logger::Level::INFO, __FILE__, __LINE__, __FUNCTION__)
+#define LOG_WARNING() LogStream(Logger::Level::WARNING, __FILE__, __LINE__, __FUNCTION__)
+#define LOG_CRITICAL() LogStream(Logger::Level::CRITICAL, __FILE__, __LINE__, __FUNCTION__)
 
 #endif // LOGGER_H

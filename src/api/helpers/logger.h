@@ -15,7 +15,7 @@ public:
         CRITICAL
     };
 
-    static QString formatPrefix(const QString& file, int line) {
+    static QString formatPrefix(const QString& file, int line, const QString& function) {
         // Get current timestamp with milliseconds
         QDateTime now = QDateTime::currentDateTime();
         QString timestamp = now.toString("yyyy-MM-dd hh:mm:ss.zzz");
@@ -24,8 +24,8 @@ public:
         QFileInfo fileInfo(file);
         QString filename = fileInfo.fileName();
         
-        // Format: "timestamp filename:line"
-        return QString("%1 %2:%3").arg(timestamp).arg(filename).arg(line);
+        // Format: "timestamp filename:line:function"
+        return QString("%1 %2:%3 [%4]").arg(timestamp).arg(filename).arg(line).arg(function);
     }
 
     static QtMsgType levelToMsgType(Level level) {
@@ -42,11 +42,11 @@ public:
 // QtLogStream helper class for stream-style logging with Qt
 class QtLogStream {
 public:
-    QtLogStream(QtLogger::Level level, const QString& file, int line)
-        : m_level(level), m_file(file), m_line(line) {}
+    QtLogStream(QtLogger::Level level, const QString& file, int line, const QString& function)
+        : m_level(level), m_file(file), m_line(line), m_function(function) {}
 
     ~QtLogStream() {
-        QString prefix = QtLogger::formatPrefix(m_file, m_line);
+        QString prefix = QtLogger::formatPrefix(m_file, m_line, m_function);
         QString fullMessage = QString("%1 %2").arg(prefix).arg(m_message);
         
         switch (m_level) {
@@ -82,13 +82,14 @@ private:
     QtLogger::Level m_level;
     QString m_file;
     int m_line;
+    QString m_function;
     QString m_message;
 };
 
 // Macros to make it easier to use with stream-style syntax
-#define LOG_DEBUG() QtLogStream(QtLogger::Level::DEBUG, __FILE__, __LINE__)
-#define LOG_INFO() QtLogStream(QtLogger::Level::INFO, __FILE__, __LINE__)
-#define LOG_WARNING() QtLogStream(QtLogger::Level::WARNING, __FILE__, __LINE__)
-#define LOG_CRITICAL() QtLogStream(QtLogger::Level::CRITICAL, __FILE__, __LINE__)
+#define LOG_DEBUG() QtLogStream(QtLogger::Level::DEBUG, __FILE__, __LINE__, __FUNCTION__)
+#define LOG_INFO() QtLogStream(QtLogger::Level::INFO, __FILE__, __LINE__, __FUNCTION__)
+#define LOG_WARNING() QtLogStream(QtLogger::Level::WARNING, __FILE__, __LINE__, __FUNCTION__)
+#define LOG_CRITICAL() QtLogStream(QtLogger::Level::CRITICAL, __FILE__, __LINE__, __FUNCTION__)
 
 #endif // API_LOGGER_H
