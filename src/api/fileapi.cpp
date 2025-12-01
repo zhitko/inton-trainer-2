@@ -1,4 +1,5 @@
 #include "fileapi.h"
+#include "helpers/logger.h"
 #include <QDirIterator>
 #include <QDebug>
 #include <QFileInfo>

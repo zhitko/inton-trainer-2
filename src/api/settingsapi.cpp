@@ -1,4 +1,5 @@
 #include "settingsapi.h"
+#include "helpers/logger.h"
 #include <QDebug>
 #include <QCoreApplication>
 #include <QQmlEngine>
@@ -166,6 +167,6 @@ void SettingsApi::updateTranslator()
             engine->retranslate();
         }
     } else {
-        qDebug() << "Failed to load translation for" << lang;
+        LOG_WARNING() << "Failed to load translation for" << lang;
     }
 }

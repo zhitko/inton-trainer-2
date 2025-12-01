@@ -1,4 +1,5 @@
 #include "audioapi.h"
+#include "helpers/logger.h"
 #include <QDebug>
 #include <QStandardPaths>
 #include <QDir>
@@ -52,7 +53,7 @@ qreal AudioApi::audioLevel() const
 
 void AudioApi::play(const QString& filePath)
 {
-    qDebug() << "AudioApi::play() " << filePath;
+    LOG_DEBUG() << "AudioApi::play()" << filePath;
     QString fullPath = QDir(QCoreApplication::applicationDirPath()).filePath(filePath);
     m_player->setSource(QUrl::fromLocalFile(fullPath));
     m_player->play();
@@ -112,7 +113,7 @@ void AudioApi::startRecording(int durationSeconds)
     m_isRecording = true;
     emit isRecordingChanged();
 
-    qDebug() << "Recording started";
+    LOG_INFO() << "Recording started";
 }
 
 void AudioApi::stopRecording()
@@ -128,7 +129,7 @@ void AudioApi::stopRecording()
     m_isRecording = false;
     emit isRecordingChanged();
 
-    qDebug() << "Recording stopped";
+    LOG_INFO() << "Recording stopped";
 }
 
 QString AudioApi::saveWavFile(QString fileName)

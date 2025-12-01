@@ -1,4 +1,5 @@
 #include "settings.h"
+#include "logger.h"
 #include <QSettings>
 #include <QFileInfo>
 #include <QCoreApplication>
@@ -22,7 +23,7 @@ AppSettings Settings::loadSettings() {
     QString absolutePath = fileInfo.absoluteFilePath();
     
     QSettings qsettings(absolutePath, QSettings::IniFormat);
-    qDebug() << "Loading settings from:" << absolutePath;
+    LOG_INFO() << "Loading settings from:" << absolutePath;
 
     qsettings.beginGroup("General");
     settings.language = qsettings.value("language", "ru").toString().toStdString();
@@ -50,7 +51,7 @@ void Settings::saveSettings(const AppSettings& settings) {
     QString absolutePath = fileInfo.absoluteFilePath();
     
     QSettings qsettings(absolutePath, QSettings::IniFormat);
-    qDebug() << "Saving settings to:" << absolutePath;
+    LOG_INFO() << "Saving settings to:" << absolutePath;
 
     qsettings.beginGroup("General");
     qsettings.setValue("language", QString::fromStdString(settings.language));
@@ -69,9 +70,8 @@ void Settings::saveSettings(const AppSettings& settings) {
     
     qsettings.sync();
     
-    // Debug output
-    qDebug() << "QSettings status:" << qsettings.status();
+    LOG_DEBUG() << "QSettings status:" << qsettings.status();
     if (qsettings.status() != QSettings::NoError) {
-        qWarning() << "Failed to save settings. Status:" << qsettings.status();
+        LOG_WARNING() << "Failed to save settings. Status:" << qsettings.status();
     }
 }
