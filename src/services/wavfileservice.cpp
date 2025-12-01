@@ -3,6 +3,8 @@
 #include <iostream>
 #include <filesystem>
 #include <algorithm>
+#include <sstream>
+#include "helpers/logger.h"
 
 namespace fs = std::filesystem;
 
@@ -46,7 +48,7 @@ std::string WavFileService::writeWaveFile(const std::string &fileName, const std
     saveWaveFile(waveFile, absoluteFilePath.string());
     waveCloseFile(waveFile);
 
-    std::cout << "Saved to:" << absoluteFilePath.string() << std::endl;
+    LOG_INFO() << "Saved to:" << absoluteFilePath.string();
     return relativePath.string();
 }
 
@@ -54,7 +56,7 @@ std::vector<double> WavFileService::readWaveData(WaveFile *waveFile)
 {
     std::vector<double> samples;
     if (!waveFile || !waveFile->dataChunk) {
-        std::cerr << "WaveFile or DataChunk is null" << std::endl;
+        LOG_WARNING() << "WaveFile or DataChunk is null";
         return samples;
     }
 
@@ -68,15 +70,15 @@ std::vector<double> WavFileService::readWaveData(WaveFile *waveFile)
 
 std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
 {
-    std::cout << "readCuePoints called" << std::endl;
+    LOG_DEBUG() << "readCuePoints called";
     std::vector<CuePointData> cuePoints;
     if (!waveFile || !waveFile->cueChunk) {
-        std::cout << "WaveFile or CueChunk is null" << std::endl;
+        LOG_WARNING() << "WaveFile or CueChunk is null";
         return cuePoints;
     }
 
     uint32_t cuePointsCount = littleEndianBytesToUInt32(waveFile->cueChunk->cuePointsCount);
-    std::cout << "Found " << cuePointsCount << " cue points" << std::endl;
+    LOG_INFO() << "Found " << cuePointsCount << " cue points";
 
     for (uint32_t i = 0; i < cuePointsCount; ++i) {
         CuePointData cuePoint;
@@ -124,11 +126,11 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
         }
         cuePoint.label = label;
         
-        std::cout << "Cue Point " << i 
-                  << ": ID=" << cuePoint.id 
-                  << " Label=" << cuePoint.label 
-                  << " Position=" << cuePoint.position
-                  << " Length=" << cuePoint.length << std::endl;
+        LOG_DEBUG() << "Cue Point " << i 
+                    << ": ID=" << cuePoint.id 
+                    << " Label=" << cuePoint.label 
+                    << " Position=" << cuePoint.position
+                    << " Length=" << cuePoint.length;
 
         cuePoints.push_back(cuePoint);
     }

@@ -3,6 +3,8 @@
 #include <cmath>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
+#include "helpers/logger.h"
 
 std::vector<double> UMPService::getUMP(
     const std::vector<double>& pitch,
@@ -11,25 +13,25 @@ std::vector<double> UMPService::getUMP(
     int waveDataSize
 )
 {
-    std::cout << "[UMPService::getUMP] Starting..." << std::endl;
-    std::cout << "  Pitch size: " << pitch.size() << std::endl;
-    std::cout << "  Cue points count: " << cuePoints.size() << std::endl;
-    std::cout << "  Target segment length: " << length << std::endl;
-    std::cout << "  Wave data size: " << waveDataSize << std::endl;
+    LOG_INFO() << "[UMPService::getUMP] Starting...";
+    LOG_INFO() << "  Pitch size: " << pitch.size();
+    LOG_INFO() << "  Cue points count: " << cuePoints.size();
+    LOG_INFO() << "  Target segment length: " << length;
+    LOG_INFO() << "  Wave data size: " << waveDataSize;
     
     std::vector<double> result;
 
     const int pitchSize = pitch.size();
     
     if (pitch.empty() || cuePoints.empty() || length <= 0 || pitchSize <= 0) {
-        std::cout << "  Early return due to invalid input" << std::endl;
+        LOG_WARNING() << "  Early return due to invalid input";
         return result;
     }
 
     int cuePointIndex = 0;
     for (const auto& cuePoint : cuePoints) {
-        std::cout << "  Processing cue point " << cuePointIndex << " (ID " << cuePoint.id << ", label: " << cuePoint.label << ")" << std::endl;
-        std::cout << "    Position: " << cuePoint.position << ", Length: " << cuePoint.length << std::endl;
+        LOG_DEBUG() << "  Processing cue point " << cuePointIndex << " (ID " << cuePoint.id << ", label: " << cuePoint.label << ")";
+        LOG_DEBUG() << "    Position: " << cuePoint.position << ", Length: " << cuePoint.length;
         
         // Calculate start and end frame indices
         // cuePoint.position is in waveDataSize
@@ -38,18 +40,18 @@ std::vector<double> UMPService::getUMP(
         int startFrame = static_cast<int>(std::floor(pitchSize * cuePoint.position / waveDataSize));
         int endFrame = static_cast<int>(std::floor(pitchSize * (cuePoint.position + cuePoint.length) / waveDataSize));
         
-        std::cout << "    Calculated startFrame: " << startFrame << ", endFrame: " << endFrame << std::endl;
+        LOG_DEBUG() << "    Calculated startFrame: " << startFrame << ", endFrame: " << endFrame;
         
         // Clamp indices to pitch vector bounds
         startFrame = std::max(0, std::min(startFrame, pitchSize));
         endFrame = std::max(0, std::min(endFrame, pitchSize));
         
-        std::cout << "    Clamped startFrame: " << startFrame << ", endFrame: " << endFrame << std::endl;
+        LOG_DEBUG() << "    Clamped startFrame: " << startFrame << ", endFrame: " << endFrame;
         
         // If startFrame >= endFrame, we have no data for this segment.
         // We still need to produce 'length' samples to maintain the structure.
         if (startFrame >= endFrame) {
-            std::cout << "    No data for this segment, filling with zeros" << std::endl;
+            LOG_DEBUG() << "    No data for this segment, filling with zeros";
             for (int i = 0; i < length; ++i) {
                 result.push_back(0.0);
             }
@@ -63,7 +65,7 @@ std::vector<double> UMPService::getUMP(
             segment.assign(pitch.begin() + startFrame, pitch.begin() + endFrame);
         }
 
-        std::cout << "    Segment size: " << segment.size() << " frames" << std::endl;
+        LOG_DEBUG() << "    Segment size: " << segment.size() << " frames";
 
         std::vector<double> interpolatedSegment = VectorUtils::linearInterpolation(segment, length);
         result.insert(result.end(), interpolatedSegment.begin(), interpolatedSegment.end());
@@ -71,6 +73,6 @@ std::vector<double> UMPService::getUMP(
         cuePointIndex++;
     }
 
-    std::cout << "[UMPService::getUMP] Finished. Result size: " << result.size() << std::endl;
+    LOG_INFO() << "[UMPService::getUMP] Finished. Result size: " << result.size();
     return result;
 }

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include "SPTK/analysis/pitch_extraction.h"
+#include "helpers/logger.h"
 
 PitchService::PitchService() {
 }
@@ -43,7 +44,7 @@ std::vector<double> PitchService::getPitch(
             sptkAlgorithm = sptk::PitchExtraction::kNumAlgorithms;
             break;
         default:
-            std::cerr << "Unknown algorithm" << std::endl;
+            LOG_WARNING() << "Unknown algorithm";
             return result;
     }
 
@@ -60,7 +61,7 @@ std::vector<double> PitchService::getPitch(
     );
 
     if (!pitchExtractor.IsValid()) {
-        std::cerr << "PitchExtraction initialization failed" << std::endl;
+        LOG_CRITICAL() << "PitchExtraction initialization failed";
         return result;
     }
 
@@ -70,7 +71,7 @@ std::vector<double> PitchService::getPitch(
     sptk::PitchExtractionInterface::Polarity polarity;
     
     if (!pitchExtractor.Run(inputWaveData, &f0, &epochs, &polarity)) {
-        std::cerr << "Pitch extraction failed" << std::endl;
+        LOG_CRITICAL() << "Pitch extraction failed";
         return result;
     }
 
@@ -94,7 +95,7 @@ std::vector<double> PitchService::getPitch(
             }
             break;
         default:
-            std::cerr << "Unknown output format" << std::endl;
+            LOG_WARNING() << "Unknown output format";
             return result;
     }
 
