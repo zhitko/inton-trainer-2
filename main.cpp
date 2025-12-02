@@ -8,8 +8,14 @@
 #include "wavfileapi.h"
 #include "src/api/settingsapi.h"
 
+// Logging
+#include "src/services/helpers/fileLogger.h"
+
 int main(int argc, char *argv[])
 {
+    // Initialize file logger (clears the log file)
+    FileLogger::getInstance().initialize();
+    
     QGuiApplication app(argc, argv);
 
     qmlRegisterType<AudioApi>("by.intontrainer.audio", 1, 0, "AudioApi");

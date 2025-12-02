@@ -7,6 +7,7 @@
 #include <chrono>
 #include <iomanip>
 #include <filesystem>
+#include "fileLogger.h"
 
 class Logger {
 public:
@@ -34,10 +35,20 @@ public:
         std::filesystem::path filePath(file);
         std::string filename = filePath.filename().string();
 
-        std::cout << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S")
-                  << "." << std::setfill('0') << std::setw(3) << ms.count() << " "
-                  << filename << ":" << line << " [" << function << "] "
-                  << message << std::endl;
+        // Format the log message
+        std::ostringstream oss;
+        oss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S")
+            << "." << std::setfill('0') << std::setw(3) << ms.count() << " "
+            << filename << ":" << line << " [" << function << "] "
+            << message;
+        
+        std::string formattedMessage = oss.str();
+        
+        // Write to console
+        std::cout << formattedMessage << std::endl;
+        
+        // Write to file
+        FileLogger::getInstance().writeLog(formattedMessage);
     }
 };
 

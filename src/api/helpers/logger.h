@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QString>
 #include <QFileInfo>
+#include "../services/helpers/fileLogger.h"
 
 class QtLogger {
 public:
@@ -49,6 +50,7 @@ public:
         QString prefix = QtLogger::formatPrefix(m_file, m_line, m_function);
         QString fullMessage = QString("%1 %2").arg(prefix).arg(m_message);
         
+        // Write to console
         switch (m_level) {
             case QtLogger::Level::DEBUG:
                 qDebug().noquote() << fullMessage;
@@ -63,6 +65,9 @@ public:
                 qCritical().noquote() << fullMessage;
                 break;
         }
+        
+        // Write to file
+        FileLogger::getInstance().writeLog(fullMessage.toStdString());
     }
 
     template <typename T>

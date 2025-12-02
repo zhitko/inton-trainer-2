@@ -30,6 +30,7 @@ qt_add_executable(appinton-trainer-2
     src/services/helpers/wavFile.cpp
     src/services/helpers/vectorutils.h
     src/services/helpers/vectorutils.cpp
+    src/services/helpers/fileLogger.h
 )
 
 target_include_directories(appinton-trainer-2 PRIVATE 
