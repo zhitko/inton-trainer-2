@@ -58,6 +58,30 @@ ApplicationWindow {
             text: stackView.currentItem.title || qsTr("Inton Trainer")
             anchors.centerIn: parent
         }
+
+        Button {
+            id: backButton
+            anchors.right: parent.right
+            font.family: Icons.familySolid
+            font.pointSize: backButton.hovered ? 18 : 16
+            text: Icons.faCircleLeft
+            height: window.header.height
+            width: window.header.height
+            hoverEnabled: true
+            onClicked: stackView.pop()
+            visible: stackView.depth > 1
+
+            background: Rectangle {
+                color: "transparent"
+            }
+
+            transitions: Transition {
+                NumberAnimation {
+                    property: "font.pointSize"
+                    duration: 100
+                }
+            }
+        }
     }
 
     Drawer {
