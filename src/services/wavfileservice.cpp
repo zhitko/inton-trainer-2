@@ -10,10 +10,17 @@ namespace fs = std::filesystem;
 
 WavFileService::WavFileService(const std::string &rootPath) : m_rootPath(rootPath)
 {
+    LOG_DEBUG() << "Start: WavFileService constructor - rootPath=" << rootPath;
+    LOG_DEBUG() << "Finish: WavFileService constructor";
 }
 
 std::string WavFileService::writeWaveFile(const std::string &fileName, const std::vector<char> &buffer, const AudioFormat &format)
 {
+    LOG_DEBUG() << "Start: writeWaveFile - fileName=" << fileName
+                << ", buffer.size=" << buffer.size()
+                << ", channels=" << format.channelCount
+                << ", sampleRate=" << format.sampleRate
+                << ", bitsPerSample=" << format.bitsPerSample;
     fs::path appDir(m_rootPath);
     fs::path recordsDir = appDir / "data" / "records";
 
@@ -48,12 +55,13 @@ std::string WavFileService::writeWaveFile(const std::string &fileName, const std
     saveWaveFile(waveFile, absoluteFilePath.string());
     waveCloseFile(waveFile);
 
-    LOG_INFO() << "Saved to:" << absoluteFilePath.string();
+    LOG_DEBUG() << "Finish: writeWaveFile - filePath=" << relativePath.string();
     return relativePath.string();
 }
 
 std::vector<double> WavFileService::readWaveData(WaveFile *waveFile)
 {
+    LOG_DEBUG() << "Start: readWaveData";
     std::vector<double> samples;
     if (!waveFile || !waveFile->dataChunk) {
         LOG_WARNING() << "WaveFile or DataChunk is null";
@@ -65,12 +73,14 @@ std::vector<double> WavFileService::readWaveData(WaveFile *waveFile)
     uint16_t bitDepth = littleEndianBytesToUInt16(waveFile->formatChunk->significantBitsPerSample);
 
     samples = waveformDataToVector(data, dataSize, bitDepth);
+    
+    LOG_DEBUG() << "Finish: readWaveData - samples.size=" << samples.size();
     return samples;
 }
 
 std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
 {
-    LOG_DEBUG() << "readCuePoints called";
+    LOG_DEBUG() << "Start: readCuePoints";
     std::vector<CuePointData> cuePoints;
     if (!waveFile || !waveFile->cueChunk) {
         LOG_WARNING() << "WaveFile or CueChunk is null";
@@ -78,7 +88,7 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
     }
 
     uint32_t cuePointsCount = littleEndianBytesToUInt32(waveFile->cueChunk->cuePointsCount);
-    LOG_INFO() << "Found " << cuePointsCount << " cue points";
+    LOG_DEBUG() << "Found " << cuePointsCount << " cue points";
 
     for (uint32_t i = 0; i < cuePointsCount; ++i) {
         CuePointData cuePoint;
@@ -139,5 +149,6 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
         return a.position < b.position;
     });
 
+    LOG_DEBUG() << "Finish: readCuePoints - cuePoints.size=" << cuePoints.size();
     return cuePoints;
 }

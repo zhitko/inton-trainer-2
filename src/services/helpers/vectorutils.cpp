@@ -1,10 +1,14 @@
 #include "vectorutils.h"
+#include "logger.h"
 #include <algorithm>
 #include <cmath>
 #include <limits>
 
 std::vector<double> VectorUtils::normalizeByMinMax(double from, double to, const std::vector<double>& data) {
+    LOG_DEBUG() << "Start: normalizeByMinMax - from=" << from << ", to=" << to << ", data.size=" << data.size();
+    
     if (data.empty()) {
+        LOG_DEBUG() << "Finish: normalizeByMinMax - result.size=0 (empty input)";
         return {};
     }
 
@@ -32,11 +36,15 @@ std::vector<double> VectorUtils::normalizeByMinMax(double from, double to, const
         result.push_back(normalized);
     }
 
+    LOG_DEBUG() << "Finish: normalizeByMinMax - result.size=" << result.size();
     return result;
 }
 
 std::vector<double> VectorUtils::normalizeByMax(double to, const std::vector<double>& data) {
+    LOG_DEBUG() << "Start: normalizeByMax - to=" << to << ", data.size=" << data.size();
+    
     if (data.empty()) {
+        LOG_DEBUG() << "Finish: normalizeByMax - result.size=0 (empty input)";
         return {};
     }
 
@@ -57,11 +65,15 @@ std::vector<double> VectorUtils::normalizeByMax(double to, const std::vector<dou
         result.push_back((val / maxVal) * to);
     }
 
+    LOG_DEBUG() << "Finish: normalizeByMax - result.size=" << result.size();
     return result;
 }
 
 std::vector<double> VectorUtils::normalizeByMean(const std::vector<double>& data) {
+    LOG_DEBUG() << "Start: normalizeByMean - data.size=" << data.size();
+    
     if (data.empty()) {
+        LOG_DEBUG() << "Finish: normalizeByMean - result.size=0 (empty input)";
         return {};
     }
 
@@ -78,11 +90,15 @@ std::vector<double> VectorUtils::normalizeByMean(const std::vector<double>& data
         result.push_back(val - mean);
     }
 
+    LOG_DEBUG() << "Finish: normalizeByMean - result.size=" << result.size();
     return result;
 }
 
 std::vector<double> VectorUtils::normalizeByMeanDeviation(const std::vector<double>& data) {
+    LOG_DEBUG() << "Start: normalizeByMeanDeviation - data.size=" << data.size();
+    
     if (data.empty()) {
+        LOG_DEBUG() << "Finish: normalizeByMeanDeviation - result.size=0 (empty input)";
         return {};
     }
 
@@ -110,11 +126,15 @@ std::vector<double> VectorUtils::normalizeByMeanDeviation(const std::vector<doub
         result.push_back((val - mean) / deviation);
     }
 
+    LOG_DEBUG() << "Finish: normalizeByMeanDeviation - result.size=" << result.size();
     return result;
 }
 
 std::vector<double> VectorUtils::linearInterpolation(const std::vector<double>& data, int targetLength) {
+    LOG_DEBUG() << "Start: linearInterpolation - data.size=" << data.size() << ", targetLength=" << targetLength;
+    
     if (data.empty() || targetLength <= 0) {
+        LOG_DEBUG() << "Finish: linearInterpolation - result.size=0 (invalid input)";
         return {};
     }
 
@@ -144,5 +164,6 @@ std::vector<double> VectorUtils::linearInterpolation(const std::vector<double>& 
         }
     }
 
+    LOG_DEBUG() << "Finish: linearInterpolation - result.size=" << result.size();
     return result;
 }

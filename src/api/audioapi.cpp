@@ -38,44 +38,63 @@ AudioApi::AudioApi(QObject *parent) : QObject(parent)
 
 bool AudioApi::isRecording() const
 {
-    return m_isRecording;
+    LOG_DEBUG() << "Start: isRecording";
+    bool result = m_isRecording;
+    LOG_DEBUG() << "Finish: isRecording - result=" << result;
+    return result;
 }
 
 bool AudioApi::isPlaying() const
 {
-    return m_isPlaying;
+    LOG_DEBUG() << "Start: isPlaying";
+    bool result = m_isPlaying;
+    LOG_DEBUG() << "Finish: isPlaying - result=" << result;
+    return result;
 }
 
 qreal AudioApi::audioLevel() const
 {
-    return m_audioLevel;
+    LOG_DEBUG() << "Start: audioLevel";
+    qreal result = m_audioLevel;
+    LOG_DEBUG() << "Finish: audioLevel - result=" << result;
+    return result;
 }
 
 void AudioApi::play(const QString& filePath)
 {
-    LOG_DEBUG() << "AudioApi::play()" << filePath;
+    LOG_DEBUG() << "Start: play - filePath=" << filePath;
     QString fullPath = QDir(QCoreApplication::applicationDirPath()).filePath(filePath);
     m_player->setSource(QUrl::fromLocalFile(fullPath));
     m_player->play();
+    LOG_DEBUG() << "Finish: play";
 }
 
 void AudioApi::stopPlayback()
 {
+    LOG_DEBUG() << "Start: stopPlayback";
     m_player->stop();
+    LOG_DEBUG() << "Finish: stopPlayback";
 }
 
 void AudioApi::setAudioLevel(qreal level)
 {
-    if (qFuzzyCompare(m_audioLevel, level))
+    LOG_DEBUG() << "Start: setAudioLevel - level=" << level;
+    if (qFuzzyCompare(m_audioLevel, level)) {
+        LOG_DEBUG() << "Finish: setAudioLevel - No change";
         return;
+    }
     m_audioLevel = level;
     emit isAudioLevelChanged();
+    LOG_DEBUG() << "Finish: setAudioLevel";
 }
 
 void AudioApi::startRecording(int durationSeconds)
 {
-    if (m_isRecording)
+    LOG_DEBUG() << "Start: startRecording - durationSeconds=" << durationSeconds;
+    if (m_isRecording) {
+        LOG_DEBUG() << "Finish: startRecording - Already recording";
         return;
+    }
 
     m_buffer.clear();
     setAudioLevel(0.0);
@@ -113,13 +132,16 @@ void AudioApi::startRecording(int durationSeconds)
     m_isRecording = true;
     emit isRecordingChanged();
 
-    LOG_INFO() << "Recording started";
+    LOG_DEBUG() << "Finish: startRecording - Recording started";
 }
 
 void AudioApi::stopRecording()
 {
-    if (!m_isRecording)
+    LOG_DEBUG() << "Start: stopRecording";
+    if (!m_isRecording) {
+        LOG_DEBUG() << "Finish: stopRecording - Not recording";
         return;
+    }
 
     m_audioSource->stop();
     m_audioSource->deleteLater();
@@ -129,11 +151,12 @@ void AudioApi::stopRecording()
     m_isRecording = false;
     emit isRecordingChanged();
 
-    LOG_INFO() << "Recording stopped";
+    LOG_DEBUG() << "Finish: stopRecording - Recording stopped";
 }
 
 QString AudioApi::saveWavFile(QString fileName)
 {
+    LOG_DEBUG() << "Start: saveWavFile - fileName=" << fileName;
     if (fileName.isEmpty()) {
         fileName = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH-mm-ss");
     }
@@ -155,7 +178,9 @@ QString AudioApi::saveWavFile(QString fileName)
     format.bitsPerSample = bitsPerSample;
 
     std::string result = m_wavFileService->writeWaveFile(fileName.toStdString(), buffer, format);
-    return QString::fromStdString(result);
+    QString qResult = QString::fromStdString(result);
+    LOG_DEBUG() << "Finish: saveWavFile - result=" << qResult;
+    return qResult;
 }
 
     

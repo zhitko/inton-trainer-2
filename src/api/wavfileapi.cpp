@@ -14,13 +14,16 @@ WavFileApi::WavFileApi(QObject *parent) : QObject(parent)
 
 WaveFile* WavFileApi::openWavFile(const QString& filePath)
 {
+    LOG_DEBUG() << "Start: openWavFile - filePath=" << filePath;
     std::string stdPath = filePath.toStdString();
-    return waveOpenFile(stdPath);
+    WaveFile* result = waveOpenFile(stdPath);
+    LOG_DEBUG() << "Finish: openWavFile - success=" << (result != nullptr);
+    return result;
 }
 
 QVariantList WavFileApi::getCuePoints(WaveFile* waveFile)
 {
-    LOG_DEBUG() << "getCuePoints called";
+    LOG_DEBUG() << "Start: getCuePoints";
     QVariantList cuePoints;
     
     std::vector<CuePointData> points = WavFileService::readCuePoints(waveFile);
@@ -45,13 +48,13 @@ QVariantList WavFileApi::getCuePoints(WaveFile* waveFile)
         cuePoints.append(cuePoint);
     }
 
-    LOG_DEBUG() << "getCuePoints finished";
+    LOG_DEBUG() << "Finish: getCuePoints - count=" << cuePoints.size();
     return cuePoints;
 }
 
 QVariantList WavFileApi::getWaveData(WaveFile* waveFile)
 {
-    LOG_DEBUG() << "getWaveData called";
+    LOG_DEBUG() << "Start: getWaveData";
     QVariantList waveData;
     
     std::vector<double> samples = WavFileService::readWaveData(waveFile);
@@ -61,7 +64,7 @@ QVariantList WavFileApi::getWaveData(WaveFile* waveFile)
         waveData.append(QPointF(i, normalizedSamples[i]));
     }
     
-    LOG_DEBUG() << "getWaveData finished";
+    LOG_DEBUG() << "Finish: getWaveData - size=" << waveData.size();
     return waveData;
 }
 
@@ -75,7 +78,7 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
                                   const QString& outputFormat,
                                   const QString& normalizationMode)
 {
-    LOG_DEBUG() << "getPitch called with normalization:" << normalizationMode;
+    LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate << ", minF0=" << minF0 << ", maxF0=" << maxF0 << ", voicingThreshold=" << voicingThreshold << ", outputFormat=" << outputFormat << ", normalizationMode=" << normalizationMode;
     QVariantList pitchData;
     
     if (!waveFile) {
@@ -158,7 +161,7 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
         }
     }
     
-    LOG_INFO() << "getPitch finished with" << pitch.size() << "frames";
+    LOG_DEBUG() << "Finish: getPitch - size=" << pitchData.size();
     return pitchData;
 }
 
@@ -167,11 +170,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
                                int length,
                                int waveDataSize)
 {
-    LOG_DEBUG() << "getUMP called";
-    LOG_DEBUG() << "  Input pitch size:" << pitch.size();
-    LOG_DEBUG() << "  Input cuePoints count:" << cuePoints.size();
-    LOG_DEBUG() << "  Target segment length:" << length;
-    LOG_DEBUG() << "  Wave data size:" << waveDataSize;
+    LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size() << ", cuePoints.size=" << cuePoints.size() << ", length=" << length << ", waveDataSize=" << waveDataSize;
     
     QVariantMap result;
 
@@ -235,7 +234,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
     }
     result["cuePoints"] = modifiedCuePoints;
 
-    LOG_DEBUG() << "getUMP finished";
+    LOG_DEBUG() << "Finish: getUMP - result.keys=" << result.keys();
     return result;
 }
 

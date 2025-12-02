@@ -25,15 +25,18 @@ namespace fs = std::filesystem;
 
 uint32_t to_odd(uint32_t value)
 {
+    LOG_DEBUG()  << "Start: to_odd - value=" << value;
     if (value % 2 == 1)
     {
         value += 1;
     }
+    LOG_DEBUG() << "Finish: to_odd - result=" << value;
     return value;
 }
 
 WaveFile * initWaveFile()
 {
+    LOG_DEBUG() << "Start: initWaveFile";
     WaveFile * waveFile = new WaveFile();
 
     waveFile->file = nullptr;
@@ -45,6 +48,7 @@ WaveFile * initWaveFile()
     waveFile->listChunks = nullptr;
     waveFile->listCount = 0;
 
+    LOG_DEBUG() << "Finish: initWaveFile";
     return waveFile;
 }
 
@@ -52,10 +56,12 @@ WaveFile * processFile(WaveFile * waveFile);
 
 WaveFile * waveOpenHFile(int handle)
 {
+    LOG_DEBUG() << "Start: wave OpenHFile - handle=" << handle;
     WaveFile * waveFile = initWaveFile();
     if(waveFile == nullptr)
     {
         LOG_CRITICAL() << "[waveOpenHFile] Memory Allocation Error: Could not allocate memory for Wave File";
+        LOG_DEBUG() << "Finish: waveOpenHFile - result=nullptr (allocation failed)";
         return nullptr;
     }
 
@@ -66,19 +72,24 @@ WaveFile * waveOpenHFile(int handle)
     {
         LOG_CRITICAL() << "[waveOpenHFile] Could not open input file " << (waveFile->filePath ? waveFile->filePath : "null");
         waveCloseFile(waveFile);
+        LOG_DEBUG() << "Finish: waveOpenHFile - result=nullptr (file open failed)";
         return nullptr;
     }
-    return processFile(waveFile);
+    WaveFile* result = processFile(waveFile);
+    LOG_DEBUG() << "Finish: waveOpenHFile - result=" << (result ? "success" : "failed");
+    return result;
 }
 
 
 
 WaveFile * waveOpenFile(const std::string& path)
 {
+    LOG_DEBUG() << "Start: waveOpenFile - path=" << path;
     WaveFile * waveFile = initWaveFile();
     if(waveFile == nullptr)
     {
         LOG_CRITICAL() << "[waveOpenFile] Memory Allocation Error: Could not allocate memory for Wave File";
+        LOG_DEBUG() << "Finish: waveOpenFile - result=nullptr (allocation failed)";
         return nullptr;
     }
 
@@ -101,6 +112,7 @@ WaveFile * waveOpenFile(const std::string& path)
     {
         LOG_CRITICAL() << "[waveOpenFile] Could not open input file " << (waveFile->filePath ? waveFile->filePath : "null");
         waveCloseFile(waveFile);
+        LOG_DEBUG() << "Finish: waveOpenFile - result=nullptr (file open failed)";
         return nullptr;
     }
 
@@ -112,10 +124,12 @@ WaveFile * waveOpenFile(const std::string& path)
         waveFile->file = nullptr;
     }
 
+    LOG_DEBUG() << "Finish: waveOpenFile - result=" << (waveFile ? "success" : "failed");
     return waveFile;
 }
 WaveFile * processFile(WaveFile * waveFile)
 {
+    LOG_DEBUG() << "Start: processFile";
     ChunkLocation formatChunkExtraBytes = {0,0};
     ChunkLocation dataChunkLocation = {0,0};
     ChunkLocation otherChunkLocation = {0,0};
@@ -596,13 +610,18 @@ WaveFile * processFile(WaveFile * waveFile)
         }
     }
 
+    LOG_DEBUG() << "Finish: processFile - result=success";
     return waveFile;
 }
 
 void waveCloseFile(WaveFile *waveFile)
 {
+    LOG_DEBUG() << "Start: waveCloseFile";
     // TODO: free allocated memory in stucts
-    if(waveFile == nullptr) return;
+    if(waveFile == nullptr) {
+        LOG_DEBUG() << "Finish: waveCloseFile - waveFile was nullptr";
+        return;
+    }
     if(waveFile->file != nullptr)
     {
         fclose(waveFile->file);
@@ -625,6 +644,8 @@ void waveCloseFile(WaveFile *waveFile)
     }
     if(waveFile->filePath != nullptr) free(waveFile->filePath);
     free(waveFile);
+    
+    LOG_DEBUG() << "Finish: waveCloseFile";
 }
 
 WaveFile * waveCloneFile(WaveFile *waveFile)
@@ -1027,6 +1048,7 @@ WaveFile * makeWaveFileFromRawData(
 
 void saveWaveFile(WaveFile *waveFile, const std::string &filePath)
 {
+    LOG_DEBUG() << "Start: saveWaveFile - filePath=" << filePath;
     if (!filePath.empty())
     {
         waveFile->filePath = (char *)malloc(1 + filePath.length());
@@ -1327,6 +1349,8 @@ void saveWaveFile(WaveFile *waveFile, const std::string &filePath)
             }
         }
     }
+    
+    LOG_DEBUG() << "Finish: saveWaveFile";
     fclose(waveFile->file);
     waveFile->file = nullptr;
 }
@@ -1442,6 +1466,7 @@ void uint16ToLittleEndianBytes(uint16_t uInt16Value, char out_LittleEndianBytes[
 
 std::vector<double> waveformDataToVector(void *data, uint32_t byteSize, uint16_t bitDepth)
 {
+    LOG_DEBUG() << "Start: waveformDataToVector - byteSize=" << byteSize << ", bitDepth=" << bitDepth;
     std::vector<double> samples;
     int numSamples = byteSize / (bitDepth / 8);
 
@@ -1484,6 +1509,7 @@ std::vector<double> waveformDataToVector(void *data, uint32_t byteSize, uint16_t
         LOG_WARNING() << "Unsupported bit depth:" << bitDepth;
     }
 
+    LOG_DEBUG() << "Finish: waveformDataToVector - samples.size=" << samples.size();
     return samples;
 }
 

@@ -13,11 +13,10 @@ std::vector<double> UMPService::getUMP(
     int waveDataSize
 )
 {
-    LOG_INFO() << "[UMPService::getUMP] Starting...";
-    LOG_INFO() << "  Pitch size: " << pitch.size();
-    LOG_INFO() << "  Cue points count: " << cuePoints.size();
-    LOG_INFO() << "  Target segment length: " << length;
-    LOG_INFO() << "  Wave data size: " << waveDataSize;
+    LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size()
+                << ", cuePoints.size=" << cuePoints.size()
+                << ", length=" << length
+                << ", waveDataSize=" << waveDataSize;
     
     std::vector<double> result;
 
@@ -73,6 +72,6 @@ std::vector<double> UMPService::getUMP(
         cuePointIndex++;
     }
 
-    LOG_INFO() << "[UMPService::getUMP] Finished. Result size: " << result.size();
+    LOG_DEBUG() << "Finish: getUMP - result.size=" << result.size();
     return result;
 }

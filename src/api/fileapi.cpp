@@ -45,14 +45,17 @@ FileApi::FileApi(QObject *parent) : QObject(parent)
 
 void FileApi::deleteFile(const QString &file)
 {
+    LOG_DEBUG() << "Start: deleteFile - file=" << file;
     QString basePath = QCoreApplication::applicationDirPath();
     QString searchPath = QDir(basePath).filePath(file);
     QFile f(searchPath);
     f.remove();
+    LOG_DEBUG() << "Finish: deleteFile";
 }
 
 QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilters)
 {
+    LOG_DEBUG() << "Start: getFiles - path=" << path << ", nameFilters=" << nameFilters;
     QString basePath = QCoreApplication::applicationDirPath();
     QString searchPath = QDir(basePath).filePath(path);
 
@@ -97,5 +100,6 @@ QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilter
         QStringList pathParts = relativePath.split('/');
         insert(fileTree, pathParts, fileInfo.isFile());
     }
+    LOG_DEBUG() << "Finish: getFiles - fileCount=" << fileTree.keys().count();
     return fileTree;
 }

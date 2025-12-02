@@ -5,9 +5,13 @@
 #include "helpers/logger.h"
 
 PitchService::PitchService() {
+    LOG_DEBUG() << "Start: PitchService constructor";
+    LOG_DEBUG() << "Finish: PitchService constructor";
 }
 
 PitchService::~PitchService() {
+    LOG_DEBUG() << "Start: PitchService destructor";
+    LOG_DEBUG() << "Finish: PitchService destructor";
 }
 
 std::vector<double> PitchService::getPitch(
@@ -20,6 +24,15 @@ std::vector<double> PitchService::getPitch(
     double voicingThreshold,
     PitchOutputFormat outputFormat
 ) {
+    LOG_DEBUG() << "Start: getPitch - inputWaveData.size=" << inputWaveData.size()
+                << ", algorithm=" << static_cast<int>(algorithm)
+                << ", frameShift=" << frameShift
+                << ", sampleRate=" << sampleRate
+                << ", minF0=" << minF0
+                << ", maxF0=" << maxF0
+                << ", voicingThreshold=" << voicingThreshold
+                << ", outputFormat=" << static_cast<int>(outputFormat);
+    
     std::vector<double> result;
 
     // Map PitchAlgorithm to SPTK's Algorithms
@@ -99,5 +112,6 @@ std::vector<double> PitchService::getPitch(
             return result;
     }
 
+    LOG_DEBUG() << "Finish: getPitch - result.size=" << result.size();
     return result;
 }
