@@ -17,20 +17,36 @@ Page {
     }
 
     Component.onCompleted: {
+        Logger.info("TemplatePage loaded for file: " + filePath);
+
+        Logger.debug("Opening WAV file...");
         let wavFile = wavFileApi.openWavFile(filePath);
+
+        Logger.debug("Extracting cue points...");
         let cuePoints = wavFileApi.getCuePoints(wavFile);
+        Logger.debug("Found " + cuePoints.length + " cue points");
+
+        Logger.debug("Extracting wave data...");
         let waveData = wavFileApi.getWaveData(wavFile);
+        Logger.debug("Wave data length: " + waveData.length);
+
         waveFormGraph.waveData = waveData;
         waveFormGraph.cuePoints = cuePoints;
 
         // Extract pitch data
+        Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
         let pitchData = wavFileApi.getPitch(wavFile, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization);
+        Logger.debug("Pitch data length: " + pitchData.length);
         pitchWaveFormGraph.waveData = pitchData;
 
         // Calculate UMP
+        Logger.debug("Calculating UMP...");
         let umpResult = wavFileApi.getUMP(pitchData, cuePoints, 100, waveData.length);
+        Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
         umpWaveFormGraph.waveData = umpResult.ump;
         umpWaveFormGraph.cuePoints = umpResult.cuePoints;
+
+        Logger.info("TemplatePage initialization complete");
     }
 
     ScrollView {

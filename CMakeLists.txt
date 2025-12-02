@@ -18,6 +18,8 @@ qt_add_executable(appinton-trainer-2
     src/api/wavfileapi.cpp
     src/api/settingsapi.h
     src/api/settingsapi.cpp
+    src/api/qmllogger.h
+    src/api/qmllogger.cpp
     src/api/helpers/settings.h
     src/api/helpers/settings.cpp
     src/services/wavfileservice.h
@@ -43,6 +45,7 @@ add_subdirectory(3rdparty/SPTK)
 
 set(qml_singletons
     ui/utils/Icons.qml
+    ui/utils/Logger.qml
 )
 
 set_source_files_properties(${qml_singletons}

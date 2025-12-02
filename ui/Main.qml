@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material 6.8
 
 import by.intontrainer.settings 1.0
+import "utils"
 
 ApplicationWindow {
     id: window
@@ -27,6 +28,11 @@ ApplicationWindow {
 
     property var theme: getTheme()
 
+    Component.onCompleted: {
+        Logger.info("Main window initialized");
+        Logger.debug("Initial theme: " + window.theme);
+    }
+
     Material.theme: window.theme
 
     header: ToolBar {
@@ -40,7 +46,10 @@ ApplicationWindow {
             height: window.header.height
             width: window.header.height
             hoverEnabled: true
-            onClicked: drawer.open()
+            onClicked: {
+                Logger.debug("Menu button clicked");
+                drawer.open();
+            }
 
             background: Rectangle {
                 color: "transparent"
