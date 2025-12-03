@@ -41,7 +41,7 @@ Page {
 
         // Calculate UMP
         Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(pitchData, cuePoints, 100, waveData.length);
+        let umpResult = wavFileApi.getUMP(pitchData, cuePoints, 50, 100, 50, waveData.length);
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
         umpWaveFormGraph.waveData = umpResult.ump;
         umpWaveFormGraph.cuePoints = umpResult.cuePoints;

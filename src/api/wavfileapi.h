@@ -29,7 +29,9 @@ public slots:
 
     Q_INVOKABLE QVariantMap getUMP(const QVariantList& pitch,
                                    const QVariantList& cuePoints,
-                                   int length,
+                                   int pLength,
+                                   int nLength,
+                                   int tLength,
                                    int waveDataSize);
 };
 

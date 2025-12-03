@@ -10,7 +10,9 @@ public:
     static std::vector<double> getUMP(
         const std::vector<double>& pitch,
         const std::vector<CuePointData>& cuePoints,
-        int length,
+        int pLength,
+        int nLength,
+        int tLength,
         int waveDataSize
     );
 };

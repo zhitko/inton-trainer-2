@@ -9,20 +9,24 @@
 std::vector<double> UMPService::getUMP(
     const std::vector<double>& pitch,
     const std::vector<CuePointData>& cuePoints,
-    int length,
+    int pLength,
+    int nLength,
+    int tLength,
     int waveDataSize
 )
 {
     LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size()
                 << ", cuePoints.size=" << cuePoints.size()
-                << ", length=" << length
+                << ", pLength=" << pLength
+                << ", nLength=" << nLength
+                << ", tLength=" << tLength
                 << ", waveDataSize=" << waveDataSize;
     
     std::vector<double> result;
 
     const int pitchSize = pitch.size();
     
-    if (pitch.empty() || cuePoints.empty() || length <= 0 || pitchSize <= 0) {
+    if (pitch.empty() || cuePoints.empty() || pLength <= 0 || nLength <= 0 || tLength <= 0 || pitchSize <= 0) {
         LOG_WARNING() << "  Early return due to invalid input";
         return result;
     }
@@ -31,6 +35,15 @@ std::vector<double> UMPService::getUMP(
     for (const auto& cuePoint : cuePoints) {
         LOG_DEBUG() << "  Processing cue point " << cuePointIndex << " (ID " << cuePoint.id << ", label: " << cuePoint.label << ")";
         LOG_DEBUG() << "    Position: " << cuePoint.position << ", Length: " << cuePoint.length;
+
+        int length = nLength;
+        char firstChar = cuePoint.label.empty() ? '\0' : std::tolower(static_cast<unsigned char>(cuePoint.label[0]));
+
+        if (firstChar == 'p') {
+            length = pLength;
+        } else if (firstChar == 't') {
+            length = tLength;
+        }
         
         // Calculate start and end frame indices
         // cuePoint.position is in waveDataSize

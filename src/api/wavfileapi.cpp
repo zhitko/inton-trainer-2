@@ -167,10 +167,12 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
 
 QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
                                const QVariantList& cuePoints,
-                               int length,
+                               int pLength,
+                               int nLength,
+                               int tLength,
                                int waveDataSize)
 {
-    LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size() << ", cuePoints.size=" << cuePoints.size() << ", length=" << length << ", waveDataSize=" << waveDataSize;
+    LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size() << ", cuePoints.size=" << cuePoints.size() << ", pLength=" << pLength << ", nLength=" << nLength << ", tLength=" << tLength << ", waveDataSize=" << waveDataSize;
     
     QVariantMap result;
 
@@ -207,7 +209,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
 
     // Call UMPService
     LOG_DEBUG() << "  Calling UMPService::getUMP...";
-    std::vector<double> umpVec = UMPService::getUMP(pitchVec, cuePointsVec, length, waveDataSize);
+    std::vector<double> umpVec = UMPService::getUMP(pitchVec, cuePointsVec, pLength, nLength, tLength, waveDataSize);
     LOG_DEBUG() << "  UMP result size:" << umpVec.size();
 
     // Convert result back to QVariantList (as QPointF for graph)
@@ -220,14 +222,23 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
 
     // Create modified cue points
     QVariantList modifiedCuePoints;
+    int position = 0;
     for (size_t i = 0; i < cuePointsVec.size(); ++i) {
+        int length = nLength;
+        QString label = QString::fromStdString(cuePointsVec[i].label).toLower();
+        if (label.startsWith("p")) {
+            length = pLength;
+        } else if (label.startsWith("t")) {
+            length = tLength;
+        }
+        
         QVariantMap cpMap;
         cpMap["id"] = cuePointsVec[i].id;
         cpMap["label"] = QString::fromStdString(cuePointsVec[i].label);
-        cpMap["position"] = static_cast<uint>(i * length);
+        cpMap["position"] = static_cast<uint>(position);
         cpMap["length"] = static_cast<uint>(length);
         modifiedCuePoints.append(cpMap);
-        
+        position += length;
         LOG_DEBUG() << "  Modified cue point" << cpMap["id"].toUInt() << ":" 
                  << "position=" << cpMap["position"].toUInt() 
                  << "length=" << cpMap["length"].toUInt();
