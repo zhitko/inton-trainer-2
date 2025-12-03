@@ -58,7 +58,7 @@ QVariantList WavFileApi::getWaveData(WaveFile* waveFile)
     QVariantList waveData;
     
     std::vector<double> samples = WavFileService::readWaveData(waveFile);
-    std::vector<double> normalizedSamples = VectorUtils::normalizeByMinMax(0.0, 1.0, samples);
+    std::vector<double> normalizedSamples = VectorUtils::normalizeFromTo(0.0, 1.0, samples);
     
     for (size_t i = 0; i < normalizedSamples.size(); ++i) {
         waveData.append(QPointF(i, normalizedSamples[i]));
@@ -143,9 +143,9 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
         std::vector<double> normalizedPitch;
         
         if (normalizationMode == "max") {
-            normalizedPitch = VectorUtils::normalizeByMax(1.0, pitch);
+            normalizedPitch = pitch;
         } else if (normalizationMode == "min_max") {
-            normalizedPitch = VectorUtils::normalizeByMinMax(0.0, 1.0, pitch);
+            normalizedPitch = VectorUtils::normalizeByMinMax(pitch);
         } else if (normalizationMode == "mean") {
             normalizedPitch = VectorUtils::normalizeByMean(pitch);
         } else if (normalizationMode == "mean_deviation") {
@@ -153,7 +153,7 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
         } else {
             // Default to by max if unknown
             LOG_WARNING() << "Unknown normalization mode:" << normalizationMode << ", defaulting to max";
-            normalizedPitch = VectorUtils::normalizeByMax(1.0, pitch);
+            normalizedPitch = pitch;
         }
         
         for (size_t i = 0; i < normalizedPitch.size(); ++i) {

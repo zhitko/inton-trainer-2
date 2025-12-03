@@ -4,11 +4,11 @@
 #include <cmath>
 #include <limits>
 
-std::vector<double> VectorUtils::normalizeByMinMax(double from, double to, const std::vector<double>& data) {
-    LOG_DEBUG() << "Start: normalizeByMinMax - from=" << from << ", to=" << to << ", data.size=" << data.size();
+std::vector<double> VectorUtils::normalizeFromTo(double from, double to, const std::vector<double>& data) {
+    LOG_DEBUG() << "Start: normalizeFromTo - from=" << from << ", to=" << to << ", data.size=" << data.size();
     
     if (data.empty()) {
-        LOG_DEBUG() << "Finish: normalizeByMinMax - result.size=0 (empty input)";
+        LOG_DEBUG() << "Finish: normalizeFromTo - result.size=0 (empty input)";
         return {};
     }
 
@@ -36,15 +36,48 @@ std::vector<double> VectorUtils::normalizeByMinMax(double from, double to, const
         result.push_back(normalized);
     }
 
+    LOG_DEBUG() << "Finish: normalizeFromTo - result.size=" << result.size();
+    return result;
+}
+
+std::vector<double> VectorUtils::normalizeByMinMax(const std::vector<double>& data) {
+    LOG_DEBUG() << "Start: normalizeByMinMax - data.size=" << data.size();
+    
+    if (data.empty()) {
+        LOG_DEBUG() << "Finish: normalizeByMinMax - result.size=0 (empty input)";
+        return {};
+    }
+
+    double minVal = std::numeric_limits<double>::max();
+    double maxVal = std::numeric_limits<double>::lowest();
+
+    for (double val : data) {
+        if (val < minVal) minVal = val;
+        if (val > maxVal) maxVal = val;
+    }
+
+    if (std::abs(maxVal - minVal) < std::numeric_limits<double>::epsilon()) {
+        // All values are the same, return a vector of 'from'
+        return std::vector<double>(data.size(), 0.0);
+    }
+
+    std::vector<double> result;
+    result.reserve(data.size());
+
+    for (double val : data) {
+        double normalized = val - minVal;
+        result.push_back(normalized);
+    }
+
     LOG_DEBUG() << "Finish: normalizeByMinMax - result.size=" << result.size();
     return result;
 }
 
-std::vector<double> VectorUtils::normalizeByMax(double to, const std::vector<double>& data) {
-    LOG_DEBUG() << "Start: normalizeByMax - to=" << to << ", data.size=" << data.size();
+std::vector<double> VectorUtils::normalizeTo(double to, const std::vector<double>& data) {
+    LOG_DEBUG() << "Start: normalizeTo - to=" << to << ", data.size=" << data.size();
     
     if (data.empty()) {
-        LOG_DEBUG() << "Finish: normalizeByMax - result.size=0 (empty input)";
+        LOG_DEBUG() << "Finish: normalizeTo - result.size=0 (empty input)";
         return {};
     }
 
@@ -65,7 +98,7 @@ std::vector<double> VectorUtils::normalizeByMax(double to, const std::vector<dou
         result.push_back((val / maxVal) * to);
     }
 
-    LOG_DEBUG() << "Finish: normalizeByMax - result.size=" << result.size();
+    LOG_DEBUG() << "Finish: normalizeTo - result.size=" << result.size();
     return result;
 }
 

@@ -6,13 +6,19 @@
 class VectorUtils {
 public:
     /**
+     * @brief Normalizes data so that the minimum value becomes 0 and the maximum value becomes maximum - minimum.
+     * @param data Input vector.
+     * @return Normalized vector.
+     */
+    static std::vector<double> normalizeByMinMax(const std::vector<double>& data);
+    /**
      * @brief Normalizes data so that the minimum value becomes 'from' and the maximum value becomes 'to'.
      * @param from Target minimum value.
      * @param to Target maximum value.
      * @param data Input vector.
      * @return Normalized vector.
      */
-    static std::vector<double> normalizeByMinMax(double from, double to, const std::vector<double>& data);
+    static std::vector<double> normalizeFromTo(double from, double to, const std::vector<double>& data);
 
     /**
      * @brief Normalizes data by scaling the maximum value to 'to'.
@@ -20,7 +26,7 @@ public:
      * @param data Input vector.
      * @return Normalized vector.
      */
-    static std::vector<double> normalizeByMax(double to, const std::vector<double>& data);
+    static std::vector<double> normalizeTo(double to, const std::vector<double>& data);
 
     /**
      * @brief Normalizes data by subtracting the mean from each element.
