@@ -37,11 +37,9 @@ std::vector<double> UMPService::getUMP(
         LOG_DEBUG() << "    Position: " << cuePoint.position << ", Length: " << cuePoint.length;
 
         int length = nLength;
-        char firstChar = cuePoint.label.empty() ? '\0' : std::tolower(static_cast<unsigned char>(cuePoint.label[0]));
-
-        if (firstChar == 'p') {
+        if (cuePoint.type == CuePointType::PRE_NUCLEUS) {
             length = pLength;
-        } else if (firstChar == 't') {
+        } else if (cuePoint.type == CuePointType::POST_NUCLEUS) {
             length = tLength;
         }
         

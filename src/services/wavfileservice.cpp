@@ -135,12 +135,28 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
             }
         }
         cuePoint.label = label;
+
+        if (!label.empty()) {
+            char firstChar = std::tolower(label[0]);
+            if (firstChar == 'p') {
+                cuePoint.type = CuePointType::PRE_NUCLEUS;
+            } else if (firstChar == 'n') {
+                cuePoint.type = CuePointType::NUCLEUS;
+            } else if (firstChar == 't') {
+                cuePoint.type = CuePointType::POST_NUCLEUS;
+            } else {
+                 cuePoint.type = CuePointType::NUCLEUS; // Default
+            }
+        } else {
+            cuePoint.type = CuePointType::NUCLEUS; // Default
+        }
         
         LOG_DEBUG() << "Cue Point " << i 
                     << ": ID=" << cuePoint.id 
                     << " Label=" << cuePoint.label 
                     << " Position=" << cuePoint.position
-                    << " Length=" << cuePoint.length;
+                    << " Length=" << cuePoint.length
+                    << " Type=" << static_cast<int>(cuePoint.type);
 
         cuePoints.push_back(cuePoint);
     }

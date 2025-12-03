@@ -34,6 +34,7 @@ QVariantList WavFileApi::getCuePoints(WaveFile* waveFile)
         cuePoint["id"] = cp.id;
         cuePoint["position"] = cp.position;
         cuePoint["label"] = QString::fromStdString(cp.label);
+        cuePoint["type"] = static_cast<int>(cp.type);
         
         if (cp.length > 0) {
              cuePoint["length"] = cp.length;
@@ -43,7 +44,8 @@ QVariantList WavFileApi::getCuePoints(WaveFile* waveFile)
                  << ": ID=" << cp.id
                  << "Label=" << cuePoint["label"].toString()
                  << "Position=" << cp.position
-                 << "Length=" << cp.length;
+                 << "Length=" << cp.length
+                 << "Type=" << static_cast<int>(cp.type);
 
         cuePoints.append(cuePoint);
     }
@@ -199,6 +201,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
         cp.position = cpMap["position"].toUInt();
         cp.length = cpMap["length"].toUInt();
         cp.label = cpMap["label"].toString().toStdString();
+        cp.type = static_cast<CuePointType>(cpMap["type"].toInt());
         cuePointsVec.push_back(cp);
         
         LOG_DEBUG() << "  Cue point" << cp.id << ":" 
@@ -225,10 +228,9 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
     int position = 0;
     for (size_t i = 0; i < cuePointsVec.size(); ++i) {
         int length = nLength;
-        QString label = QString::fromStdString(cuePointsVec[i].label).toLower();
-        if (label.startsWith("p")) {
+        if (cuePointsVec[i].type == CuePointType::PRE_NUCLEUS) {
             length = pLength;
-        } else if (label.startsWith("t")) {
+        } else if (cuePointsVec[i].type == CuePointType::POST_NUCLEUS) {
             length = tLength;
         }
         
