@@ -17,25 +17,50 @@ Item {
             ctx.reset();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (root.waveData.length < 2) {
+            if (!root.waveData || root.waveData.length === 0) {
                 return;
             }
 
-            // Find min/max for scaling
-            var minX = root.waveData[0].x;
-            var maxX = root.waveData[root.waveData.length - 1].x;
-
-            // Calculate min/max Y from data
-            var minY = root.waveData[0].y;
-            var maxY = root.waveData[0].y;
-
-            for (var i = 1; i < root.waveData.length; i++) {
-                var y = root.waveData[i].y;
-                if (y < minY)
-                    minY = y;
-                if (y > maxY)
-                    maxY = y;
+            // Normalize data to array of arrays
+            var datasets = [];
+            if (Array.isArray(root.waveData)) {
+                datasets = root.waveData;
+            } else {
+                datasets = [root.waveData];
             }
+
+            if (datasets.length === 0 || datasets[0].length < 2) {
+                return;
+            }
+
+            // Find global min/max for scaling
+            var minX = datasets[0][0].x;
+            var maxX = datasets[0][datasets[0].length - 1].x;
+            var minY = datasets[0][0].y;
+            var maxY = datasets[0][0].y;
+
+            for (var d = 0; d < datasets.length; d++) {
+                var data = datasets[d];
+                if (data.length > 0) {
+                    if (data[0].x < minX)
+                        minX = data[0].x;
+                    if (data[data.length - 1].x > maxX)
+                        maxX = data[data.length - 1].x;
+
+                    for (var i = 0; i < data.length; i++) {
+                        var y = data[i].y;
+                        if (y < minY)
+                            minY = y;
+                        if (y > maxY)
+                            maxY = y;
+                    }
+                }
+            }
+
+            Logger.debug("MinX: " + minX);
+            Logger.debug("MaxX: " + maxX);
+            Logger.debug("MinY: " + minY);
+            Logger.debug("MaxY: " + maxY);
 
             // Add some padding
             var range = maxY - minY;
@@ -119,16 +144,27 @@ Item {
                 ctx.fillText(cue.label, x + width / 2, canvas.height - bottomPadding / 2);
             }
 
-            ctx.beginPath();
-            ctx.moveTo(scaleX(root.waveData[0].x), scaleY(root.waveData[0].y));
+            // Draw datasets
+            var colors = ["steelblue", "red", "green", "orange", "purple"];
 
-            for (var i = 1; i < root.waveData.length; i += 2) {
-                ctx.lineTo(scaleX(root.waveData[i].x), scaleY(root.waveData[i].y));
+            for (var d = 0; d < datasets.length; d++) {
+                var data = datasets[d];
+                if (data.length < 2)
+                    continue;
+
+                ctx.beginPath();
+                ctx.moveTo(scaleX(data[0].x), scaleY(data[0].y));
+
+                for (var i = 1; i < data.length; i++) {
+                    // Simple optimization: skip points if they map to same pixel?
+                    // For now, just draw all.
+                    ctx.lineTo(scaleX(data[i].x), scaleY(data[i].y));
+                }
+
+                ctx.strokeStyle = colors[d % colors.length];
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
             }
-
-            ctx.strokeStyle = "steelblue";
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
         }
     }
 

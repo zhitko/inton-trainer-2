@@ -34,10 +34,14 @@ Page {
         waveFormGraph.cuePoints = cuePoints;
 
         // Extract pitch data
+        Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
+        let pitchOriginalData = wavFileApi.getPitch(wavFile, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "");
+        Logger.debug("Pitch original data length: " + pitchOriginalData.length);
+
         Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
         let pitchData = wavFileApi.getPitch(wavFile, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization);
         Logger.debug("Pitch data length: " + pitchData.length);
-        pitchWaveFormGraph.waveData = pitchData;
+        pitchWaveFormGraph.waveData = [pitchOriginalData, pitchData];
 
         // Calculate UMP
         Logger.debug("Calculating UMP...");
