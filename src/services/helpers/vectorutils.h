@@ -8,9 +8,10 @@ public:
     /**
      * @brief Normalizes data so that the minimum value becomes 0 and the maximum value becomes maximum - minimum.
      * @param data Input vector.
+     * @param skipZeros If true, zero values are not considered when finding the minimum value.
      * @return Normalized vector.
      */
-    static std::vector<double> normalizeByMinMax(const std::vector<double>& data);
+    static std::vector<double> normalizeByMinMax(const std::vector<double>& data, bool skipZeros = true);
     /**
      * @brief Normalizes data so that the minimum value becomes 'from' and the maximum value becomes 'to'.
      * @param from Target minimum value.
@@ -31,16 +32,18 @@ public:
     /**
      * @brief Normalizes data by subtracting the mean from each element.
      * @param data Input vector.
+     * @param skipZeros If true, zero values are not considered when calculating the mean.
      * @return Normalized vector.
      */
-    static std::vector<double> normalizeByMean(const std::vector<double>& data);
+    static std::vector<double> normalizeByMean(const std::vector<double>& data, bool skipZeros = true);
 
     /**
      * @brief Normalizes data by subtracting the mean and dividing by the mean absolute deviation.
      * @param data Input vector.
+     * @param skipZeros If true, zero values are not considered when calculating the mean and deviation.
      * @return Normalized vector.
      */
-    static std::vector<double> normalizeByMeanDeviation(const std::vector<double>& data);
+    static std::vector<double> normalizeByMeanDeviation(const std::vector<double>& data, bool skipZeros = true);
 
     /**
      * @brief Resamples the input vector to the target length using linear interpolation.
