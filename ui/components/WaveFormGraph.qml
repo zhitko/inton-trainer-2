@@ -128,6 +128,38 @@ Item {
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
 
+            // Draw 0 mark and line
+            if (minY <= 0 && maxY >= 0) {
+                var y0 = scaleY(0);
+
+                // Draw horizontal line
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(leftMargin, topPadding, graphWidth, graphHeight);
+                ctx.clip();
+
+                ctx.beginPath();
+                ctx.moveTo(leftMargin, y0);
+                ctx.lineTo(leftMargin + graphWidth, y0);
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.restore();
+
+                // Draw axis mark
+                ctx.beginPath();
+                ctx.moveTo(leftMargin, y0);
+                ctx.lineTo(leftMargin - 5, y0);
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Draw label
+                ctx.fillStyle = "black";
+                ctx.textAlign = "right";
+                ctx.fillText("0", leftMargin - 8, y0);
+            }
+
             for (var i = 0; i < root.cuePoints.length; i++) {
                 var cue = root.cuePoints[i];
                 var x = scaleX(cue.position);
