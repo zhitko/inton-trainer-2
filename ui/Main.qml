@@ -8,7 +8,7 @@ import "utils"
 
 ApplicationWindow {
     id: window
-    width: 400
+    width: 800
     height: 600
     visible: true
     title: qsTr("Inton Trainer")

@@ -1,6 +1,7 @@
 import QtQuick 6.8
 import QtQuick.Controls 6.8
 import QtQuick.Controls.Material 6.8
+import QtQuick.Layouts
 
 import by.intontrainer.wavfile 1.0
 
@@ -8,7 +9,13 @@ import "../components"
 import "../utils"
 
 Page {
+    id: root
     property string filePath: ""
+    property bool showSettings: true
+
+    property var wavFileHandle: null
+    property var loadedCuePoints: []
+    property var loadedWaveData: []
 
     title: filePath.substring(filePath.lastIndexOf('/') + 1)
 
@@ -16,88 +23,154 @@ Page {
         id: wavFileApi
     }
 
-    Component.onCompleted: {
-        Logger.info("TemplatePage loaded for file: " + filePath);
+    Connections {
+        target: window.settingsApi
+        function onAlgorithmChanged() {
+            updateData();
+        }
+        function onFrameShiftChanged() {
+            updateData();
+        }
+        function onSampleRateChanged() {
+            updateData();
+        }
+        function onMinF0Changed() {
+            updateData();
+        }
+        function onMaxF0Changed() {
+            updateData();
+        }
+        function onVoicingThresholdChanged() {
+            updateData();
+        }
+        function onPitchNormalizationChanged() {
+            updateData();
+        }
+    }
 
-        Logger.debug("Opening WAV file...");
-        let wavFile = wavFileApi.openWavFile(filePath);
-
-        Logger.debug("Extracting cue points...");
-        let cuePoints = wavFileApi.getCuePoints(wavFile);
-        Logger.debug("Found " + cuePoints.length + " cue points");
-
-        Logger.debug("Extracting wave data...");
-        let waveData = wavFileApi.getWaveData(wavFile);
-        Logger.debug("Wave data length: " + waveData.length);
-
-        waveFormGraph.waveData = waveData;
-        waveFormGraph.cuePoints = cuePoints;
+    function updateData() {
+        if (!wavFileHandle)
+            return;
 
         // Extract pitch data
         Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
-        let pitchOriginalData = wavFileApi.getPitch(wavFile, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "");
+        let pitchOriginalData = wavFileApi.getPitch(wavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "");
         Logger.debug("Pitch original data length: " + pitchOriginalData.length);
 
         Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
-        let pitchData = wavFileApi.getPitch(wavFile, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization);
+        let pitchData = wavFileApi.getPitch(wavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization);
         Logger.debug("Pitch data length: " + pitchData.length);
         pitchWaveFormGraph.waveData = [pitchOriginalData, pitchData];
 
         // Calculate UMP
         Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(pitchData, cuePoints, 50, 100, 50, waveData.length);
+        let umpResult = wavFileApi.getUMP(pitchData, loadedCuePoints, 50, 100, 50, loadedWaveData.length);
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
         umpWaveFormGraph.waveData = umpResult.ump;
         umpWaveFormGraph.cuePoints = umpResult.cuePoints;
+    }
+
+    Component.onCompleted: {
+        Logger.info("TemplatePage loaded for file: " + filePath);
+
+        Logger.debug("Opening WAV file...");
+        wavFileHandle = wavFileApi.openWavFile(filePath);
+
+        Logger.debug("Extracting cue points...");
+        loadedCuePoints = wavFileApi.getCuePoints(wavFileHandle);
+        Logger.debug("Found " + loadedCuePoints.length + " cue points");
+
+        Logger.debug("Extracting wave data...");
+        loadedWaveData = wavFileApi.getWaveData(wavFileHandle);
+        Logger.debug("Wave data length: " + loadedWaveData.length);
+
+        waveFormGraph.waveData = loadedWaveData;
+        waveFormGraph.cuePoints = loadedCuePoints;
+
+        updateData();
 
         Logger.info("TemplatePage initialization complete");
     }
 
-    ScrollView {
+    Button {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        text: root.showSettings ? qsTr("Hide Settings") : qsTr("Show Settings")
+        onClicked: root.showSettings = !root.showSettings
+        z: 99
+    }
+
+    RowLayout {
         anchors.fill: parent
-        anchors.margins: 10
-        contentWidth: availableWidth
+        spacing: 0
 
-        Column {
-            width: parent.width
-            spacing: 10
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            PlayButton {
-                id: playButton
-                width: 32
-                height: 32
-                file: filePath
-                showLabel: true
+            ScrollView {
+                anchors.fill: parent
+                anchors.margins: 10
+                contentWidth: availableWidth
+
+                Column {
+                    width: parent.width
+                    spacing: 10
+
+                    PlayButton {
+                        id: playButton
+                        width: 32
+                        height: 32
+                        file: filePath
+                        showLabel: true
+                    }
+
+                    WaveFormGraph {
+                        id: waveFormGraph
+                        width: parent.width
+                        height: 300
+                    }
+
+                    Text {
+                        text: qsTr("Pitch (F0)")
+                        font.pixelSize: 14
+                        font.bold: true
+                    }
+
+                    WaveFormGraph {
+                        id: pitchWaveFormGraph
+                        width: parent.width
+                        height: 200
+                    }
+
+                    Text {
+                        text: qsTr("UMP")
+                        font.pixelSize: 14
+                        font.bold: true
+                    }
+
+                    WaveFormGraph {
+                        id: umpWaveFormGraph
+                        width: parent.width
+                        height: 200
+                    }
+                }
             }
+        }
 
-            WaveFormGraph {
-                id: waveFormGraph
-                width: parent.width
-                height: 300
-            }
+        Rectangle {
+            Layout.preferredWidth: 1
+            Layout.fillHeight: true
+            color: Material.dividerColor
+            visible: root.showSettings
+        }
 
-            Text {
-                text: qsTr("Pitch (F0)")
-                font.pixelSize: 14
-                font.bold: true
-            }
-
-            WaveFormGraph {
-                id: pitchWaveFormGraph
-                width: parent.width
-                height: 200
-            }
-
-            Text {
-                text: qsTr("UMP")
-                font.pixelSize: 14
-                font.bold: true
-            }
-
-            WaveFormGraph {
-                id: umpWaveFormGraph
-                width: parent.width
-                height: 200
+        SettingsPage {
+            visible: root.showSettings
+            Layout.preferredWidth: 400
+            Layout.fillHeight: true
+            background: Rectangle {
+                color: Material.background
             }
         }
     }
