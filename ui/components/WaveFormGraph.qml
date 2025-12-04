@@ -63,9 +63,14 @@ Item {
             Logger.debug("MaxY: " + maxY);
 
             // Add some padding
-            var range = maxY - minY;
-            if (range === 0) {
-                range = 1.0;
+            var rangeY = maxY - minY;
+            if (rangeY === 0) {
+                rangeY = 1.0;
+            }
+
+            var rangeX = maxX - minX;
+            if (rangeX === 0) {
+                rangeX = 1.0;
             }
 
             // Reserve space for Y axis and paddings
@@ -76,13 +81,22 @@ Item {
             var graphHeight = canvas.height - topPadding - bottomPadding;
 
             function scaleX(x) {
-                return leftMargin + (x - minX) / (maxX - minX) * graphWidth;
+                let scaledX = (x - minX) / rangeX * graphWidth;
+                if (scaledX < 0)
+                    return leftMargin;
+                if (scaledX > graphWidth)
+                    return leftMargin + graphWidth;
+                return scaledX + leftMargin;
             }
 
             function scaleY(y) {
                 // Y is inverted in canvas, so we subtract from height
-                var scaledY = (y - minY) / (maxY - minY);
-                return topPadding + graphHeight * (1 - scaledY);
+                let scaledY = (y - minY) / rangeY * graphHeight;
+                if (scaledY < 0)
+                    return graphHeight + topPadding;
+                if (scaledY > graphHeight)
+                    return topPadding;
+                return graphHeight + topPadding - scaledY;
             }
 
             // Draw Y axis
@@ -145,7 +159,12 @@ Item {
             }
 
             // Draw datasets
-            var colors = ["steelblue", "red", "green", "orange", "purple"];
+            var colors = ["steelblue", "green", "orange", "purple"];
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(leftMargin, topPadding, graphWidth, graphHeight);
+            ctx.clip();
 
             for (var d = 0; d < datasets.length; d++) {
                 var data = datasets[d];
@@ -163,8 +182,10 @@ Item {
 
                 ctx.strokeStyle = colors[d % colors.length];
                 ctx.lineWidth = 1.5;
+                ctx.lineJoin = "round";
                 ctx.stroke();
             }
+            ctx.restore();
         }
     }
 
