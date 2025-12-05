@@ -166,17 +166,17 @@ Item {
                 var width = scaleX(cue.position + cue.length) - x;
 
                 if (cue.label.toUpperCase().startsWith("P")) {
-                    ctx.fillStyle = "rgba(237, 106, 90, 0.3)";
-                    ctx.strokeStyle = "#ed6a5a";
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.strokeStyle = 'rgb(176, 190, 197)';
                 } else if (cue.label.toUpperCase().startsWith("N")) {
-                    ctx.fillStyle = "rgba(244, 241, 187, 0.3)";
-                    ctx.strokeStyle = "#f4f1bb";
+                    ctx.fillStyle = 'rgba(76, 175, 80, 0.2)';
+                    ctx.strokeStyle = 'rgb(165, 214, 167)';
                 } else if (cue.label.toUpperCase().startsWith("T")) {
-                    ctx.fillStyle = "rgba(155, 193, 188, 0.3)";
-                    ctx.strokeStyle = "#9bc1bc";
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.strokeStyle = 'rgb(176, 190, 197)';
                 } else {
-                    ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
-                    ctx.strokeStyle = "red";
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.strokeStyle = 'rgb(176, 190, 197)';
                 }
 
                 // Draw rectangle
