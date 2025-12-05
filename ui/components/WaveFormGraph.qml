@@ -191,7 +191,7 @@ Item {
             }
 
             // Draw datasets
-            var colors = ["steelblue", "green", "orange", "purple"];
+            var colors = ["#512DA8", "#D32F2F", "#0288D1", "#0097A7", "#689F38", "#FFA000", "#C2185B", "#303F9F", "#0097A7", "#00796B", "#AFB42B", "#F57C00", "#C2185B", "#1976D2", "#0097A7", "#388E3C", "#FBC02D", "#E64A19",];
 
             ctx.save();
             ctx.beginPath();
