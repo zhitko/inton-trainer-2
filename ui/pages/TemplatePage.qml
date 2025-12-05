@@ -117,14 +117,6 @@ Page {
                     width: parent.width
                     spacing: 10
 
-                    PlayButton {
-                        id: playButton
-                        width: 32
-                        height: 32
-                        file: filePath
-                        showLabel: true
-                    }
-
                     WaveFormGraph {
                         id: waveFormGraph
                         width: parent.width
@@ -135,6 +127,14 @@ Page {
                         text: qsTr("Pitch (F0)")
                         font.pixelSize: 14
                         font.bold: true
+                    }
+
+                    PlayButton {
+                        id: playButton
+                        width: 32
+                        height: 32
+                        file: filePath
+                        showLabel: true
                     }
 
                     WaveFormGraph {
