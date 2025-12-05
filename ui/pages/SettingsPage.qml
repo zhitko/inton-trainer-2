@@ -103,7 +103,7 @@ Page {
                             color: Material.primaryTextColor
                         }
                         ComboBox {
-                            model: ["RAPT", "SWIPE", "REAPER", "DIO", "Harvest"]
+                            model: ["RAPT"]
                             currentIndex: model.indexOf(window.settingsApi.algorithm)
                             onActivated: window.settingsApi.algorithm = currentText
                             Layout.fillWidth: true
@@ -169,7 +169,7 @@ Page {
                             color: Material.primaryTextColor
                         }
                         ComboBox {
-                            model: ["max", "min_max", "mean", "mean_deviation"]
+                            model: ["min_max", "mean"]
                             currentIndex: model.indexOf(window.settingsApi.pitchNormalization)
                             onActivated: window.settingsApi.pitchNormalization = currentText
                             Layout.fillWidth: true
