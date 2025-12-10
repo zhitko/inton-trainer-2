@@ -38,6 +38,7 @@ AppSettings Settings::loadSettings() {
     settings.maxF0 = qsettings.value("maxF0", 600.0).toDouble();
     settings.voicingThreshold = qsettings.value("voicingThreshold", 0.3).toDouble();
     settings.pitchNormalization = qsettings.value("pitchNormalization", "max").toString().toStdString();
+    settings.pitchInterpolationType = qsettings.value("pitchInterpolationType", "Linear").toString().toStdString();
     qsettings.endGroup();
 
     return settings;
@@ -66,6 +67,7 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("maxF0", settings.maxF0);
     qsettings.setValue("voicingThreshold", settings.voicingThreshold);
     qsettings.setValue("pitchNormalization", QString::fromStdString(settings.pitchNormalization));
+    qsettings.setValue("pitchInterpolationType", QString::fromStdString(settings.pitchInterpolationType));
     qsettings.endGroup();
     
     qsettings.sync();

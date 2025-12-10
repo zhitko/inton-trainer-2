@@ -46,6 +46,13 @@ The SPTK (Speech Signal Processing Toolkit) library is required but not included
 git clone https://github.com/sp-nitech/SPTK.git 3rdparty/SPTK
 ```
 
+The ALGLIB library is required but not included in the repository. Download it into the `3rdparty` directory:
+
+```bash
+wget https://www.alglib.net/translator/re/alglib-4.06.0.cpp.gpl.zip
+unzip alglib-4.06.0.cpp.gpl.zip -d 3rdparty/alglib-cpp
+```
+
 ### Build Steps
 
 #### Linux/macOS
@@ -86,7 +93,9 @@ inton-trainer-2/
 │   └── utils/        # QML utilities
 ├── res/              # Resources (fonts, icons)
 ├── i18n/             # Translation files
-├── 3rdparty/         # Third-party libraries (SPTK)
+├── 3rdparty/         # Third-party libraries
+│   ├── SPTK/         # Speech Signal Processing Toolkit 4.3 https://sp-tk.sourceforge.net/
+│   └── alglib-cpp/   # ALGLIB library 4.06.0 https://www.alglib.net/
 └── CMakeLists.txt    # CMake configuration
 ```
 

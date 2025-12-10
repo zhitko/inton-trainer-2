@@ -174,6 +174,17 @@ Page {
                             onActivated: window.settingsApi.pitchNormalization = currentText
                             Layout.fillWidth: true
                         }
+
+                        Label {
+                            text: qsTr("Pitch Interpolation")
+                            color: Material.primaryTextColor
+                        }
+                        ComboBox {
+                            model: ["None", "Linear", "Cubic", "Akima", "Monotone"]
+                            currentIndex: window.settingsApi.pitchInterpolationType
+                            onActivated: window.settingsApi.pitchInterpolationType = currentIndex
+                            Layout.fillWidth: true
+                        }
                     }
                 }
             }

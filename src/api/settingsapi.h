@@ -17,8 +17,17 @@ class SettingsApi : public QObject
     Q_PROPERTY(double maxF0 READ maxF0 WRITE setMaxF0 NOTIFY maxF0Changed)
     Q_PROPERTY(double voicingThreshold READ voicingThreshold WRITE setVoicingThreshold NOTIFY voicingThresholdChanged)
     Q_PROPERTY(QString pitchNormalization READ pitchNormalization WRITE setPitchNormalization NOTIFY pitchNormalizationChanged)
+    Q_PROPERTY(PitchInterpolationType pitchInterpolationType READ pitchInterpolationType WRITE setPitchInterpolationType NOTIFY pitchInterpolationTypeChanged)
 
 public:
+    enum class PitchInterpolationType {
+        None,
+        Linear,
+        Cubic,
+        Akima,
+        Monotone
+    };
+    Q_ENUM(PitchInterpolationType)
     explicit SettingsApi(QObject *parent = nullptr);
 
     QString language() const;
@@ -48,6 +57,9 @@ public:
     QString pitchNormalization() const;
     void setPitchNormalization(const QString &pitchNormalization);
 
+    PitchInterpolationType pitchInterpolationType() const;
+    void setPitchInterpolationType(PitchInterpolationType pitchInterpolationType);
+
     Q_INVOKABLE void load();
     Q_INVOKABLE void save();
 
@@ -61,6 +73,7 @@ signals:
     void maxF0Changed();
     void voicingThresholdChanged();
     void pitchNormalizationChanged();
+    void pitchInterpolationTypeChanged();
 
 private:
     AppSettings m_settings;

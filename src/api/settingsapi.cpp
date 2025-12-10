@@ -194,7 +194,9 @@ void SettingsApi::load()
     emit minF0Changed();
     emit maxF0Changed();
     emit voicingThresholdChanged();
+    emit voicingThresholdChanged();
     emit pitchNormalizationChanged();
+    emit pitchInterpolationTypeChanged();
     LOG_DEBUG() << "Finish: load";
 }
 
@@ -203,6 +205,40 @@ void SettingsApi::save()
     LOG_DEBUG() << "Start: save";
     Settings::saveSettings(m_settings);
     LOG_DEBUG() << "Finish: save";
+}
+
+SettingsApi::PitchInterpolationType SettingsApi::pitchInterpolationType() const
+{
+    LOG_DEBUG() << "Start: pitchInterpolationType";
+    PitchInterpolationType result = PitchInterpolationType::Linear;
+    std::string type = m_settings.pitchInterpolationType;
+    if (type == "None") result = PitchInterpolationType::None;
+    else if (type == "Linear") result = PitchInterpolationType::Linear;
+    else if (type == "Cubic") result = PitchInterpolationType::Cubic;
+    else if (type == "Akima") result = PitchInterpolationType::Akima;
+    else if (type == "Monotone") result = PitchInterpolationType::Monotone;
+    LOG_DEBUG() << "Finish: pitchInterpolationType - result=" << static_cast<int>(result);
+    return result;
+}
+
+void SettingsApi::setPitchInterpolationType(PitchInterpolationType pitchInterpolationType)
+{
+    LOG_DEBUG() << "Start: setPitchInterpolationType - pitchInterpolationType=" << static_cast<int>(pitchInterpolationType);
+    std::string type = "Linear";
+    switch (pitchInterpolationType) {
+        case PitchInterpolationType::None: type = "None"; break;
+        case PitchInterpolationType::Linear: type = "Linear"; break;
+        case PitchInterpolationType::Cubic: type = "Cubic"; break;
+        case PitchInterpolationType::Akima: type = "Akima"; break;
+        case PitchInterpolationType::Monotone: type = "Monotone"; break;
+    }
+    
+    if (m_settings.pitchInterpolationType != type) {
+        m_settings.pitchInterpolationType = type;
+        save();
+        emit pitchInterpolationTypeChanged();
+    }
+    LOG_DEBUG() << "Finish: setPitchInterpolationType";
 }
 
 void SettingsApi::updateTranslator()

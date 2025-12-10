@@ -17,6 +17,7 @@ struct AppSettings {
     double maxF0 = 600.0;
     double voicingThreshold = 0.2;
     std::string pitchNormalization = "max";
+    std::string pitchInterpolationType = "Linear";
 };
 
 class Settings {

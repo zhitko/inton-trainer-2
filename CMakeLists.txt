@@ -38,6 +38,27 @@ qt_add_executable(appinton-trainer-2
 target_include_directories(appinton-trainer-2 PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/api
     ${CMAKE_CURRENT_SOURCE_DIR}/src/services
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/alglib-cpp/src
+)
+
+target_sources(appinton-trainer-2 PRIVATE
+    3rdparty/alglib-cpp/src/alglibinternal.cpp
+    3rdparty/alglib-cpp/src/alglibmisc.cpp
+    3rdparty/alglib-cpp/src/ap.cpp
+    3rdparty/alglib-cpp/src/dataanalysis.cpp
+    3rdparty/alglib-cpp/src/diffequations.cpp
+    3rdparty/alglib-cpp/src/fasttransforms.cpp
+    3rdparty/alglib-cpp/src/integration.cpp
+    3rdparty/alglib-cpp/src/interpolation.cpp
+    3rdparty/alglib-cpp/src/kernels_avx2.cpp
+    3rdparty/alglib-cpp/src/kernels_fma.cpp
+    3rdparty/alglib-cpp/src/kernels_sse2.cpp
+    3rdparty/alglib-cpp/src/linalg.cpp
+    3rdparty/alglib-cpp/src/minlp.cpp
+    3rdparty/alglib-cpp/src/optimization.cpp
+    3rdparty/alglib-cpp/src/solvers.cpp
+    3rdparty/alglib-cpp/src/specialfunctions.cpp
+    3rdparty/alglib-cpp/src/statistics.cpp
 )
 
 set(SPTK_BUILD_COMMANDS OFF CACHE BOOL "Build SPTK commands" FORCE)

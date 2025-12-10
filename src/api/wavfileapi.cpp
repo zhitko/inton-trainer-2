@@ -78,9 +78,10 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
                                   double maxF0,
                                   double voicingThreshold,
                                   const QString& outputFormat,
-                                  const QString& normalizationMode)
+                                  const QString& normalizationMode,
+                                  const QString& pitchInterpolationType)
 {
-    LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate << ", minF0=" << minF0 << ", maxF0=" << maxF0 << ", voicingThreshold=" << voicingThreshold << ", outputFormat=" << outputFormat << ", normalizationMode=" << normalizationMode;
+    LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate << ", minF0=" << minF0 << ", maxF0=" << maxF0 << ", voicingThreshold=" << voicingThreshold << ", outputFormat=" << outputFormat << ", normalizationMode=" << normalizationMode << ", interpolation=" << pitchInterpolationType;
     QVariantList pitchData;
     
     if (!waveFile) {
@@ -140,6 +141,10 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
         format
     );
     
+    if (!pitch.empty()) {
+        pitch = VectorUtils::interpolate(pitchInterpolationType.toStdString(), pitch, pitch.size());
+    }
+    
     // Normalize pitch data using VectorUtils based on mode
     if (!pitch.empty()) {
         std::vector<double> normalizedPitch;
@@ -172,9 +177,10 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
                                int pLength,
                                int nLength,
                                int tLength,
-                               int waveDataSize)
+                               int waveDataSize,
+                               const QString& pitchInterpolationType)
 {
-    LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size() << ", cuePoints.size=" << cuePoints.size() << ", pLength=" << pLength << ", nLength=" << nLength << ", tLength=" << tLength << ", waveDataSize=" << waveDataSize;
+    LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size() << ", cuePoints.size=" << cuePoints.size() << ", pLength=" << pLength << ", nLength=" << nLength << ", tLength=" << tLength << ", waveDataSize=" << waveDataSize << ", interpolation=" << pitchInterpolationType;
     
     QVariantMap result;
 
@@ -212,7 +218,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
 
     // Call UMPService
     LOG_DEBUG() << "  Calling UMPService::getUMP...";
-    std::vector<double> umpVec = UMPService::getUMP(pitchVec, cuePointsVec, pLength, nLength, tLength, waveDataSize);
+    std::vector<double> umpVec = UMPService::getUMP(pitchInterpolationType.toStdString(), pitchVec, cuePointsVec, pLength, nLength, tLength, waveDataSize);
     LOG_DEBUG() << "  UMP result size:" << umpVec.size();
 
     // Convert result back to QVariantList (as QPointF for graph)

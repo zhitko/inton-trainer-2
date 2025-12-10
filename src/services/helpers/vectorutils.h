@@ -2,6 +2,7 @@
 #define VECTORUTILS_H
 
 #include <vector>
+#include <string>
 
 class VectorUtils {
 public:
@@ -52,6 +53,49 @@ public:
      * @return Resampled vector.
      */
     static std::vector<double> linearInterpolation(const std::vector<double>& data, int targetLength);
+
+    /**
+     * @brief Resamples the input vector to the target length using Linear spline interpolation (Alglib).
+     * @param data Input vector.
+     * @param targetLength Target length of the output vector.
+     * @return Resampled vector.
+     */
+    static std::vector<double> interpolationSplineLinear(const std::vector<double>& data, int targetLength);
+
+
+
+    /**
+     * @brief Resamples the input vector to the target length using Cubic spline interpolation (Alglib).
+     * @param data Input vector.
+     * @param targetLength Target length of the output vector.
+     * @return Resampled vector.
+     */
+    static std::vector<double> interpolationSplineCubic(const std::vector<double>& data, int targetLength);
+
+    /**
+     * @brief Resamples the input vector to the target length using Akima spline interpolation (Alglib).
+     * @param data Input vector.
+     * @param targetLength Target length of the output vector.
+     * @return Resampled vector.
+     */
+    static std::vector<double> interpolationSplineAkima(const std::vector<double>& data, int targetLength);
+
+    /**
+     * @brief Resamples the input vector to the target length using Monotone spline interpolation (Alglib).
+     * @param data Input vector.
+     * @param targetLength Target length of the output vector.
+     * @return Resampled vector.
+     */
+    static std::vector<double> interpolationSplineMonotone(const std::vector<double>& data, int targetLength);
+
+    /**
+     * @brief Dispatches interpolation based on type string.
+     * @param type Interpolation type ("Linear", "Hermite", etc.).
+     * @param data Input vector.
+     * @param targetLength Target length.
+     * @return Resampled vector.
+     */
+    static std::vector<double> interpolate(const std::string& type, const std::vector<double>& data, int targetLength);
 };
 
 #endif // VECTORUTILS_H

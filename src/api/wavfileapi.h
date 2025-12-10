@@ -25,14 +25,16 @@ public slots:
                                       double maxF0,
                                       double voicingThreshold,
                                       const QString& outputFormat,
-                                      const QString& normalizationMode);
+                                      const QString& normalizationMode,
+                                      const QString& pitchInterpolationType);
 
     Q_INVOKABLE QVariantMap getUMP(const QVariantList& pitch,
                                    const QVariantList& cuePoints,
                                    int pLength,
                                    int nLength,
                                    int tLength,
-                                   int waveDataSize);
+                                   int waveDataSize,
+                                   const QString& pitchInterpolationType);
 };
 
 #endif // WAVFILEAPI_H

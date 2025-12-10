@@ -8,6 +8,7 @@ class UMPService
 {
 public:
     static std::vector<double> getUMP(
+        const std::string& interpolationType,
         const std::vector<double>& pitch,
         const std::vector<CuePointData>& cuePoints,
         int pLength,

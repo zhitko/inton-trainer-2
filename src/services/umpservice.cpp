@@ -7,6 +7,7 @@
 #include "helpers/logger.h"
 
 std::vector<double> UMPService::getUMP(
+    const std::string& interpolationType,
     const std::vector<double>& pitch,
     const std::vector<CuePointData>& cuePoints,
     int pLength,
@@ -77,7 +78,7 @@ std::vector<double> UMPService::getUMP(
 
         LOG_DEBUG() << "    Segment size: " << segment.size() << " frames";
 
-        std::vector<double> interpolatedSegment = VectorUtils::linearInterpolation(segment, length);
+        std::vector<double> interpolatedSegment = VectorUtils::interpolate(interpolationType, segment, length);
         result.insert(result.end(), interpolatedSegment.begin(), interpolatedSegment.end());
         
         cuePointIndex++;
