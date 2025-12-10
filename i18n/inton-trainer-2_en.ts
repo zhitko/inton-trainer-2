@@ -32,38 +32,38 @@
 <context>
     <name>Main</name>
     <message>
-        <location filename="../ui/Main.qml" line="13"/>
-        <location filename="../ui/Main.qml" line="58"/>
+        <location filename="../ui/Main.qml" line="14"/>
+        <location filename="../ui/Main.qml" line="67"/>
         <source>Inton Trainer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="95"/>
+        <location filename="../ui/Main.qml" line="128"/>
         <source>Menu</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="102"/>
+        <location filename="../ui/Main.qml" line="135"/>
         <source>Home</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="126"/>
+        <location filename="../ui/Main.qml" line="159"/>
         <source>Templates</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="151"/>
+        <location filename="../ui/Main.qml" line="184"/>
         <source>My Records</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="176"/>
+        <location filename="../ui/Main.qml" line="209"/>
         <source>Settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="204"/>
+        <location filename="../ui/Main.qml" line="237"/>
         <source>Dark Mode</source>
         <translation></translation>
     </message>
@@ -122,7 +122,7 @@
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="88"/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="102"/>
@@ -154,13 +154,38 @@
         <source>Voicing Threshold</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="168"/>
+        <source>Pitch Normalization</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="179"/>
+        <source>Pitch Interpolation</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>TemplatePage</name>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="55"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="101"/>
+        <source>Hide Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplatePage.qml" line="101"/>
+        <source>Show Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplatePage.qml" line="130"/>
         <source>Pitch (F0)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplatePage.qml" line="150"/>
+        <source>UMP</source>
+        <translation></translation>
     </message>
 </context>
 <context>
