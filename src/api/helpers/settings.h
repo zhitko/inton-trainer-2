@@ -18,6 +18,11 @@ struct AppSettings {
     double voicingThreshold = 0.2;
     std::string pitchNormalization = "max";
     std::string pitchInterpolationType = "Linear";
+    std::string pitchSmoothing = "None";
+    int pitchSmoothingWindowSize = 10;
+    double pitchGaussianSmoothingSigma = 1.0;
+    int pitchSavitzkyGolaySmoothingPolynomialOrder = 5;
+    double pitchSplineSmoothingPenalty = 1.0;
 };
 
 class Settings {

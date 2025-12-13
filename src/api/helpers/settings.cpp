@@ -39,6 +39,11 @@ AppSettings Settings::loadSettings() {
     settings.voicingThreshold = qsettings.value("voicingThreshold", 0.3).toDouble();
     settings.pitchNormalization = qsettings.value("pitchNormalization", "max").toString().toStdString();
     settings.pitchInterpolationType = qsettings.value("pitchInterpolationType", "Linear").toString().toStdString();
+    settings.pitchSmoothing = qsettings.value("pitchSmoothing", "None").toString().toStdString();
+    settings.pitchSmoothingWindowSize = qsettings.value("pitchSmoothingWindowSize", 5).toInt();
+    settings.pitchGaussianSmoothingSigma = qsettings.value("pitchGaussianSmoothingSigma", 2.0).toDouble();
+    settings.pitchSavitzkyGolaySmoothingPolynomialOrder = qsettings.value("pitchSavitzkyGolaySmoothingPolynomialOrder", 2).toInt();
+    settings.pitchSplineSmoothingPenalty = qsettings.value("pitchSplineSmoothingPenalty", 10.0).toDouble();
     qsettings.endGroup();
 
     return settings;
@@ -68,6 +73,11 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("voicingThreshold", settings.voicingThreshold);
     qsettings.setValue("pitchNormalization", QString::fromStdString(settings.pitchNormalization));
     qsettings.setValue("pitchInterpolationType", QString::fromStdString(settings.pitchInterpolationType));
+    qsettings.setValue("pitchSmoothing", QString::fromStdString(settings.pitchSmoothing));
+    qsettings.setValue("pitchSmoothingWindowSize", settings.pitchSmoothingWindowSize);
+    qsettings.setValue("pitchGaussianSmoothingSigma", settings.pitchGaussianSmoothingSigma);
+    qsettings.setValue("pitchSavitzkyGolaySmoothingPolynomialOrder", settings.pitchSavitzkyGolaySmoothingPolynomialOrder);
+    qsettings.setValue("pitchSplineSmoothingPenalty", settings.pitchSplineSmoothingPenalty);
     qsettings.endGroup();
     
     qsettings.sync();

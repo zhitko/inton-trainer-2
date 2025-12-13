@@ -49,6 +49,21 @@ Page {
         function onPitchInterpolationTypeChanged() {
             updateData();
         }
+        function onPitchSmoothingChanged() {
+            updateData();
+        }
+        function onPitchSmoothingWindowSizeChanged() {
+            updateData();
+        }
+        function onPitchGaussianSmoothingSigmaChanged() {
+            updateData();
+        }
+        function onPitchSavitzkyGolaySmoothingPolynomialOrderChanged() {
+            updateData();
+        }
+        function onPitchSplineSmoothingPenaltyChanged() {
+            updateData();
+        }
     }
 
     function updateData() {
@@ -57,13 +72,14 @@ Page {
 
         // Extract pitch data
         Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
-        let pitchOriginalData = wavFileApi.getPitch(wavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None");
+        let pitchOriginalData = wavFileApi.getPitch(wavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None", "None");
         Logger.debug("Pitch original data length: " + pitchOriginalData.length);
+        pitchWaveFormGraph.waveData = [pitchOriginalData];
 
         Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
-        let pitchData = wavFileApi.getPitch(wavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        let pitchData = wavFileApi.getPitch(wavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "SavitzkyGolay", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSavitzkyGolaySmoothingPolynomialOrder, window.settingsApi.pitchSplineSmoothingPenalty);
         Logger.debug("Pitch data length: " + pitchData.length);
-        pitchWaveFormGraph.waveData = [pitchOriginalData, pitchData];
+        pitchProcessedWaveFormGraph.waveData = [pitchData];
 
         // Calculate UMP
         Logger.debug("Calculating UMP...");
@@ -126,12 +142,6 @@ Page {
                         height: 300
                     }
 
-                    Text {
-                        text: qsTr("Pitch (F0)")
-                        font.pixelSize: 14
-                        font.bold: true
-                    }
-
                     PlayButton {
                         id: playButton
                         width: 32
@@ -140,8 +150,20 @@ Page {
                         showLabel: true
                     }
 
+                    Text {
+                        text: qsTr("Pitch (F0)")
+                        font.pixelSize: 14
+                        font.bold: true
+                    }
+
                     WaveFormGraph {
                         id: pitchWaveFormGraph
+                        width: parent.width
+                        height: 200
+                    }
+
+                    WaveFormGraph {
+                        id: pitchProcessedWaveFormGraph
                         width: parent.width
                         height: 200
                     }

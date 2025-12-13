@@ -79,9 +79,14 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
                                   double voicingThreshold,
                                   const QString& outputFormat,
                                   const QString& normalizationMode,
-                                  const QString& pitchInterpolationType)
+                                  const QString& pitchInterpolationType,
+                                  const QString& pitchSmoothing,
+                                  int pitchSmoothingWindowSize,
+                                  double pitchGaussianSmoothingSigma,
+                                  int pitchSavitzkyGolaySmoothingPolynomialOrder,
+                                  double pitchSplineSmoothingPenalty)
 {
-    LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate << ", minF0=" << minF0 << ", maxF0=" << maxF0 << ", voicingThreshold=" << voicingThreshold << ", outputFormat=" << outputFormat << ", normalizationMode=" << normalizationMode << ", interpolation=" << pitchInterpolationType;
+    LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate << ", minF0=" << minF0 << ", maxF0=" << maxF0 << ", voicingThreshold=" << voicingThreshold << ", outputFormat=" << outputFormat << ", normalizationMode=" << normalizationMode << ", interpolation=" << pitchInterpolationType << ", smoothing=" << pitchSmoothing << ", smoothingWindow=" << pitchSmoothingWindowSize << ", sigma=" << pitchGaussianSmoothingSigma << ", polyOrder=" << pitchSavitzkyGolaySmoothingPolynomialOrder << ", penalty=" << pitchSplineSmoothingPenalty;
     QVariantList pitchData;
     
     if (!waveFile) {
@@ -143,6 +148,24 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
     
     if (!pitch.empty()) {
         pitch = VectorUtils::interpolate(pitchInterpolationType.toStdString(), pitch, pitch.size());
+    }
+    
+    // Apply smoothing
+    if (!pitch.empty() && pitchSmoothing != "None") {
+        std::string smoothType = pitchSmoothing.toStdString();
+        // Default parameters for smoothing
+        double param1 = static_cast<double>(pitchSmoothingWindowSize); // Window size
+        double param2 = 0.0; // Sigma or poly order
+        
+        if (smoothType == "Gaussian") {
+            param2 = pitchGaussianSmoothingSigma; // Sigma
+        } else if (smoothType == "SavitzkyGolay") {
+            param2 = static_cast<double>(pitchSavitzkyGolaySmoothingPolynomialOrder); // Polynomial order
+        } else if (smoothType == "Spline") {
+            param1 = pitchSplineSmoothingPenalty; // Penalty (rho)
+        }
+        
+        pitch = VectorUtils::smooth(smoothType, pitch, param1, param2);
     }
     
     // Normalize pitch data using VectorUtils based on mode

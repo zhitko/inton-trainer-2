@@ -185,6 +185,69 @@ Page {
                             onActivated: window.settingsApi.pitchInterpolationType = currentIndex
                             Layout.fillWidth: true
                         }
+
+                        Label {
+                            text: qsTr("Pitch Smoothing")
+                            color: Material.primaryTextColor
+                        }
+                        ComboBox {
+                            model: ["None", "MovingAverage", "Median", "Gaussian", "SavitzkyGolay", "Spline"]
+                            currentIndex: window.settingsApi.pitchSmoothing
+                            onActivated: window.settingsApi.pitchSmoothing = currentIndex
+                            Layout.fillWidth: true
+                        }
+
+                        Label {
+                            text: qsTr("Smoothing Window Size")
+                            color: Material.primaryTextColor
+                            visible: window.settingsApi.pitchSmoothing !== 5 // Hide for Spline (5)
+                        }
+                        TextField {
+                            text: window.settingsApi.pitchSmoothingWindowSize.toString()
+                            onEditingFinished: window.settingsApi.pitchSmoothingWindowSize = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: window.settingsApi.pitchSmoothing !== 5 // Hide for Spline (5)
+                        }
+
+                        Label {
+                            text: qsTr("Gaussian Sigma")
+                            color: Material.primaryTextColor
+                            visible: window.settingsApi.pitchSmoothing === 3 // Show only for Gaussian (3)
+                        }
+                        TextField {
+                            text: window.settingsApi.pitchGaussianSmoothingSigma.toString()
+                            onEditingFinished: window.settingsApi.pitchGaussianSmoothingSigma = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: window.settingsApi.pitchSmoothing === 3 // Show only for Gaussian (3)
+                        }
+
+                        Label {
+                            text: qsTr("Polynomial Order")
+                            color: Material.primaryTextColor
+                            visible: window.settingsApi.pitchSmoothing === 4 // Show only for SavitzkyGolay (4)
+                        }
+                        TextField {
+                            text: window.settingsApi.pitchSavitzkyGolaySmoothingPolynomialOrder.toString()
+                            onEditingFinished: window.settingsApi.pitchSavitzkyGolaySmoothingPolynomialOrder = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: window.settingsApi.pitchSmoothing === 4 // Show only for SavitzkyGolay (4)
+                        }
+
+                        Label {
+                            text: qsTr("Spline Penalty")
+                            color: Material.primaryTextColor
+                            visible: window.settingsApi.pitchSmoothing === 5 // Show only for Spline (5)
+                        }
+                        TextField {
+                            text: window.settingsApi.pitchSplineSmoothingPenalty.toString()
+                            onEditingFinished: window.settingsApi.pitchSplineSmoothingPenalty = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: window.settingsApi.pitchSmoothing === 5 // Show only for Spline (5)
+                        }
                     }
                 }
             }

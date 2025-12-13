@@ -196,7 +196,13 @@ void SettingsApi::load()
     emit voicingThresholdChanged();
     emit voicingThresholdChanged();
     emit pitchNormalizationChanged();
+    emit pitchNormalizationChanged();
     emit pitchInterpolationTypeChanged();
+    emit pitchSmoothingChanged();
+    emit pitchSmoothingWindowSizeChanged();
+    emit pitchGaussianSmoothingSigmaChanged();
+    emit pitchSavitzkyGolaySmoothingPolynomialOrderChanged();
+    emit pitchSplineSmoothingPenaltyChanged();
     LOG_DEBUG() << "Finish: load";
 }
 
@@ -239,6 +245,120 @@ void SettingsApi::setPitchInterpolationType(PitchInterpolationType pitchInterpol
         emit pitchInterpolationTypeChanged();
     }
     LOG_DEBUG() << "Finish: setPitchInterpolationType";
+}
+
+SettingsApi::PitchSmoothingType SettingsApi::pitchSmoothing() const
+{
+    LOG_DEBUG() << "Start: pitchSmoothing";
+    PitchSmoothingType result = PitchSmoothingType::None;
+    std::string type = m_settings.pitchSmoothing;
+    
+    if (type == "None") result = PitchSmoothingType::None;
+    else if (type == "MovingAverage") result = PitchSmoothingType::MovingAverage;
+    else if (type == "Median") result = PitchSmoothingType::Median;
+    else if (type == "Gaussian") result = PitchSmoothingType::Gaussian;
+    else if (type == "SavitzkyGolay") result = PitchSmoothingType::SavitzkyGolay;
+    else if (type == "Spline") result = PitchSmoothingType::Spline;
+    
+    LOG_DEBUG() << "Finish: pitchSmoothing - result=" << static_cast<int>(result);
+    return result;
+}
+
+void SettingsApi::setPitchSmoothing(PitchSmoothingType pitchSmoothing)
+{
+    LOG_DEBUG() << "Start: setPitchSmoothing - pitchSmoothing=" << static_cast<int>(pitchSmoothing);
+    std::string type = "None";
+    switch (pitchSmoothing) {
+        case PitchSmoothingType::None: type = "None"; break;
+        case PitchSmoothingType::MovingAverage: type = "MovingAverage"; break;
+        case PitchSmoothingType::Median: type = "Median"; break;
+        case PitchSmoothingType::Gaussian: type = "Gaussian"; break;
+        case PitchSmoothingType::SavitzkyGolay: type = "SavitzkyGolay"; break;
+        case PitchSmoothingType::Spline: type = "Spline"; break;
+    }
+    
+    if (m_settings.pitchSmoothing != type) {
+        m_settings.pitchSmoothing = type;
+        save();
+        emit pitchSmoothingChanged();
+    }
+    LOG_DEBUG() << "Finish: setPitchSmoothing";
+}
+
+int SettingsApi::pitchSmoothingWindowSize() const
+{
+    LOG_DEBUG() << "Start: pitchSmoothingWindowSize";
+    int result = m_settings.pitchSmoothingWindowSize;
+    LOG_DEBUG() << "Finish: pitchSmoothingWindowSize - result=" << result;
+    return result;
+}
+
+void SettingsApi::setPitchSmoothingWindowSize(int pitchSmoothingWindowSize)
+{
+    LOG_DEBUG() << "Start: setPitchSmoothingWindowSize - pitchSmoothingWindowSize=" << pitchSmoothingWindowSize;
+    if (m_settings.pitchSmoothingWindowSize != pitchSmoothingWindowSize) {
+        m_settings.pitchSmoothingWindowSize = pitchSmoothingWindowSize;
+        save();
+        emit pitchSmoothingWindowSizeChanged();
+    }
+    LOG_DEBUG() << "Finish: setPitchSmoothingWindowSize";
+}
+
+double SettingsApi::pitchGaussianSmoothingSigma() const
+{
+    LOG_DEBUG() << "Start: pitchGaussianSmoothingSigma";
+    double result = m_settings.pitchGaussianSmoothingSigma;
+    LOG_DEBUG() << "Finish: pitchGaussianSmoothingSigma - result=" << result;
+    return result;
+}
+
+void SettingsApi::setPitchGaussianSmoothingSigma(double pitchGaussianSmoothingSigma)
+{
+    LOG_DEBUG() << "Start: setPitchGaussianSmoothingSigma - pitchGaussianSmoothingSigma=" << pitchGaussianSmoothingSigma;
+    if (qAbs(m_settings.pitchGaussianSmoothingSigma - pitchGaussianSmoothingSigma) > 0.0001) {
+        m_settings.pitchGaussianSmoothingSigma = pitchGaussianSmoothingSigma;
+        save();
+        emit pitchGaussianSmoothingSigmaChanged();
+    }
+    LOG_DEBUG() << "Finish: setPitchGaussianSmoothingSigma";
+}
+
+int SettingsApi::pitchSavitzkyGolaySmoothingPolynomialOrder() const
+{
+    LOG_DEBUG() << "Start: pitchSavitzkyGolaySmoothingPolynomialOrder";
+    int result = m_settings.pitchSavitzkyGolaySmoothingPolynomialOrder;
+    LOG_DEBUG() << "Finish: pitchSavitzkyGolaySmoothingPolynomialOrder - result=" << result;
+    return result;
+}
+
+void SettingsApi::setPitchSavitzkyGolaySmoothingPolynomialOrder(int pitchSavitzkyGolaySmoothingPolynomialOrder)
+{
+    LOG_DEBUG() << "Start: setPitchSavitzkyGolaySmoothingPolynomialOrder - pitchSavitzkyGolaySmoothingPolynomialOrder=" << pitchSavitzkyGolaySmoothingPolynomialOrder;
+    if (m_settings.pitchSavitzkyGolaySmoothingPolynomialOrder != pitchSavitzkyGolaySmoothingPolynomialOrder) {
+        m_settings.pitchSavitzkyGolaySmoothingPolynomialOrder = pitchSavitzkyGolaySmoothingPolynomialOrder;
+        save();
+        emit pitchSavitzkyGolaySmoothingPolynomialOrderChanged();
+    }
+    LOG_DEBUG() << "Finish: setPitchSavitzkyGolaySmoothingPolynomialOrder";
+}
+
+double SettingsApi::pitchSplineSmoothingPenalty() const
+{
+    LOG_DEBUG() << "Start: pitchSplineSmoothingPenalty";
+    double result = m_settings.pitchSplineSmoothingPenalty;
+    LOG_DEBUG() << "Finish: pitchSplineSmoothingPenalty - result=" << result;
+    return result;
+}
+
+void SettingsApi::setPitchSplineSmoothingPenalty(double pitchSplineSmoothingPenalty)
+{
+    LOG_DEBUG() << "Start: setPitchSplineSmoothingPenalty - pitchSplineSmoothingPenalty=" << pitchSplineSmoothingPenalty;
+    if (m_settings.pitchSplineSmoothingPenalty != pitchSplineSmoothingPenalty) {
+        m_settings.pitchSplineSmoothingPenalty = pitchSplineSmoothingPenalty;
+        save();
+        emit pitchSplineSmoothingPenaltyChanged();
+    }
+    LOG_DEBUG() << "Finish: setPitchSplineSmoothingPenalty";
 }
 
 void SettingsApi::updateTranslator()

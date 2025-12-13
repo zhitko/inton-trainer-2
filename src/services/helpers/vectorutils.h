@@ -96,6 +96,58 @@ public:
      * @return Resampled vector.
      */
     static std::vector<double> interpolate(const std::string& type, const std::vector<double>& data, int targetLength);
+
+    /**
+     * @brief Smooths data using a Simple Moving Average.
+     * @param data Input vector.
+     * @param windowSize Size of the smoothing window (must be odd).
+     * @return Smoothed vector.
+     */
+    static std::vector<double> smoothMovingAverage(const std::vector<double>& data, int windowSize);
+
+    /**
+     * @brief Smooths data using a Median filter.
+     * @param data Input vector.
+     * @param windowSize Size of the smoothing window (must be odd).
+     * @return Smoothed vector.
+     */
+    static std::vector<double> smoothMedian(const std::vector<double>& data, int windowSize);
+
+    /**
+     * @brief Smooths data using a Gaussian filter.
+     * @param data Input vector.
+     * @param windowSize Size of the smoothing window (must be odd).
+     * @param sigma Standard deviation of the Gaussian kernel.
+     * @return Smoothed vector.
+     */
+    static std::vector<double> smoothGaussian(const std::vector<double>& data, int windowSize, double sigma);
+
+    /**
+     * @brief Smooths data using a Savitzky-Golay filter.
+     * @param data Input vector.
+     * @param windowSize Size of the smoothing window (must be odd).
+     * @param polynomialOrder Order of the polynomial to fit.
+     * @return Smoothed vector.
+     */
+    static std::vector<double> smoothSavitzkyGolay(const std::vector<double>& data, int windowSize, int polynomialOrder);
+
+    /**
+     * @brief Smooths data using Alglib's Penalized Spline.
+     * @param data Input vector.
+     * @param penalty Penalty coefficient (rho). Large rho = smoother (linear-like), Small rho = closer to data.
+     * @return Smoothed vector.
+     */
+    static std::vector<double> smoothSpline(const std::vector<double>& data, double penalty);
+    
+    /**
+     * @brief General dispatch for smoothing.
+     * @param type Smoothing type ("MovingAverage", "Median", "Gaussian", "SavitzkyGolay", "Spline").
+     * @param data Input vector.
+     * @param param1 Primary parameter (windowSize or penalty).
+     * @param param2 Secondary parameter (polynomialOrder or sigma), if applicable.
+     * @return Smoothed vector.
+     */
+    static std::vector<double> smooth(const std::string& type, const std::vector<double>& data, double param1, double param2 = 0.0);
 };
 
 #endif // VECTORUTILS_H

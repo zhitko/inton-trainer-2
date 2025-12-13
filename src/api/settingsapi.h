@@ -18,6 +18,11 @@ class SettingsApi : public QObject
     Q_PROPERTY(double voicingThreshold READ voicingThreshold WRITE setVoicingThreshold NOTIFY voicingThresholdChanged)
     Q_PROPERTY(QString pitchNormalization READ pitchNormalization WRITE setPitchNormalization NOTIFY pitchNormalizationChanged)
     Q_PROPERTY(PitchInterpolationType pitchInterpolationType READ pitchInterpolationType WRITE setPitchInterpolationType NOTIFY pitchInterpolationTypeChanged)
+    Q_PROPERTY(PitchSmoothingType pitchSmoothing READ pitchSmoothing WRITE setPitchSmoothing NOTIFY pitchSmoothingChanged)
+    Q_PROPERTY(int pitchSmoothingWindowSize READ pitchSmoothingWindowSize WRITE setPitchSmoothingWindowSize NOTIFY pitchSmoothingWindowSizeChanged)
+    Q_PROPERTY(double pitchGaussianSmoothingSigma READ pitchGaussianSmoothingSigma WRITE setPitchGaussianSmoothingSigma NOTIFY pitchGaussianSmoothingSigmaChanged)
+    Q_PROPERTY(int pitchSavitzkyGolaySmoothingPolynomialOrder READ pitchSavitzkyGolaySmoothingPolynomialOrder WRITE setPitchSavitzkyGolaySmoothingPolynomialOrder NOTIFY pitchSavitzkyGolaySmoothingPolynomialOrderChanged)
+    Q_PROPERTY(double pitchSplineSmoothingPenalty READ pitchSplineSmoothingPenalty WRITE setPitchSplineSmoothingPenalty NOTIFY pitchSplineSmoothingPenaltyChanged)
 
 public:
     enum class PitchInterpolationType {
@@ -28,6 +33,16 @@ public:
         Monotone
     };
     Q_ENUM(PitchInterpolationType)
+    
+    enum class PitchSmoothingType {
+        None,
+        MovingAverage,
+        Median,
+        Gaussian,
+        SavitzkyGolay,
+        Spline
+    };
+    Q_ENUM(PitchSmoothingType)
     explicit SettingsApi(QObject *parent = nullptr);
 
     QString language() const;
@@ -60,6 +75,21 @@ public:
     PitchInterpolationType pitchInterpolationType() const;
     void setPitchInterpolationType(PitchInterpolationType pitchInterpolationType);
 
+    PitchSmoothingType pitchSmoothing() const;
+    void setPitchSmoothing(PitchSmoothingType pitchSmoothing);
+
+    int pitchSmoothingWindowSize() const;
+    void setPitchSmoothingWindowSize(int pitchSmoothingWindowSize);
+
+    double pitchGaussianSmoothingSigma() const;
+    void setPitchGaussianSmoothingSigma(double pitchGaussianSmoothingSigma);
+
+    int pitchSavitzkyGolaySmoothingPolynomialOrder() const;
+    void setPitchSavitzkyGolaySmoothingPolynomialOrder(int pitchSavitzkyGolaySmoothingPolynomialOrder);
+
+    double pitchSplineSmoothingPenalty() const;
+    void setPitchSplineSmoothingPenalty(double pitchSplineSmoothingPenalty);
+
     Q_INVOKABLE void load();
     Q_INVOKABLE void save();
 
@@ -74,6 +104,11 @@ signals:
     void voicingThresholdChanged();
     void pitchNormalizationChanged();
     void pitchInterpolationTypeChanged();
+    void pitchSmoothingChanged();
+    void pitchSmoothingWindowSizeChanged();
+    void pitchGaussianSmoothingSigmaChanged();
+    void pitchSavitzkyGolaySmoothingPolynomialOrderChanged();
+    void pitchSplineSmoothingPenaltyChanged();
 
 private:
     AppSettings m_settings;

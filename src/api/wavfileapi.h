@@ -26,7 +26,12 @@ public slots:
                                       double voicingThreshold,
                                       const QString& outputFormat,
                                       const QString& normalizationMode,
-                                      const QString& pitchInterpolationType);
+                                      const QString& pitchInterpolationType,
+                                      const QString& pitchSmoothing = "None",
+                                      int pitchSmoothingWindowSize = 5,
+                                      double pitchGaussianSmoothingSigma = 2.0,
+                                      int pitchSavitzkyGolaySmoothingPolynomialOrder = 2,
+                                      double pitchSplineSmoothingPenalty = 10.0);
 
     Q_INVOKABLE QVariantMap getUMP(const QVariantList& pitch,
                                    const QVariantList& cuePoints,
