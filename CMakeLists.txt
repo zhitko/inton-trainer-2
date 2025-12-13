@@ -32,6 +32,9 @@ qt_add_executable(appinton-trainer-2
     src/services/helpers/wavFile.cpp
     src/services/helpers/vectorutils.h
     src/services/helpers/vectorutils.cpp
+    src/services/helpers/vectorutils_normalization.cpp
+    src/services/helpers/vectorutils_interpolation.cpp
+    src/services/helpers/vectorutils_smoothing.cpp
     src/services/helpers/fileLogger.h
 )
 
