@@ -21,7 +21,7 @@ class SettingsApi : public QObject
     Q_PROPERTY(PitchSmoothingType pitchSmoothing READ pitchSmoothing WRITE setPitchSmoothing NOTIFY pitchSmoothingChanged)
     Q_PROPERTY(int pitchSmoothingWindowSize READ pitchSmoothingWindowSize WRITE setPitchSmoothingWindowSize NOTIFY pitchSmoothingWindowSizeChanged)
     Q_PROPERTY(double pitchGaussianSmoothingSigma READ pitchGaussianSmoothingSigma WRITE setPitchGaussianSmoothingSigma NOTIFY pitchGaussianSmoothingSigmaChanged)
-    Q_PROPERTY(int pitchSavitzkyGolaySmoothingPolynomialOrder READ pitchSavitzkyGolaySmoothingPolynomialOrder WRITE setPitchSavitzkyGolaySmoothingPolynomialOrder NOTIFY pitchSavitzkyGolaySmoothingPolynomialOrderChanged)
+
     Q_PROPERTY(double pitchSplineSmoothingPenalty READ pitchSplineSmoothingPenalty WRITE setPitchSplineSmoothingPenalty NOTIFY pitchSplineSmoothingPenaltyChanged)
 
 public:
@@ -39,7 +39,6 @@ public:
         MovingAverage,
         Median,
         Gaussian,
-        SavitzkyGolay,
         Spline
     };
     Q_ENUM(PitchSmoothingType)
@@ -84,8 +83,7 @@ public:
     double pitchGaussianSmoothingSigma() const;
     void setPitchGaussianSmoothingSigma(double pitchGaussianSmoothingSigma);
 
-    int pitchSavitzkyGolaySmoothingPolynomialOrder() const;
-    void setPitchSavitzkyGolaySmoothingPolynomialOrder(int pitchSavitzkyGolaySmoothingPolynomialOrder);
+
 
     double pitchSplineSmoothingPenalty() const;
     void setPitchSplineSmoothingPenalty(double pitchSplineSmoothingPenalty);
@@ -107,7 +105,7 @@ signals:
     void pitchSmoothingChanged();
     void pitchSmoothingWindowSizeChanged();
     void pitchGaussianSmoothingSigmaChanged();
-    void pitchSavitzkyGolaySmoothingPolynomialOrderChanged();
+
     void pitchSplineSmoothingPenaltyChanged();
 
 private:

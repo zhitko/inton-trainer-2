@@ -42,7 +42,7 @@ AppSettings Settings::loadSettings() {
     settings.pitchSmoothing = qsettings.value("pitchSmoothing", "None").toString().toStdString();
     settings.pitchSmoothingWindowSize = qsettings.value("pitchSmoothingWindowSize", 5).toInt();
     settings.pitchGaussianSmoothingSigma = qsettings.value("pitchGaussianSmoothingSigma", 2.0).toDouble();
-    settings.pitchSavitzkyGolaySmoothingPolynomialOrder = qsettings.value("pitchSavitzkyGolaySmoothingPolynomialOrder", 2).toInt();
+
     settings.pitchSplineSmoothingPenalty = qsettings.value("pitchSplineSmoothingPenalty", 10.0).toDouble();
     qsettings.endGroup();
 
@@ -76,7 +76,7 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("pitchSmoothing", QString::fromStdString(settings.pitchSmoothing));
     qsettings.setValue("pitchSmoothingWindowSize", settings.pitchSmoothingWindowSize);
     qsettings.setValue("pitchGaussianSmoothingSigma", settings.pitchGaussianSmoothingSigma);
-    qsettings.setValue("pitchSavitzkyGolaySmoothingPolynomialOrder", settings.pitchSavitzkyGolaySmoothingPolynomialOrder);
+
     qsettings.setValue("pitchSplineSmoothingPenalty", settings.pitchSplineSmoothingPenalty);
     qsettings.endGroup();
     

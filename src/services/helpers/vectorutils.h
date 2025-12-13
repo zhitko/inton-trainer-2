@@ -123,15 +123,6 @@ public:
     static std::vector<double> smoothGaussian(const std::vector<double>& data, int windowSize, double sigma);
 
     /**
-     * @brief Smooths data using a Savitzky-Golay filter.
-     * @param data Input vector.
-     * @param windowSize Size of the smoothing window (must be odd).
-     * @param polynomialOrder Order of the polynomial to fit.
-     * @return Smoothed vector.
-     */
-    static std::vector<double> smoothSavitzkyGolay(const std::vector<double>& data, int windowSize, int polynomialOrder);
-
-    /**
      * @brief Smooths data using Alglib's Penalized Spline.
      * @param data Input vector.
      * @param penalty Penalty coefficient (rho). Large rho = smoother (linear-like), Small rho = closer to data.
@@ -141,7 +132,7 @@ public:
     
     /**
      * @brief General dispatch for smoothing.
-     * @param type Smoothing type ("MovingAverage", "Median", "Gaussian", "SavitzkyGolay", "Spline").
+     * @param type Smoothing type ("MovingAverage", "Median", "Gaussian", "Spline").
      * @param data Input vector.
      * @param param1 Primary parameter (windowSize or penalty).
      * @param param2 Secondary parameter (polynomialOrder or sigma), if applicable.

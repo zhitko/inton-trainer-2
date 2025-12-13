@@ -201,7 +201,7 @@ void SettingsApi::load()
     emit pitchSmoothingChanged();
     emit pitchSmoothingWindowSizeChanged();
     emit pitchGaussianSmoothingSigmaChanged();
-    emit pitchSavitzkyGolaySmoothingPolynomialOrderChanged();
+
     emit pitchSplineSmoothingPenaltyChanged();
     LOG_DEBUG() << "Finish: load";
 }
@@ -257,7 +257,7 @@ SettingsApi::PitchSmoothingType SettingsApi::pitchSmoothing() const
     else if (type == "MovingAverage") result = PitchSmoothingType::MovingAverage;
     else if (type == "Median") result = PitchSmoothingType::Median;
     else if (type == "Gaussian") result = PitchSmoothingType::Gaussian;
-    else if (type == "SavitzkyGolay") result = PitchSmoothingType::SavitzkyGolay;
+
     else if (type == "Spline") result = PitchSmoothingType::Spline;
     
     LOG_DEBUG() << "Finish: pitchSmoothing - result=" << static_cast<int>(result);
@@ -273,7 +273,7 @@ void SettingsApi::setPitchSmoothing(PitchSmoothingType pitchSmoothing)
         case PitchSmoothingType::MovingAverage: type = "MovingAverage"; break;
         case PitchSmoothingType::Median: type = "Median"; break;
         case PitchSmoothingType::Gaussian: type = "Gaussian"; break;
-        case PitchSmoothingType::SavitzkyGolay: type = "SavitzkyGolay"; break;
+
         case PitchSmoothingType::Spline: type = "Spline"; break;
     }
     
@@ -323,24 +323,7 @@ void SettingsApi::setPitchGaussianSmoothingSigma(double pitchGaussianSmoothingSi
     LOG_DEBUG() << "Finish: setPitchGaussianSmoothingSigma";
 }
 
-int SettingsApi::pitchSavitzkyGolaySmoothingPolynomialOrder() const
-{
-    LOG_DEBUG() << "Start: pitchSavitzkyGolaySmoothingPolynomialOrder";
-    int result = m_settings.pitchSavitzkyGolaySmoothingPolynomialOrder;
-    LOG_DEBUG() << "Finish: pitchSavitzkyGolaySmoothingPolynomialOrder - result=" << result;
-    return result;
-}
 
-void SettingsApi::setPitchSavitzkyGolaySmoothingPolynomialOrder(int pitchSavitzkyGolaySmoothingPolynomialOrder)
-{
-    LOG_DEBUG() << "Start: setPitchSavitzkyGolaySmoothingPolynomialOrder - pitchSavitzkyGolaySmoothingPolynomialOrder=" << pitchSavitzkyGolaySmoothingPolynomialOrder;
-    if (m_settings.pitchSavitzkyGolaySmoothingPolynomialOrder != pitchSavitzkyGolaySmoothingPolynomialOrder) {
-        m_settings.pitchSavitzkyGolaySmoothingPolynomialOrder = pitchSavitzkyGolaySmoothingPolynomialOrder;
-        save();
-        emit pitchSavitzkyGolaySmoothingPolynomialOrderChanged();
-    }
-    LOG_DEBUG() << "Finish: setPitchSavitzkyGolaySmoothingPolynomialOrder";
-}
 
 double SettingsApi::pitchSplineSmoothingPenalty() const
 {

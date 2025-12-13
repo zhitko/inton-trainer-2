@@ -21,7 +21,7 @@ struct AppSettings {
     std::string pitchSmoothing = "None";
     int pitchSmoothingWindowSize = 10;
     double pitchGaussianSmoothingSigma = 1.0;
-    int pitchSavitzkyGolaySmoothingPolynomialOrder = 5;
+
     double pitchSplineSmoothingPenalty = 1.0;
 };
 

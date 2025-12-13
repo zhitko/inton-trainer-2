@@ -83,10 +83,9 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
                                   const QString& pitchSmoothing,
                                   int pitchSmoothingWindowSize,
                                   double pitchGaussianSmoothingSigma,
-                                  int pitchSavitzkyGolaySmoothingPolynomialOrder,
                                   double pitchSplineSmoothingPenalty)
 {
-    LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate << ", minF0=" << minF0 << ", maxF0=" << maxF0 << ", voicingThreshold=" << voicingThreshold << ", outputFormat=" << outputFormat << ", normalizationMode=" << normalizationMode << ", interpolation=" << pitchInterpolationType << ", smoothing=" << pitchSmoothing << ", smoothingWindow=" << pitchSmoothingWindowSize << ", sigma=" << pitchGaussianSmoothingSigma << ", polyOrder=" << pitchSavitzkyGolaySmoothingPolynomialOrder << ", penalty=" << pitchSplineSmoothingPenalty;
+    LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate << ", minF0=" << minF0 << ", maxF0=" << maxF0 << ", voicingThreshold=" << voicingThreshold << ", outputFormat=" << outputFormat << ", normalizationMode=" << normalizationMode << ", interpolation=" << pitchInterpolationType << ", smoothing=" << pitchSmoothing << ", smoothingWindow=" << pitchSmoothingWindowSize << ", sigma=" << pitchGaussianSmoothingSigma << ", penalty=" << pitchSplineSmoothingPenalty;
     QVariantList pitchData;
     
     if (!waveFile) {
@@ -159,8 +158,6 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
         
         if (smoothType == "Gaussian") {
             param2 = pitchGaussianSmoothingSigma; // Sigma
-        } else if (smoothType == "SavitzkyGolay") {
-            param2 = static_cast<double>(pitchSavitzkyGolaySmoothingPolynomialOrder); // Polynomial order
         } else if (smoothType == "Spline") {
             param1 = pitchSplineSmoothingPenalty; // Penalty (rho)
         }
