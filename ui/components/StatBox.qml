@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Effects
 import "../utils"
 
 Rectangle {
@@ -17,6 +18,15 @@ Rectangle {
 
     implicitWidth: 100
     implicitHeight: 100
+
+    layer.enabled: true
+    layer.effect: MultiEffect {
+        shadowEnabled: true
+        shadowColor: Qt.rgba(0, 0, 0, 0.15)
+        blur: 0.34
+        shadowVerticalOffset: 4
+        shadowHorizontalOffset: 0
+    }
 
     ColumnLayout {
         anchors.centerIn: parent
@@ -44,7 +54,7 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             text: root.value
             font.pixelSize: 18
-            font.bold: true
+            font.weight: 600
             color: "#212121"
         }
     }

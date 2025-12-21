@@ -82,6 +82,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/Main.qml
         ui/pages/RecordingPage.qml
         ui/pages/HomePage.qml
+        ui/pages/CategoriesPage.qml
         ui/pages/RecordsPage.qml
         ui/pages/TemplatesPage.qml
         ui/pages/TemplatePage.qml
@@ -89,6 +90,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/cards/Card.qml
         ui/components/FileTreeView.qml
         ui/components/FileTreeViewItem.qml
+        ui/components/ListItem.qml
         ui/components/PlayButton.qml
         ui/components/CustomButton.qml
         ui/components/DeleteButton.qml
@@ -96,6 +98,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/CircularProgress.qml
         ui/components/StatBox.qml
         ui/components/StartTrainingButton.qml
+        ui/components/SearchBar.qml
         ${qml_singletons}
     RESOURCES
         res/fonts/fa-brands-400.ttf

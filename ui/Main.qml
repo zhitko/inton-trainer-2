@@ -34,6 +34,7 @@ ApplicationWindow {
     }
 
     Material.theme: window.theme
+    Material.background: window.theme === Material.Dark ? Qt.rgba(0.19, 0.19, 0.19, 1.0) : "#e2e9ef"
 
     header: ToolBar {
         contentHeight: 56

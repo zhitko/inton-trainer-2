@@ -9,6 +9,8 @@ Page {
     id: templatesPage
     title: qsTr("Templates")
 
+    property string path: "data/templates"
+
     Material.theme: window.theme
 
     FileApi {
@@ -20,8 +22,8 @@ Page {
         anchors.margins: 16
 
         FileTreeView {
-            model: fileApi.getFiles("data/templates", ["*.wav"])
-            path: "data/templates"
+            model: fileApi.getFiles(templatesPage.path, ["*.wav"])
+            path: templatesPage.path
             onFileClicked: filePath => {
                 console.log("ui/pages/TemplatesPage.qml:onFileClicked:", filePath);
                 stackView.push("TemplatePage.qml", {

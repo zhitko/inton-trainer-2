@@ -47,7 +47,7 @@ Page {
             // 2. Center Action Button with Waveform Visuals
             StartTrainingButton {
                 text: qsTr("Start Training")
-                onClicked: stackView.push("RecordingPage.qml")
+                onClicked: stackView.push("CategoriesPage.qml")
             }
 
             // 3. Stats Row

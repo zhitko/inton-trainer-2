@@ -5,3 +5,4 @@ CustomButton CustomButton.qml
 DeleteButton DeleteButton.qml
 WaveFormGraph WaveFormGraph.qml
 StartTrainingButton StartTrainingButton.qml
+ListItem ListItem.qml

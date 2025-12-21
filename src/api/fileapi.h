@@ -11,6 +11,7 @@ public:
     explicit FileApi(QObject *parent = nullptr);
 
     Q_INVOKABLE QVariantMap getFiles(const QString &path, const QStringList &nameFilters);
+    Q_INVOKABLE QVariantList getFolders(const QString &path);
     Q_INVOKABLE void deleteFile(const QString &file);
 
 };

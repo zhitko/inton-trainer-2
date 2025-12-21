@@ -103,3 +103,21 @@ QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilter
     LOG_DEBUG() << "Finish: getFiles - fileCount=" << fileTree.keys().count();
     return fileTree;
 }
+
+QVariantList FileApi::getFolders(const QString &path)
+{
+    LOG_DEBUG() << "Start: getFolders - path=" << path;
+    QString basePath = QCoreApplication::applicationDirPath();
+    QString searchPath = QDir(basePath).filePath(path);
+
+    QDir dir(searchPath);
+    QStringList folders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+
+    QVariantList result;
+    for (const QString &folder : folders) {
+        result << folder;
+    }
+
+    LOG_DEBUG() << "Finish: getFolders - folderCount=" << result.count();
+    return result;
+}
