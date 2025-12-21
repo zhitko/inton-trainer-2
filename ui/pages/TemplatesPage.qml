@@ -1,9 +1,10 @@
 import QtQuick
 import QtQuick.Controls
-import by.intontrainer.file 1.0
+import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
-
+import by.intontrainer.file 1.0
 import "../components"
+import "../utils"
 
 Page {
     id: templatesPage
@@ -13,22 +14,70 @@ Page {
 
     Material.theme: window.theme
 
+    property var allFiles: []
+
+    Component.onCompleted: {
+        allFiles = fileApi.getFilesList(templatesPage.path, ["*.wav"]);
+    }
+
     FileApi {
         id: fileApi
     }
 
-    ScrollView {
+    ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 16
+        anchors.margins: 24
+        spacing: 24
 
-        FileTreeView {
-            model: fileApi.getFiles(templatesPage.path, ["*.wav"])
-            path: templatesPage.path
-            onFileClicked: filePath => {
-                console.log("ui/pages/TemplatesPage.qml:onFileClicked:", filePath);
-                stackView.push("TemplatePage.qml", {
-                    "filePath": filePath
-                });
+        // Search Bar
+        SearchBar {
+            id: searchField
+        }
+
+        // Templates List
+        ListView {
+            id: listView
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
+            spacing: 10
+
+            model: {
+                if (!searchField.text)
+                    return allFiles;
+                return allFiles.filter(file => file.fileName.toLowerCase().includes(searchField.text.toLowerCase()));
+            }
+
+            section.property: "directory"
+            section.criteria: ViewSection.FullString
+            section.delegate: Component {
+                Item {
+                    width: listView.width
+                    height: 40
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: section
+                        font.pixelSize: 16
+                        font.weight: 700
+                        color: Material.primaryTextColor
+                        opacity: 0.7
+                    }
+                }
+            }
+
+            delegate: ListItem {
+                itemData: modelData.fileName
+                itemIndex: index
+                icon: Icons.faFileAudio
+                onClicked: {
+                    console.log("Clicked template:", modelData.filePath);
+                    stackView.push("TemplatePage.qml", {
+                        filePath: templatesPage.path + "/" + modelData.filePath
+                    });
+                }
             }
         }
     }

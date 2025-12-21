@@ -121,3 +121,84 @@ QVariantList FileApi::getFolders(const QString &path)
     LOG_DEBUG() << "Finish: getFolders - folderCount=" << result.count();
     return result;
 }
+
+QVariantList FileApi::getFilesList(const QString &path, const QStringList &nameFilters)
+{
+    LOG_DEBUG() << "Start: getFilesList - path=" << path << ", nameFilters=" << nameFilters;
+    QString basePath = QCoreApplication::applicationDirPath();
+    QString searchPath = QDir(basePath).filePath(path);
+
+    QVariantList fileList;
+    QDirIterator it(searchPath, QDir::AllEntries | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+
+    while (it.hasNext()) {
+        it.next();
+
+        QFileInfo fileInfo = it.fileInfo();
+        if (fileInfo.isFile()) {
+            bool match = false;
+            if (nameFilters.isEmpty()) {
+                match = true;
+            } else {
+                for (const QString &filter : nameFilters) {
+                    QRegularExpression re(QRegularExpression::wildcardToRegularExpression(filter));
+                    if (re.match(fileInfo.fileName()).hasMatch()) {
+                        match = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!match) {
+                continue; // Skip files that don't match the filter
+            }
+
+            QString fullPath = fileInfo.filePath();
+            QString relativePath = fullPath;
+            if (searchPath.endsWith("/")) {
+                relativePath.remove(0, searchPath.length());
+            } else {
+                relativePath.remove(0, searchPath.length() + 1);
+            }
+
+            if (relativePath.isEmpty()) {
+                continue;
+            }
+
+            QString directory = "";
+            if (relativePath.contains('/')) {
+                directory = relativePath.section('/', 0, -2);
+            } else {
+                directory = "Root"; // Or handled as empty/top level
+            }
+            
+            // Format directory for display (capitalize, maybe?)
+            // For now, keep as is or just take the immediate parent folder name if we want to mimic "Categories" style?
+            // "Basic/Sentence 1.wav" -> directory "Basic"
+            // "Advanced/Sentences/S1.wav" -> directory "Advanced/Sentences"
+            
+            // If the user wants "Grouped by parent subdirectories", "Advanced/Sentences" is good.
+            
+            QVariantMap fileData;
+            fileData["fileName"] = fileInfo.fileName();
+            fileData["filePath"] = relativePath;
+            fileData["directory"] = directory;
+            
+            fileList.append(fileData);
+        }
+    }
+    
+    // Sort logic? Maybe the UI will sort or the iterator order is filesystem dependent.
+    // Let's sort by directory then filename to ensure consistent grouping.
+    std::sort(fileList.begin(), fileList.end(), [](const QVariant &a, const QVariant &b) {
+        QVariantMap mapA = a.toMap();
+        QVariantMap mapB = b.toMap();
+        if (mapA["directory"].toString() != mapB["directory"].toString()) {
+            return mapA["directory"].toString() < mapB["directory"].toString();
+        }
+        return mapA["fileName"].toString() < mapB["fileName"].toString();
+    });
+
+    LOG_DEBUG() << "Finish: getFilesList - fileCount=" << fileList.count();
+    return fileList;
+}

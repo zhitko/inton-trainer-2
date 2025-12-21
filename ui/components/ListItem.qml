@@ -10,6 +10,7 @@ Item {
 
     property string itemData: ""
     property int itemIndex: 0
+    property string icon: Icons.faBook
 
     signal clicked
 
@@ -54,7 +55,7 @@ Item {
 
             Text {
                 anchors.centerIn: parent
-                text: Icons.faBook
+                text: root.icon
                 font.family: Icons.familySolid
                 font.pixelSize: 20
                 color: "#FFFFFF"
