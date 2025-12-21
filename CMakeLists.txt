@@ -93,6 +93,9 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/CustomButton.qml
         ui/components/DeleteButton.qml
         ui/components/WaveFormGraph.qml
+        ui/components/CircularProgress.qml
+        ui/components/StatBox.qml
+        ui/components/StartTrainingButton.qml
         ${qml_singletons}
     RESOURCES
         res/fonts/fa-brands-400.ttf
