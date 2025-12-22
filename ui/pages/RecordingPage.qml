@@ -9,8 +9,6 @@ import "../components"
 Page {
     property string lastRecordedFile: ""
 
-    Material.theme: window.theme
-
     AudioApi {
         id: audioApi
     }
@@ -28,7 +26,7 @@ Page {
             font.family: Icons.familySolid
             font.bold: true
             text: audioApi.isRecording ? Icons.faMicrophoneLines : Icons.faMicrophone
-            Material.foreground: audioApi.isRecording ? Material.DeepOrange : Material.primaryTextColor
+            color: audioApi.isRecording ? Theme.error(Material.theme) : Theme.onSurface(Material.theme)
             anchors.centerIn: parent
             font.pixelSize: recordButton.hovered ? parent.width / 2 + 5 : parent.width / 2
             horizontalAlignment: Label.AlignHCenter

@@ -1,12 +1,14 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 6.8
+import "../utils"
 
 Item {
     id: root
 
     property real progress: 0.0 // 0.0 to 1.0
-    property color color: "#00FF00"
-    property color backgroundColor: "#E0E0E0"
+    property color color: Theme.primary(Material.theme)
+    property color backgroundColor: Theme.surfaceContainerHighest(Material.theme)
     property real lineWidth: 10
     property bool roundCap: true
 

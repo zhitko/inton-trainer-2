@@ -35,7 +35,7 @@ Item {
                     width: 4
                     height: leftWaveBar.modelData
                     radius: 2
-                    color: "#4FC3F7" // Light Blue
+                    color: Theme.secondary(Material.theme)
                     anchors.verticalCenter: parent.verticalCenter
                     opacity: 0.8 - (leftWaveBar.index * 0.05) // Fade slighty
 
@@ -69,7 +69,7 @@ Item {
                 width: 200
                 height: 200
                 radius: 100
-                color: "#E1F5FE" // Very light blue glow
+                color: Theme.primaryContainer(Material.theme)
                 opacity: startButtonMouseArea.containsMouse ? 0.8 : 0.4
 
                 Behavior on opacity {
@@ -118,11 +118,11 @@ Item {
                 gradient: Gradient {
                     GradientStop {
                         position: 0.0
-                        color: "#42A5F5"
+                        color: Theme.primary(Material.theme)
                     }
                     GradientStop {
                         position: 1.0
-                        color: "#1976D2"
+                        color: Theme.primary(Material.theme)
                     }
                 }
 
@@ -154,7 +154,7 @@ Item {
                             width: 4
                             height: innerBar.modelData
                             radius: 2
-                            color: "white"
+                            color: Theme.onPrimary(Material.theme)
                             opacity: 0.2
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -180,7 +180,7 @@ Item {
                     id: label
                     anchors.centerIn: parent
                     text: qsTr("Start Training")
-                    color: "white"
+                    color: Theme.onPrimary(Material.theme)
                     font.bold: true
                     font.pixelSize: 18
                 }
@@ -201,7 +201,7 @@ Item {
                     width: 4
                     height: rightWaveBar.modelData
                     radius: 2
-                    color: "#4FC3F7" // Light Blue
+                    color: Theme.secondary(Material.theme)
                     anchors.verticalCenter: parent.verticalCenter
                     opacity: 0.8 - (rightWaveBar.index * 0.05)
 

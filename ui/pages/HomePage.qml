@@ -9,8 +9,6 @@ Page {
     id: root
     title: qsTr("Home")
 
-    Material.theme: window.theme
-
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -32,14 +30,14 @@ Page {
                     text: qsTr("Inton@Trainer 2.0")
                     font.bold: true
                     font.pixelSize: 28
-                    color: Material.primaryTextColor
+                    color: Theme.onSurface(Material.theme)
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 Label {
                     text: qsTr("American English")
                     font.pixelSize: 16
-                    color: "#757575" // Grey subtitle
+                    color: Theme.onSurfaceVariant(Material.theme)
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
@@ -92,8 +90,8 @@ Page {
                     width: height
                     lineWidth: 24
                     progress: 0.85
-                    color: "#00E676" // Bright Green
-                    backgroundColor: "#E0E0E0"
+                    color: Theme.primary(Material.theme)
+                    backgroundColor: Theme.surfaceContainerHighest(Material.theme)
 
                     // Text inside
                     Column {
@@ -102,14 +100,14 @@ Page {
                         Text {
                             text: qsTr("Overall Progress:")
                             font.pixelSize: 18
-                            color: "#616161"
+                            color: Theme.onSurfaceVariant(Material.theme)
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text {
                             text: "85%"
                             font.pixelSize: 36
                             font.bold: true
-                            color: "#212121"
+                            color: Theme.onSurface(Material.theme)
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }

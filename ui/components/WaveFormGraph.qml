@@ -1,4 +1,6 @@
 import QtQuick 2.15
+import QtQuick.Controls.Material 6.8
+import "../utils"
 
 Item {
     id: root
@@ -100,7 +102,7 @@ Item {
             }
 
             // Draw Y axis
-            ctx.strokeStyle = "black";
+            ctx.strokeStyle = Theme.outline(Material.theme);
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(leftMargin, topPadding);
@@ -116,7 +118,7 @@ Item {
             ctx.stroke();
 
             // Draw Y axis labels
-            ctx.fillStyle = "black";
+            ctx.fillStyle = Theme.onSurfaceVariant(Material.theme);
             ctx.font = "10px sans-serif";
             ctx.textAlign = "right";
             ctx.textBaseline = "middle";
@@ -141,7 +143,7 @@ Item {
                 ctx.beginPath();
                 ctx.moveTo(leftMargin, y0);
                 ctx.lineTo(leftMargin + graphWidth, y0);
-                ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+                ctx.strokeStyle = Theme.outlineVariant(Material.theme);
                 ctx.lineWidth = 1;
                 ctx.stroke();
                 ctx.restore();
@@ -155,7 +157,7 @@ Item {
                 ctx.stroke();
 
                 // Draw label
-                ctx.fillStyle = "black";
+                ctx.fillStyle = Theme.onSurfaceVariant(Material.theme);
                 ctx.textAlign = "right";
                 ctx.fillText("0", leftMargin - 8, y0);
             }
@@ -186,12 +188,12 @@ Item {
                 ctx.stroke();
 
                 // Draw label
-                ctx.fillStyle = "black";
+                ctx.fillStyle = Theme.onSurface(Material.theme);
                 ctx.fillText(cue.label, x + width / 2, canvas.height - bottomPadding / 2);
             }
 
             // Draw datasets
-            var colors = ["#512DA8", "#D32F2F", "#0288D1", "#0097A7", "#689F38", "#FFA000", "#C2185B", "#303F9F", "#0097A7", "#00796B", "#AFB42B", "#F57C00", "#C2185B", "#1976D2", "#0097A7", "#388E3C", "#FBC02D", "#E64A19",];
+            var colors = [Theme.primary(Material.theme), Theme.secondary(Material.theme), Theme.tertiary(Material.theme), Theme.error(Material.theme), Theme.primaryContainer(Material.theme), Theme.secondaryContainer(Material.theme)];
 
             ctx.save();
             ctx.beginPath();

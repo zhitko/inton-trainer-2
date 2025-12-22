@@ -14,11 +14,13 @@ RoundButton {
     background: Rectangle {
         radius: control.radius
         anchors.fill: parent
+        color: "transparent"
         Label {
             id: label
             font.family: Icons.familySolid
             font.bold: true
             text: control.label
+            color: Theme.onSurface(Material.theme)
             anchors.left: parent.left
             anchors.leftMargin: parent.width / 3
             anchors.top: parent.top
@@ -31,12 +33,12 @@ RoundButton {
             anchors.fill: parent
             hoverEnabled: true
             onEntered: {
-                parent.color = Material.rippleColor
-                label.font.pixelSize+=4
+                parent.color = Theme.surfaceContainerLow(Material.theme);
+                label.font.pixelSize += 4;
             }
             onExited: {
-                parent.color = Material.backgroundColor
-                label.font.pixelSize-=4
+                parent.color = "transparent";
+                label.font.pixelSize -= 4;
             }
         }
     }

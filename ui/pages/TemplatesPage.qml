@@ -12,8 +12,6 @@ Page {
 
     property string path: "data/templates"
 
-    Material.theme: window.theme
-
     property var allFiles: []
 
     Component.onCompleted: {
@@ -62,7 +60,7 @@ Page {
                         text: section
                         font.pixelSize: 16
                         font.weight: 700
-                        color: Material.primaryTextColor
+                        color: Theme.onSurfaceVariant(templatesPage.Material.theme)
                         opacity: 0.7
                     }
                 }

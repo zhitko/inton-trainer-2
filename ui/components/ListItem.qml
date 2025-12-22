@@ -24,7 +24,7 @@ Item {
         anchors.rightMargin: 8
         anchors.leftMargin: 8
         radius: 16
-        color: mouseArea.containsMouse ? "#F5F5F5" : "#FFFFFF"
+        color: mouseArea.containsMouse ? Theme.surfaceContainerLow(Material.theme) : Theme.surface(Material.theme)
         layer.enabled: true
         layer.effect: MultiEffect {
             shadowEnabled: true
@@ -35,7 +35,7 @@ Item {
         }
 
         // Shadow effect (basic simulation with border for now or simplified)
-        border.color: "#E0E0E0"
+        border.color: Theme.outlineVariant(Material.theme)
         border.width: 1
 
         // Icon Circle
@@ -49,7 +49,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             color: {
                 // Mocking different colors based on index or content
-                var colors = ["#CFD8DC", "#BBDEFB", "#C8E6C9", "#F8BBD0", "#E1BEE7"];
+                var colors = [Theme.primaryContainer(Material.theme), Theme.secondaryContainer(Material.theme), Theme.tertiaryContainer(Material.theme)];
                 return colors[root.itemIndex % colors.length];
             }
 
@@ -58,7 +58,7 @@ Item {
                 text: root.icon
                 font.family: Icons.familySolid
                 font.pixelSize: 20
-                color: "#FFFFFF"
+                color: Theme.onPrimaryContainer(Material.theme)
             }
         }
 
@@ -75,7 +75,7 @@ Item {
                 text: root.itemData // Folder name
                 font.pixelSize: 18
                 font.weight: 600
-                color: Material.primaryTextColor
+                color: Theme.onSurface(Material.theme)
                 Layout.fillWidth: true
                 elide: Text.ElideRight
             }
@@ -85,11 +85,11 @@ Item {
                 Text {
                     text: Icons.faSquareCheck
                     font.family: Icons.familySolid
-                    color: "#BDBDBD"
+                    color: Theme.onSurfaceVariant(Material.theme)
                 }
                 Text {
                     text: (Math.floor(Math.random() * 80) + 10) + "%" // Mock percentage
-                    color: "#9E9E9E"
+                    color: Theme.onSurfaceVariant(Material.theme)
                     font.pixelSize: 14
                 }
             }
@@ -112,7 +112,7 @@ Item {
                     text: Icons.faCheck
                     font.family: Icons.familySolid
                     font.pixelSize: 48
-                    color: "#4CAF50"
+                    color: Theme.primary(Material.theme)
                 }
             }
 
@@ -126,17 +126,14 @@ Item {
                     height: parent.height
                     lineWidth: 6
                     progress: Math.random() * 0.8 + 0.1
-                    color: {
-                        var colors = ["#2196F3", "#4CAF50", "#9C27B0", "#FF9800"];
-                        return colors[root.itemIndex % colors.length];
-                    }
-                    backgroundColor: "#EEEEEE"
+                    color: Theme.primary(Material.theme)
+                    backgroundColor: Theme.surfaceContainerHighest(Material.theme)
 
                     Text {
                         anchors.centerIn: parent
                         text: Math.round(parent.progress * 100) + "%"
                         font.pixelSize: 14
-                        color: "#616161"
+                        color: Theme.onSurfaceVariant(Material.theme)
                     }
                 }
             }

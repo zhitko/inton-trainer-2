@@ -10,7 +10,7 @@ Rectangle {
     Layout.fillWidth: true
     Layout.preferredHeight: 56
     radius: 28
-    color: "#FFFFFF"
+    color: Theme.surface(Material.theme)
 
     property alias text: searchInputField.text
 
@@ -35,7 +35,7 @@ Rectangle {
             text: Icons.faMagnifyingGlass
             font.family: Icons.familySolid
             font.pixelSize: 24
-            color: "#9E9E9E"
+            color: Theme.onSurfaceVariant(Material.theme)
             Layout.alignment: Qt.AlignVCenter
         }
 
@@ -45,7 +45,7 @@ Rectangle {
             placeholderText: qsTr("Search")
             background: null
             font.pixelSize: 16
-            color: Material.primaryTextColor
+            color: Theme.onSurface(Material.theme)
         }
     }
 }

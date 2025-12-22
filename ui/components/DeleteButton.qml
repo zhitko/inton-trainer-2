@@ -10,7 +10,7 @@ RoundButton {
 
     width: 50
     height: width
-    radius: width/2
+    radius: width / 2
     visible: file !== ""
 
     signal fileDeleted(string filePath)
@@ -22,6 +22,7 @@ RoundButton {
     background: Rectangle {
         radius: control.radius
         anchors.fill: parent
+        color: "transparent"
         Label {
             id: label
             anchors.centerIn: parent
@@ -29,6 +30,7 @@ RoundButton {
             font.bold: true
             text: Icons.faTrash
             font.pixelSize: parent.width / 2
+            color: Theme.onSurface(Material.theme)
             horizontalAlignment: Label.AlignHCenter
         }
         MouseArea {
@@ -36,18 +38,18 @@ RoundButton {
             anchors.fill: parent
             hoverEnabled: true
             onEntered: {
-                parent.color = Material.rippleColor
-                label.font.pixelSize+=4
+                parent.color = Theme.surfaceContainerLow(Material.theme);
+                label.font.pixelSize += 4;
             }
             onExited: {
-                parent.color = Material.backgroundColor
-                label.font.pixelSize-=4
+                parent.color = "transparent";
+                label.font.pixelSize -= 4;
             }
         }
     }
 
     onClicked: {
-        fileApi.deleteFile(control.file)
-        control.fileDeleted(control.file)
+        fileApi.deleteFile(control.file);
+        control.fileDeleted(control.file);
     }
 }

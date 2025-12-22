@@ -1,16 +1,17 @@
 import QtQuick
 import QtQuick.Controls.Material 6.8
 import QtQuick.Controls.Basic
+import "../../utils"
 
 Rectangle {
     id: card
     width: 150
     height: 100
-    radius: 8
-    border.color: mouseArea.containsMouse ? Material.primary : Material.dividerColor
+    radius: 16
+    border.color: mouseArea.containsMouse ? Theme.primary(Material.theme) : Theme.outlineVariant(Material.theme)
     border.width: 1
     scale: mouseArea.containsMouse ? 1.05 : 1.0
-    color: mouseArea.containsMouse ? Material.rippleColor : Material.backgroundColor
+    color: mouseArea.containsMouse ? Theme.surfaceContainerLow(Material.theme) : Theme.surface(Material.theme)
 
     Behavior on scale {
         NumberAnimation {
@@ -34,14 +35,14 @@ Rectangle {
         anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: 16
-        color: mouseArea.containsMouse ? Material.accentColor : Material.primaryTextColor
+        color: mouseArea.containsMouse ? Theme.secondary(Material.theme) : Theme.onSurface(Material.theme)
     }
 
     Text {
         id: cardText
         anchors.centerIn: parent
         font.pixelSize: 16
-        color: Material.primaryTextColor
+        color: Theme.onSurface(Material.theme)
     }
 
     MouseArea {
@@ -51,4 +52,3 @@ Rectangle {
         hoverEnabled: true
     }
 }
-

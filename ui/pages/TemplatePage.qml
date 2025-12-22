@@ -152,6 +152,7 @@ Page {
                         text: qsTr("Pitch (F0)")
                         font.pixelSize: 14
                         font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
                     }
 
                     WaveFormGraph {
@@ -170,6 +171,7 @@ Page {
                         text: qsTr("UMP")
                         font.pixelSize: 14
                         font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
                     }
 
                     WaveFormGraph {
@@ -184,7 +186,7 @@ Page {
         Rectangle {
             Layout.preferredWidth: 1
             Layout.fillHeight: true
-            color: Material.dividerColor
+            color: Theme.outlineVariant(root.Material.theme)
             visible: root.showSettings
         }
 
@@ -193,7 +195,7 @@ Page {
             Layout.preferredWidth: 400
             Layout.fillHeight: true
             background: Rectangle {
-                color: Material.background
+                color: Theme.surface(root.Material.theme)
             }
         }
     }

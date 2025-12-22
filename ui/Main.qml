@@ -34,10 +34,16 @@ ApplicationWindow {
     }
 
     Material.theme: window.theme
-    Material.background: window.theme === Material.Dark ? Qt.rgba(0.19, 0.19, 0.19, 1.0) : "#e2e9ef"
+    Material.primary: Theme.primary(window.theme)
+    Material.accent: Theme.accent(window.theme)
+    Material.background: Theme.background(window.theme)
 
     header: ToolBar {
         contentHeight: 56
+        background: Rectangle {
+            anchors.fill: parent
+            color: Theme.surfaceContainer(Material.theme)
+        }
 
         Button {
             id: menuButton
@@ -145,14 +151,14 @@ ApplicationWindow {
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                         font.family: Icons.familyRegular
                         text: Icons.faHome
-                        color: Material.primaryTextColor
+                        color: Theme.onSurface(Material.theme)
                     }
                     Text {
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                         Layout.fillWidth: true
                         text: parent.parent.text
                         font: parent.parent.font
-                        color: Material.primaryTextColor
+                        color: Theme.onSurface(Material.theme)
                     }
                 }
             }
@@ -170,14 +176,14 @@ ApplicationWindow {
                         font.family: Icons.familySolid
                         font.bold: true
                         text: Icons.faFolderTree
-                        color: Material.primaryTextColor
+                        color: Theme.onSurface(Material.theme)
                     }
                     Text {
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                         Layout.fillWidth: true
                         text: parent.parent.text
                         font: parent.parent.font
-                        color: Material.primaryTextColor
+                        color: Theme.onSurface(Material.theme)
                     }
                 }
             }
@@ -195,14 +201,14 @@ ApplicationWindow {
                         font.family: Icons.familySolid
                         font.bold: true
                         text: Icons.faBoxArchive
-                        color: Material.primaryTextColor
+                        color: Theme.onSurface(Material.theme)
                     }
                     Text {
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                         Layout.fillWidth: true
                         text: parent.parent.text
                         font: parent.parent.font
-                        color: Material.primaryTextColor
+                        color: Theme.onSurface(Material.theme)
                     }
                 }
             }
@@ -220,14 +226,14 @@ ApplicationWindow {
                         font.family: Icons.familySolid
                         font.bold: true
                         text: Icons.faGear
-                        color: Material.primaryTextColor
+                        color: Theme.onSurface(Material.theme)
                     }
                     Text {
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                         Layout.fillWidth: true
                         text: parent.parent.text
                         font: parent.parent.font
-                        color: Material.primaryTextColor
+                        color: Theme.onSurface(Material.theme)
                     }
                 }
             }

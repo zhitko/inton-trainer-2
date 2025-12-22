@@ -13,7 +13,7 @@ Rectangle {
     property string icon: ""
     property string iconFamily: Icons.familySolid
 
-    color: "#F5F5F5" // Light grey background
+    color: Theme.surfaceContainerLow(Material.theme)
     radius: 12
 
     implicitWidth: 100
@@ -37,14 +37,14 @@ Rectangle {
             text: root.icon
             font.family: root.iconFamily
             font.pixelSize: 24
-            color: "#1565C0" // Blueish color
+            color: Theme.primary(Material.theme)
         }
 
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: root.title
             font.pixelSize: 14
-            color: "#757575"
+            color: Theme.onSurfaceVariant(Material.theme)
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
             Layout.maximumWidth: root.width - 16
@@ -55,7 +55,7 @@ Rectangle {
             text: root.value
             font.pixelSize: 18
             font.weight: 600
-            color: "#212121"
+            color: Theme.onSurface(Material.theme)
         }
     }
 }

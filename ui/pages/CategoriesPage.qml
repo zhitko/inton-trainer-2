@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -11,8 +12,6 @@ import QtQuick.Effects
 Page {
     id: root
     title: qsTr("Categories")
-
-    Material.theme: window.theme
 
     property var allFolders: []
 
@@ -50,6 +49,8 @@ Page {
             }
 
             delegate: ListItem {
+                required property string modelData
+                required property int index
                 itemData: modelData
                 itemIndex: index
                 onClicked: {

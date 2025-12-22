@@ -8,7 +8,7 @@ Page {
     id: root
     title: qsTr("Settings")
 
-    Material.theme: window.theme
+    Material.theme: ApplicationWindow.window.theme
 
     ScrollView {
         anchors.fill: parent
@@ -24,8 +24,8 @@ Page {
 
                 background: Rectangle {
                     color: "transparent"
-                    border.color: Material.dividerColor
-                    radius: 4
+                    border.color: Theme.outlineVariant(Material.theme)
+                    radius: 8
                 }
 
                 ColumnLayout {
@@ -36,7 +36,7 @@ Page {
                         text: qsTr("General")
                         font.bold: true
                         font.pixelSize: 20
-                        color: Material.accent
+                        color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
 
@@ -48,23 +48,23 @@ Page {
 
                         Label {
                             text: qsTr("Language")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         ComboBox {
                             model: ["en", "ru"]
-                            currentIndex: model.indexOf(window.settingsApi.language)
-                            onActivated: window.settingsApi.language = currentText
+                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.language)
+                            onActivated: ApplicationWindow.window.settingsApi.language = currentText
                             Layout.fillWidth: true
                         }
 
                         Label {
                             text: qsTr("Theme")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         ComboBox {
                             model: ["light", "dark", "system"]
-                            currentIndex: model.indexOf(window.settingsApi.theme)
-                            onActivated: window.settingsApi.theme = currentText
+                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.theme)
+                            onActivated: ApplicationWindow.window.settingsApi.theme = currentText
                             Layout.fillWidth: true
                         }
                     }
@@ -76,8 +76,8 @@ Page {
 
                 background: Rectangle {
                     color: "transparent"
-                    border.color: Material.dividerColor
-                    radius: 4
+                    border.color: Theme.outlineVariant(Material.theme)
+                    radius: 8
                 }
 
                 ColumnLayout {
@@ -88,7 +88,7 @@ Page {
                         text: qsTr("Pitch")
                         font.bold: true
                         font.pixelSize: 20
-                        color: Material.accent
+                        color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
 
@@ -100,140 +100,140 @@ Page {
 
                         Label {
                             text: qsTr("Algorithm")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         ComboBox {
                             model: ["RAPT"]
-                            currentIndex: model.indexOf(window.settingsApi.algorithm)
-                            onActivated: window.settingsApi.algorithm = currentText
+                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.algorithm)
+                            onActivated: ApplicationWindow.window.settingsApi.algorithm = currentText
                             Layout.fillWidth: true
                         }
 
                         Label {
                             text: qsTr("Frame Shift (ms)")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: window.settingsApi.frameShift.toString()
-                            onEditingFinished: window.settingsApi.frameShift = parseFloat(text)
+                            text: ApplicationWindow.window.settingsApi.frameShift.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.frameShift = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
 
                         Label {
                             text: qsTr("Sample Rate (Hz)")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: window.settingsApi.sampleRate.toString()
-                            onEditingFinished: window.settingsApi.sampleRate = parseFloat(text)
+                            text: ApplicationWindow.window.settingsApi.sampleRate.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.sampleRate = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
 
                         Label {
                             text: qsTr("Min F0 (Hz)")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: window.settingsApi.minF0.toString()
-                            onEditingFinished: window.settingsApi.minF0 = parseFloat(text)
+                            text: ApplicationWindow.window.settingsApi.minF0.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.minF0 = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
 
                         Label {
                             text: qsTr("Max F0 (Hz)")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: window.settingsApi.maxF0.toString()
-                            onEditingFinished: window.settingsApi.maxF0 = parseFloat(text)
+                            text: ApplicationWindow.window.settingsApi.maxF0.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.maxF0 = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
 
                         Label {
                             text: qsTr("Voicing Threshold")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: window.settingsApi.voicingThreshold.toString()
-                            onEditingFinished: window.settingsApi.voicingThreshold = parseFloat(text)
+                            text: ApplicationWindow.window.settingsApi.voicingThreshold.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.voicingThreshold = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
 
                         Label {
                             text: qsTr("Pitch Normalization")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         ComboBox {
                             model: ["min_max", "mean"]
-                            currentIndex: model.indexOf(window.settingsApi.pitchNormalization)
-                            onActivated: window.settingsApi.pitchNormalization = currentText
+                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.pitchNormalization)
+                            onActivated: ApplicationWindow.window.settingsApi.pitchNormalization = currentText
                             Layout.fillWidth: true
                         }
 
                         Label {
                             text: qsTr("Pitch Interpolation")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         ComboBox {
                             model: ["None", "Linear", "Cubic", "Akima", "Monotone"]
-                            currentIndex: window.settingsApi.pitchInterpolationType
-                            onActivated: window.settingsApi.pitchInterpolationType = currentIndex
+                            currentIndex: ApplicationWindow.window.settingsApi.pitchInterpolationType
+                            onActivated: ApplicationWindow.window.settingsApi.pitchInterpolationType = currentIndex
                             Layout.fillWidth: true
                         }
 
                         Label {
                             text: qsTr("Pitch Smoothing")
-                            color: Material.primaryTextColor
+                            color: Theme.onSurface(Material.theme)
                         }
                         ComboBox {
                             model: ["None", "MovingAverage", "Median", "Gaussian", "Spline"]
-                            currentIndex: window.settingsApi.pitchSmoothing
-                            onActivated: window.settingsApi.pitchSmoothing = currentIndex
+                            currentIndex: ApplicationWindow.window.settingsApi.pitchSmoothing
+                            onActivated: ApplicationWindow.window.settingsApi.pitchSmoothing = currentIndex
                             Layout.fillWidth: true
                         }
 
                         Label {
                             text: qsTr("Smoothing Window Size")
-                            color: Material.primaryTextColor
-                            visible: window.settingsApi.pitchSmoothing !== 4 // Hide for Spline (4)
+                            color: Theme.onSurface(Material.theme)
+                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing !== 4 // Hide for Spline (4)
                         }
                         TextField {
-                            text: window.settingsApi.pitchSmoothingWindowSize.toString()
-                            onEditingFinished: window.settingsApi.pitchSmoothingWindowSize = parseInt(text)
+                            text: ApplicationWindow.window.settingsApi.pitchSmoothingWindowSize.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.pitchSmoothingWindowSize = parseInt(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            visible: window.settingsApi.pitchSmoothing !== 4 // Hide for Spline (4)
+                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing !== 4 // Hide for Spline (4)
                         }
 
                         Label {
                             text: qsTr("Gaussian Sigma")
-                            color: Material.primaryTextColor
-                            visible: window.settingsApi.pitchSmoothing === 3 // Show only for Gaussian (3)
+                            color: Theme.onSurface(Material.theme)
+                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing === 3 // Show only for Gaussian (3)
                         }
                         TextField {
-                            text: window.settingsApi.pitchGaussianSmoothingSigma.toString()
-                            onEditingFinished: window.settingsApi.pitchGaussianSmoothingSigma = parseFloat(text)
+                            text: ApplicationWindow.window.settingsApi.pitchGaussianSmoothingSigma.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.pitchGaussianSmoothingSigma = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            visible: window.settingsApi.pitchSmoothing === 3 // Show only for Gaussian (3)
+                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing === 3 // Show only for Gaussian (3)
                         }
 
                         Label {
                             text: qsTr("Spline Penalty")
-                            color: Material.primaryTextColor
-                            visible: window.settingsApi.pitchSmoothing === 4 // Show only for Spline (4)
+                            color: Theme.onSurface(Material.theme)
+                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing === 4 // Show only for Spline (4)
                         }
                         TextField {
-                            text: window.settingsApi.pitchSplineSmoothingPenalty.toString()
-                            onEditingFinished: window.settingsApi.pitchSplineSmoothingPenalty = parseFloat(text)
+                            text: ApplicationWindow.window.settingsApi.pitchSplineSmoothingPenalty.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.pitchSplineSmoothingPenalty = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            visible: window.settingsApi.pitchSmoothing === 4 // Show only for Spline (4)
+                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing === 4 // Show only for Spline (4)
                         }
                     }
                 }

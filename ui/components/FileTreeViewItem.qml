@@ -14,24 +14,24 @@ Column {
 
     onModelChanged: {
         if (!!fileItem.model) {
-            title.font.bold = true
-            title.font.pointSize = 16
-            playButton.visible = false
-            mouseArea.hoverEnabled = false
+            title.font.bold = true;
+            title.font.pointSize = 16;
+            playButton.visible = false;
+            mouseArea.hoverEnabled = false;
         }
     }
 
     onModelItemChanged: {
-        title.text = fileItem.modelItem.replace(".wav", "")
+        title.text = fileItem.modelItem.replace(".wav", "");
     }
 
     onIndentChanged: {
-        fileItem.leftPadding = fileItem.indent * 10
+        fileItem.leftPadding = fileItem.indent * 10;
     }
 
     onPathChanged: {
-        playButton.file = fileItem.path
-        deleteButton.file = fileItem.path
+        playButton.file = fileItem.path;
+        deleteButton.file = fileItem.path;
     }
 
     Row {
@@ -42,7 +42,7 @@ Column {
             width: title.height
             visible: fileItem.canDelete
             onFileDeleted: {
-                parent.visible = false
+                parent.visible = false;
             }
         }
         PlayButton {
@@ -51,7 +51,7 @@ Column {
             width: title.height
         }
         Rectangle {
-            color: Material.backgroundColor
+            color: "transparent"
             height: title.height
             width: title.width
             MouseArea {
@@ -60,20 +60,21 @@ Column {
                 anchors.fill: parent
                 onClicked: {
                     if (!fileItem.model) {
-                        console.log("ui/components/FileTreeViewItem.qml:onClicked", fileItem.path)
-                        fileItem.fileClicked(fileItem.path)
+                        console.log("ui/components/FileTreeViewItem.qml:onClicked", fileItem.path);
+                        fileItem.fileClicked(fileItem.path);
                     }
                 }
                 onEntered: {
-                    parent.color = Material.rippleColor
+                    parent.color = Theme.surfaceContainerLow(Material.theme);
                 }
                 onExited: {
-                    parent.color = Material.backgroundColor
+                    parent.color = "transparent";
                 }
             }
             Text {
                 id: title
                 font.pointSize: 15
+                color: Theme.onSurface(Material.theme)
             }
         }
     }
@@ -84,8 +85,8 @@ Column {
         indent: fileItem.indent + 1
         model: fileItem.model
         canDelete: fileItem.canDelete
-        onFileClicked: (filePath) => {
-            fileItem.fileClicked(filePath)
+        onFileClicked: filePath => {
+            fileItem.fileClicked(filePath);
         }
     }
 }

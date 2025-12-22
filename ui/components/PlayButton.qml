@@ -20,12 +20,13 @@ RoundButton {
     background: Rectangle {
         radius: control.radius
         anchors.fill: parent
+        color: "transparent"
         Label {
             id: label
             font.family: Icons.familySolid
             font.bold: true
             text: audioApi.isPlaying ? (Icons.faStop + " " + (control.showLabel ? qsTr("Stop") : "")) : (Icons.faPlay + " " + (control.showLabel ? qsTr("Play") : ""))
-            Material.foreground: audioApi.isPlaying ? Material.DeepOrange : Material.primaryTextColor
+            color: audioApi.isPlaying ? Theme.error(Material.theme) : Theme.primary(Material.theme)
             anchors.left: parent.left
             anchors.leftMargin: parent.width / 3
             anchors.top: parent.top
@@ -38,11 +39,11 @@ RoundButton {
             anchors.fill: parent
             hoverEnabled: true
             onEntered: {
-                parent.color = Material.rippleColor;
+                parent.color = Theme.surfaceContainerLow(Material.theme);
                 label.font.pixelSize += 4;
             }
             onExited: {
-                parent.color = Material.backgroundColor;
+                parent.color = "transparent";
                 label.font.pixelSize -= 4;
             }
         }

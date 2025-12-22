@@ -70,6 +70,7 @@ add_subdirectory(3rdparty/SPTK)
 set(qml_singletons
     ui/utils/Icons.qml
     ui/utils/Logger.qml
+    ui/utils/Theme.qml
 )
 
 set_source_files_properties(${qml_singletons}
