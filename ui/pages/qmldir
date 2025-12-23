@@ -3,3 +3,4 @@ RecordsPage RecordsPage.qml
 TemplatesPage TemplatesPage.qml
 RecordingPage RecordingPage.qml
 TemplatePage TemplatePage.qml
+TrainingPage TrainingPage.qml

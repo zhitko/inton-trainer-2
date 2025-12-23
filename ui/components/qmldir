@@ -1,8 +1,12 @@
 FileTreeView FileTreeView.qml
 FileTreeViewItem FileTreeViewItem.qml
 PlayButton PlayButton.qml
+PlayRoundButton PlayRoundButton.qml
 CustomButton CustomButton.qml
 DeleteButton DeleteButton.qml
 WaveFormGraph WaveFormGraph.qml
 StartTrainingButton StartTrainingButton.qml
 ListItem ListItem.qml
+CircularProgress CircularProgress.qml
+SearchBar SearchBar.qml
+StatBox StatBox.qml

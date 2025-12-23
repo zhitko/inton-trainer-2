@@ -72,8 +72,8 @@ Page {
                 icon: Icons.faFileAudio
                 onClicked: {
                     console.log("Clicked template:", modelData.filePath);
-                    stackView.push("TemplatePage.qml", {
-                        filePath: templatesPage.path + "/" + modelData.filePath
+                    stackView.push("TrainingPage.qml", {
+                        referenceFilePath: templatesPage.path + "/" + modelData.filePath
                     });
                 }
             }

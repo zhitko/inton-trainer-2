@@ -87,12 +87,15 @@ qt_add_qml_module(appinton-trainer-2
         ui/pages/RecordsPage.qml
         ui/pages/TemplatesPage.qml
         ui/pages/TemplatePage.qml
+        ui/pages/TrainingPage.qml
         ui/pages/SettingsPage.qml
         ui/components/cards/Card.qml
         ui/components/FileTreeView.qml
         ui/components/FileTreeViewItem.qml
         ui/components/ListItem.qml
         ui/components/PlayButton.qml
+        ui/components/PlayRoundButton.qml
+        ui/components/RecordRoundButton.qml
         ui/components/CustomButton.qml
         ui/components/DeleteButton.qml
         ui/components/WaveFormGraph.qml
