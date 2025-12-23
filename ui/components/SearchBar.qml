@@ -10,7 +10,7 @@ Rectangle {
     Layout.fillWidth: true
     Layout.preferredHeight: 56
     radius: 28
-    color: Theme.surface(Material.theme)
+    color: Theme.surfaceVariant(Material.theme)
 
     property alias text: searchInputField.text
 
@@ -45,7 +45,7 @@ Rectangle {
             placeholderText: qsTr("Search")
             background: null
             font.pixelSize: 16
-            color: Theme.onSurface(Material.theme)
+            color: Theme.onSurfaceVariant(Material.theme)
         }
     }
 }

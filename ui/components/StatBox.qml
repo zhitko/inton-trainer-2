@@ -13,7 +13,7 @@ Rectangle {
     property string icon: ""
     property string iconFamily: Icons.familySolid
 
-    color: Theme.surfaceContainerLow(Material.theme)
+    color: Theme.secondaryContainer(Material.theme)
     radius: 12
 
     implicitWidth: 100
@@ -44,7 +44,7 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             text: root.title
             font.pixelSize: 14
-            color: Theme.onSurfaceVariant(Material.theme)
+            color: Theme.onSecondaryContainer(Material.theme)
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
             Layout.maximumWidth: root.width - 16
