@@ -13,6 +13,7 @@ ColumnLayout {
     readonly property bool isRecording: audioApi.isRecording
     readonly property real audioLevel: audioApi.audioLevel
     signal clicked
+    signal recordingFinished(string filePath)
 
     AudioApi {
         id: audioApi
@@ -71,8 +72,13 @@ ColumnLayout {
                 onClicked: {
                     if (audioApi.isRecording) {
                         audioApi.stopRecording();
-                    } else if (root.filePath !== "") {
-                        audioApi.startRecording(root.filePath);
+                        root.filePath = audioApi.saveWavFile();
+                        root.recordingFinished(root.filePath);
+                        Logger.debug("Recording finished: " + root.filePath);
+                    } else {
+                        audioApi.startRecording();
+                        root.filePath = "";
+                        Logger.debug("Recording started");
                     }
                     root.clicked();
                 }
@@ -94,6 +100,13 @@ ColumnLayout {
             SequentialAnimation {
                 running: root.isRecording
                 loops: Animation.Infinite
+
+                onRunningChanged: {
+                    if (!running) {
+                        pulse.scale = 1.0;
+                        pulse.opacity = 0;
+                    }
+                }
 
                 ParallelAnimation {
                     NumberAnimation {
@@ -129,7 +142,7 @@ ColumnLayout {
 
     Text {
         Layout.alignment: Qt.AlignHCenter
-        text: qsTr("Record")
+        text: root.isRecording ? qsTr("Recording") : qsTr("Record")
         font.pixelSize: 14
         font.weight: 600
         color: Theme.onSurface(Material.theme)

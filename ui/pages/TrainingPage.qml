@@ -17,35 +17,46 @@ Page {
 
     title: titleText
 
-    property var referenceWavFileHandle: null
-    property var referenceCuePoints: []
-    property var referenceWaveData: []
-
-    property var userWavFileHandle: null
-    property var userWaveData: []
+    property var referenceUMP: null
+    property var userUMP: null
 
     WavFileApi {
         id: wavFileApi
     }
 
     Component.onCompleted: {
-        Logger.info("TrainingPage loaded for file: " + referenceFilePath);
-        referenceWavFileHandle = wavFileApi.openWavFile(referenceFilePath);
-        referenceCuePoints = wavFileApi.getCuePoints(referenceWavFileHandle);
-        referenceWaveData = wavFileApi.getWaveData(referenceWavFileHandle);
-        updateUMP();
+        updateReferenceUMP();
     }
 
-    function updateUMP() {
-        if (!referenceWavFileHandle)
-            return;
+    function updateReferenceUMP() {
+        Logger.info("TrainingPage loaded for file: " + referenceFilePath);
+
+        let referenceWavFileHandle = wavFileApi.openWavFile(referenceFilePath);
+        let referenceCuePoints = wavFileApi.getCuePoints(referenceWavFileHandle);
+        let referenceWaveData = wavFileApi.getWaveData(referenceWavFileHandle);
 
         let pitchData = wavFileApi.getPitch(referenceWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
 
-        let umpResult = wavFileApi.getUMP(pitchData, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        referenceUMP = wavFileApi.getUMP(pitchData, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
 
-        umpGraph.waveData = umpResult.ump;
-        umpGraph.cuePoints = umpResult.cuePoints;
+        umpGraph.waveData = referenceUMP.ump;
+        umpGraph.cuePoints = referenceUMP.cuePoints;
+    }
+
+    function updateUserUMP(filePath) {
+        Logger.info("Updating user UMP for file: " + filePath);
+
+        root.userFilePath = filePath;
+        let userWavFileHandle = wavFileApi.openWavFile(filePath);
+        let userCuePoints = wavFileApi.getCuePoints(userWavFileHandle);
+        let userWaveData = wavFileApi.getWaveData(userWavFileHandle);
+
+        let pitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+
+        // TODO: implement user UMP calculation
+
+        umpGraph.waveData = [referenceUMP.ump, pitchData];
+        umpGraph.cuePoints = referenceUMP.cuePoints;
     }
 
     background: Rectangle {
@@ -199,6 +210,7 @@ Page {
 
                 RecordRoundButton {
                     filePath: root.userFilePath
+                    onRecordingFinished: updateUserUMP(filePath)
                 }
 
                 PlayRoundButton {
