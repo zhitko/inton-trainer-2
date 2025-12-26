@@ -62,6 +62,31 @@ Page {
         function onPitchSplineSmoothingPenaltyChanged() {
             updateData();
         }
+
+        function onSpecFftLengthChanged() {
+            updateData();
+        }
+        function onSpecF0RefinementChanged() {
+            updateData();
+        }
+        function onSpecUseLogScaleChanged() {
+            spectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
+        }
+        function onSpecColorSchemeChanged() {
+            updateColorScheme();
+        }
+    }
+
+    function updateColorScheme() {
+        let scheme = window.settingsApi.specColorScheme;
+        if (scheme === 0)
+            spectrumGraph.colorScheme = "viridis";
+        else if (scheme === 1)
+            spectrumGraph.colorScheme = "plasma";
+        else if (scheme === 2)
+            spectrumGraph.colorScheme = "hot";
+        else if (scheme === 3)
+            spectrumGraph.colorScheme = "cool";
     }
 
     function updateData() {
@@ -85,6 +110,14 @@ Page {
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
         umpWaveFormGraph.waveData = umpResult.ump;
         umpWaveFormGraph.cuePoints = umpResult.cuePoints;
+
+        // Extract spectrum data
+        Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
+        let specData = wavFileApi.getSpec(wavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Spectrum data frames: " + specData.length);
+
+        // Pass spectrum data directly to the 2D graph
+        spectrumGraph.spectrumData = specData;
     }
 
     Component.onCompleted: {
@@ -105,6 +138,10 @@ Page {
         waveFormGraph.cuePoints = loadedCuePoints;
 
         updateData();
+
+        // Initialize spectrum visualization settings
+        spectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
+        updateColorScheme();
 
         Logger.info("TemplatePage initialization complete");
     }
@@ -136,7 +173,7 @@ Page {
 
                     WaveFormGraph {
                         id: waveFormGraph
-                        width: parent.width
+                        width: parent.width - 80
                         height: 300
                     }
 
@@ -149,6 +186,19 @@ Page {
                     }
 
                     Text {
+                        text: qsTr("Spectrum")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    Spectrogram2DGraph {
+                        id: spectrumGraph
+                        width: parent.width
+                        height: 400
+                    }
+
+                    Text {
                         text: qsTr("Pitch (F0)")
                         font.pixelSize: 14
                         font.bold: true
@@ -157,13 +207,13 @@ Page {
 
                     WaveFormGraph {
                         id: pitchWaveFormGraph
-                        width: parent.width
+                        width: parent.width - 80
                         height: 200
                     }
 
                     WaveFormGraph {
                         id: pitchProcessedWaveFormGraph
-                        width: parent.width
+                        width: parent.width - 80
                         height: 200
                     }
 
@@ -176,7 +226,7 @@ Page {
 
                     WaveFormGraph {
                         id: umpWaveFormGraph
-                        width: parent.width
+                        width: parent.width - 80
                         height: 200
                     }
                 }

@@ -238,6 +238,76 @@ Page {
                     }
                 }
             }
+
+            Frame {
+                Layout.fillWidth: true
+
+                background: Rectangle {
+                    color: "transparent"
+                    border.color: Theme.outlineVariant(Material.theme)
+                    radius: 8
+                }
+
+                ColumnLayout {
+                    width: parent.width
+                    spacing: 10
+
+                    Label {
+                        text: qsTr("Spectrum")
+                        font.bold: true
+                        font.pixelSize: 20
+                        color: Theme.primary(Material.theme)
+                        Layout.fillWidth: true
+                    }
+
+                    GridLayout {
+                        columns: 2
+                        columnSpacing: 20
+                        rowSpacing: 10
+                        Layout.fillWidth: true
+
+                        Label {
+                            text: qsTr("FFT Length")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        ComboBox {
+                            model: [1024, 2048, 4096, 8192]
+                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.specFftLength)
+                            onActivated: ApplicationWindow.window.settingsApi.specFftLength = model[currentIndex]
+                            Layout.fillWidth: true
+                        }
+
+                        Label {
+                            text: qsTr("F0 Refinement")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.specF0Refinement
+                            onToggled: ApplicationWindow.window.settingsApi.specF0Refinement = checked
+                        }
+
+                        Label {
+                            text: qsTr("Use Log Scale")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.specUseLogScale
+                            onToggled: ApplicationWindow.window.settingsApi.specUseLogScale = checked
+                        }
+
+                        Label {
+                            text: qsTr("Color Scheme")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        ComboBox {
+                            model: ["Viridis", "Plasma", "Hot", "Cool"]
+                            currentIndex: ApplicationWindow.window.settingsApi.specColorScheme
+                            onActivated: ApplicationWindow.window.settingsApi.specColorScheme = currentIndex
+                            Layout.fillWidth: true
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -194,8 +194,6 @@ void SettingsApi::load()
     emit minF0Changed();
     emit maxF0Changed();
     emit voicingThresholdChanged();
-    emit voicingThresholdChanged();
-    emit pitchNormalizationChanged();
     emit pitchNormalizationChanged();
     emit pitchInterpolationTypeChanged();
     emit pitchSmoothingChanged();
@@ -203,6 +201,10 @@ void SettingsApi::load()
     emit pitchGaussianSmoothingSigmaChanged();
 
     emit pitchSplineSmoothingPenaltyChanged();
+    emit specFftLengthChanged();
+    emit specF0RefinementChanged();
+    emit specUseLogScaleChanged();
+    emit specColorSchemeChanged();
     LOG_DEBUG() << "Finish: load";
 }
 
@@ -342,6 +344,97 @@ void SettingsApi::setPitchSplineSmoothingPenalty(double pitchSplineSmoothingPena
         emit pitchSplineSmoothingPenaltyChanged();
     }
     LOG_DEBUG() << "Finish: setPitchSplineSmoothingPenalty";
+}
+
+int SettingsApi::specFftLength() const
+{
+    LOG_DEBUG() << "Start: specFftLength";
+    int result = m_settings.specFftLength;
+    LOG_DEBUG() << "Finish: specFftLength - result=" << result;
+    return result;
+}
+
+void SettingsApi::setSpecFftLength(int specFftLength)
+{
+    LOG_DEBUG() << "Start: setSpecFftLength - specFftLength=" << specFftLength;
+    if (m_settings.specFftLength != specFftLength) {
+        m_settings.specFftLength = specFftLength;
+        save();
+        emit specFftLengthChanged();
+    }
+    LOG_DEBUG() << "Finish: setSpecFftLength";
+}
+
+bool SettingsApi::specF0Refinement() const
+{
+    LOG_DEBUG() << "Start: specF0Refinement";
+    bool result = m_settings.specF0Refinement;
+    LOG_DEBUG() << "Finish: specF0Refinement - result=" << result;
+    return result;
+}
+
+void SettingsApi::setSpecF0Refinement(bool specF0Refinement)
+{
+    LOG_DEBUG() << "Start: setSpecF0Refinement - specF0Refinement=" << specF0Refinement;
+    if (m_settings.specF0Refinement != specF0Refinement) {
+        m_settings.specF0Refinement = specF0Refinement;
+        save();
+        emit specF0RefinementChanged();
+    }
+    LOG_DEBUG() << "Finish: setSpecF0Refinement";
+}
+
+bool SettingsApi::specUseLogScale() const
+{
+    LOG_DEBUG() << "Start: specUseLogScale";
+    bool result = m_settings.specUseLogScale;
+    LOG_DEBUG() << "Finish: specUseLogScale - result=" << result;
+    return result;
+}
+
+void SettingsApi::setSpecUseLogScale(bool specUseLogScale)
+{
+    LOG_DEBUG() << "Start: setSpecUseLogScale - specUseLogScale=" << specUseLogScale;
+    if (m_settings.specUseLogScale != specUseLogScale) {
+        m_settings.specUseLogScale = specUseLogScale;
+        save();
+        emit specUseLogScaleChanged();
+    }
+    LOG_DEBUG() << "Finish: setSpecUseLogScale";
+}
+
+SettingsApi::SpecColorScheme SettingsApi::specColorScheme() const
+{
+    LOG_DEBUG() << "Start: specColorScheme";
+    SpecColorScheme result = SpecColorScheme::Viridis;
+    std::string scheme = m_settings.specColorScheme;
+    
+    if (scheme == "Viridis") result = SpecColorScheme::Viridis;
+    else if (scheme == "Plasma") result = SpecColorScheme::Plasma;
+    else if (scheme == "Hot") result = SpecColorScheme::Hot;
+    else if (scheme == "Cool") result = SpecColorScheme::Cool;
+    
+    LOG_DEBUG() << "Finish: specColorScheme - result=" << static_cast<int>(result);
+    return result;
+}
+
+void SettingsApi::setSpecColorScheme(SpecColorScheme specColorScheme)
+{
+    LOG_DEBUG() << "Start: setSpecColorScheme - specColorScheme=" << static_cast<int>(specColorScheme);
+    std::string scheme = "Viridis";
+    switch (specColorScheme) {
+        case SpecColorScheme::Viridis: scheme = "Viridis"; break;
+        case SpecColorScheme::Plasma: scheme = "Plasma"; break;
+        case SpecColorScheme::Hot: scheme = "Hot"; break;
+        case SpecColorScheme::Cool: scheme = "Cool"; break;
+    }
+    
+    if (m_settings.specColorScheme != scheme) {
+        m_settings.specColorScheme = scheme;
+        save();
+        emit specColorSchemeChanged();
+    }
+    LOG_DEBUG() << "Finish: setSpecColorScheme";
 }
 
 void SettingsApi::updateTranslator()

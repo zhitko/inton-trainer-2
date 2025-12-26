@@ -26,6 +26,8 @@ qt_add_executable(appinton-trainer-2
     src/services/wavfileservice.cpp
     src/services/pitchservice.h
     src/services/pitchservice.cpp
+    src/services/specservice.h
+    src/services/specservice.cpp
     src/services/umpservice.h
     src/services/umpservice.cpp
     src/services/helpers/wavFile.h
@@ -99,6 +101,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/CustomButton.qml
         ui/components/DeleteButton.qml
         ui/components/WaveFormGraph.qml
+        ui/components/Spectrogram2DGraph.qml
         ui/components/CircularProgress.qml
         ui/components/StatBox.qml
         ui/components/StartTrainingButton.qml

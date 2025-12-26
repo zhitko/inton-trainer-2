@@ -39,6 +39,16 @@ public slots:
                                    int tLength,
                                    int waveDataSize,
                                    const QString& pitchInterpolationType);
+
+    Q_INVOKABLE QVariantList getSpec(WaveFile* waveFile,
+                                     int fftLength,
+                                     int frameShift,
+                                     double sampleRate,
+                                     const QString& algorithm = "DIO",
+                                     double minF0 = 71.0,
+                                     double maxF0 = 800.0,
+                                     double voicingThreshold = 0.9,
+                                     bool f0Refinement = false);
 };
 
 #endif // WAVFILEAPI_H

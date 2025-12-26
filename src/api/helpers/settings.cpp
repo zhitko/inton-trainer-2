@@ -45,6 +45,13 @@ AppSettings Settings::loadSettings() {
 
     settings.pitchSplineSmoothingPenalty = qsettings.value("pitchSplineSmoothingPenalty", 10.0).toDouble();
     qsettings.endGroup();
+    
+    qsettings.beginGroup("Spectrum");
+    settings.specFftLength = qsettings.value("specFftLength", 2048).toInt();
+    settings.specF0Refinement = qsettings.value("specF0Refinement", false).toBool();
+    settings.specUseLogScale = qsettings.value("specUseLogScale", true).toBool();
+    settings.specColorScheme = qsettings.value("specColorScheme", "Viridis").toString().toStdString();
+    qsettings.endGroup();
 
     return settings;
 }
@@ -78,6 +85,13 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("pitchGaussianSmoothingSigma", settings.pitchGaussianSmoothingSigma);
 
     qsettings.setValue("pitchSplineSmoothingPenalty", settings.pitchSplineSmoothingPenalty);
+    qsettings.endGroup();
+
+    qsettings.beginGroup("Spectrum");
+    qsettings.setValue("specFftLength", settings.specFftLength);
+    qsettings.setValue("specF0Refinement", settings.specF0Refinement);
+    qsettings.setValue("specUseLogScale", settings.specUseLogScale);
+    qsettings.setValue("specColorScheme", QString::fromStdString(settings.specColorScheme));
     qsettings.endGroup();
     
     qsettings.sync();

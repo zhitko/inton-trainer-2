@@ -23,6 +23,12 @@ struct AppSettings {
     double pitchGaussianSmoothingSigma = 1.0;
 
     double pitchSplineSmoothingPenalty = 1.0;
+
+    // Spectrum
+    int specFftLength = 2048;
+    bool specF0Refinement = false;
+    bool specUseLogScale = true;
+    std::string specColorScheme = "Viridis";
 };
 
 class Settings {

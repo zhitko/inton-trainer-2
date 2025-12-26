@@ -2,6 +2,7 @@
 #include "helpers/logger.h"
 #include "src/services/wavfileservice.h"
 #include "src/services/pitchservice.h"
+#include "src/services/specservice.h"
 #include "src/services/umpservice.h"
 #include "src/services/helpers/vectorutils.h"
 #include <QDebug>
@@ -275,5 +276,109 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
 
     LOG_DEBUG() << "Finish: getUMP - result.keys=" << result.keys();
     return result;
+}
+
+QVariantList WavFileApi::getSpec(WaveFile* waveFile,
+                                 int fftLength,
+                                 int frameShift,
+                                 double sampleRate,
+                                 const QString& algorithm,
+                                 double minF0,
+                                 double maxF0,
+                                 double voicingThreshold,
+                                 bool f0Refinement)
+{
+    LOG_DEBUG() << "Start: getSpec - fftLength=" << fftLength 
+                << ", frameShift=" << frameShift 
+                << ", sampleRate=" << sampleRate
+                << ", algorithm=" << algorithm
+                << ", minF0=" << minF0
+                << ", maxF0=" << maxF0
+                << ", voicingThreshold=" << voicingThreshold
+                << ", f0Refinement=" << f0Refinement;
+    
+    QVariantList specData;
+    
+    if (!waveFile) {
+        LOG_WARNING() << "WaveFile is null";
+        return specData;
+    }
+    
+    // Get wave data
+    std::vector<double> samples = WavFileService::readWaveData(waveFile);
+    if (samples.empty()) {
+        LOG_WARNING() << "No wave data found";
+        return specData;
+    }
+    
+    // Map algorithm string to enum
+    PitchAlgorithm algo;
+    if (algorithm == "RAPT") {
+        algo = PitchAlgorithm::RAPT;
+    } else if (algorithm == "SWIPE") {
+        algo = PitchAlgorithm::SWIPE;
+    } else if (algorithm == "REAPER") {
+        algo = PitchAlgorithm::REAPER;
+    } else if (algorithm == "DIO") {
+        algo = PitchAlgorithm::DIO;
+    } else if (algorithm == "Harvest") {
+        algo = PitchAlgorithm::Harvest;
+    } else {
+        LOG_WARNING() << "Unknown algorithm:" << algorithm << ", defaulting to DIO";
+        algo = PitchAlgorithm::DIO;
+    }
+    
+    // Extract F0 using PitchService
+    PitchService pitchService;
+    std::vector<double> f0Vec = pitchService.getPitch(
+        samples,
+        algo,
+        static_cast<double>(frameShift),
+        sampleRate,
+        minF0,
+        maxF0,
+        voicingThreshold,
+        PitchOutputFormat::F0  // We need F0 in Hz for spectrum extraction
+    );
+    
+    if (f0Vec.empty()) {
+        LOG_WARNING() << "F0 extraction failed";
+        return specData;
+    }
+    
+    LOG_DEBUG() << "Extracted F0 vector size:" << f0Vec.size();
+    
+    // Create SpecService and extract spectrum
+    SpecService specService;
+    std::vector<std::vector<double>> spectrum = specService.getSpec(
+        samples,
+        f0Vec,
+        fftLength,
+        frameShift,
+        sampleRate,
+        f0Refinement
+    );
+    
+    if (spectrum.empty()) {
+        LOG_WARNING() << "Spectrum extraction returned empty result";
+        return specData;
+    }
+    
+    // Convert 2D spectrum vector to QVariantList
+    // Each frame becomes a QVariantList of spectral values
+    for (size_t frameIdx = 0; frameIdx < spectrum.size(); ++frameIdx) {
+        QVariantList frame;
+        for (size_t binIdx = 0; binIdx < spectrum[frameIdx].size(); ++binIdx) {
+            frame.append(spectrum[frameIdx][binIdx]);
+        }
+        specData.append(QVariant::fromValue(frame));
+    }
+    
+    LOG_DEBUG() << "Finish: getSpec - frames=" << specData.size();
+    if (!spectrum.empty()) {
+        LOG_DEBUG() << "First frame bins=" << spectrum[0].size();
+    }
+    
+    return specData;
 }
 

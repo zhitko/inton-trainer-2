@@ -24,7 +24,20 @@ class SettingsApi : public QObject
 
     Q_PROPERTY(double pitchSplineSmoothingPenalty READ pitchSplineSmoothingPenalty WRITE setPitchSplineSmoothingPenalty NOTIFY pitchSplineSmoothingPenaltyChanged)
 
+    Q_PROPERTY(int specFftLength READ specFftLength WRITE setSpecFftLength NOTIFY specFftLengthChanged)
+    Q_PROPERTY(bool specF0Refinement READ specF0Refinement WRITE setSpecF0Refinement NOTIFY specF0RefinementChanged)
+    Q_PROPERTY(bool specUseLogScale READ specUseLogScale WRITE setSpecUseLogScale NOTIFY specUseLogScaleChanged)
+    Q_PROPERTY(SpecColorScheme specColorScheme READ specColorScheme WRITE setSpecColorScheme NOTIFY specColorSchemeChanged)
+
 public:
+    enum class SpecColorScheme {
+        Viridis,
+        Plasma,
+        Hot,
+        Cool
+    };
+    Q_ENUM(SpecColorScheme)
+
     enum class PitchInterpolationType {
         None,
         Linear,
@@ -88,6 +101,18 @@ public:
     double pitchSplineSmoothingPenalty() const;
     void setPitchSplineSmoothingPenalty(double pitchSplineSmoothingPenalty);
 
+    int specFftLength() const;
+    void setSpecFftLength(int specFftLength);
+
+    bool specF0Refinement() const;
+    void setSpecF0Refinement(bool specF0Refinement);
+
+    bool specUseLogScale() const;
+    void setSpecUseLogScale(bool specUseLogScale);
+
+    SpecColorScheme specColorScheme() const;
+    void setSpecColorScheme(SpecColorScheme specColorScheme);
+
     Q_INVOKABLE void load();
     Q_INVOKABLE void save();
 
@@ -107,6 +132,11 @@ signals:
     void pitchGaussianSmoothingSigmaChanged();
 
     void pitchSplineSmoothingPenaltyChanged();
+
+    void specFftLengthChanged();
+    void specF0RefinementChanged();
+    void specUseLogScaleChanged();
+    void specColorSchemeChanged();
 
 private:
     AppSettings m_settings;
