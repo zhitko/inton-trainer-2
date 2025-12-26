@@ -205,7 +205,29 @@ void SettingsApi::load()
     emit specF0RefinementChanged();
     emit specUseLogScaleChanged();
     emit specColorSchemeChanged();
+    emit cepstrNumOrderChanged();
     LOG_DEBUG() << "Finish: load";
+}
+
+// ... existing code ...
+
+int SettingsApi::cepstrNumOrder() const
+{
+    LOG_DEBUG() << "Start: cepstrNumOrder";
+    int result = m_settings.cepstrNumOrder;
+    LOG_DEBUG() << "Finish: cepstrNumOrder - result=" << result;
+    return result;
+}
+
+void SettingsApi::setCepstrNumOrder(int cepstrNumOrder)
+{
+    LOG_DEBUG() << "Start: setCepstrNumOrder - cepstrNumOrder=" << cepstrNumOrder;
+    if (m_settings.cepstrNumOrder != cepstrNumOrder) {
+        m_settings.cepstrNumOrder = cepstrNumOrder;
+        save();
+        emit cepstrNumOrderChanged();
+    }
+    LOG_DEBUG() << "Finish: setCepstrNumOrder";
 }
 
 void SettingsApi::save()

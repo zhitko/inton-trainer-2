@@ -305,6 +305,18 @@ Page {
                             onActivated: ApplicationWindow.window.settingsApi.specColorScheme = currentIndex
                             Layout.fillWidth: true
                         }
+
+                        Label {
+                            text: qsTr("Cepstrum Order")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.cepstrNumOrder.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.cepstrNumOrder = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                        }
                     }
                 }
             }

@@ -29,6 +29,8 @@ class SettingsApi : public QObject
     Q_PROPERTY(bool specUseLogScale READ specUseLogScale WRITE setSpecUseLogScale NOTIFY specUseLogScaleChanged)
     Q_PROPERTY(SpecColorScheme specColorScheme READ specColorScheme WRITE setSpecColorScheme NOTIFY specColorSchemeChanged)
 
+    Q_PROPERTY(int cepstrNumOrder READ cepstrNumOrder WRITE setCepstrNumOrder NOTIFY cepstrNumOrderChanged)
+
 public:
     enum class SpecColorScheme {
         Viridis,
@@ -113,6 +115,9 @@ public:
     SpecColorScheme specColorScheme() const;
     void setSpecColorScheme(SpecColorScheme specColorScheme);
 
+    int cepstrNumOrder() const;
+    void setCepstrNumOrder(int cepstrNumOrder);
+
     Q_INVOKABLE void load();
     Q_INVOKABLE void save();
 
@@ -137,6 +142,7 @@ signals:
     void specF0RefinementChanged();
     void specUseLogScaleChanged();
     void specColorSchemeChanged();
+    void cepstrNumOrderChanged();
 
 private:
     AppSettings m_settings;

@@ -29,6 +29,9 @@ struct AppSettings {
     bool specF0Refinement = false;
     bool specUseLogScale = true;
     std::string specColorScheme = "Viridis";
+
+    // Cepstrum
+    int cepstrNumOrder = 25;
 };
 
 class Settings {

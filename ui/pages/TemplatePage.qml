@@ -75,18 +75,25 @@ Page {
         function onSpecColorSchemeChanged() {
             updateColorScheme();
         }
+        function onCepstrNumOrderChanged() {
+            updateData();
+        }
     }
 
     function updateColorScheme() {
         let scheme = window.settingsApi.specColorScheme;
+        let colorSchemeStr = "viridis";
         if (scheme === 0)
-            spectrumGraph.colorScheme = "viridis";
+            colorSchemeStr = "viridis";
         else if (scheme === 1)
-            spectrumGraph.colorScheme = "plasma";
+            colorSchemeStr = "plasma";
         else if (scheme === 2)
-            spectrumGraph.colorScheme = "hot";
+            colorSchemeStr = "hot";
         else if (scheme === 3)
-            spectrumGraph.colorScheme = "cool";
+            colorSchemeStr = "cool";
+
+        spectrumGraph.colorScheme = colorSchemeStr;
+        cepstrogramGraph.colorScheme = colorSchemeStr;
     }
 
     function updateData() {
@@ -118,6 +125,12 @@ Page {
 
         // Pass spectrum data directly to the 2D graph
         spectrumGraph.spectrumData = specData;
+
+        // Extract cepstrum data
+        Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
+        let cepstrData = wavFileApi.getCepstr(wavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Cepstrum data frames: " + cepstrData.length);
+        cepstrogramGraph.spectrumData = cepstrData;
     }
 
     Component.onCompleted: {
@@ -141,6 +154,7 @@ Page {
 
         // Initialize spectrum visualization settings
         spectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
+        cepstrogramGraph.useLogScale = false; // Usually cepstrum is not shown in log scale
         updateColorScheme();
 
         Logger.info("TemplatePage initialization complete");
@@ -194,6 +208,19 @@ Page {
 
                     Spectrogram2DGraph {
                         id: spectrumGraph
+                        width: parent.width
+                        height: 400
+                    }
+
+                    Text {
+                        text: qsTr("Cepstrum")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    Spectrogram2DGraph {
+                        id: cepstrogramGraph
                         width: parent.width
                         height: 400
                     }

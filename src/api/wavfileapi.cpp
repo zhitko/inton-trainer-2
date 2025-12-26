@@ -382,3 +382,110 @@ QVariantList WavFileApi::getSpec(WaveFile* waveFile,
     return specData;
 }
 
+QVariantList WavFileApi::getCepstr(WaveFile* waveFile,
+                                   int fftLength,
+                                   int frameShift,
+                                   double sampleRate,
+                                   int numOrder,
+                                   const QString& algorithm,
+                                   double minF0,
+                                   double maxF0,
+                                   double voicingThreshold,
+                                   bool f0Refinement)
+{
+    LOG_DEBUG() << "Start: getCepstr - fftLength=" << fftLength 
+                << ", frameShift=" << frameShift 
+                << ", sampleRate=" << sampleRate
+                << ", numOrder=" << numOrder
+                << ", algorithm=" << algorithm
+                << ", minF0=" << minF0
+                << ", maxF0=" << maxF0
+                << ", voicingThreshold=" << voicingThreshold
+                << ", f0Refinement=" << f0Refinement;
+    
+    QVariantList cepstrData;
+    
+    if (!waveFile) {
+        LOG_WARNING() << "WaveFile is null";
+        return cepstrData;
+    }
+    
+    // Get wave data
+    std::vector<double> samples = WavFileService::readWaveData(waveFile);
+    if (samples.empty()) {
+        LOG_WARNING() << "No wave data found";
+        return cepstrData;
+    }
+    
+    // Map algorithm string to enum
+    PitchAlgorithm algo;
+    if (algorithm == "RAPT") {
+        algo = PitchAlgorithm::RAPT;
+    } else if (algorithm == "SWIPE") {
+        algo = PitchAlgorithm::SWIPE;
+    } else if (algorithm == "REAPER") {
+        algo = PitchAlgorithm::REAPER;
+    } else if (algorithm == "DIO") {
+        algo = PitchAlgorithm::DIO;
+    } else if (algorithm == "Harvest") {
+        algo = PitchAlgorithm::Harvest;
+    } else {
+        LOG_WARNING() << "Unknown algorithm:" << algorithm << ", defaulting to DIO";
+        algo = PitchAlgorithm::DIO;
+    }
+    
+    // Extract F0 using PitchService
+    PitchService pitchService;
+    std::vector<double> f0Vec = pitchService.getPitch(
+        samples,
+        algo,
+        static_cast<double>(frameShift),
+        sampleRate,
+        minF0,
+        maxF0,
+        voicingThreshold,
+        PitchOutputFormat::F0  // We need F0 in Hz for spectrum/cepstrum extraction
+    );
+    
+    if (f0Vec.empty()) {
+        LOG_WARNING() << "F0 extraction failed";
+        return cepstrData;
+    }
+    
+    LOG_DEBUG() << "Extracted F0 vector size:" << f0Vec.size();
+    
+    // Create SpecService and extract cepstrum
+    SpecService specService;
+    std::vector<std::vector<double>> cepstrum = specService.getCepstr(
+        samples,
+        f0Vec,
+        fftLength,
+        frameShift,
+        sampleRate,
+        numOrder,
+        f0Refinement
+    );
+    
+    if (cepstrum.empty()) {
+        LOG_WARNING() << "Cepstrum extraction returned empty result";
+        return cepstrData;
+    }
+    
+    // Convert 2D cepstrum vector to QVariantList
+    // Each frame becomes a QVariantList of cepstral coefficients
+    for (size_t frameIdx = 0; frameIdx < cepstrum.size(); ++frameIdx) {
+        QVariantList frame;
+        for (size_t coeffIdx = 0; coeffIdx < cepstrum[frameIdx].size(); ++coeffIdx) {
+            frame.append(cepstrum[frameIdx][coeffIdx]);
+        }
+        cepstrData.append(QVariant::fromValue(frame));
+    }
+    
+    LOG_DEBUG() << "Finish: getCepstr - frames=" << cepstrData.size();
+    if (!cepstrum.empty()) {
+        LOG_DEBUG() << "First frame coefficients=" << cepstrum[0].size();
+    }
+    
+    return cepstrData;
+}
+

@@ -1,6 +1,7 @@
 #include "specservice.h"
 #include <iostream>
 #include "SPTK/analysis/spectrum_extraction.h"
+#include "SPTK/analysis/fast_fourier_transform_cepstral_analysis.h"
 #include "helpers/logger.h"
 
 SpecService::SpecService() {
@@ -71,4 +72,65 @@ std::vector<std::vector<double>> SpecService::getSpec(
     }
     
     return result;
+}
+
+std::vector<std::vector<double>> SpecService::getCepstr(
+    const std::vector<double>& inputWaveData,
+    const std::vector<double>& f0,
+    int fftLength,
+    int frameShift,
+    double sampleRate,
+    int numOrder,
+    bool f0Refinement
+) {
+    LOG_DEBUG() << "Start: getCepstr - inputWaveData.size=" << inputWaveData.size()
+                << ", f0.size=" << f0.size()
+                << ", fftLength=" << fftLength
+                << ", frameShift=" << frameShift
+                << ", sampleRate=" << sampleRate
+                << ", numOrder=" << numOrder
+                << ", f0Refinement=" << f0Refinement;
+
+    // 1. Get power spectrum first
+    std::vector<std::vector<double>> specData = getSpec(
+        inputWaveData, f0, fftLength, frameShift, sampleRate, f0Refinement);
+    
+    if (specData.empty()) {
+        LOG_WARNING() << "Failed to get spectrum for cepstrum calculation";
+        return {};
+    }
+
+    // 2. Initialize cepstral analysis
+    // Recommended settings: iterations=3, acceleration=0.0
+    int numIteration = 3;
+    double accelerationFactor = 0.0;
+    
+    sptk::FastFourierTransformCepstralAnalysis cepstrAnalysis(
+        fftLength, numOrder, numIteration, accelerationFactor);
+    
+    if (!cepstrAnalysis.IsValid()) {
+        LOG_CRITICAL() << "FastFourierTransformCepstralAnalysis initialization failed";
+        return {};
+    }
+
+    sptk::FastFourierTransformCepstralAnalysis::Buffer buffer;
+    std::vector<std::vector<double>> cepstrData;
+    cepstrData.reserve(specData.size());
+
+    // 3. Convert each spectrum frame to cepstrum
+    for (const auto& specFrame : specData) {
+        std::vector<double> cepstrFrame;
+        if (!cepstrAnalysis.Run(specFrame, &cepstrFrame, &buffer)) {
+            LOG_CRITICAL() << "Cepstrum calculation failed for a frame";
+            return {};
+        }
+        cepstrData.push_back(std::move(cepstrFrame));
+    }
+
+    LOG_DEBUG() << "Finish: getCepstr - result.size=" << cepstrData.size();
+    if (!cepstrData.empty()) {
+        LOG_DEBUG() << "First cepstrum frame size=" << cepstrData[0].size();
+    }
+
+    return cepstrData;
 }
