@@ -9,6 +9,8 @@ Item {
 
     property var waveData: []
     property var cuePoints: []
+    property bool independentScale: false
+    property var datasetColors: []
 
     Canvas {
         id: canvas
@@ -35,11 +37,15 @@ Item {
                 return;
             }
 
-            // Find global min/max for scaling
+            // Find global min/max for scaling (and per-dataset Y ranges for independent scaling)
             var minX = datasets[0][0].x;
             var maxX = datasets[0][datasets[0].length - 1].x;
             var minY = datasets[0][0].y;
             var maxY = datasets[0][0].y;
+
+            // Arrays to hold per-dataset Y ranges when independent scaling is enabled
+            var perMinY = [];
+            var perMaxY = [];
 
             for (var d = 0; d < datasets.length; d++) {
                 var data = datasets[d];
@@ -49,13 +55,26 @@ Item {
                     if (data[data.length - 1].x > maxX)
                         maxX = data[data.length - 1].x;
 
+                    var dMin = data[0].y;
+                    var dMax = data[0].y;
+
                     for (var i = 0; i < data.length; i++) {
                         var y = data[i].y;
                         if (y < minY)
                             minY = y;
                         if (y > maxY)
                             maxY = y;
+                        if (y < dMin)
+                            dMin = y;
+                        if (y > dMax)
+                            dMax = y;
                     }
+                    perMinY.push(dMin);
+                    perMaxY.push(dMax);
+                } else {
+                    // Keep placeholder values for empty datasets
+                    perMinY.push(0);
+                    perMaxY.push(0);
                 }
             }
 
@@ -91,9 +110,19 @@ Item {
                 return scaledX + leftMargin;
             }
 
-            function scaleY(y) {
+            function scaleY(y, datasetIndex) {
+                // If independentScale is enabled and a datasetIndex is provided,
+                // scale using that dataset's min/max Y range; otherwise use global range.
+                var min = minY;
+                var range = rangeY;
+                if (root.independentScale && typeof datasetIndex === "number" && perMinY.length > datasetIndex) {
+                    min = perMinY[datasetIndex];
+                    var max = perMaxY[datasetIndex];
+                    range = max - min;
+                    if (range === 0) range = 1.0;
+                }
                 // Y is inverted in canvas, so we subtract from height
-                let scaledY = (y - minY) / rangeY * graphHeight;
+                let scaledY = (y - min) / range * graphHeight;
                 if (scaledY < 0)
                     return graphHeight + topPadding;
                 if (scaledY > graphHeight)
@@ -193,7 +222,25 @@ Item {
             }
 
             // Draw datasets
-            var colors = [Theme.primary(Material.theme), Theme.secondary(Material.theme), Theme.tertiary(Material.theme), Theme.error(Material.theme), Theme.primaryContainer(Material.theme), Theme.secondaryContainer(Material.theme)];
+            // Build a color palette for datasets. Priority:
+            // 1) dataset.color property, 2) root.datasetColors, 3) graphics palette (Tableau/D3-like), 4) generated HSL colors
+            // Recommended palettes for clear graphics: Tableau 10, D3 Category10, ColorBrewer Set2 (colorblind-friendly). Using a Tableau-like palette by default.
+            var graphicsPalette = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"];
+            var colors = [];
+            for (var i = 0; i < datasets.length; i++) {
+                var color = null;
+                if (datasets[i] && datasets[i].color) {
+                    color = datasets[i].color;
+                } else if (root.datasetColors && root.datasetColors.length > i) {
+                    color = root.datasetColors[i];
+                } else if (i < graphicsPalette.length) {
+                    color = graphicsPalette[i];
+                } else {
+                    var hue = (i * 360 / datasets.length) % 360;
+                    color = "hsl(" + hue + ", 60%, 50%)";
+                }
+                colors.push(color);
+            }
 
             ctx.save();
             ctx.beginPath();
@@ -206,12 +253,12 @@ Item {
                     continue;
 
                 ctx.beginPath();
-                ctx.moveTo(scaleX(data[0].x), scaleY(data[0].y));
+                ctx.moveTo(scaleX(data[0].x), scaleY(data[0].y, d));
 
                 for (var i = 1; i < data.length; i++) {
                     // Simple optimization: skip points if they map to same pixel?
                     // For now, just draw all.
-                    ctx.lineTo(scaleX(data[i].x), scaleY(data[i].y));
+                    ctx.lineTo(scaleX(data[i].x), scaleY(data[i].y, d));
                 }
 
                 ctx.strokeStyle = colors[d % colors.length];
@@ -228,6 +275,14 @@ Item {
     }
 
     onCuePointsChanged: {
+        canvas.requestPaint();
+    }
+
+    onIndependentScaleChanged: {
+        canvas.requestPaint();
+    }
+
+    onDatasetColorsChanged: {
         canvas.requestPaint();
     }
 }

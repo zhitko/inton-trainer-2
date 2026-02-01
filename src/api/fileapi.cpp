@@ -53,6 +53,11 @@ void FileApi::deleteFile(const QString &file)
     LOG_DEBUG() << "Finish: deleteFile";
 }
 
+QString FileApi::getApplicationDirPath()
+{
+    return QCoreApplication::applicationDirPath();
+}
+
 QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilters)
 {
     LOG_DEBUG() << "Start: getFiles - path=" << path << ", nameFilters=" << nameFilters;

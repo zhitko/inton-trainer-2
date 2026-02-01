@@ -30,6 +30,10 @@ qt_add_executable(appinton-trainer-2
     src/services/specservice.cpp
     src/services/umpservice.h
     src/services/umpservice.cpp
+    src/services/basedpservice.h
+    src/services/specdpservice.h
+    src/services/specdpservice.cpp
+    src/services/dpmaskservice.h
     src/services/helpers/wavFile.h
     src/services/helpers/wavFile.cpp
     src/services/helpers/vectorutils.h

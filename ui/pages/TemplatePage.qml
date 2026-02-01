@@ -10,14 +10,17 @@ import "../utils"
 
 Page {
     id: root
-    property string filePath: ""
-    property bool showSettings: true
+    property string refFilePath: ""
+    property string userFilePath: ""
+    property bool showSettings: false
 
-    property var wavFileHandle: null
+    property var refWavFileHandle: null
+    property var userWavFileHandle: null
     property var loadedCuePoints: []
     property var loadedWaveData: []
+    property var refPatternData: []
 
-    title: filePath.substring(filePath.lastIndexOf('/') + 1)
+    title: refFilePath.substring(refFilePath.lastIndexOf('/') + 1)
 
     WavFileApi {
         id: wavFileApi
@@ -70,7 +73,8 @@ Page {
             updateData();
         }
         function onSpecUseLogScaleChanged() {
-            spectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
+            refSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
+            userSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
         }
         function onSpecColorSchemeChanged() {
             updateColorScheme();
@@ -92,69 +96,137 @@ Page {
         else if (scheme === 3)
             colorSchemeStr = "cool";
 
-        spectrumGraph.colorScheme = colorSchemeStr;
-        cepstrogramGraph.colorScheme = colorSchemeStr;
+        refSpectrumGraph.colorScheme = colorSchemeStr;
+        refCepstrogramGraph.colorScheme = colorSchemeStr;
+
+        userSpectrumGraph.colorScheme = colorSchemeStr;
+        userCepstrogramGraph.colorScheme = colorSchemeStr;
     }
 
     function updateData() {
-        if (!wavFileHandle)
+        updateRefData();
+        updateUserData();
+    }
+
+    function updateUserData() {
+        if (!userWavFileHandle)
             return;
 
         // Extract pitch data
         Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
-        let pitchOriginalData = wavFileApi.getPitch(wavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None", "None");
+        let pitchOriginalData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None", "None");
         Logger.debug("Pitch original data length: " + pitchOriginalData.length);
-        pitchWaveFormGraph.waveData = [pitchOriginalData];
+        userPitchWaveFormGraph.waveData = [pitchOriginalData];
 
         Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
-        let pitchData = wavFileApi.getPitch(wavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        let pitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
         Logger.debug("Pitch data length: " + pitchData.length);
-        pitchProcessedWaveFormGraph.waveData = [pitchData];
+        userPitchProcessedWaveFormGraph.waveData = [pitchData];
+
+        // Extract spectrum data
+        Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
+        let specData = wavFileApi.getSpec(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Spectrum data frames: " + specData.length);
+
+        // Pass spectrum data directly to the 2D graph
+        userSpectrumGraph.spectrumData = specData;
+
+        // Extract cepstrum data
+        Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
+        let cepstrData = wavFileApi.getCepstr(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Cepstrum data frames: " + cepstrData.length);
+        userCepstrogramGraph.spectrumData = cepstrData;
+
+        // Run DP comparison
+        Logger.debug("Calculating DP...");
+        let dpResult = wavFileApi.getSpecDP(refPatternData, cepstrData);
+        Logger.debug("DP result length: " + dpResult.length);
+
+        // Calculate UMP
+        Logger.debug("Calculating scaled pitch...");
+        let scaledPitch = wavFileApi.getScaledPitch(dpResult, pitchData);
+        Logger.debug("Scaled pitch calculated with " + scaledPitch.length + " points");
+
+        Logger.debug("Calculating UMP...");
+        let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
+
+        userUmpWaveFormGraph.waveData = umpResult.ump;
+        userUmpWaveFormGraph.cuePoints = refUmpWaveFormGraph.cuePoints;
+    }
+
+    function updateRefData() {
+        if (!refWavFileHandle)
+            return;
+
+        // Extract pitch data
+        Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
+        let pitchOriginalData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None", "None");
+        Logger.debug("Pitch original data length: " + pitchOriginalData.length);
+        refPitchWaveFormGraph.waveData = [pitchOriginalData];
+
+        Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
+        let pitchData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        Logger.debug("Pitch data length: " + pitchData.length);
+        refPitchProcessedWaveFormGraph.waveData = [pitchData];
 
         // Calculate UMP
         Logger.debug("Calculating UMP...");
         let umpResult = wavFileApi.getUMP(pitchData, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
-        umpWaveFormGraph.waveData = umpResult.ump;
-        umpWaveFormGraph.cuePoints = umpResult.cuePoints;
+        refUmpWaveFormGraph.waveData = umpResult.ump;
+        refUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
 
         // Extract spectrum data
         Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
-        let specData = wavFileApi.getSpec(wavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        let specData = wavFileApi.getSpec(refWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
         Logger.debug("Spectrum data frames: " + specData.length);
 
         // Pass spectrum data directly to the 2D graph
-        spectrumGraph.spectrumData = specData;
+        refSpectrumGraph.spectrumData = specData;
 
         // Extract cepstrum data
         Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
-        let cepstrData = wavFileApi.getCepstr(wavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
-        Logger.debug("Cepstrum data frames: " + cepstrData.length);
-        cepstrogramGraph.spectrumData = cepstrData;
+        refPatternData = wavFileApi.getCepstr(refWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Cepstrum data frames: " + refPatternData.length);
+        refCepstrogramGraph.spectrumData = refPatternData;
     }
 
     Component.onCompleted: {
-        Logger.info("TemplatePage loaded for file: " + filePath);
+        Logger.info("TemplatePage initialization started");
 
-        Logger.debug("Opening WAV file...");
-        wavFileHandle = wavFileApi.openWavFile(filePath);
+        if (refFilePath) {
+            Logger.debug("Opening reference WAV file: " + refFilePath);
+            refWavFileHandle = wavFileApi.openWavFile(refFilePath);
 
-        Logger.debug("Extracting cue points...");
-        loadedCuePoints = wavFileApi.getCuePoints(wavFileHandle);
-        Logger.debug("Found " + loadedCuePoints.length + " cue points");
+            Logger.debug("Extracting cue points...");
+            loadedCuePoints = wavFileApi.getCuePoints(refWavFileHandle);
+            Logger.debug("Found " + loadedCuePoints.length + " cue points");
 
-        Logger.debug("Extracting wave data...");
-        loadedWaveData = wavFileApi.getWaveData(wavFileHandle);
-        Logger.debug("Wave data length: " + loadedWaveData.length);
+            Logger.debug("Extracting wave data...");
+            loadedWaveData = wavFileApi.getWaveData(refWavFileHandle);
+            Logger.debug("Wave data length: " + loadedWaveData.length);
 
-        waveFormGraph.waveData = loadedWaveData;
-        waveFormGraph.cuePoints = loadedCuePoints;
+            refWaveFormGraph.waveData = loadedWaveData;
+            refWaveFormGraph.cuePoints = loadedCuePoints;
+        }
+
+        if (userFilePath) {
+            Logger.debug("Opening user WAV file: " + userFilePath);
+            userWavFileHandle = wavFileApi.openWavFile(userFilePath);
+            let userWaveData = wavFileApi.getWaveData(userWavFileHandle);
+            Logger.debug("User wave data length: " + userWaveData.length);
+            userWaveFormGraph.waveData = userWaveData;
+        }
 
         updateData();
 
         // Initialize spectrum visualization settings
-        spectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
-        cepstrogramGraph.useLogScale = false; // Usually cepstrum is not shown in log scale
+        refSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
+        refCepstrogramGraph.useLogScale = false;
+
+        userSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
+        userCepstrogramGraph.useLogScale = false;
         updateColorScheme();
 
         Logger.info("TemplatePage initialization complete");
@@ -181,80 +253,162 @@ Page {
                 anchors.margins: 10
                 contentWidth: availableWidth
 
-                Column {
+                Row {
                     width: parent.width
-                    spacing: 10
+                    spacing: 20
 
-                    WaveFormGraph {
-                        id: waveFormGraph
-                        width: parent.width - 80
-                        height: 300
+                    Column {
+                        width: parent.width / 2 - 10
+                        spacing: 10
+
+                        WaveFormGraph {
+                            id: refWaveFormGraph
+                            width: parent.width - 80
+                            height: 300
+                        }
+
+                        PlayButton {
+                            id: refPlayButton
+                            width: 32
+                            height: 32
+                            file: refFilePath
+                            showLabel: true
+                        }
+
+                        Text {
+                            text: qsTr("Spectrum")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        Spectrogram2DGraph {
+                            id: refSpectrumGraph
+                            width: parent.width
+                            height: 400
+                        }
+
+                        Text {
+                            text: qsTr("Cepstrum")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        Spectrogram2DGraph {
+                            id: refCepstrogramGraph
+                            width: parent.width
+                            height: 400
+                        }
+
+                        Text {
+                            text: qsTr("Pitch (F0)")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        WaveFormGraph {
+                            id: refPitchWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
+
+                        WaveFormGraph {
+                            id: refPitchProcessedWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
+
+                        Text {
+                            text: qsTr("UMP")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        WaveFormGraph {
+                            id: refUmpWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
                     }
 
-                    PlayButton {
-                        id: playButton
-                        width: 32
-                        height: 32
-                        file: filePath
-                        showLabel: true
-                    }
+                    Column {
+                        width: parent.width / 2 - 10
+                        spacing: 10
 
-                    Text {
-                        text: qsTr("Spectrum")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                        WaveFormGraph {
+                            id: userWaveFormGraph
+                            width: parent.width - 80
+                            height: 300
+                        }
 
-                    Spectrogram2DGraph {
-                        id: spectrumGraph
-                        width: parent.width
-                        height: 400
-                    }
+                        PlayButton {
+                            id: userPlayButton
+                            width: 32
+                            height: 32
+                            file: userFilePath
+                            showLabel: true
+                        }
 
-                    Text {
-                        text: qsTr("Cepstrum")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                        Text {
+                            text: qsTr("Spectrum")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
 
-                    Spectrogram2DGraph {
-                        id: cepstrogramGraph
-                        width: parent.width
-                        height: 400
-                    }
+                        Spectrogram2DGraph {
+                            id: userSpectrumGraph
+                            width: parent.width
+                            height: 400
+                        }
 
-                    Text {
-                        text: qsTr("Pitch (F0)")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                        Text {
+                            text: qsTr("Cepstrum")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
 
-                    WaveFormGraph {
-                        id: pitchWaveFormGraph
-                        width: parent.width - 80
-                        height: 200
-                    }
+                        Spectrogram2DGraph {
+                            id: userCepstrogramGraph
+                            width: parent.width
+                            height: 400
+                        }
 
-                    WaveFormGraph {
-                        id: pitchProcessedWaveFormGraph
-                        width: parent.width - 80
-                        height: 200
-                    }
+                        Text {
+                            text: qsTr("Pitch (F0)")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
 
-                    Text {
-                        text: qsTr("UMP")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                        WaveFormGraph {
+                            id: userPitchWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
 
-                    WaveFormGraph {
-                        id: umpWaveFormGraph
-                        width: parent.width - 80
-                        height: 200
+                        WaveFormGraph {
+                            id: userPitchProcessedWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
+
+                        Text {
+                            text: qsTr("UMP")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        WaveFormGraph {
+                            id: userUmpWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
                     }
                 }
             }

@@ -3,8 +3,10 @@ import QtQuick.Controls 6.8
 import QtQuick.Controls.Material 6.8
 import QtQuick.Layouts
 import QtQuick.Effects
+import Qt.labs.platform 1.1
 
 import by.intontrainer.wavfile 1.0
+import by.intontrainer.file 1.0
 
 import "../components"
 import "../utils"
@@ -18,10 +20,18 @@ Page {
     title: titleText
 
     property var referenceUMP: null
+    property var referenceCuePoints: null
+    property var referenceCepstrData: null
+    property var referenceWaveData: null
+
     property var userUMP: null
 
     WavFileApi {
         id: wavFileApi
+    }
+
+    FileApi {
+        id: fileApi
     }
 
     Component.onCompleted: {
@@ -32,8 +42,8 @@ Page {
         Logger.info("TrainingPage loaded for file: " + referenceFilePath);
 
         let referenceWavFileHandle = wavFileApi.openWavFile(referenceFilePath);
-        let referenceCuePoints = wavFileApi.getCuePoints(referenceWavFileHandle);
-        let referenceWaveData = wavFileApi.getWaveData(referenceWavFileHandle);
+        referenceCuePoints = wavFileApi.getCuePoints(referenceWavFileHandle);
+        referenceWaveData = wavFileApi.getWaveData(referenceWavFileHandle);
 
         let pitchData = wavFileApi.getPitch(referenceWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
 
@@ -41,6 +51,11 @@ Page {
 
         umpGraph.waveData = referenceUMP.ump;
         umpGraph.cuePoints = referenceUMP.cuePoints;
+
+        // Extract cepstrum data for reference
+        Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
+        referenceCepstrData = wavFileApi.getCepstr(referenceWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Cepstrum data frames: " + referenceCepstrData.length);
     }
 
     function updateUserUMP(filePath) {
@@ -53,9 +68,27 @@ Page {
 
         let pitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
 
-        // TODO: implement user UMP calculation
+        // Extract cepstrum data for user
+        Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
+        let userCepstrData = wavFileApi.getCepstr(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Cepstrum data frames: " + userCepstrData.length);
 
-        umpGraph.waveData = [referenceUMP.ump, pitchData];
+        // Run DP comparison
+        Logger.debug("Calculating DP...");
+        let dpResult = wavFileApi.getSpecDP(referenceCepstrData, userCepstrData);
+        Logger.debug("DP result length: " + dpResult.length);
+
+        // Generate UMP from DP result
+        Logger.debug("Calculating scaled pitch...");
+        let scaledPitch = wavFileApi.getScaledPitch(dpResult, pitchData);
+        Logger.debug("Scaled pitch calculated with " + scaledPitch.length + " points");
+
+        Logger.debug("Calculating UMP...");
+        userUMP = wavFileApi.getUMP(scaledPitch, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        Logger.debug("UMP calculated with " + userUMP.cuePoints.length + " cue points");
+
+
+        umpGraph.waveData = [referenceUMP.ump, userUMP.ump];
         umpGraph.cuePoints = referenceUMP.cuePoints;
     }
 
@@ -196,6 +229,7 @@ Page {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 240
+                independentScale: true
             }
 
             // Controls
@@ -280,8 +314,111 @@ Page {
 
                 onClicked: {
                     stackView.push("TemplatePage.qml", {
-                        filePath: root.referenceFilePath
+                        refFilePath: root.referenceFilePath,
+                        userFilePath: root.userFilePath
                     });
+                }
+            }
+
+            // Open Test File Button
+            Button {
+                id: openTestFileButton
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 200
+                Layout.preferredHeight: 48
+                flat: false
+
+                contentItem: Text {
+                    text: qsTr("Open Test File")
+                    font.pixelSize: 16
+                    font.weight: 600
+                    color: openTestFileButton.down ? Qt.darker(Theme.onPrimary(root.Material.theme), 1.1) : Theme.onPrimary(root.Material.theme)
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                background: Rectangle {
+                    radius: 24
+                    gradient: Gradient {
+                        GradientStop {
+                            position: 0.0
+                            color: openTestFileButton.hovered ? Qt.lighter(Theme.primary(root.Material.theme), 1.1) : Theme.primary(root.Material.theme)
+                        }
+                        GradientStop {
+                            position: 1.0
+                            color: openTestFileButton.hovered ? Theme.primary(root.Material.theme) : Qt.darker(Theme.primary(root.Material.theme), 1.2)
+                        }
+                    }
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 200
+                        }
+                    }
+
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        shadowEnabled: true
+                        shadowColor: Qt.rgba(0, 0, 0, 0.2)
+                        blur: openTestFileButton.hovered ? 0.3 : 0.2
+                        shadowVerticalOffset: openTestFileButton.hovered ? 6 : 4
+                    }
+
+                    scale: openTestFileButton.pressed ? 0.95 : (openTestFileButton.hovered ? 1.02 : 1.0)
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: 100
+                            easing.type: Easing.OutBack
+                        }
+                    }
+                }
+
+                onClicked: testFileDialog.open()
+            }
+
+            FileDialog {
+                id: testFileDialog
+                title: qsTr("Open test file")
+                nameFilters: ["WAV files (*.wav)"]
+                onAccepted: {
+                    var selectedPath = null;
+                    if (testFileDialog.file !== undefined && testFileDialog.file !== "") selectedPath = testFileDialog.file;
+                    else if (testFileDialog.fileUrl) selectedPath = testFileDialog.fileUrl;
+                    else if (testFileDialog.fileUrls && testFileDialog.fileUrls.length > 0) selectedPath = testFileDialog.fileUrls[0];
+
+                    // Convert QUrl to string/local path if needed
+                    if (selectedPath && typeof selectedPath === "object") {
+                        if (selectedPath.toLocalFile) selectedPath = selectedPath.toLocalFile();
+                        else if (selectedPath.toString) selectedPath = selectedPath.toString();
+                    }
+
+                    if (selectedPath && typeof selectedPath === "string") {
+                        var selStr = selectedPath;
+                        // Handle file:// URI strings (may contain percent-encoding)
+                        if (selStr.indexOf("file://") === 0) {
+                            // Strip leading file:// or file:/// and decode percent-encodings
+                            selStr = selStr.replace(/^file:\/+/, "/");
+                            try {
+                                selStr = decodeURIComponent(selStr);
+                            } catch (e) {
+                                // ignore decode errors and keep as-is
+                            }
+                        }
+
+                        // Normalize separators
+                        var normalizedSel = String(selStr).replace(/\\/g, "/");
+                        var appBase = fileApi.getApplicationDirPath();
+                        var normalizedBase = String(appBase).replace(/\\/g, "/");
+
+                        if (normalizedSel.indexOf(normalizedBase + "/") === 0) {
+                            selectedPath = normalizedSel.substring(normalizedBase.length + 1);
+                        } else {
+                            selectedPath = normalizedSel;
+                        }
+
+                        // Call processing with relative or absolute path
+                        updateUserUMP(selectedPath);
+                    }
                 }
             }
 

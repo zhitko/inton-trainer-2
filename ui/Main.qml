@@ -8,8 +8,8 @@ import "utils"
 
 ApplicationWindow {
     id: window
-    width: 800
-    height: 600
+    width: 700
+    height: 900
     visible: true
     title: qsTr("Inton Trainer")
 
@@ -142,7 +142,8 @@ ApplicationWindow {
                 text: qsTr("Home")
                 width: parent.width - parent.padding
                 onClicked: {
-                    onClicked: stackView.push("pages/HomePage.qml");
+                    stackView.clear();
+                    stackView.push("pages/HomePage.qml");
                     drawer.close();
                 }
                 contentItem: RowLayout {
@@ -166,7 +167,7 @@ ApplicationWindow {
                 text: qsTr("Templates")
                 width: parent.width - parent.padding
                 onClicked: {
-                    onClicked: stackView.push("pages/TemplatesPage.qml");
+                    stackView.push("pages/TemplatesPage.qml");
                     drawer.close();
                 }
                 contentItem: RowLayout {
@@ -191,7 +192,7 @@ ApplicationWindow {
                 text: qsTr("My Records")
                 width: parent.width - parent.padding
                 onClicked: {
-                    onClicked: stackView.push("pages/RecordsPage.qml");
+                    stackView.push("pages/RecordsPage.qml");
                     drawer.close();
                 }
                 contentItem: RowLayout {
@@ -266,17 +267,20 @@ ApplicationWindow {
 
         TabButton {
             id: homeTabButton
-            onClicked: stackView.push("pages/HomePage.qml")
+            onClicked: {
+                stackView.clear()
+                stackView.push("pages/HomePage.qml")
+            }
             font.family: Icons.familyRegular
             font.pointSize: 20
             text: Icons.faHome
         }
         TabButton {
-            onClicked: stackView.push("pages/RecordingPage.qml")
+            onClicked: stackView.push("pages/SettingsPage.qml")
             font.family: Icons.familySolid
             font.pointSize: 20
             font.bold: true
-            text: Icons.faMicrophone
+            text: Icons.faGear
         }
     }
 }

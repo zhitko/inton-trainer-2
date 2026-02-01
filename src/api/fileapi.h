@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVariantMap>
+#include <QString>
 
 class FileApi : public QObject
 {
@@ -14,6 +15,8 @@ public:
     Q_INVOKABLE QVariantList getFolders(const QString &path);
     Q_INVOKABLE QVariantList getFilesList(const QString &path, const QStringList &nameFilters);
     Q_INVOKABLE void deleteFile(const QString &file);
+
+    Q_INVOKABLE QString getApplicationDirPath();
 
 };
 
