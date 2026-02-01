@@ -58,6 +58,16 @@ QString FileApi::getApplicationDirPath()
     return QCoreApplication::applicationDirPath();
 }
 
+bool FileApi::directoryExists(const QString &path)
+{
+    LOG_DEBUG() << "Start: directoryExists - path=" << path;
+    QString basePath = QCoreApplication::applicationDirPath();
+    QString searchPath = QDir(basePath).filePath(path);
+    bool exists = QDir(searchPath).exists();
+    LOG_DEBUG() << "Finish: directoryExists - exists=" << exists << ", path=" << searchPath;
+    return exists;
+}
+
 QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilters)
 {
     LOG_DEBUG() << "Start: getFiles - path=" << path << ", nameFilters=" << nameFilters;

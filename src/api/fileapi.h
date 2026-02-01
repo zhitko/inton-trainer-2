@@ -17,6 +17,7 @@ public:
     Q_INVOKABLE void deleteFile(const QString &file);
 
     Q_INVOKABLE QString getApplicationDirPath();
+    Q_INVOKABLE bool directoryExists(const QString &path);
 
 };
 

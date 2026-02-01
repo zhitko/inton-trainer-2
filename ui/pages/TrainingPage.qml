@@ -1,6 +1,7 @@
 import QtQuick 6.8
 import QtQuick.Controls 6.8
 import QtQuick.Controls.Material 6.8
+import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Effects
 import Qt.labs.platform 1.1
@@ -253,6 +254,121 @@ Page {
                 }
             }
 
+            // Open Test File Button
+            Button {
+                id: openTestFileButton
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 200
+                Layout.preferredHeight: 48
+                flat: false
+
+                contentItem: Text {
+                    text: qsTr("Open Test File")
+                    font.pixelSize: 16
+                    font.weight: 600
+                    color: openTestFileButton.down ? Qt.darker(Theme.onPrimary(root.Material.theme), 1.1) : Theme.onPrimary(root.Material.theme)
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                background: Rectangle {
+                    radius: 24
+                    gradient: Gradient {
+                        GradientStop {
+                            position: 0.0
+                            color: openTestFileButton.hovered ? Qt.lighter(Theme.primary(root.Material.theme), 1.1) : Theme.primary(root.Material.theme)
+                        }
+                        GradientStop {
+                            position: 1.0
+                            color: openTestFileButton.hovered ? Theme.primary(root.Material.theme) : Qt.darker(Theme.primary(root.Material.theme), 1.2)
+                        }
+                    }
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 200
+                        }
+                    }
+
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        shadowEnabled: true
+                        shadowColor: Qt.rgba(0, 0, 0, 0.2)
+                        blur: openTestFileButton.hovered ? 0.3 : 0.2
+                        shadowVerticalOffset: openTestFileButton.hovered ? 6 : 4
+                    }
+
+                    scale: openTestFileButton.pressed ? 0.95 : (openTestFileButton.hovered ? 1.02 : 1.0)
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: 100
+                            easing.type: Easing.OutBack
+                        }
+                    }
+                }
+
+                onClicked: {
+                    console.log("Opening test file dialog: " + fileApi.getApplicationDirPath() + "/data/test");
+                    // Ensure the folder exists before opening the dialog
+                    if (!fileApi.directoryExists(fileApi.getApplicationDirPath() + "/data/test")) {
+                        console.warn("Directory does not exist: " + fileApi.getApplicationDirPath() + "/data/test");
+                    } else {
+                        // Ensure folder is set immediately before opening (avoid stale bindings)
+                        // Use file:// URL to ensure native dialogs interpret it as an absolute path
+                        testFileDialog.folder = "file://" + fileApi.getApplicationDirPath() + "/data/test";
+                        testFileDialog.open();
+                    }
+                }
+            }
+
+            FileDialog {
+                id: testFileDialog
+                title: qsTr("Open test file")
+                nameFilters: ["WAV files (*.wav)"]
+                folder: QUrl(fileApi.getApplicationDirPath() + "/data/test") // Set the initial folder to data/test
+                onAccepted: {
+                    console.log("testFileDialog accepted. folder: " + testFileDialog.folder + ", file: " + testFileDialog.file + ", fileUrl: " + testFileDialog.fileUrl);
+                    var selectedPath = null;
+                    if (testFileDialog.file !== undefined && testFileDialog.file !== "") selectedPath = testFileDialog.file;
+                    else if (testFileDialog.fileUrl) selectedPath = testFileDialog.fileUrl;
+                    else if (testFileDialog.fileUrls && testFileDialog.fileUrls.length > 0) selectedPath = testFileDialog.fileUrls[0];
+
+                    // Convert QUrl to string/local path if needed
+                    if (selectedPath && typeof selectedPath === "object") {
+                        if (selectedPath.toLocalFile) selectedPath = selectedPath.toLocalFile();
+                        else if (selectedPath.toString) selectedPath = selectedPath.toString();
+                    }
+
+                    if (selectedPath && typeof selectedPath === "string") {
+                        var selStr = selectedPath;
+                        // Handle file:// URI strings (may contain percent-encoding)
+                        if (selStr.indexOf("file://") === 0) {
+                            // Strip leading file:// or file:/// and decode percent-encodings
+                            selStr = selStr.replace(/^file:\/+/g, "/");
+                            try {
+                                selStr = decodeURIComponent(selStr);
+                            } catch (e) {
+                                // ignore decode errors and keep as-is
+                            }
+                        }
+
+                        // Normalize separators
+                        var normalizedSel = String(selStr).replace(/\\/g, "/");
+                        var appBase = fileApi.getApplicationDirPath();
+                        var normalizedBase = String(appBase).replace(/\\/g, "/");
+
+                        if (normalizedSel.indexOf(normalizedBase + "/") === 0) {
+                            selectedPath = normalizedSel.substring(normalizedBase.length + 1);
+                        } else {
+                            selectedPath = normalizedSel;
+                        }
+
+                        // Call processing with relative or absolute path
+                        updateUserUMP(selectedPath);
+                    }
+                }
+            }
+
             // Advanced Button
             Button {
                 id: advancedButton
@@ -317,108 +433,6 @@ Page {
                         refFilePath: root.referenceFilePath,
                         userFilePath: root.userFilePath
                     });
-                }
-            }
-
-            // Open Test File Button
-            Button {
-                id: openTestFileButton
-                Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 200
-                Layout.preferredHeight: 48
-                flat: false
-
-                contentItem: Text {
-                    text: qsTr("Open Test File")
-                    font.pixelSize: 16
-                    font.weight: 600
-                    color: openTestFileButton.down ? Qt.darker(Theme.onPrimary(root.Material.theme), 1.1) : Theme.onPrimary(root.Material.theme)
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                background: Rectangle {
-                    radius: 24
-                    gradient: Gradient {
-                        GradientStop {
-                            position: 0.0
-                            color: openTestFileButton.hovered ? Qt.lighter(Theme.primary(root.Material.theme), 1.1) : Theme.primary(root.Material.theme)
-                        }
-                        GradientStop {
-                            position: 1.0
-                            color: openTestFileButton.hovered ? Theme.primary(root.Material.theme) : Qt.darker(Theme.primary(root.Material.theme), 1.2)
-                        }
-                    }
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 200
-                        }
-                    }
-
-                    layer.enabled: true
-                    layer.effect: MultiEffect {
-                        shadowEnabled: true
-                        shadowColor: Qt.rgba(0, 0, 0, 0.2)
-                        blur: openTestFileButton.hovered ? 0.3 : 0.2
-                        shadowVerticalOffset: openTestFileButton.hovered ? 6 : 4
-                    }
-
-                    scale: openTestFileButton.pressed ? 0.95 : (openTestFileButton.hovered ? 1.02 : 1.0)
-                    Behavior on scale {
-                        NumberAnimation {
-                            duration: 100
-                            easing.type: Easing.OutBack
-                        }
-                    }
-                }
-
-                onClicked: testFileDialog.open()
-            }
-
-            FileDialog {
-                id: testFileDialog
-                title: qsTr("Open test file")
-                nameFilters: ["WAV files (*.wav)"]
-                onAccepted: {
-                    var selectedPath = null;
-                    if (testFileDialog.file !== undefined && testFileDialog.file !== "") selectedPath = testFileDialog.file;
-                    else if (testFileDialog.fileUrl) selectedPath = testFileDialog.fileUrl;
-                    else if (testFileDialog.fileUrls && testFileDialog.fileUrls.length > 0) selectedPath = testFileDialog.fileUrls[0];
-
-                    // Convert QUrl to string/local path if needed
-                    if (selectedPath && typeof selectedPath === "object") {
-                        if (selectedPath.toLocalFile) selectedPath = selectedPath.toLocalFile();
-                        else if (selectedPath.toString) selectedPath = selectedPath.toString();
-                    }
-
-                    if (selectedPath && typeof selectedPath === "string") {
-                        var selStr = selectedPath;
-                        // Handle file:// URI strings (may contain percent-encoding)
-                        if (selStr.indexOf("file://") === 0) {
-                            // Strip leading file:// or file:/// and decode percent-encodings
-                            selStr = selStr.replace(/^file:\/+/, "/");
-                            try {
-                                selStr = decodeURIComponent(selStr);
-                            } catch (e) {
-                                // ignore decode errors and keep as-is
-                            }
-                        }
-
-                        // Normalize separators
-                        var normalizedSel = String(selStr).replace(/\\/g, "/");
-                        var appBase = fileApi.getApplicationDirPath();
-                        var normalizedBase = String(appBase).replace(/\\/g, "/");
-
-                        if (normalizedSel.indexOf(normalizedBase + "/") === 0) {
-                            selectedPath = normalizedSel.substring(normalizedBase.length + 1);
-                        } else {
-                            selectedPath = normalizedSel;
-                        }
-
-                        // Call processing with relative or absolute path
-                        updateUserUMP(selectedPath);
-                    }
                 }
             }
 
