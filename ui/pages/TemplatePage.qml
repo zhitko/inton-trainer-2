@@ -253,162 +253,222 @@ Page {
                 anchors.margins: 10
                 contentWidth: availableWidth
 
-                Row {
+                Column {
                     width: parent.width
-                    spacing: 20
+                    spacing: 10
 
-                    Column {
-                        width: parent.width / 2 - 10
-                        spacing: 10
-
-                        WaveFormGraph {
-                            id: refWaveFormGraph
-                            width: parent.width - 80
-                            height: 300
-                        }
-
-                        PlayButton {
-                            id: refPlayButton
-                            width: 32
-                            height: 32
-                            file: refFilePath
-                            showLabel: true
-                        }
-
-                        Text {
-                            text: qsTr("Spectrum")
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: Theme.onSurface(root.Material.theme)
-                        }
-
-                        Spectrogram2DGraph {
-                            id: refSpectrumGraph
-                            width: parent.width
-                            height: 400
-                        }
-
-                        Text {
-                            text: qsTr("Cepstrum")
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: Theme.onSurface(root.Material.theme)
-                        }
-
-                        Spectrogram2DGraph {
-                            id: refCepstrogramGraph
-                            width: parent.width
-                            height: 400
-                        }
-
-                        Text {
-                            text: qsTr("Pitch (F0)")
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: Theme.onSurface(root.Material.theme)
-                        }
-
-                        WaveFormGraph {
-                            id: refPitchWaveFormGraph
-                            width: parent.width - 80
-                            height: 200
-                        }
-
-                        WaveFormGraph {
-                            id: refPitchProcessedWaveFormGraph
-                            width: parent.width - 80
-                            height: 200
-                        }
-
-                        Text {
-                            text: qsTr("UMP")
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: Theme.onSurface(root.Material.theme)
-                        }
-
-                        WaveFormGraph {
-                            id: refUmpWaveFormGraph
-                            width: parent.width - 80
-                            height: 200
-                        }
+                    Text {
+                        text: qsTr("Waveforms")
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
                     }
 
-                    Column {
-                        width: parent.width / 2 - 10
-                        spacing: 10
+                    Text {
+                        text: qsTr("Reference")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
 
-                        WaveFormGraph {
-                            id: userWaveFormGraph
-                            width: parent.width - 80
-                            height: 300
-                        }
+                    WaveFormGraph {
+                        id: refWaveFormGraph
+                        width: parent.width
+                        height: 300
+                    }
 
-                        PlayButton {
-                            id: userPlayButton
-                            width: 32
-                            height: 32
-                            file: userFilePath
-                            showLabel: true
-                        }
+                    PlayButton {
+                        id: refPlayButton
+                        width: 32
+                        height: 32
+                        file: refFilePath
+                        showLabel: true
+                    }
 
-                        Text {
-                            text: qsTr("Spectrum")
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: Theme.onSurface(root.Material.theme)
-                        }
+                    Text {
+                        text: qsTr("User")
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
 
-                        Spectrogram2DGraph {
-                            id: userSpectrumGraph
-                            width: parent.width
-                            height: 400
-                        }
+                    WaveFormGraph {
+                        id: userWaveFormGraph
+                        width: parent.width
+                        height: 300
+                    }
 
-                        Text {
-                            text: qsTr("Cepstrum")
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: Theme.onSurface(root.Material.theme)
-                        }
+                    PlayButton {
+                        id: userPlayButton
+                        width: 32
+                        height: 32
+                        file: userFilePath
+                        showLabel: true
+                    }
 
-                        Spectrogram2DGraph {
-                            id: userCepstrogramGraph
-                            width: parent.width
-                            height: 400
-                        }
+                    Text {
+                        text: qsTr("Spectrum")
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
 
-                        Text {
-                            text: qsTr("Pitch (F0)")
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: Theme.onSurface(root.Material.theme)
-                        }
+                    Text {
+                        text: qsTr("Reference")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
 
-                        WaveFormGraph {
-                            id: userPitchWaveFormGraph
-                            width: parent.width - 80
-                            height: 200
-                        }
+                    Spectrogram2DGraph {
+                        id: refSpectrumGraph
+                        width: parent.width
+                        height: 400
+                    }
 
-                        WaveFormGraph {
-                            id: userPitchProcessedWaveFormGraph
-                            width: parent.width - 80
-                            height: 200
-                        }
+                    Text {
+                        text: qsTr("User")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
 
-                        Text {
-                            text: qsTr("UMP")
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: Theme.onSurface(root.Material.theme)
-                        }
+                    Spectrogram2DGraph {
+                        id: userSpectrumGraph
+                        width: parent.width
+                        height: 400
+                    }
 
-                        WaveFormGraph {
-                            id: userUmpWaveFormGraph
-                            width: parent.width - 80
-                            height: 200
-                        }
+                    Text {
+                        text: qsTr("Cepstrum")
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    Text {
+                        text: qsTr("Reference")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    Spectrogram2DGraph {
+                        id: refCepstrogramGraph
+                        width: parent.width
+                        height: 400
+                    }
+
+                    Text {
+                        text: qsTr("User")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    Spectrogram2DGraph {
+                        id: userCepstrogramGraph
+                        width: parent.width
+                        height: 400
+                    }
+
+                    Text {
+                        text: qsTr("Pitch (F0)")
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    Text {
+                        text: qsTr("Reference")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    WaveFormGraph {
+                        id: refPitchWaveFormGraph
+                        width: parent.width - 80
+                        height: 200
+                    }
+
+                    Text {
+                        text: qsTr("User")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    WaveFormGraph {
+                        id: userPitchWaveFormGraph
+                        width: parent.width - 80
+                        height: 200
+                    }
+
+                    Text {
+                        text: qsTr("Processed Pitch (F0)")
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    Text {
+                        text: qsTr("Reference")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    WaveFormGraph {
+                        id: refPitchProcessedWaveFormGraph
+                        width: parent.width - 80
+                        height: 200
+                    }
+
+                    Text {
+                        text: qsTr("User")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    WaveFormGraph {
+                        id: userPitchProcessedWaveFormGraph
+                        width: parent.width - 80
+                        height: 200
+                    }
+
+                    Text {
+                        text: qsTr("UMP")
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    Text {
+                        text: qsTr("Reference")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    WaveFormGraph {
+                        id: refUmpWaveFormGraph
+                        width: parent.width - 80
+                        height: 200
+                    }
+
+                    Text {
+                        text: qsTr("User")
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.onSurface(root.Material.theme)
+                    }
+
+                    WaveFormGraph {
+                        id: userUmpWaveFormGraph
+                        width: parent.width - 80
+                        height: 200
                     }
                 }
             }

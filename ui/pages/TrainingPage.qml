@@ -42,7 +42,7 @@ Page {
     function updateReferenceUMP() {
         Logger.info("TrainingPage loaded for file: " + referenceFilePath);
 
-        let referenceWavFileHandle = wavFileApi.openWavFile(referenceFilePath);
+        let referenceWavFileHandle = wavFileApi.openWavFile(fileApi.getApplicationDirPath() + "/" + referenceFilePath);
         referenceCuePoints = wavFileApi.getCuePoints(referenceWavFileHandle);
         referenceWaveData = wavFileApi.getWaveData(referenceWavFileHandle);
 
@@ -59,11 +59,11 @@ Page {
         Logger.debug("Cepstrum data frames: " + referenceCepstrData.length);
     }
 
-    function updateUserUMP(filePath) {
-        Logger.info("Updating user UMP for file: " + filePath);
+    function updateUserUMP(fileFullPath) {
+        Logger.info("Updating user UMP for file: " + fileFullPath);
 
-        root.userFilePath = filePath;
-        let userWavFileHandle = wavFileApi.openWavFile(filePath);
+        root.userFilePath = fileFullPath;
+        let userWavFileHandle = wavFileApi.openWavFile(root.userFilePath);
         let userCuePoints = wavFileApi.getCuePoints(userWavFileHandle);
         let userWaveData = wavFileApi.getWaveData(userWavFileHandle);
 
@@ -325,7 +325,7 @@ Page {
                 id: testFileDialog
                 title: qsTr("Open test file")
                 nameFilters: ["WAV files (*.wav)"]
-                folder: QUrl(fileApi.getApplicationDirPath() + "/data/test") // Set the initial folder to data/test
+                folder: (fileApi.getApplicationDirPath() + "/data/test") // Set the initial folder to data/test
                 onAccepted: {
                     console.log("testFileDialog accepted. folder: " + testFileDialog.folder + ", file: " + testFileDialog.file + ", fileUrl: " + testFileDialog.fileUrl);
                     var selectedPath = null;
@@ -344,7 +344,10 @@ Page {
                         // Handle file:// URI strings (may contain percent-encoding)
                         if (selStr.indexOf("file://") === 0) {
                             // Strip leading file:// or file:/// and decode percent-encodings
-                            selStr = selStr.replace(/^file:\/+/g, "/");
+                            selStr = selStr.replace(/^file:\/+/g, "");
+                            // For linux add leading slash (windows path started with drive letter 'Z:/')
+                            console.log("selStr.indexOf(':/') = " + selStr.indexOf(":/"));
+                            if (selStr.indexOf(":/") === -1) selStr = "/" + selStr;
                             try {
                                 selStr = decodeURIComponent(selStr);
                             } catch (e) {
@@ -352,19 +355,7 @@ Page {
                             }
                         }
 
-                        // Normalize separators
-                        var normalizedSel = String(selStr).replace(/\\/g, "/");
-                        var appBase = fileApi.getApplicationDirPath();
-                        var normalizedBase = String(appBase).replace(/\\/g, "/");
-
-                        if (normalizedSel.indexOf(normalizedBase + "/") === 0) {
-                            selectedPath = normalizedSel.substring(normalizedBase.length + 1);
-                        } else {
-                            selectedPath = normalizedSel;
-                        }
-
-                        // Call processing with relative or absolute path
-                        updateUserUMP(selectedPath);
+                        updateUserUMP(selStr);
                     }
                 }
             }
