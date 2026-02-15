@@ -209,8 +209,6 @@ void SettingsApi::load()
     LOG_DEBUG() << "Finish: load";
 }
 
-// ... existing code ...
-
 int SettingsApi::cepstrNumOrder() const
 {
     LOG_DEBUG() << "Start: cepstrNumOrder";

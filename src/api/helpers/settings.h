@@ -10,23 +10,23 @@ struct AppSettings {
     std::string theme = "light";
 
     // Pitch
-    std::string algorithm = "SWIPE";
-    double frameShift = 1.0;
-    double sampleRate = 16000.0;
+    std::string algorithm = "RAPT";
+    double frameShift = 32.0;
+    double sampleRate = 8000.0;
     double minF0 = 50.0;
-    double maxF0 = 600.0;
-    double voicingThreshold = 0.2;
-    std::string pitchNormalization = "max";
+    double maxF0 = 500.0;
+    double voicingThreshold = 0;
+    std::string pitchNormalization = "min_max";
     std::string pitchInterpolationType = "Linear";
-    std::string pitchSmoothing = "None";
-    int pitchSmoothingWindowSize = 10;
+    std::string pitchSmoothing = "Median";
+    int pitchSmoothingWindowSize = 8;
     double pitchGaussianSmoothingSigma = 1.0;
 
     double pitchSplineSmoothingPenalty = 1.0;
 
     // Spectrum
-    int specFftLength = 2048;
-    bool specF0Refinement = false;
+    int specFftLength = 1024;
+    bool specF0Refinement = true;
     bool specUseLogScale = true;
     std::string specColorScheme = "Viridis";
 
