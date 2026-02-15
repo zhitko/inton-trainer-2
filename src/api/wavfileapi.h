@@ -50,11 +50,6 @@ public slots:
                                      double voicingThreshold = 0.9,
                                      bool f0Refinement = false);
 
-    Q_INVOKABLE QVariantList getSpecDP(const QVariantList& patternSpectrum,
-                                       const QVariantList& signalSpectrum,
-                                       int globalLimit = 10,
-                                       double localLimit = 0.001);
-
     Q_INVOKABLE QVariantList getCepstr(WaveFile* waveFile,
                                        int fftLength,
                                        int frameShift,
@@ -66,9 +61,10 @@ public slots:
                                        double voicingThreshold = 0.9,
                                        bool f0Refinement = false);
 
-    // Applies DP mask to a pitch signal and returns the scaled pitch (as QPointF list)
-    Q_INVOKABLE QVariantList getScaledPitch(const QVariantList& mask,
-                                            const QVariantList& pitch);
+    Q_INVOKABLE QVariantList getSpecDP(const QVariantList& patternSpectrum,
+                                       const QVariantList& signalSpectrum,
+                                       const QVariantList& pitch,
+                                       const int targetLength);
 };
 
 #endif // WAVFILEAPI_H

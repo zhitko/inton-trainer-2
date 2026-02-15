@@ -3,119 +3,35 @@
 #include "src/services/wavfileservice.h"
 #include "src/services/pitchservice.h"
 #include "src/services/specservice.h"
-#include "src/services/specdpservice.h"
 #include "src/services/umpservice.h"
-#include "src/services/dpmaskservice.h"
+#include "src/services/dpservice.h"
 #include "src/services/helpers/vectorutils.h"
 #include <QDebug>
 #include <QPointF>
 #include <limits>
 
-QVariantList WavFileApi::getScaledPitch(const QVariantList& mask,
-                                        const QVariantList& pitch)
-{
-    LOG_DEBUG() << "Start: getScaledPitch - mask.size=" << mask.size() << ", pitch.size=" << pitch.size();
-
-    QVariantList result;
-
-    // Convert mask (QVariantList of maps) to vector<DPMaskPoint>
-    std::vector<DPMaskPoint> maskVec;
-    maskVec.reserve(mask.size());
-    for (const auto& item : mask) {
-        QVariantMap p = item.toMap();
-        DPMaskPoint mp;
-        mp.signalPos = p["signalPos"].toInt();
-        mp.patternPos = p["patternPos"].toInt();
-        maskVec.push_back(mp);
-    }
-
-    if (maskVec.empty()) {
-        LOG_WARNING() << "Mask is empty";
-        return result;
-    }
-
-    // Convert pitch QVariantList to std::vector<double>
-    std::vector<double> pitchVec;
-    pitchVec.reserve(pitch.size());
-    for (const auto& val : pitch) {
-        if (val.canConvert<QPointF>()) {
-            pitchVec.push_back(val.toPointF().y());
-        } else {
-            pitchVec.push_back(val.toDouble());
-        }
-    }
-
-    if (pitchVec.empty()) {
-        LOG_WARNING() << "Pitch is empty";
-        return result;
-    }
-
-    // Local scalar signal wrapper
-    class ScalarSignal : public Signal<double> {
-    public:
-        ScalarSignal(const std::vector<double>& src) : data(new std::vector<double>(src)) {}
-        ScalarSignal(int size) : data(new std::vector<double>(size, 0.0)) {}
-        virtual ~ScalarSignal() { delete data; }
-        Signal<double>* makeSignal(int size) override { return new ScalarSignal(size); }
-        void freeSignal() override { /* no-op */ }
-        int size() override { return static_cast<int>(data->size()); }
-        double valueAt(int index) override { return (*data)[index]; }
-        void setValueAt(double value, int index) override { if (index >= 0 && index < (int)data->size()) (*data)[index] = value; }
-        const std::vector<double>& getData() const { return *data; }
-    private:
-        std::vector<double>* data;
-    };
-
-    ScalarSignal* input = new ScalarSignal(pitchVec);
-
-    // Apply mask using DPMaskService
-    DPMaskService dm(maskVec);
-    Signal<double>* scaled = dm.applyMask<double>(input);
-
-    if (!scaled) {
-        LOG_WARNING() << "Scaling returned null";
-        delete input;
-        return result;
-    }
-
-    // Convert scaled signal to QVariantList (QPointF)
-    for (int i = 0; i < scaled->size(); ++i) {
-        double v = scaled->valueAt(i);
-        result.append(QPointF(i, v));
-    }
-
-    // Clean up - avoid double delete if scaled == input
-    if (scaled != input) {
-        scaled->freeSignal();
-        delete scaled;
-        input->freeSignal();
-        delete input;
-    } else {
-        scaled->freeSignal();
-        delete scaled; // same as input
-    }
-
-    LOG_DEBUG() << "Finish: getScaledPitch - result.size=" << result.size();
-    return result;
-}
-
 QVariantList WavFileApi::getSpecDP(const QVariantList& patternSpectrum,
                                    const QVariantList& signalSpectrum,
-                                   int globalLimit,
-                                   double localLimit)
+                                   const QVariantList& pitch,
+                                   const int targetLength)
 {
-    LOG_DEBUG() << "Start: getSpecDP - pattern.size=" << patternSpectrum.size() << ", signal.size=" << signalSpectrum.size() << ", globalLimit=" << globalLimit << ", localLimit=" << localLimit;
+    LOG_DEBUG() << "Start: getSpecDP - pattern.size=" << patternSpectrum.size() << ", signal.size=" << signalSpectrum.size() << ", pitch.size=" << pitch.size();
 
-    QVariantList maskDataList;
+    QVariantList pathDataList;
 
     if (patternSpectrum.isEmpty()) {
         LOG_WARNING() << "Pattern spectrum is empty";
-        return maskDataList;
+        return pathDataList;
     }
 
     if (signalSpectrum.isEmpty()) {
         LOG_WARNING() << "Signal spectrum is empty";
-        return maskDataList;
+        return pathDataList;
+    }
+
+    if (pitch.isEmpty()) {
+        LOG_WARNING() << "Pitch data is empty";
+        return pathDataList;
     }
 
     // Convert patternSpectrum QVariantList -> std::vector<std::vector<double>>
@@ -144,30 +60,28 @@ QVariantList WavFileApi::getSpecDP(const QVariantList& patternSpectrum,
         signalSpec.push_back(frameVec);
     }
 
-    // Create SpecDPService and compute DP mask
-    SpecDPService dpService(patternSpec, signalSpec, globalLimit, localLimit);
-
-    DPStateStack* mask = dpService.getSignalMask();
-    if (!mask) {
-        LOG_WARNING() << "DP mask is empty";
-        return maskDataList;
-    }
-
-    // Iterate over mask linked list and collect points
-    DPStateStack* step = mask;
-    while (step != nullptr) {
-        DPStateOperation op = step->value.operation;
-        if (op == trDiag || op == trVert) {
-            QVariantMap point;
-            point["signalPos"] = step->value.signalPos;
-            point["patternPos"] = step->value.patternPos;
-            maskDataList.append(point);
+    // Convert pitch QVariantList to std::vector<double>
+    std::vector<double> pitchVec;
+    pitchVec.reserve(pitch.size());
+    for (const auto& val : pitch) {
+        if (val.canConvert<QPointF>()) {
+            pitchVec.push_back(val.toPointF().y());
+        } else {
+            pitchVec.push_back(val.toDouble());
         }
-        step = step->next;
+    }
+    
+    // Create DPService and compute signal path
+    DPService dpService(patternSpec, signalSpec);
+    dpService.compute();
+    std::vector<double> pitchTransformed = dpService.applyPathToVector(pitchVec, targetLength); // Apply DP path to pitch vector
+
+    for (size_t i = 0; i < pitchTransformed.size(); ++i) {
+        pathDataList.append(QPointF(i, pitchTransformed[i]));
     }
 
-    LOG_DEBUG() << "Finish: getSpecDP - mask points=" << maskDataList.size();
-    return maskDataList;
+    LOG_DEBUG() << "Finish: getSpecDP - path points=" << pathDataList.size();
+    return pathDataList;
 }
 
 WavFileApi::WavFileApi(QObject *parent) : QObject(parent)

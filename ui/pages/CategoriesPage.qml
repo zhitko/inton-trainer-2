@@ -16,7 +16,7 @@ Page {
     property var allFolders: []
 
     Component.onCompleted: {
-        allFolders = fileApi.getFolders("data/templates");
+        allFolders = fileApi.getFolders("data/patterns");
     }
 
     FileApi {
@@ -56,7 +56,7 @@ Page {
                 onClicked: {
                     console.log("Clicked category:", modelData);
                     stackView.push("TemplatesPage.qml", {
-                        path: "data/templates/" + modelData
+                        path: "data/patterns/" + modelData
                     });
                 }
             }

@@ -164,7 +164,7 @@ ApplicationWindow {
                 }
             }
             ItemDelegate {
-                text: qsTr("Templates")
+                text: qsTr("Patterns")
                 width: parent.width - parent.padding
                 onClicked: {
                     stackView.push("pages/TemplatesPage.qml");

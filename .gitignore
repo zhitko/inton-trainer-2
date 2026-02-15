@@ -85,3 +85,4 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 /build*/
+application.log

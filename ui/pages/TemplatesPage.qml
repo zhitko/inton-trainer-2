@@ -8,9 +8,9 @@ import "../utils"
 
 Page {
     id: templatesPage
-    title: qsTr("Templates")
+    title: qsTr("Patterns")
 
-    property string path: "data/templates"
+    property string path: "data/patterns"
 
     property var allFiles: []
 
@@ -32,7 +32,7 @@ Page {
             id: searchField
         }
 
-        // Templates List
+        // Patterns List
         ListView {
             id: listView
             Layout.fillWidth: true
@@ -73,7 +73,7 @@ Page {
                 onClicked: {
                     console.log("Clicked template:", modelData.filePath);
                     stackView.push("TrainingPage.qml", {
-                        referenceFilePath: templatesPage.path + "/" + modelData.filePath
+                        referenceFilePath: fileApi.getApplicationDirPath() + "/" + templatesPage.path + "/" + modelData.filePath
                     });
                 }
             }

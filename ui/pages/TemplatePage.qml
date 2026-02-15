@@ -19,6 +19,7 @@ Page {
     property var loadedCuePoints: []
     property var loadedWaveData: []
     property var refPatternData: []
+    property var refPitchData: []
 
     title: refFilePath.substring(refFilePath.lastIndexOf('/') + 1)
 
@@ -139,13 +140,8 @@ Page {
 
         // Run DP comparison
         Logger.debug("Calculating DP...");
-        let dpResult = wavFileApi.getSpecDP(refPatternData, cepstrData);
-        Logger.debug("DP result length: " + dpResult.length);
-
-        // Calculate UMP
-        Logger.debug("Calculating scaled pitch...");
-        let scaledPitch = wavFileApi.getScaledPitch(dpResult, pitchData);
-        Logger.debug("Scaled pitch calculated with " + scaledPitch.length + " points");
+        let scaledPitch = wavFileApi.getSpecDP(refPatternData, cepstrData, pitchData, refPitchData.length);
+        Logger.debug("DP result length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
         let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
@@ -166,13 +162,13 @@ Page {
         refPitchWaveFormGraph.waveData = [pitchOriginalData];
 
         Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
-        let pitchData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
-        Logger.debug("Pitch data length: " + pitchData.length);
-        refPitchProcessedWaveFormGraph.waveData = [pitchData];
+        refPitchData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        Logger.debug("Pitch data length: " + refPitchData.length);
+        refPitchProcessedWaveFormGraph.waveData = [refPitchData];
 
         // Calculate UMP
         Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(pitchData, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        let umpResult = wavFileApi.getUMP(refPitchData, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
         refUmpWaveFormGraph.waveData = umpResult.ump;
         refUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
