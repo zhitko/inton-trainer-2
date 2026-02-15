@@ -13,14 +13,15 @@ Page {
     id: root
     title: qsTr("Categories")
 
+    property string path: "data/patterns"
     property var allFolders: []
-
-    Component.onCompleted: {
-        allFolders = fileApi.getFolders("data/patterns");
-    }
 
     FileApi {
         id: fileApi
+    }
+
+    Component.onCompleted: {
+        allFolders = fileApi.getFolders(root.path);
     }
 
     ColumnLayout {
@@ -55,9 +56,16 @@ Page {
                 itemIndex: index
                 onClicked: {
                     console.log("Clicked category:", modelData);
-                    stackView.push("TemplatesPage.qml", {
-                        path: "data/patterns/" + modelData
-                    });
+                    let subFolders = fileApi.getFolders(root.path + "/" + modelData);
+                    if (subFolders.length > 0) {
+                        stackView.push("CategoriesPage.qml", {
+                            path: root.path + "/" + modelData
+                        });
+                    } else {
+                        stackView.push("TemplatesPage.qml", {
+                            path: root.path + "/" + modelData
+                        });
+                    }
                 }
             }
         }
