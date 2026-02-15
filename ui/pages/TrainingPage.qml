@@ -8,6 +8,7 @@ import Qt.labs.platform 1.1
 
 import by.intontrainer.wavfile 1.0
 import by.intontrainer.file 1.0
+import by.intontrainer.analysis 1.0
 
 import "../components"
 import "../utils"
@@ -27,9 +28,17 @@ Page {
     property var referencePitchData: null
 
     property var userUMP: null
+    property double referenceRange: 0
+    property double userRange: 0
+    property double rangeSimilarity: 0
+    property double shapeSimilarity: 0
 
     WavFileApi {
         id: wavFileApi
+    }
+
+    AnalysisApi {
+        id: analysisApi
     }
 
     FileApi {
@@ -87,6 +96,13 @@ Page {
 
         umpGraph.waveData = [referenceUMP.ump, userUMP.ump];
         umpGraph.cuePoints = referenceUMP.cuePoints;
+
+        // Compare UMPs using AnalysisApi
+        var cmp = analysisApi.compareUMP(referenceUMP.ump, userUMP.ump, window.settingsApi.minF0, window.settingsApi.maxF0);
+        root.referenceRange = cmp.referenceRange || 0;
+        root.userRange = cmp.userRange || 0;
+        root.rangeSimilarity = cmp.rangeSimilarity || 0;
+        root.shapeSimilarity = cmp.shapeSimilarity || 0;
     }
 
     background: Rectangle {
@@ -134,7 +150,7 @@ Page {
                             color: Theme.onSecondaryContainer(root.Material.theme)
                         }
                         Text {
-                            text: "83%"
+                            text: Math.round(root.rangeSimilarity) + "%"
                             font.pixelSize: 28
                             font.weight: 700
                             color: Theme.primary(root.Material.theme)
@@ -157,7 +173,7 @@ Page {
                             color: Theme.onSurfaceVariant(root.Material.theme)
                         }
                         Text {
-                            text: "88%"
+                            text: Math.round(root.shapeSimilarity) + "%"
                             font.pixelSize: 28
                             font.weight: 700
                             color: Theme.primary(root.Material.theme)
@@ -187,7 +203,7 @@ Page {
                         color: Theme.surfaceContainerHighest(root.Material.theme)
                         radius: 4
                         Rectangle {
-                            width: parent.width * 0.9
+                            width: parent.width * (root.referenceRange / 100.0)
                             height: parent.height
                             color: Theme.primary(root.Material.theme)
                             radius: 4
@@ -211,7 +227,7 @@ Page {
                         color: Theme.surfaceContainerHighest(root.Material.theme)
                         radius: 4
                         Rectangle {
-                            width: parent.width * 0.0
+                            width: parent.width * (root.userRange / 100.0)
                             height: parent.height
                             color: Theme.secondary(root.Material.theme)
                             radius: 4

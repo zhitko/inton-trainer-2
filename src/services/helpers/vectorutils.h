@@ -139,6 +139,22 @@ public:
      * @return Smoothed vector.
      */
     static std::vector<double> smooth(const std::string& type, const std::vector<double>& data, double param1, double param2 = 0.0);
+
+    /**
+     * @brief Calculates the Pearson correlation coefficient between two vectors.
+     * 
+     * @param vec1 First vector.
+     * @param vec2 Second vector (must have same length as vec1).
+     * @return Pearson correlation coefficient in range [-1, 1].
+     *         Returns 0.0 if vectors have different sizes or are empty.
+     * 
+     * @details Computes: r = Σ((x-μx)(y-μy)) / √(Σ(x-μx)² * Σ(y-μy)²)
+     *          where μx and μy are the means of the vectors.
+     *          - r = 1: perfect positive correlation
+     *          - r = 0: no correlation
+     *          - r = -1: perfect negative correlation
+     */
+    static double pearsonCorrelation(const std::vector<double>& vec1, const std::vector<double>& vec2);
 };
 
 #endif // VECTORUTILS_H

@@ -16,6 +16,8 @@ qt_add_executable(appinton-trainer-2
     src/api/fileapi.cpp
     src/api/wavfileapi.h
     src/api/wavfileapi.cpp
+    src/api/analysisapi.h
+    src/api/analysisapi.cpp
     src/api/settingsapi.h
     src/api/settingsapi.cpp
     src/api/qmllogger.h

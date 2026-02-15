@@ -136,3 +136,59 @@ UMPResult UMPService::getUMP(
     out.processedCuePoints = std::move(processedCuePoints);
     return out;
 }
+
+UMPComparison UMPService::compareUMP(
+    const std::vector<double>& referenceUmp,
+    const std::vector<double>& userUmp,
+    double fullMin,
+    double fullMax
+)
+{
+    UMPComparison result = {0.0, 0.0, 0.0, 0.0};
+
+    // Validate inputs
+    if (referenceUmp.empty() || userUmp.empty() || 
+        referenceUmp.size() != userUmp.size() ||
+        fullMin >= fullMax) {
+        LOG_WARNING() << "compareUMP: Invalid input - reference size=" << referenceUmp.size()
+                      << ", user size=" << userUmp.size()
+                      << ", fullMin=" << fullMin << ", fullMax=" << fullMax;
+        return result;
+    }
+
+    const double fullRange = fullMax - fullMin;
+
+    // Calculate min/max values for each UMP
+    auto refMin = *std::min_element(referenceUmp.begin(), referenceUmp.end());
+    auto refMax = *std::max_element(referenceUmp.begin(), referenceUmp.end());
+    auto userMin = *std::min_element(userUmp.begin(), userUmp.end());
+    auto userMax = *std::max_element(userUmp.begin(), userUmp.end());
+
+    // Calculate range spans as percentage of full range
+    double refRangeSpan = (refMax - refMin) / fullRange;
+    double userRangeSpan = (userMax - userMin) / fullRange;
+
+    // Clamp to [0, 1] and scale to [0, 100]
+    result.referenceRange = std::min(100.0, refRangeSpan * 100.0);
+    result.userRange = std::min(100.0, userRangeSpan * 100.0);
+
+    // Calculate range similarity: 100 - abs difference in range percentages
+    double rangeDifference = std::abs(result.referenceRange - result.userRange);
+    result.rangeSimilarity = std::max(0.0, 100.0 - rangeDifference);
+
+    // Calculate shape similarity using Pearson correlation coefficient
+    double correlation = VectorUtils::pearsonCorrelation(referenceUmp, userUmp);
+
+    // Convert correlation from [-1, 1] to [0, 100]
+    // -1 (completely opposite) -> 0
+    // 0 (no correlation) -> 50
+    // 1 (perfect match) -> 100
+    result.shapeSimilarity = (correlation + 1.0) * 50.0;
+
+    LOG_DEBUG() << "compareUMP completed: refRange=" << result.referenceRange
+                << "%, userRange=" << result.userRange
+                << "%, rangeSim=" << result.rangeSimilarity
+                << "%, shapeSim=" << result.shapeSimilarity << "%";
+
+    return result;
+}
