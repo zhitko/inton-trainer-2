@@ -314,31 +314,32 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
 
     // Call UMPService
     LOG_DEBUG() << "  Calling UMPService::getUMP...";
-    std::vector<double> umpVec = UMPService::getUMP(pitchInterpolationType.toStdString(), pitchVec, cuePointsVec, pLength, nLength, tLength, waveDataSize);
-    LOG_DEBUG() << "  UMP result size:" << umpVec.size();
+    UMPResult umpResult = UMPService::getUMP(pitchInterpolationType.toStdString(), pitchVec, cuePointsVec, pLength, nLength, tLength, waveDataSize);
+    LOG_DEBUG() << "  UMP result size:" << umpResult.ump.size();
 
     // Convert result back to QVariantList (as QPointF for graph)
     QVariantList umpData;
-    for (size_t i = 0; i < umpVec.size(); ++i) {
-        umpData.append(QPointF(i, umpVec[i]));
+    for (size_t i = 0; i < umpResult.ump.size(); ++i) {
+        umpData.append(QPointF(i, umpResult.ump[i]));
     }
     result["ump"] = umpData;
     LOG_DEBUG() << "  UMP data points created:" << umpData.size();
 
-    // Create modified cue points
+    // Create modified cue points from processedCuePoints returned by UMPService
     QVariantList modifiedCuePoints;
     int position = 0;
-    for (size_t i = 0; i < cuePointsVec.size(); ++i) {
+    for (size_t i = 0; i < umpResult.processedCuePoints.size(); ++i) {
+        const CuePointData& cp = umpResult.processedCuePoints[i];
         int length = nLength;
-        if (cuePointsVec[i].type == CuePointType::PRE_NUCLEUS) {
+        if (cp.type == CuePointType::PRE_NUCLEUS) {
             length = pLength;
-        } else if (cuePointsVec[i].type == CuePointType::POST_NUCLEUS) {
+        } else if (cp.type == CuePointType::POST_NUCLEUS) {
             length = tLength;
         }
         
         QVariantMap cpMap;
-        cpMap["id"] = cuePointsVec[i].id;
-        cpMap["label"] = QString::fromStdString(cuePointsVec[i].label);
+        cpMap["id"] = cp.id;
+        cpMap["label"] = QString::fromStdString(cp.label);
         cpMap["position"] = static_cast<uint>(position);
         cpMap["length"] = static_cast<uint>(length);
         modifiedCuePoints.append(cpMap);
