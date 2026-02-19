@@ -144,7 +144,7 @@ Page {
         Logger.debug("DP result length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
 
         userUmpWaveFormGraph.waveData = umpResult.ump;
@@ -166,9 +166,20 @@ Page {
         Logger.debug("Pitch data length: " + refPitchData.length);
         refPitchProcessedWaveFormGraph.waveData = [refPitchData];
 
+        // Scale loadedCuePoints to match pitch data length
+        let scaledCuePoints = loadedCuePoints.map(cp => {
+            return {
+                position: Math.round(cp.position * refPitchData.length / loadedWaveData.length),
+                label: cp.label,
+                length: Math.round(cp.length * refPitchData.length / loadedWaveData.length)
+            };
+        });
+        refPitchProcessedWaveFormGraph.cuePoints = scaledCuePoints;
+        refPitchWaveFormGraph.cuePoints = scaledCuePoints;
+
         // Calculate UMP
         Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(refPitchData, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        let umpResult = wavFileApi.getUMP(refPitchData, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
         refUmpWaveFormGraph.waveData = umpResult.ump;
         refUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
