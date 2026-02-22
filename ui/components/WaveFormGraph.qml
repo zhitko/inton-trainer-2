@@ -262,7 +262,7 @@ Item {
                 }
 
                 ctx.strokeStyle = colors[d % colors.length];
-                ctx.lineWidth = 1.5;
+                ctx.lineWidth = 2.5;
                 ctx.lineJoin = "round";
                 ctx.stroke();
             }
