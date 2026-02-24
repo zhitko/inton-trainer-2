@@ -1,6 +1,7 @@
 #include "amplitudeservice.h"
 #include <cmath>
 #include "helpers/logger.h"
+#include "helpers/vectorutils.h"
 
 AmplitudeService::AmplitudeService() {
     LOG_DEBUG() << "Start: AmplitudeService constructor";
@@ -37,6 +38,9 @@ std::vector<double> AmplitudeService::getAmplitude(
         result.push_back(rms);
     }
 
+    // normalize amplitude to [0,1]
+    result = VectorUtils::normalizeFromTo(0.0, 1.0, result);
+
     LOG_DEBUG() << "Finish: getAmplitude - result.size=" << result.size();
     return result;
 }
@@ -59,6 +63,9 @@ std::vector<double> AmplitudeService::getAmplitudeDerivative(
             deriv.push_back(amp[i] - amp[i - 1]);
         }
     }
+
+    // normalize derivative vector as well
+    deriv = VectorUtils::normalizeFromTo(0.0, 1.0, deriv);
 
     LOG_DEBUG() << "Finish: getAmplitudeDerivative - deriv.size=" << deriv.size();
     return deriv;
