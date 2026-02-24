@@ -26,6 +26,8 @@ Page {
     property var referenceCepstrData: null
     property var referenceWaveData: null
     property var referencePitchData: null
+    property var referenceAmplitudeData: null
+    property var referenceAmplitudeDerivData: null
 
     property var userUMP: null
     property double referenceRange: 0
@@ -58,6 +60,9 @@ Page {
 
         referencePitchData = wavFileApi.getPitch(referenceWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
 
+        referenceAmplitudeData = wavFileApi.getAmplitude(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        referenceAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+
         referenceUMP = wavFileApi.getUMP(referencePitchData, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
 
         umpGraph.waveData = referenceUMP.ump;
@@ -79,6 +84,9 @@ Page {
 
         let pitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
 
+        let userAmplitudeData = wavFileApi.getAmplitude(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        let userAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+
         // Extract cepstrum data for user
         Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
         let userCepstrData = wavFileApi.getCepstr(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
@@ -86,13 +94,12 @@ Page {
 
         // Generate UMP from DP result
         Logger.debug("Calculating DP...");
-        let scaledPitch = wavFileApi.getSpecDP(referenceCepstrData, userCepstrData, pitchData, referencePitchData.length);
+        let scaledPitch = wavFileApi.getDP(referenceAmplitudeData, referenceAmplitudeDerivData, referencePitchData, referenceCepstrData, userAmplitudeData, userAmplitudeDerivData, pitchData, userCepstrData, pitchData, referencePitchData.length);
         Logger.debug("DP result length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
         userUMP = wavFileApi.getUMP(scaledPitch, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
         Logger.debug("UMP calculated with " + userUMP.cuePoints.length + " cue points");
-
 
         umpGraph.waveData = [referenceUMP.ump, userUMP.ump];
         umpGraph.cuePoints = referenceUMP.cuePoints;
@@ -341,14 +348,19 @@ Page {
                 onAccepted: {
                     console.log("testFileDialog accepted. folder: " + testFileDialog.folder + ", file: " + testFileDialog.file + ", fileUrl: " + testFileDialog.fileUrl);
                     var selectedPath = null;
-                    if (testFileDialog.file !== undefined && testFileDialog.file !== "") selectedPath = testFileDialog.file;
-                    else if (testFileDialog.fileUrl) selectedPath = testFileDialog.fileUrl;
-                    else if (testFileDialog.fileUrls && testFileDialog.fileUrls.length > 0) selectedPath = testFileDialog.fileUrls[0];
+                    if (testFileDialog.file !== undefined && testFileDialog.file !== "")
+                        selectedPath = testFileDialog.file;
+                    else if (testFileDialog.fileUrl)
+                        selectedPath = testFileDialog.fileUrl;
+                    else if (testFileDialog.fileUrls && testFileDialog.fileUrls.length > 0)
+                        selectedPath = testFileDialog.fileUrls[0];
 
                     // Convert QUrl to string/local path if needed
                     if (selectedPath && typeof selectedPath === "object") {
-                        if (selectedPath.toLocalFile) selectedPath = selectedPath.toLocalFile();
-                        else if (selectedPath.toString) selectedPath = selectedPath.toString();
+                        if (selectedPath.toLocalFile)
+                            selectedPath = selectedPath.toLocalFile();
+                        else if (selectedPath.toString)
+                            selectedPath = selectedPath.toString();
                     }
 
                     if (selectedPath && typeof selectedPath === "string") {
@@ -359,7 +371,8 @@ Page {
                             selStr = selStr.replace(/^file:\/+/g, "");
                             // For linux add leading slash (windows path started with drive letter 'Z:/')
                             console.log("selStr.indexOf(':/') = " + selStr.indexOf(":/"));
-                            if (selStr.indexOf(":/") === -1) selStr = "/" + selStr;
+                            if (selStr.indexOf(":/") === -1)
+                                selStr = "/" + selStr;
                             try {
                                 selStr = decodeURIComponent(selStr);
                             } catch (e) {

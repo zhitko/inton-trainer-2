@@ -8,8 +8,8 @@
 class DPService {
 public:
     DPService(
-        std::vector<std::vector<double>> templateData,
-        std::vector<std::vector<double>> signalData
+        std::vector<std::vector<std::vector<double>>> templateData,
+        std::vector<std::vector<std::vector<double>>> signalData
     );
     ~DPService();
 
@@ -19,9 +19,12 @@ public:
     std::vector<double> applyPathToVector(const std::vector<double>& input, const int targetLength);
 
 private:
+    void normalizeData();
+    std::vector<std::vector<double>> scaleStream(const std::vector<std::vector<double>>& stream, size_t targetLength);
+
     // Template and signal data for dynamic programming
-    std::vector<std::vector<double>> templateData;
-    std::vector<std::vector<double>> signalData;
+    std::vector<std::vector<std::vector<double>>> templateData;
+    std::vector<std::vector<std::vector<double>>> signalData;
 
     // Distance matrix for dynamic programming
     std::vector<std::vector<double>> distanceMatrix;

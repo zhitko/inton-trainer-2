@@ -20,6 +20,8 @@ Page {
     property var loadedWaveData: []
     property var refPatternData: []
     property var refPitchData: []
+    property var refAmplitudeData: []
+    property var refAmplitudeDerivData: []
 
     title: refFilePath.substring(refFilePath.lastIndexOf('/') + 1)
 
@@ -171,7 +173,7 @@ Page {
 
         // Run DP comparison
         Logger.debug("Calculating DP...");
-        let scaledPitch = wavFileApi.getSpecDP(refPatternData, cepstrData, pitchData, refPitchData.length);
+        let scaledPitch = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refPitchData, root.refPatternData, ampData, ampDeriv, pitchData, cepstrData, pitchData, refPitchData.length);
         Logger.debug("DP result length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
@@ -189,10 +191,12 @@ Page {
         Logger.debug("Extracting amplitude data");
         let ampData = wavFileApi.getAmplitude(refWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
         refAmplitudeWaveFormGraph.waveData = [ampData];
+        root.refAmplitudeData = ampData;
 
         Logger.debug("Extracting amplitude derivative data");
         let ampDeriv = wavFileApi.getAmplitudeDerivative(refWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
         refAmplitudeDerivWaveFormGraph.waveData = [ampDeriv];
+        root.refAmplitudeDerivData = ampDeriv;
         // Extract pitch data
         Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
         let pitchOriginalData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None", "None");

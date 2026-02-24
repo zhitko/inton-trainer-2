@@ -6,10 +6,48 @@
 
 
 DPService::DPService(
-    std::vector<std::vector<double>> templateData,
-    std::vector<std::vector<double>> signalData
+    std::vector<std::vector<std::vector<double>>> templateData,
+    std::vector<std::vector<std::vector<double>>> signalData
 ) : templateData(templateData), signalData(signalData) {
-    // Constructor implementation (if needed)
+    normalizeData();
+}
+
+void DPService::normalizeData() {
+    if (!templateData.empty()) {
+        size_t targetLength = templateData[0].size();
+        for (size_t k = 1; k < templateData.size(); ++k) {
+            if (templateData[k].size() != targetLength) {
+                templateData[k] = scaleStream(templateData[k], targetLength);
+            }
+        }
+    }
+    
+    if (!signalData.empty()) {
+        size_t targetLength = signalData[0].size();
+        for (size_t k = 1; k < signalData.size(); ++k) {
+            if (signalData[k].size() != targetLength) {
+                signalData[k] = scaleStream(signalData[k], targetLength);
+            }
+        }
+    }
+}
+
+std::vector<std::vector<double>> DPService::scaleStream(const std::vector<std::vector<double>>& stream, size_t targetLength) {
+    if (stream.empty() || targetLength == 0) {
+        return stream;
+    }
+    
+    std::vector<std::vector<double>> transformed(targetLength);
+    double scalingFactor = static_cast<double>(stream.size()) / targetLength;
+    for (size_t i = 0; i < targetLength; ++i) {
+        size_t inputIndex = static_cast<size_t>(i * scalingFactor);
+        if (inputIndex < stream.size()) {
+            transformed[i] = stream[inputIndex];
+        } else {
+            transformed[i] = stream.back();
+        }
+    }
+    return transformed;
 }
 
 DPService::~DPService() {
@@ -18,7 +56,7 @@ DPService::~DPService() {
 
 void DPService::compute() {
     // Example implementation of the compute function
-    if (templateData.empty() || signalData.empty()) {
+    if (templateData.empty() || signalData.empty() || templateData[0].empty() || signalData[0].empty()) {
         return; // Handle empty data case
     }
 
@@ -46,7 +84,18 @@ void DPService::computeDistanceMatrix() {
 
     for (int i = 0; i < templateLength; ++i) {
         for (int j = 0; j < signalLength; ++j) {
-            distanceMatrix[i][j] = calculateDistance(templateData[i], signalData[j]);
+            double totalDistance = 0.0;
+            int count = 0;
+            
+            size_t minStreams = std::min(templateData.size(), signalData.size());
+            for (size_t k = 0; k < minStreams; ++k) {
+                if (i < templateData[k].size() && j < signalData[k].size()) {
+                    totalDistance += calculateDistance(templateData[k][i], signalData[k][j]);
+                    count++;
+                }
+            }
+            
+            distanceMatrix[i][j] = (count > 0) ? (totalDistance / count) : 0.0;
         }
     }
 }

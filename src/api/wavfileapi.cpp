@@ -71,9 +71,10 @@ QVariantList WavFileApi::getSpecDP(const QVariantList& patternSpectrum,
             pitchVec.push_back(val.toDouble());
         }
     }
-    
     // Create DPService and compute signal path
-    DPService dpService(patternSpec, signalSpec);
+    std::vector<std::vector<std::vector<double>>> patternData = {patternSpec};
+    std::vector<std::vector<std::vector<double>>> signalData = {signalSpec};
+    DPService dpService(patternData, signalData);
     dpService.compute();
     std::vector<double> pitchTransformed = dpService.applyPathToVector(pitchVec, targetLength); // Apply DP path to pitch vector
 
@@ -82,6 +83,86 @@ QVariantList WavFileApi::getSpecDP(const QVariantList& patternSpectrum,
     }
 
     LOG_DEBUG() << "Finish: getSpecDP - path points=" << pathDataList.size();
+    return pathDataList;
+}
+
+QVariantList WavFileApi::getDP(const QVariantList& patternAmplitude,
+                               const QVariantList& patternAmplitudeDerivative,
+                               const QVariantList& patternPitch,
+                               const QVariantList& patternCepstrum,
+                               const QVariantList& signalAmplitude,
+                               const QVariantList& signalAmplitudeDerivative,
+                               const QVariantList& signalPitch,
+                               const QVariantList& signalCepstrum,
+                               const QVariantList& pitchToTransform,
+                               const int targetLength)
+{
+    LOG_DEBUG() << "Start: getDP - pattern data size=" << patternAmplitude.size();
+
+    QVariantList pathDataList;
+
+    if (patternAmplitude.isEmpty() || signalAmplitude.isEmpty() || pitchToTransform.isEmpty()) {
+        LOG_WARNING() << "Input data is empty in getDP";
+        return pathDataList;
+    }
+
+    auto parse1D = [](const QVariantList& list) {
+        std::vector<std::vector<double>> res;
+        res.reserve(list.size());
+        for (const auto& val : list) {
+            if (val.canConvert<QPointF>()) res.push_back({val.toPointF().y()});
+            else res.push_back({val.toDouble()});
+        }
+        return res;
+    };
+
+    auto parse2D = [](const QVariantList& list) {
+        std::vector<std::vector<double>> res;
+        res.reserve(list.size());
+        for (const auto& frameVar : list) {
+            QVariantList frameQ = frameVar.toList();
+            std::vector<double> frameVec;
+            frameVec.reserve(frameQ.size());
+            for (const auto& val : frameQ) {
+                frameVec.push_back(val.toDouble());
+            }
+            res.push_back(frameVec);
+        }
+        return res;
+    };
+
+    std::vector<std::vector<std::vector<double>>> patternData;
+    if (!patternAmplitude.isEmpty()) patternData.push_back(parse1D(patternAmplitude));
+    if (!patternAmplitudeDerivative.isEmpty()) patternData.push_back(parse1D(patternAmplitudeDerivative));
+    if (!patternPitch.isEmpty()) patternData.push_back(parse1D(patternPitch));
+    if (!patternCepstrum.isEmpty()) patternData.push_back(parse2D(patternCepstrum));
+
+    std::vector<std::vector<std::vector<double>>> signalData;
+    if (!signalAmplitude.isEmpty()) signalData.push_back(parse1D(signalAmplitude));
+    if (!signalAmplitudeDerivative.isEmpty()) signalData.push_back(parse1D(signalAmplitudeDerivative));
+    if (!signalPitch.isEmpty()) signalData.push_back(parse1D(signalPitch));
+    if (!signalCepstrum.isEmpty()) signalData.push_back(parse2D(signalCepstrum));
+
+    std::vector<double> pitchVec;
+    pitchVec.reserve(pitchToTransform.size());
+    for (const auto& val : pitchToTransform) {
+        if (val.canConvert<QPointF>()) {
+            pitchVec.push_back(val.toPointF().y());
+        } else {
+            pitchVec.push_back(val.toDouble());
+        }
+    }
+
+    DPService dpService(patternData, signalData);
+    dpService.compute();
+    
+    std::vector<double> pitchTransformed = dpService.applyPathToVector(pitchVec, targetLength);
+
+    for (size_t i = 0; i < pitchTransformed.size(); ++i) {
+        pathDataList.append(QPointF(i, pitchTransformed[i]));
+    }
+
+    LOG_DEBUG() << "Finish: getDP - path points=" << pathDataList.size();
     return pathDataList;
 }
 
