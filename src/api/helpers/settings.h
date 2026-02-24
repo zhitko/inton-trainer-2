@@ -13,13 +13,13 @@ struct AppSettings {
     std::string algorithm = "RAPT";
     double frameShift = 32.0;
     double sampleRate = 8000.0;
-    double minF0 = 50.0;
+    double minF0 = 80.0;
     double maxF0 = 500.0;
     double voicingThreshold = 0;
     std::string pitchNormalization = "min_max";
     std::string pitchInterpolationType = "Linear";
     std::string pitchSmoothing = "Median";
-    int pitchSmoothingWindowSize = 8;
+    int pitchSmoothingWindowSize = 16;
     double pitchGaussianSmoothingSigma = 1.0;
 
     double pitchSplineSmoothingPenalty = 1.0;
