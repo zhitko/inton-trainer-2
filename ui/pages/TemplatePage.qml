@@ -20,6 +20,7 @@ Page {
     property var loadedWaveData: []
     property var refPatternData: []
     property var refPitchData: []
+    property var refLogPitchData: []
     property var refAmplitudeData: []
     property var refAmplitudeDerivData: []
 
@@ -157,6 +158,10 @@ Page {
         Logger.debug("Pitch data length: " + pitchData.length);
         userPitchProcessedWaveFormGraph.waveData = [pitchData];
 
+        Logger.debug("Extracting log pitch data with algorithm: " + window.settingsApi.algorithm);
+        let logPitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        Logger.debug("Log pitch data length: " + logPitchData.length);
+
         // Extract spectrum data
         Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
         let specData = wavFileApi.getSpec(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
@@ -173,7 +178,7 @@ Page {
 
         // Run DP comparison
         Logger.debug("Calculating DP...");
-        let scaledPitch = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refPitchData, root.refPatternData, ampData, ampDeriv, pitchData, cepstrData, pitchData, refPitchData.length);
+        let scaledPitch = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refPatternData, ampData, ampDeriv, logPitchData, cepstrData, pitchData, refLogPitchData.length);
         Logger.debug("DP result length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
@@ -207,6 +212,10 @@ Page {
         refPitchData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
         Logger.debug("Pitch data length: " + refPitchData.length);
         refPitchProcessedWaveFormGraph.waveData = [refPitchData];
+
+        Logger.debug("Extracting log pitch data with algorithm: " + window.settingsApi.algorithm);
+        refLogPitchData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        Logger.debug("Log pitch data length: " + refLogPitchData.length);
 
         // Scale loadedCuePoints to match pitch data length
         let scaledCuePoints = loadedCuePoints.map(cp => {
