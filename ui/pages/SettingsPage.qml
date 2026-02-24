@@ -99,6 +99,24 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
+                            text: qsTr("Show F0")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.showF0
+                            onToggled: ApplicationWindow.window.settingsApi.showF0 = checked
+                        }
+
+                        Label {
+                            text: qsTr("Show Processed Pitch (F0)")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.showProcessedPitch
+                            onToggled: ApplicationWindow.window.settingsApi.showProcessedPitch = checked
+                        }
+
+                        Label {
                             text: qsTr("Algorithm")
                             color: Theme.onSurface(Material.theme)
                         }

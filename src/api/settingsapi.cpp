@@ -371,6 +371,22 @@ bool SettingsApi::showAmplitudeDerivative() const
     return result;
 }
 
+bool SettingsApi::showF0() const
+{
+    LOG_DEBUG() << "Start: showF0";
+    bool result = m_settings.showF0;
+    LOG_DEBUG() << "Finish: showF0 - result=" << result;
+    return result;
+}
+
+bool SettingsApi::showProcessedPitch() const
+{
+    LOG_DEBUG() << "Start: showProcessedPitch";
+    bool result = m_settings.showProcessedPitch;
+    LOG_DEBUG() << "Finish: showProcessedPitch - result=" << result;
+    return result;
+}
+
 void SettingsApi::setAmplitudeWindow(int amplitudeWindow)
 {
     LOG_DEBUG() << "Start: setAmplitudeWindow - amplitudeWindow=" << amplitudeWindow;
@@ -413,6 +429,28 @@ void SettingsApi::setShowAmplitudeDerivative(bool showAmplitudeDerivative)
         emit showAmplitudeDerivativeChanged();
     }
     LOG_DEBUG() << "Finish: setShowAmplitudeDerivative";
+}
+
+void SettingsApi::setShowF0(bool showF0)
+{
+    LOG_DEBUG() << "Start: setShowF0 - showF0=" << showF0;
+    if (m_settings.showF0 != showF0) {
+        m_settings.showF0 = showF0;
+        save();
+        emit showF0Changed();
+    }
+    LOG_DEBUG() << "Finish: setShowF0";
+}
+
+void SettingsApi::setShowProcessedPitch(bool showProcessedPitch)
+{
+    LOG_DEBUG() << "Start: setShowProcessedPitch - showProcessedPitch=" << showProcessedPitch;
+    if (m_settings.showProcessedPitch != showProcessedPitch) {
+        m_settings.showProcessedPitch = showProcessedPitch;
+        save();
+        emit showProcessedPitchChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowProcessedPitch";
 }
 
 void SettingsApi::setPitchGaussianSmoothingSigma(double pitchGaussianSmoothingSigma)

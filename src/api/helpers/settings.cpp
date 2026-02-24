@@ -52,6 +52,8 @@ AppSettings Settings::loadSettings() {
     settings.amplitudeShift = qsettings.value("shift", 512).toInt();
     settings.showAmplitude = qsettings.value("showAmplitude", true).toBool();
     settings.showAmplitudeDerivative = qsettings.value("showAmplitudeDerivative", true).toBool();
+    settings.showF0 = qsettings.value("showF0", true).toBool();
+    settings.showProcessedPitch = qsettings.value("showProcessedPitch", true).toBool();
     qsettings.endGroup();
     
     qsettings.beginGroup("Spectrum");
@@ -103,6 +105,8 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("shift", settings.amplitudeShift);
     qsettings.setValue("showAmplitude", settings.showAmplitude);
     qsettings.setValue("showAmplitudeDerivative", settings.showAmplitudeDerivative);
+    qsettings.setValue("showF0", settings.showF0);
+    qsettings.setValue("showProcessedPitch", settings.showProcessedPitch);
     qsettings.endGroup();
 
     qsettings.beginGroup("Spectrum");

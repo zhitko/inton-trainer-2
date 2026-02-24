@@ -38,6 +38,10 @@ struct AppSettings {
     bool showAmplitude = true;
     bool showAmplitudeDerivative = true;
 
+    // Pitch display
+    bool showF0 = true;
+    bool showProcessedPitch = true;
+
     // Cepstrum
     int cepstrNumOrder = 25;
 };

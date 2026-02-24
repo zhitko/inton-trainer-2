@@ -101,6 +101,12 @@ Page {
         function onAmplitudeShiftChanged() {
             updateData();
         }
+        function onShowF0Changed() {
+            updateData();
+        }
+        function onShowProcessedPitchChanged() {
+            updateData();
+        }
     }
 
     function updateColorScheme() {
@@ -502,70 +508,82 @@ Page {
                         }
                     }
 
-                    Text {
-                        text: qsTr("Pitch (F0)")
-                        font.pixelSize: 16
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
+                    Column {
+                        visible: window.settingsApi.showF0
+                        width: parent.width
+                        spacing: 10
+
+                        Text {
+                            text: qsTr("Pitch (F0)")
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        Text {
+                            text: qsTr("Reference")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        WaveFormGraph {
+                            id: refPitchWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
+
+                        Text {
+                            text: qsTr("User")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        WaveFormGraph {
+                            id: userPitchWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
                     }
 
-                    Text {
-                        text: qsTr("Reference")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                    Column {
+                        visible: window.settingsApi.showProcessedPitch
+                        width: parent.width
+                        spacing: 10
 
-                    WaveFormGraph {
-                        id: refPitchWaveFormGraph
-                        width: parent.width - 80
-                        height: 200
-                    }
+                        Text {
+                            text: qsTr("Processed Pitch (F0)")
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
 
-                    Text {
-                        text: qsTr("User")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                        Text {
+                            text: qsTr("Reference")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
 
-                    WaveFormGraph {
-                        id: userPitchWaveFormGraph
-                        width: parent.width - 80
-                        height: 200
-                    }
+                        WaveFormGraph {
+                            id: refPitchProcessedWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
 
-                    Text {
-                        text: qsTr("Processed Pitch (F0)")
-                        font.pixelSize: 16
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                        Text {
+                            text: qsTr("User")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
 
-                    Text {
-                        text: qsTr("Reference")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
-
-                    WaveFormGraph {
-                        id: refPitchProcessedWaveFormGraph
-                        width: parent.width - 80
-                        height: 200
-                    }
-
-                    Text {
-                        text: qsTr("User")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
-
-                    WaveFormGraph {
-                        id: userPitchProcessedWaveFormGraph
-                        width: parent.width - 80
-                        height: 200
+                        WaveFormGraph {
+                            id: userPitchProcessedWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
                     }
 
                     Text {
