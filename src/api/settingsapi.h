@@ -28,6 +28,8 @@ class SettingsApi : public QObject
     Q_PROPERTY(bool specF0Refinement READ specF0Refinement WRITE setSpecF0Refinement NOTIFY specF0RefinementChanged)
     Q_PROPERTY(bool specUseLogScale READ specUseLogScale WRITE setSpecUseLogScale NOTIFY specUseLogScaleChanged)
     Q_PROPERTY(SpecColorScheme specColorScheme READ specColorScheme WRITE setSpecColorScheme NOTIFY specColorSchemeChanged)
+    Q_PROPERTY(bool showSpectrum READ showSpectrum WRITE setShowSpectrum NOTIFY showSpectrumChanged)
+    Q_PROPERTY(bool showCepstrum READ showCepstrum WRITE setShowCepstrum NOTIFY showCepstrumChanged)
 
     Q_PROPERTY(int cepstrNumOrder READ cepstrNumOrder WRITE setCepstrNumOrder NOTIFY cepstrNumOrderChanged)
 
@@ -115,6 +117,12 @@ public:
     SpecColorScheme specColorScheme() const;
     void setSpecColorScheme(SpecColorScheme specColorScheme);
 
+    bool showSpectrum() const;
+    void setShowSpectrum(bool showSpectrum);
+
+    bool showCepstrum() const;
+    void setShowCepstrum(bool showCepstrum);
+
     int cepstrNumOrder() const;
     void setCepstrNumOrder(int cepstrNumOrder);
 
@@ -142,6 +150,8 @@ signals:
     void specF0RefinementChanged();
     void specUseLogScaleChanged();
     void specColorSchemeChanged();
+    void showSpectrumChanged();
+    void showCepstrumChanged();
     void cepstrNumOrderChanged();
 
 private:

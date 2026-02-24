@@ -83,6 +83,12 @@ Page {
         function onCepstrNumOrderChanged() {
             updateData();
         }
+        function onShowSpectrumChanged() {
+            updateData();
+        }
+        function onShowCepstrumChanged() {
+            updateData();
+        }
     }
 
     function updateColorScheme() {
@@ -313,70 +319,82 @@ Page {
                         showLabel: true
                     }
 
-                    Text {
-                        text: qsTr("Spectrum")
-                        font.pixelSize: 16
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
-
-                    Text {
-                        text: qsTr("Reference")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
-
-                    Spectrogram2DGraph {
-                        id: refSpectrumGraph
+                    Column {
+                        visible: window.settingsApi.showSpectrum
                         width: parent.width
-                        height: 400
+                        spacing: 10
+
+                        Text {
+                            text: qsTr("Spectrum")
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        Text {
+                            text: qsTr("Reference")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        Spectrogram2DGraph {
+                            id: refSpectrumGraph
+                            width: parent.width
+                            height: 400
+                        }
+
+                        Text {
+                            text: qsTr("User")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        Spectrogram2DGraph {
+                            id: userSpectrumGraph
+                            width: parent.width
+                            height: 400
+                        }
                     }
 
-                    Text {
-                        text: qsTr("User")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
-
-                    Spectrogram2DGraph {
-                        id: userSpectrumGraph
+                    Column {
+                        visible: window.settingsApi.showCepstrum
                         width: parent.width
-                        height: 400
-                    }
+                        spacing: 10
 
-                    Text {
-                        text: qsTr("Cepstrum")
-                        font.pixelSize: 16
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                        Text {
+                            text: qsTr("Cepstrum")
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
 
-                    Text {
-                        text: qsTr("Reference")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                        Text {
+                            text: qsTr("Reference")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
 
-                    Spectrogram2DGraph {
-                        id: refCepstrogramGraph
-                        width: parent.width
-                        height: 400
-                    }
+                        Spectrogram2DGraph {
+                            id: refCepstrogramGraph
+                            width: parent.width
+                            height: 400
+                        }
 
-                    Text {
-                        text: qsTr("User")
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: Theme.onSurface(root.Material.theme)
-                    }
+                        Text {
+                            text: qsTr("User")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
 
-                    Spectrogram2DGraph {
-                        id: userCepstrogramGraph
-                        width: parent.width
-                        height: 400
+                        Spectrogram2DGraph {
+                            id: userCepstrogramGraph
+                            width: parent.width
+                            height: 400
+                        }
                     }
 
                     Text {

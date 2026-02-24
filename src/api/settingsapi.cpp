@@ -423,6 +423,44 @@ void SettingsApi::setSpecUseLogScale(bool specUseLogScale)
     LOG_DEBUG() << "Finish: setSpecUseLogScale";
 }
 
+bool SettingsApi::showSpectrum() const
+{
+    LOG_DEBUG() << "Start: showSpectrum";
+    bool result = m_settings.showSpectrum;
+    LOG_DEBUG() << "Finish: showSpectrum - result=" << result;
+    return result;
+}
+
+void SettingsApi::setShowSpectrum(bool showSpectrum)
+{
+    LOG_DEBUG() << "Start: setShowSpectrum - showSpectrum=" << showSpectrum;
+    if (m_settings.showSpectrum != showSpectrum) {
+        m_settings.showSpectrum = showSpectrum;
+        save();
+        emit showSpectrumChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowSpectrum";
+}
+
+bool SettingsApi::showCepstrum() const
+{
+    LOG_DEBUG() << "Start: showCepstrum";
+    bool result = m_settings.showCepstrum;
+    LOG_DEBUG() << "Finish: showCepstrum - result=" << result;
+    return result;
+}
+
+void SettingsApi::setShowCepstrum(bool showCepstrum)
+{
+    LOG_DEBUG() << "Start: setShowCepstrum - showCepstrum=" << showCepstrum;
+    if (m_settings.showCepstrum != showCepstrum) {
+        m_settings.showCepstrum = showCepstrum;
+        save();
+        emit showCepstrumChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowCepstrum";
+}
+
 SettingsApi::SpecColorScheme SettingsApi::specColorScheme() const
 {
     LOG_DEBUG() << "Start: specColorScheme";

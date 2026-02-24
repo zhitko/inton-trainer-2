@@ -51,6 +51,8 @@ AppSettings Settings::loadSettings() {
     settings.specF0Refinement = qsettings.value("specF0Refinement", false).toBool();
     settings.specUseLogScale = qsettings.value("specUseLogScale", true).toBool();
     settings.specColorScheme = qsettings.value("specColorScheme", "Viridis").toString().toStdString();
+    settings.showSpectrum = qsettings.value("showSpectrum", false).toBool();
+    settings.showCepstrum = qsettings.value("showCepstrum", false).toBool();
     qsettings.endGroup();
 
     return settings;
@@ -92,6 +94,8 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("specF0Refinement", settings.specF0Refinement);
     qsettings.setValue("specUseLogScale", settings.specUseLogScale);
     qsettings.setValue("specColorScheme", QString::fromStdString(settings.specColorScheme));
+    qsettings.setValue("showSpectrum", settings.showSpectrum);
+    qsettings.setValue("showCepstrum", settings.showCepstrum);
     qsettings.endGroup();
     
     qsettings.sync();

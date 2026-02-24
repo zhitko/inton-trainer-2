@@ -267,6 +267,24 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
+                            text: qsTr("Show Spectrum")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.showSpectrum
+                            onToggled: ApplicationWindow.window.settingsApi.showSpectrum = checked
+                        }
+
+                        Label {
+                            text: qsTr("Show Cepstrum")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.showCepstrum
+                            onToggled: ApplicationWindow.window.settingsApi.showCepstrum = checked
+                        }
+
+                        Label {
                             text: qsTr("FFT Length")
                             color: Theme.onSurface(Material.theme)
                         }
