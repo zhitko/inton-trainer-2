@@ -2,14 +2,15 @@ import QtQuick 6.8
 import QtQuick.Controls 6.8
 import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material 6.8
+import QtQuick.Window
 
 import by.intontrainer.settings 1.0
 import "utils"
 
 ApplicationWindow {
     id: window
-    width: 490
-    height: 680
+    width: Screen.width ? Math.min(640, Screen.width - 200) : 640
+    height: Screen.height ? Math.min(1024, Screen.height - 200) : 1024
     visible: true
     title: qsTr("Inton Trainer")
 
@@ -268,8 +269,8 @@ ApplicationWindow {
         TabButton {
             id: homeTabButton
             onClicked: {
-                stackView.clear()
-                stackView.push("pages/HomePage.qml")
+                stackView.clear();
+                stackView.push("pages/HomePage.qml");
             }
             font.family: Icons.familyRegular
             font.pointSize: 20
