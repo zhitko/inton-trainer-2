@@ -200,6 +200,11 @@ void SettingsApi::load()
     emit pitchSmoothingWindowSizeChanged();
     emit pitchGaussianSmoothingSigmaChanged();
 
+    emit amplitudeWindowChanged();
+    emit amplitudeShiftChanged();
+    emit showAmplitudeChanged();
+    emit showAmplitudeDerivativeChanged();
+
     emit pitchSplineSmoothingPenaltyChanged();
     emit specFftLengthChanged();
     emit specF0RefinementChanged();
@@ -332,6 +337,82 @@ double SettingsApi::pitchGaussianSmoothingSigma() const
     double result = m_settings.pitchGaussianSmoothingSigma;
     LOG_DEBUG() << "Finish: pitchGaussianSmoothingSigma - result=" << result;
     return result;
+}
+
+int SettingsApi::amplitudeWindow() const
+{
+    LOG_DEBUG() << "Start: amplitudeWindow";
+    int result = m_settings.amplitudeWindow;
+    LOG_DEBUG() << "Finish: amplitudeWindow - result=" << result;
+    return result;
+}
+
+int SettingsApi::amplitudeShift() const
+{
+    LOG_DEBUG() << "Start: amplitudeShift";
+    int result = m_settings.amplitudeShift;
+    LOG_DEBUG() << "Finish: amplitudeShift - result=" << result;
+    return result;
+}
+
+bool SettingsApi::showAmplitude() const
+{
+    LOG_DEBUG() << "Start: showAmplitude";
+    bool result = m_settings.showAmplitude;
+    LOG_DEBUG() << "Finish: showAmplitude - result=" << result;
+    return result;
+}
+
+bool SettingsApi::showAmplitudeDerivative() const
+{
+    LOG_DEBUG() << "Start: showAmplitudeDerivative";
+    bool result = m_settings.showAmplitudeDerivative;
+    LOG_DEBUG() << "Finish: showAmplitudeDerivative - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAmplitudeWindow(int amplitudeWindow)
+{
+    LOG_DEBUG() << "Start: setAmplitudeWindow - amplitudeWindow=" << amplitudeWindow;
+    if (m_settings.amplitudeWindow != amplitudeWindow) {
+        m_settings.amplitudeWindow = amplitudeWindow;
+        save();
+        emit amplitudeWindowChanged();
+    }
+    LOG_DEBUG() << "Finish: setAmplitudeWindow";
+}
+
+void SettingsApi::setAmplitudeShift(int amplitudeShift)
+{
+    LOG_DEBUG() << "Start: setAmplitudeShift - amplitudeShift=" << amplitudeShift;
+    if (m_settings.amplitudeShift != amplitudeShift) {
+        m_settings.amplitudeShift = amplitudeShift;
+        save();
+        emit amplitudeShiftChanged();
+    }
+    LOG_DEBUG() << "Finish: setAmplitudeShift";
+}
+
+void SettingsApi::setShowAmplitude(bool showAmplitude)
+{
+    LOG_DEBUG() << "Start: setShowAmplitude - showAmplitude=" << showAmplitude;
+    if (m_settings.showAmplitude != showAmplitude) {
+        m_settings.showAmplitude = showAmplitude;
+        save();
+        emit showAmplitudeChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowAmplitude";
+}
+
+void SettingsApi::setShowAmplitudeDerivative(bool showAmplitudeDerivative)
+{
+    LOG_DEBUG() << "Start: setShowAmplitudeDerivative - showAmplitudeDerivative=" << showAmplitudeDerivative;
+    if (m_settings.showAmplitudeDerivative != showAmplitudeDerivative) {
+        m_settings.showAmplitudeDerivative = showAmplitudeDerivative;
+        save();
+        emit showAmplitudeDerivativeChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowAmplitudeDerivative";
 }
 
 void SettingsApi::setPitchGaussianSmoothingSigma(double pitchGaussianSmoothingSigma)

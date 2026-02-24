@@ -46,6 +46,14 @@ AppSettings Settings::loadSettings() {
     settings.pitchSplineSmoothingPenalty = qsettings.value("pitchSplineSmoothingPenalty", 10.0).toDouble();
     qsettings.endGroup();
     
+    // Amplitude settings
+    qsettings.beginGroup("Amplitude");
+    settings.amplitudeWindow = qsettings.value("window", 1024).toInt();
+    settings.amplitudeShift = qsettings.value("shift", 512).toInt();
+    settings.showAmplitude = qsettings.value("showAmplitude", true).toBool();
+    settings.showAmplitudeDerivative = qsettings.value("showAmplitudeDerivative", true).toBool();
+    qsettings.endGroup();
+    
     qsettings.beginGroup("Spectrum");
     settings.specFftLength = qsettings.value("specFftLength", 2048).toInt();
     settings.specF0Refinement = qsettings.value("specF0Refinement", false).toBool();
@@ -87,6 +95,14 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("pitchGaussianSmoothingSigma", settings.pitchGaussianSmoothingSigma);
 
     qsettings.setValue("pitchSplineSmoothingPenalty", settings.pitchSplineSmoothingPenalty);
+    qsettings.endGroup();
+
+    // Amplitude settings
+    qsettings.beginGroup("Amplitude");
+    qsettings.setValue("window", settings.amplitudeWindow);
+    qsettings.setValue("shift", settings.amplitudeShift);
+    qsettings.setValue("showAmplitude", settings.showAmplitude);
+    qsettings.setValue("showAmplitudeDerivative", settings.showAmplitudeDerivative);
     qsettings.endGroup();
 
     qsettings.beginGroup("Spectrum");

@@ -30,6 +30,8 @@ qt_add_executable(appinton-trainer-2
     src/services/pitchservice.cpp
     src/services/specservice.h
     src/services/specservice.cpp
+    src/services/amplitudeservice.h
+    src/services/amplitudeservice.cpp
     src/services/umpservice.h
     src/services/umpservice.cpp
     src/services/dpservice.h

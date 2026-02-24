@@ -32,6 +32,12 @@ struct AppSettings {
     bool showSpectrum = false;
     bool showCepstrum = false;
 
+    // Amplitude analysis
+    int amplitudeWindow = 1024;
+    int amplitudeShift = 512;
+    bool showAmplitude = true;
+    bool showAmplitudeDerivative = true;
+
     // Cepstrum
     int cepstrNumOrder = 25;
 };

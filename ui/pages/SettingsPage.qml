@@ -252,6 +252,79 @@ Page {
                     width: parent.width
                     spacing: 10
 
+                    // Amplitude settings section
+                    Label {
+                        text: qsTr("Amplitude")
+                        font.bold: true
+                        font.pixelSize: 20
+                        color: Theme.primary(Material.theme)
+                        Layout.fillWidth: true
+                    }
+
+                    GridLayout {
+                        columns: 2
+                        columnSpacing: 20
+                        rowSpacing: 10
+                        Layout.fillWidth: true
+
+                        Label {
+                            text: qsTr("Show Amplitude")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.showAmplitude
+                            onToggled: ApplicationWindow.window.settingsApi.showAmplitude = checked
+                        }
+
+                        Label {
+                            text: qsTr("Show Amplitude Derivative")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.showAmplitudeDerivative
+                            onToggled: ApplicationWindow.window.settingsApi.showAmplitudeDerivative = checked
+                        }
+
+                        Label {
+                            text: qsTr("Window")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.amplitudeWindow.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.amplitudeWindow = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                        }
+
+                        Label {
+                            text: qsTr("Shift")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.amplitudeShift.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.amplitudeShift = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                        }
+                    }
+                }
+            }
+
+            Frame {
+                Layout.fillWidth: true
+
+                background: Rectangle {
+                    color: "transparent"
+                    border.color: Theme.outlineVariant(Material.theme)
+                    radius: 8
+                }
+
+                ColumnLayout {
+                    width: parent.width
+                    spacing: 10
+
                     Label {
                         text: qsTr("Spectrum")
                         font.bold: true

@@ -89,6 +89,18 @@ Page {
         function onShowCepstrumChanged() {
             updateData();
         }
+        function onShowAmplitudeChanged() {
+            updateData();
+        }
+        function onShowAmplitudeDerivativeChanged() {
+            updateData();
+        }
+        function onAmplitudeWindowChanged() {
+            updateData();
+        }
+        function onAmplitudeShiftChanged() {
+            updateData();
+        }
     }
 
     function updateColorScheme() {
@@ -118,7 +130,14 @@ Page {
     function updateUserData() {
         if (!userWavFileHandle)
             return;
+        // Extract amplitude data
+        Logger.debug("Extracting amplitude data");
+        let ampData = wavFileApi.getAmplitude(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        userAmplitudeWaveFormGraph.waveData = [ampData];
 
+        Logger.debug("Extracting amplitude derivative data");
+        let ampDeriv = wavFileApi.getAmplitudeDerivative(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        userAmplitudeDerivWaveFormGraph.waveData = [ampDeriv];
         // Extract pitch data
         Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
         let pitchOriginalData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None", "None");
@@ -160,7 +179,14 @@ Page {
     function updateRefData() {
         if (!refWavFileHandle)
             return;
+        // Extract amplitude data
+        Logger.debug("Extracting amplitude data");
+        let ampData = wavFileApi.getAmplitude(refWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        refAmplitudeWaveFormGraph.waveData = [ampData];
 
+        Logger.debug("Extracting amplitude derivative data");
+        let ampDeriv = wavFileApi.getAmplitudeDerivative(refWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        refAmplitudeDerivWaveFormGraph.waveData = [ampDeriv];
         // Extract pitch data
         Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
         let pitchOriginalData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None", "None");
@@ -394,6 +420,85 @@ Page {
                             id: userCepstrogramGraph
                             width: parent.width
                             height: 400
+                        }
+                    }
+
+                    // Amplitude graphs
+                    Column {
+                        visible: window.settingsApi.showAmplitude
+                        width: parent.width
+                        spacing: 10
+
+                        Text {
+                            text: qsTr("Amplitude")
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        Text {
+                            text: qsTr("Reference")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        WaveFormGraph {
+                            id: refAmplitudeWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
+
+                        Text {
+                            text: qsTr("User")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        WaveFormGraph {
+                            id: userAmplitudeWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
+                    }
+
+                    Column {
+                        visible: window.settingsApi.showAmplitudeDerivative
+                        width: parent.width
+                        spacing: 10
+
+                        Text {
+                            text: qsTr("Amplitude Derivative")
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        Text {
+                            text: qsTr("Reference")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        WaveFormGraph {
+                            id: refAmplitudeDerivWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
+                        }
+
+                        Text {
+                            text: qsTr("User")
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: Theme.onSurface(root.Material.theme)
+                        }
+
+                        WaveFormGraph {
+                            id: userAmplitudeDerivWaveFormGraph
+                            width: parent.width - 80
+                            height: 200
                         }
                     }
 

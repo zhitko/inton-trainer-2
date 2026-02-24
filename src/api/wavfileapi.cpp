@@ -6,6 +6,7 @@
 #include "src/services/umpservice.h"
 #include "src/services/dpservice.h"
 #include "src/services/helpers/vectorutils.h"
+#include "src/services/amplitudeservice.h"
 #include <QDebug>
 #include <QPointF>
 #include <limits>
@@ -144,6 +145,62 @@ QVariantList WavFileApi::getWaveData(WaveFile* waveFile)
     
     LOG_DEBUG() << "Finish: getWaveData - size=" << waveData.size();
     return waveData;
+}
+
+QVariantList WavFileApi::getAmplitude(WaveFile* waveFile,
+                                       int window,
+                                       int shift)
+{
+    LOG_DEBUG() << "Start: getAmplitude - window=" << window << ", shift=" << shift;
+    QVariantList result;
+
+    if (!waveFile) {
+        LOG_WARNING() << "getAmplitude called with null WaveFile";
+        return result;
+    }
+
+    std::vector<double> samples = WavFileService::readWaveData(waveFile);
+    if (samples.empty()) {
+        LOG_WARNING() << "getAmplitude - no wave data";
+        return result;
+    }
+
+    AmplitudeService ampService;
+    std::vector<double> amps = ampService.getAmplitude(samples, window, shift);
+    for (size_t i = 0; i < amps.size(); ++i) {
+        result.append(QPointF(i, amps[i]));
+    }
+
+    LOG_DEBUG() << "Finish: getAmplitude - size=" << result.size();
+    return result;
+}
+
+QVariantList WavFileApi::getAmplitudeDerivative(WaveFile* waveFile,
+                                                  int window,
+                                                  int shift)
+{
+    LOG_DEBUG() << "Start: getAmplitudeDerivative - window=" << window << ", shift=" << shift;
+    QVariantList result;
+
+    if (!waveFile) {
+        LOG_WARNING() << "getAmplitudeDerivative called with null WaveFile";
+        return result;
+    }
+
+    std::vector<double> samples = WavFileService::readWaveData(waveFile);
+    if (samples.empty()) {
+        LOG_WARNING() << "getAmplitudeDerivative - no wave data";
+        return result;
+    }
+
+    AmplitudeService ampService;
+    std::vector<double> deriv = ampService.getAmplitudeDerivative(samples, window, shift);
+    for (size_t i = 0; i < deriv.size(); ++i) {
+        result.append(QPointF(i, deriv[i]));
+    }
+
+    LOG_DEBUG() << "Finish: getAmplitudeDerivative - size=" << result.size();
+    return result;
 }
 
 QVariantList WavFileApi::getPitch(WaveFile* waveFile,

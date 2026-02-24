@@ -31,6 +31,11 @@ class SettingsApi : public QObject
     Q_PROPERTY(bool showSpectrum READ showSpectrum WRITE setShowSpectrum NOTIFY showSpectrumChanged)
     Q_PROPERTY(bool showCepstrum READ showCepstrum WRITE setShowCepstrum NOTIFY showCepstrumChanged)
 
+    Q_PROPERTY(int amplitudeWindow READ amplitudeWindow WRITE setAmplitudeWindow NOTIFY amplitudeWindowChanged)
+    Q_PROPERTY(int amplitudeShift READ amplitudeShift WRITE setAmplitudeShift NOTIFY amplitudeShiftChanged)
+    Q_PROPERTY(bool showAmplitude READ showAmplitude WRITE setShowAmplitude NOTIFY showAmplitudeChanged)
+    Q_PROPERTY(bool showAmplitudeDerivative READ showAmplitudeDerivative WRITE setShowAmplitudeDerivative NOTIFY showAmplitudeDerivativeChanged)
+
     Q_PROPERTY(int cepstrNumOrder READ cepstrNumOrder WRITE setCepstrNumOrder NOTIFY cepstrNumOrderChanged)
 
 public:
@@ -124,12 +129,27 @@ public:
     void setShowCepstrum(bool showCepstrum);
 
     int cepstrNumOrder() const;
+
+    int amplitudeWindow() const;
+    int amplitudeShift() const;
+    bool showAmplitude() const;
+    bool showAmplitudeDerivative() const;
+
+    void setAmplitudeWindow(int amplitudeWindow);
+    void setAmplitudeShift(int amplitudeShift);
+    void setShowAmplitude(bool showAmplitude);
+    void setShowAmplitudeDerivative(bool showAmplitudeDerivative);
+
     void setCepstrNumOrder(int cepstrNumOrder);
 
     Q_INVOKABLE void load();
     Q_INVOKABLE void save();
 
 signals:
+    void amplitudeWindowChanged();
+    void amplitudeShiftChanged();
+    void showAmplitudeChanged();
+    void showAmplitudeDerivativeChanged();
     void languageChanged();
     void themeChanged();
     void algorithmChanged();

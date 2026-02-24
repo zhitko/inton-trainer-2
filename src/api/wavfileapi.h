@@ -65,6 +65,14 @@ public slots:
                                        const QVariantList& signalSpectrum,
                                        const QVariantList& pitch,
                                        const int targetLength);
+
+    Q_INVOKABLE QVariantList getAmplitude(WaveFile* waveFile,
+                                         int window,
+                                         int shift);
+
+    Q_INVOKABLE QVariantList getAmplitudeDerivative(WaveFile* waveFile,
+                                                    int window,
+                                                    int shift);
 };
 
 #endif // WAVFILEAPI_H
