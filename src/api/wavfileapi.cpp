@@ -465,6 +465,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
 
     // Create modified cue points from processedCuePoints returned by UMPService
     QVariantList modifiedCuePoints;
+    QVariantList scaledCuePoints;
     int position = 0;
     for (size_t i = 0; i < umpResult.processedCuePoints.size(); ++i) {
         const CuePointData& cp = umpResult.processedCuePoints[i];
@@ -485,8 +486,21 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
         LOG_DEBUG() << "  Modified cue point" << cpMap["id"].toUInt() << ":" 
                  << "position=" << cpMap["position"].toUInt() 
                  << "length=" << cpMap["length"].toUInt();
+
+        // Also create scaled cue points for the original wave data
+        QVariantMap scaledCpMap;
+        scaledCpMap["id"] = cp.id;
+        scaledCpMap["label"] = QString::fromStdString(cp.label);
+        scaledCpMap["position"] = cp.position;
+        scaledCpMap["length"] = cp.length;
+        scaledCuePoints.append(scaledCpMap);
+        LOG_DEBUG() << "  Scaled cue point" << scaledCpMap["id"].toUInt() << ":" 
+                 << "position=" << scaledCpMap["position"].toUInt() 
+                 << "length=" << scaledCpMap["length"].toUInt();
     }
     result["cuePoints"] = modifiedCuePoints;
+
+    result["waveCuePoints"] = scaledCuePoints;
 
     LOG_DEBUG() << "Finish: getUMP - result.keys=" << result.keys();
     return result;
@@ -702,4 +716,3 @@ QVariantList WavFileApi::getCepstr(WaveFile* waveFile,
     
     return cepstrData;
 }
-

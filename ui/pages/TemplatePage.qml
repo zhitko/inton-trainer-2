@@ -186,7 +186,9 @@ Page {
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
 
         userUmpWaveFormGraph.waveData = umpResult.ump;
-        userUmpWaveFormGraph.cuePoints = refUmpWaveFormGraph.cuePoints;
+        userUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
+
+        userWaveFormGraph.cuePoints = umpResult.waveCuePoints;
     }
 
     function updateRefData() {

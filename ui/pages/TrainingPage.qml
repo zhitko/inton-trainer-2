@@ -257,6 +257,7 @@ Page {
                 Layout.fillHeight: true
                 Layout.minimumHeight: 240
                 independentScale: true
+                datasetColors: ["#d62728", "#83270b"]
             }
 
             // Controls
