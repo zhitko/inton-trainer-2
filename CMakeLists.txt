@@ -76,6 +76,7 @@ set(SPTK_BUILD_COMMANDS OFF CACHE BOOL "Build SPTK commands" FORCE)
 add_subdirectory(3rdparty/SPTK)
 
 set(qml_singletons
+    ui/utils/AppScale.qml
     ui/utils/Icons.qml
     ui/utils/Logger.qml
     ui/utils/Theme.qml
