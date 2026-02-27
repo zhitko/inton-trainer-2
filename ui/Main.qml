@@ -46,8 +46,8 @@ ApplicationWindow {
     // actual window. When factor == 1.0 the transform is a no-op.
     Item {
         id: scaledRoot
-        width: AppScale.designWidth
-        height: AppScale.designHeight
+        width: window.width / AppScale.factor
+        height: window.height / AppScale.factor
         transformOrigin: Item.TopLeft
         transform: Scale {
             xScale: AppScale.factor

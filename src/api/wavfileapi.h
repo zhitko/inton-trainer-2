@@ -52,7 +52,7 @@ public slots:
                                      double maxF0 = 800.0,
                                      double voicingThreshold = 0.9,
                                      bool f0Refinement = false,
-                                     bool normalized = true);
+                                     bool normalized = false);
 
     Q_INVOKABLE QVariantList getCepstr(WaveFile* waveFile,
                                        int fftLength,
@@ -64,7 +64,7 @@ public slots:
                                        double maxF0 = 800.0,
                                        double voicingThreshold = 0.9,
                                        bool f0Refinement = false,
-                                       bool normalized = true);
+                                       bool normalized = false);
 
     Q_INVOKABLE QVariantList getSpecDP(const QVariantList& patternSpectrum,
                                        const QVariantList& signalSpectrum,
