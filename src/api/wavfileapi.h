@@ -16,7 +16,8 @@ public:
 public slots:
     Q_INVOKABLE WaveFile* openWavFile(const QString& filePath);
     Q_INVOKABLE QVariantList getCuePoints(WaveFile* waveFile);
-    Q_INVOKABLE QVariantList getWaveData(WaveFile* waveFile);
+    Q_INVOKABLE QVariantList getWaveData(WaveFile* waveFile,
+                                          bool normalized = true);
     Q_INVOKABLE QVariantList getPitch(WaveFile* waveFile,
                                       const QString& algorithm,
                                       double frameShift,
@@ -30,7 +31,8 @@ public slots:
                                       const QString& pitchSmoothing = "None",
                                       int pitchSmoothingWindowSize = 5,
                                       double pitchGaussianSmoothingSigma = 2.0,
-                                      double pitchSplineSmoothingPenalty = 10.0);
+                                      double pitchSplineSmoothingPenalty = 10.0,
+                                      bool normalized = true);
 
     Q_INVOKABLE QVariantMap getUMP(const QVariantList& pitch,
                                    const QVariantList& cuePoints,
@@ -38,7 +40,8 @@ public slots:
                                    int nLength,
                                    int tLength,
                                    int waveDataSize,
-                                   const QString& pitchInterpolationType);
+                                   const QString& pitchInterpolationType,
+                                   bool normalized = true);
 
     Q_INVOKABLE QVariantList getSpec(WaveFile* waveFile,
                                      int fftLength,
@@ -48,7 +51,8 @@ public slots:
                                      double minF0 = 71.0,
                                      double maxF0 = 800.0,
                                      double voicingThreshold = 0.9,
-                                     bool f0Refinement = false);
+                                     bool f0Refinement = false,
+                                     bool normalized = true);
 
     Q_INVOKABLE QVariantList getCepstr(WaveFile* waveFile,
                                        int fftLength,
@@ -59,7 +63,8 @@ public slots:
                                        double minF0 = 71.0,
                                        double maxF0 = 800.0,
                                        double voicingThreshold = 0.9,
-                                       bool f0Refinement = false);
+                                       bool f0Refinement = false,
+                                       bool normalized = true);
 
     Q_INVOKABLE QVariantList getSpecDP(const QVariantList& patternSpectrum,
                                        const QVariantList& signalSpectrum,
@@ -79,11 +84,13 @@ public slots:
 
     Q_INVOKABLE QVariantList getAmplitude(WaveFile* waveFile,
                                          int window,
-                                         int shift);
+                                         int shift,
+                                         bool normalized = true);
 
     Q_INVOKABLE QVariantList getAmplitudeDerivative(WaveFile* waveFile,
                                                     int window,
-                                                    int shift);
+                                                    int shift,
+                                                    bool normalized = true);
 };
 
 #endif // WAVFILEAPI_H
