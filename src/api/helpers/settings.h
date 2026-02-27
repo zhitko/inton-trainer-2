@@ -40,6 +40,7 @@ struct AppSettings {
 
     // Pitch display
     bool showF0 = true;
+    bool showLogPitch = true;
     bool showProcessedPitch = true;
 
     // Cepstrum

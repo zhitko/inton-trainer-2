@@ -36,6 +36,7 @@ class SettingsApi : public QObject
     Q_PROPERTY(bool showAmplitude READ showAmplitude WRITE setShowAmplitude NOTIFY showAmplitudeChanged)
     Q_PROPERTY(bool showAmplitudeDerivative READ showAmplitudeDerivative WRITE setShowAmplitudeDerivative NOTIFY showAmplitudeDerivativeChanged)
     Q_PROPERTY(bool showF0 READ showF0 WRITE setShowF0 NOTIFY showF0Changed)
+    Q_PROPERTY(bool showLogPitch READ showLogPitch WRITE setShowLogPitch NOTIFY showLogPitchChanged)
     Q_PROPERTY(bool showProcessedPitch READ showProcessedPitch WRITE setShowProcessedPitch NOTIFY showProcessedPitchChanged)
 
     Q_PROPERTY(int cepstrNumOrder READ cepstrNumOrder WRITE setCepstrNumOrder NOTIFY cepstrNumOrderChanged)
@@ -137,6 +138,7 @@ public:
     bool showAmplitude() const;
     bool showAmplitudeDerivative() const;
     bool showF0() const;
+    bool showLogPitch() const;
     bool showProcessedPitch() const;
 
     void setAmplitudeWindow(int amplitudeWindow);
@@ -144,6 +146,7 @@ public:
     void setShowAmplitude(bool showAmplitude);
     void setShowAmplitudeDerivative(bool showAmplitudeDerivative);
     void setShowF0(bool showF0);
+    void setShowLogPitch(bool showLogPitch);
     void setShowProcessedPitch(bool showProcessedPitch);
 
     void setCepstrNumOrder(int cepstrNumOrder);
@@ -157,6 +160,7 @@ signals:
     void showAmplitudeChanged();
     void showAmplitudeDerivativeChanged();
     void showF0Changed();
+    void showLogPitchChanged();
     void showProcessedPitchChanged();
     void languageChanged();
     void themeChanged();

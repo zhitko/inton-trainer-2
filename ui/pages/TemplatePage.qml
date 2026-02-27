@@ -3,114 +3,27 @@ import QtQuick.Controls 6.8
 import QtQuick.Controls.Material 6.8
 import QtQuick.Layouts
 
-import by.intontrainer.wavfile 1.0
-
 import "../components"
 import "../utils"
 
+import by.intontrainer.wavfile 1.0
+
 Page {
     id: root
-    property string refFilePath: ""
-    property string userFilePath: ""
-    property bool showSettings: false
 
-    property var refWavFileHandle: null
-    property var userWavFileHandle: null
     property var loadedCuePoints: []
     property var loadedWaveData: []
-    property var refPatternData: []
-    property var refPitchData: []
-    property var refLogPitchData: []
     property var refAmplitudeData: []
     property var refAmplitudeDerivData: []
-
-    title: refFilePath.substring(refFilePath.lastIndexOf('/') + 1)
-
-    WavFileApi {
-        id: wavFileApi
-    }
-
-    Connections {
-        target: window.settingsApi
-        function onAlgorithmChanged() {
-            updateData();
-        }
-        function onFrameShiftChanged() {
-            updateData();
-        }
-        function onSampleRateChanged() {
-            updateData();
-        }
-        function onMinF0Changed() {
-            updateData();
-        }
-        function onMaxF0Changed() {
-            updateData();
-        }
-        function onVoicingThresholdChanged() {
-            updateData();
-        }
-        function onPitchNormalizationChanged() {
-            updateData();
-        }
-        function onPitchInterpolationTypeChanged() {
-            updateData();
-        }
-        function onPitchSmoothingChanged() {
-            updateData();
-        }
-        function onPitchSmoothingWindowSizeChanged() {
-            updateData();
-        }
-        function onPitchGaussianSmoothingSigmaChanged() {
-            updateData();
-        }
-
-        function onPitchSplineSmoothingPenaltyChanged() {
-            updateData();
-        }
-
-        function onSpecFftLengthChanged() {
-            updateData();
-        }
-        function onSpecF0RefinementChanged() {
-            updateData();
-        }
-        function onSpecUseLogScaleChanged() {
-            refSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
-            userSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
-        }
-        function onSpecColorSchemeChanged() {
-            updateColorScheme();
-        }
-        function onCepstrNumOrderChanged() {
-            updateData();
-        }
-        function onShowSpectrumChanged() {
-            updateData();
-        }
-        function onShowCepstrumChanged() {
-            updateData();
-        }
-        function onShowAmplitudeChanged() {
-            updateData();
-        }
-        function onShowAmplitudeDerivativeChanged() {
-            updateData();
-        }
-        function onAmplitudeWindowChanged() {
-            updateData();
-        }
-        function onAmplitudeShiftChanged() {
-            updateData();
-        }
-        function onShowF0Changed() {
-            updateData();
-        }
-        function onShowProcessedPitchChanged() {
-            updateData();
-        }
-    }
+    property string refFilePath: ""
+    property var logPitchData: []
+    property var refLogPitchData: []
+    property var refPatternData: []
+    property var refPitchData: []
+    property var refWavFileHandle: null
+    property bool showSettings: false
+    property string userFilePath: ""
+    property var userWavFileHandle: null
 
     function updateColorScheme() {
         let scheme = window.settingsApi.specColorScheme;
@@ -134,61 +47,6 @@ Page {
     function updateData() {
         updateRefData();
         updateUserData();
-    }
-
-    function updateUserData() {
-        if (!userWavFileHandle)
-            return;
-        // Extract amplitude data
-        Logger.debug("Extracting amplitude data");
-        let ampData = wavFileApi.getAmplitude(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
-        userAmplitudeWaveFormGraph.waveData = [ampData];
-
-        Logger.debug("Extracting amplitude derivative data");
-        let ampDeriv = wavFileApi.getAmplitudeDerivative(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
-        userAmplitudeDerivWaveFormGraph.waveData = [ampDeriv];
-        // Extract pitch data
-        Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
-        let pitchOriginalData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None", "None");
-        Logger.debug("Pitch original data length: " + pitchOriginalData.length);
-        userPitchWaveFormGraph.waveData = [pitchOriginalData];
-
-        Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
-        let pitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
-        Logger.debug("Pitch data length: " + pitchData.length);
-        userPitchProcessedWaveFormGraph.waveData = [pitchData];
-
-        Logger.debug("Extracting log pitch data with algorithm: " + window.settingsApi.algorithm);
-        let logPitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
-        Logger.debug("Log pitch data length: " + logPitchData.length);
-
-        // Extract spectrum data
-        Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
-        let specData = wavFileApi.getSpec(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
-        Logger.debug("Spectrum data frames: " + specData.length);
-
-        // Pass spectrum data directly to the 2D graph
-        userSpectrumGraph.spectrumData = specData;
-
-        // Extract cepstrum data
-        Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
-        let cepstrData = wavFileApi.getCepstr(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
-        Logger.debug("Cepstrum data frames: " + cepstrData.length);
-        userCepstrogramGraph.spectrumData = cepstrData;
-
-        // Run DP comparison
-        Logger.debug("Calculating DP...");
-        let scaledPitch = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refPatternData, ampData, ampDeriv, logPitchData, cepstrData, pitchData, refLogPitchData.length);
-        Logger.debug("DP result length: " + scaledPitch.length);
-
-        Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
-        Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
-
-        userUmpWaveFormGraph.waveData = umpResult.ump;
-        userUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
-
-        userWaveFormGraph.cuePoints = umpResult.waveCuePoints;
     }
 
     function updateRefData() {
@@ -216,8 +74,9 @@ Page {
         refPitchProcessedWaveFormGraph.waveData = [refPitchData];
 
         Logger.debug("Extracting log pitch data with algorithm: " + window.settingsApi.algorithm);
-        refLogPitchData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        refLogPitchData = wavFileApi.getPitch(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", "None", "None", 0, 0, 0);
         Logger.debug("Log pitch data length: " + refLogPitchData.length);
+        refLogPitchWaveFormGraph.waveData = [refLogPitchData];
 
         // Scale loadedCuePoints to match pitch data length
         let scaledCuePoints = loadedCuePoints.map(cp => {
@@ -251,6 +110,64 @@ Page {
         Logger.debug("Cepstrum data frames: " + refPatternData.length);
         refCepstrogramGraph.spectrumData = refPatternData;
     }
+
+    function updateUserData() {
+        if (!userWavFileHandle)
+            return;
+        // Extract amplitude data
+        Logger.debug("Extracting amplitude data");
+        let ampData = wavFileApi.getAmplitude(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        userAmplitudeWaveFormGraph.waveData = [ampData];
+
+        Logger.debug("Extracting amplitude derivative data");
+        let ampDeriv = wavFileApi.getAmplitudeDerivative(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        userAmplitudeDerivWaveFormGraph.waveData = [ampDeriv];
+        // Extract pitch data
+        Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
+        let pitchOriginalData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", "", "None", "None");
+        Logger.debug("Pitch original data length: " + pitchOriginalData.length);
+        userPitchWaveFormGraph.waveData = [pitchOriginalData];
+
+        Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
+        let pitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        Logger.debug("Pitch data length: " + pitchData.length);
+        userPitchProcessedWaveFormGraph.waveData = [pitchData];
+
+        Logger.debug("Extracting log pitch data with algorithm: " + window.settingsApi.algorithm);
+        logPitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", "LOG_F0", "None", "None", 0, 0, 0);
+        Logger.debug("Log pitch data length: " + logPitchData.length);
+        userLogPitchWaveFormGraph.waveData = [logPitchData];
+
+        // Extract spectrum data
+        Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
+        let specData = wavFileApi.getSpec(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Spectrum data frames: " + specData.length);
+
+        // Pass spectrum data directly to the 2D graph
+        userSpectrumGraph.spectrumData = specData;
+
+        // Extract cepstrum data
+        Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
+        let cepstrData = wavFileApi.getCepstr(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Cepstrum data frames: " + cepstrData.length);
+        userCepstrogramGraph.spectrumData = cepstrData;
+
+        // Run DP comparison
+        Logger.debug("Calculating DP...");
+        let scaledPitch = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refPatternData, ampData, ampDeriv, logPitchData, cepstrData, pitchData, refLogPitchData.length);
+        Logger.debug("DP result length: " + scaledPitch.length);
+
+        Logger.debug("Calculating UMP...");
+        let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
+
+        userUmpWaveFormGraph.waveData = umpResult.ump;
+        userUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
+
+        userWaveFormGraph.cuePoints = umpResult.waveCuePoints;
+    }
+
+    title: refFilePath.substring(refFilePath.lastIndexOf('/') + 1)
 
     Component.onCompleted: {
         Logger.info("TemplatePage initialization started");
@@ -292,12 +209,126 @@ Page {
         Logger.info("TemplatePage initialization complete");
     }
 
+    WavFileApi {
+        id: wavFileApi
+    }
+
+    Connections {
+        function onAlgorithmChanged() {
+            updateData();
+        }
+
+        function onAmplitudeShiftChanged() {
+            updateData();
+        }
+
+        function onAmplitudeWindowChanged() {
+            updateData();
+        }
+
+        function onCepstrNumOrderChanged() {
+            updateData();
+        }
+
+        function onFrameShiftChanged() {
+            updateData();
+        }
+
+        function onMaxF0Changed() {
+            updateData();
+        }
+
+        function onMinF0Changed() {
+            updateData();
+        }
+
+        function onPitchGaussianSmoothingSigmaChanged() {
+            updateData();
+        }
+
+        function onPitchInterpolationTypeChanged() {
+            updateData();
+        }
+
+        function onPitchNormalizationChanged() {
+            updateData();
+        }
+
+        function onPitchSmoothingChanged() {
+            updateData();
+        }
+
+        function onPitchSmoothingWindowSizeChanged() {
+            updateData();
+        }
+
+        function onPitchSplineSmoothingPenaltyChanged() {
+            updateData();
+        }
+
+        function onSampleRateChanged() {
+            updateData();
+        }
+
+        function onShowAmplitudeChanged() {
+            updateData();
+        }
+
+        function onShowAmplitudeDerivativeChanged() {
+            updateData();
+        }
+
+        function onShowCepstrumChanged() {
+            updateData();
+        }
+
+        function onShowF0Changed() {
+            updateData();
+        }
+
+        function onShowLogPitchChanged() {
+            updateData();
+        }
+
+        function onShowProcessedPitchChanged() {
+            updateData();
+        }
+
+        function onShowSpectrumChanged() {
+            updateData();
+        }
+
+        function onSpecColorSchemeChanged() {
+            updateColorScheme();
+        }
+
+        function onSpecF0RefinementChanged() {
+            updateData();
+        }
+
+        function onSpecFftLengthChanged() {
+            updateData();
+        }
+
+        function onSpecUseLogScaleChanged() {
+            refSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
+            userSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
+        }
+
+        function onVoicingThresholdChanged() {
+            updateData();
+        }
+
+        target: window.settingsApi
+    }
+
     Button {
         anchors.right: parent.right
         anchors.top: parent.top
         text: root.showSettings ? qsTr("Hide Settings") : qsTr("Show Settings")
-        onClicked: root.showSettings = !root.showSettings
         z: 99
+
+        onClicked: root.showSettings = !root.showSettings
     }
 
     RowLayout {
@@ -305,8 +336,8 @@ Page {
         spacing: 0
 
         Item {
-            Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.fillWidth: true
 
             ScrollView {
                 anchors.fill: parent
@@ -314,340 +345,400 @@ Page {
                 contentWidth: availableWidth
 
                 Column {
-                    width: parent.width
                     spacing: 10
+                    width: parent.width
 
                     Text {
-                        text: qsTr("Waveforms")
-                        font.pixelSize: 16
-                        font.bold: true
                         color: Theme.onSurface(root.Material.theme)
+                        font.bold: true
+                        font.pixelSize: 16
+                        text: qsTr("Waveforms")
                     }
 
                     Text {
-                        text: qsTr("Reference")
-                        font.pixelSize: 14
-                        font.bold: true
                         color: Theme.onSurface(root.Material.theme)
+                        font.bold: true
+                        font.pixelSize: 14
+                        text: qsTr("Reference")
                     }
 
                     WaveFormGraph {
                         id: refWaveFormGraph
-                        width: parent.width
+
                         height: 300
+                        width: parent.width
                     }
 
                     PlayButton {
                         id: refPlayButton
-                        width: 32
-                        height: 32
+
                         file: refFilePath
+                        height: 32
                         showLabel: true
+                        width: 32
                     }
 
                     Text {
-                        text: qsTr("User")
-                        font.pixelSize: 16
-                        font.bold: true
                         color: Theme.onSurface(root.Material.theme)
+                        font.bold: true
+                        font.pixelSize: 16
+                        text: qsTr("User")
                     }
 
                     WaveFormGraph {
                         id: userWaveFormGraph
-                        width: parent.width
+
                         height: 300
+                        width: parent.width
                     }
 
                     PlayButton {
                         id: userPlayButton
-                        width: 32
-                        height: 32
+
                         file: userFilePath
+                        height: 32
                         showLabel: true
+                        width: 32
                     }
 
                     Column {
+                        spacing: 10
                         visible: window.settingsApi.showSpectrum
                         width: parent.width
-                        spacing: 10
 
                         Text {
-                            text: qsTr("Spectrum")
-                            font.pixelSize: 16
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Spectrum")
                         }
 
                         Text {
-                            text: qsTr("Reference")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("Reference")
                         }
 
                         Spectrogram2DGraph {
                             id: refSpectrumGraph
-                            width: parent.width
+
                             height: 400
+                            width: parent.width
                         }
 
                         Text {
-                            text: qsTr("User")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("User")
                         }
 
                         Spectrogram2DGraph {
                             id: userSpectrumGraph
-                            width: parent.width
+
                             height: 400
+                            width: parent.width
                         }
                     }
 
                     Column {
+                        spacing: 10
                         visible: window.settingsApi.showCepstrum
                         width: parent.width
-                        spacing: 10
 
                         Text {
-                            text: qsTr("Cepstrum")
-                            font.pixelSize: 16
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Cepstrum")
                         }
 
                         Text {
-                            text: qsTr("Reference")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("Reference")
                         }
 
                         Spectrogram2DGraph {
                             id: refCepstrogramGraph
-                            width: parent.width
+
                             height: 400
+                            width: parent.width
                         }
 
                         Text {
-                            text: qsTr("User")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("User")
                         }
 
                         Spectrogram2DGraph {
                             id: userCepstrogramGraph
-                            width: parent.width
+
                             height: 400
+                            width: parent.width
                         }
                     }
 
                     // Amplitude graphs
                     Column {
+                        spacing: 10
                         visible: window.settingsApi.showAmplitude
                         width: parent.width
-                        spacing: 10
 
                         Text {
-                            text: qsTr("Amplitude")
-                            font.pixelSize: 16
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Amplitude")
                         }
 
                         Text {
-                            text: qsTr("Reference")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("Reference")
                         }
 
                         WaveFormGraph {
                             id: refAmplitudeWaveFormGraph
-                            width: parent.width - 80
+
                             height: 200
+                            width: parent.width - 80
                         }
 
                         Text {
-                            text: qsTr("User")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("User")
                         }
 
                         WaveFormGraph {
                             id: userAmplitudeWaveFormGraph
-                            width: parent.width - 80
+
                             height: 200
+                            width: parent.width - 80
                         }
                     }
 
                     Column {
+                        spacing: 10
                         visible: window.settingsApi.showAmplitudeDerivative
                         width: parent.width
-                        spacing: 10
 
                         Text {
-                            text: qsTr("Amplitude Derivative")
-                            font.pixelSize: 16
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Amplitude Derivative")
                         }
 
                         Text {
-                            text: qsTr("Reference")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("Reference")
                         }
 
                         WaveFormGraph {
                             id: refAmplitudeDerivWaveFormGraph
-                            width: parent.width - 80
+
                             height: 200
+                            width: parent.width - 80
                         }
 
                         Text {
-                            text: qsTr("User")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("User")
                         }
 
                         WaveFormGraph {
                             id: userAmplitudeDerivWaveFormGraph
-                            width: parent.width - 80
+
                             height: 200
+                            width: parent.width - 80
                         }
                     }
 
                     Column {
+                        spacing: 10
                         visible: window.settingsApi.showF0
                         width: parent.width
-                        spacing: 10
 
                         Text {
-                            text: qsTr("Pitch (F0)")
-                            font.pixelSize: 16
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Pitch (F0)")
                         }
 
                         Text {
-                            text: qsTr("Reference")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("Reference")
                         }
 
                         WaveFormGraph {
                             id: refPitchWaveFormGraph
-                            width: parent.width - 80
+
                             height: 200
+                            width: parent.width - 80
                         }
 
                         Text {
-                            text: qsTr("User")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("User")
                         }
 
                         WaveFormGraph {
                             id: userPitchWaveFormGraph
-                            width: parent.width - 80
+
                             height: 200
+                            width: parent.width - 80
                         }
                     }
 
                     Column {
-                        visible: window.settingsApi.showProcessedPitch
-                        width: parent.width
                         spacing: 10
+                        visible: window.settingsApi.showLogPitch
+                        width: parent.width
 
                         Text {
-                            text: qsTr("Processed Pitch (F0)")
-                            font.pixelSize: 16
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Log Pitch (LOG_F0)")
                         }
 
                         Text {
-                            text: qsTr("Reference")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("Reference")
+                        }
+
+                        WaveFormGraph {
+                            id: refLogPitchWaveFormGraph
+
+                            height: 200
+                            width: parent.width - 80
+                        }
+
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("User")
+                        }
+
+                        WaveFormGraph {
+                            id: userLogPitchWaveFormGraph
+
+                            height: 200
+                            width: parent.width - 80
+                        }
+                    }
+
+                    Column {
+                        spacing: 10
+                        visible: window.settingsApi.showProcessedPitch
+                        width: parent.width
+
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Processed Pitch (F0)")
+                        }
+
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("Reference")
                         }
 
                         WaveFormGraph {
                             id: refPitchProcessedWaveFormGraph
-                            width: parent.width - 80
+
                             height: 200
+                            width: parent.width - 80
                         }
 
                         Text {
-                            text: qsTr("User")
-                            font.pixelSize: 14
-                            font.bold: true
                             color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("User")
                         }
 
                         WaveFormGraph {
                             id: userPitchProcessedWaveFormGraph
-                            width: parent.width - 80
+
                             height: 200
+                            width: parent.width - 80
                         }
                     }
 
                     Text {
-                        text: qsTr("UMP")
-                        font.pixelSize: 16
-                        font.bold: true
                         color: Theme.onSurface(root.Material.theme)
+                        font.bold: true
+                        font.pixelSize: 16
+                        text: qsTr("UMP")
                     }
 
                     Text {
-                        text: qsTr("Reference")
-                        font.pixelSize: 14
-                        font.bold: true
                         color: Theme.onSurface(root.Material.theme)
+                        font.bold: true
+                        font.pixelSize: 14
+                        text: qsTr("Reference")
                     }
 
                     WaveFormGraph {
                         id: refUmpWaveFormGraph
-                        width: parent.width - 80
+
                         height: 200
+                        width: parent.width - 80
                     }
 
                     Text {
-                        text: qsTr("User")
-                        font.pixelSize: 14
-                        font.bold: true
                         color: Theme.onSurface(root.Material.theme)
+                        font.bold: true
+                        font.pixelSize: 14
+                        text: qsTr("User")
                     }
 
                     WaveFormGraph {
                         id: userUmpWaveFormGraph
-                        width: parent.width - 80
+
                         height: 200
+                        width: parent.width - 80
                     }
                 }
             }
         }
 
         Rectangle {
-            Layout.preferredWidth: 1
             Layout.fillHeight: true
+            Layout.preferredWidth: 1
             color: Theme.outlineVariant(root.Material.theme)
             visible: root.showSettings
         }
 
         SettingsPage {
-            visible: root.showSettings
-            Layout.preferredWidth: 400
             Layout.fillHeight: true
+            Layout.preferredWidth: 400
+            visible: root.showSettings
+
             background: Rectangle {
                 color: Theme.surface(root.Material.theme)
             }

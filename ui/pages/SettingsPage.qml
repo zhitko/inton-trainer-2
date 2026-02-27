@@ -117,6 +117,15 @@ Page {
                         }
 
                         Label {
+                            text: qsTr("Show Log Pitch (LOG_F0)")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.showLogPitch
+                            onToggled: ApplicationWindow.window.settingsApi.showLogPitch = checked
+                        }
+
+                        Label {
                             text: qsTr("Algorithm")
                             color: Theme.onSurface(Material.theme)
                         }

@@ -59,15 +59,15 @@ Page {
         referenceCuePoints = wavFileApi.getCuePoints(referenceWavFileHandle);
         referenceWaveData = wavFileApi.getWaveData(referenceWavFileHandle);
 
-        referencePitchData = wavFileApi.getPitch(referenceWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        referencePitchData = wavFileApi.getPitch(referenceWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty, false);
         Logger.debug("Reference pitch data frames: " + referencePitchData.length);
-        referenceLogPitchData = wavFileApi.getPitch(referenceWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        referenceLogPitchData = wavFileApi.getPitch(referenceWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", "None", "None", 0, 0, 0);
         Logger.debug("Reference log pitch data frames: " + referenceLogPitchData.length);
 
         referenceAmplitudeData = wavFileApi.getAmplitude(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
         referenceAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
 
-        referenceUMP = wavFileApi.getUMP(referencePitchData, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        referenceUMP = wavFileApi.getUMP(referencePitchData, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], false);
 
         umpGraph.waveData = referenceUMP.ump;
         umpGraph.cuePoints = referenceUMP.cuePoints;
@@ -86,9 +86,9 @@ Page {
         let userCuePoints = wavFileApi.getCuePoints(userWavFileHandle);
         let userWaveData = wavFileApi.getWaveData(userWavFileHandle);
 
-        let pitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        let pitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty, false);
         Logger.debug("Pitch data frames: " + pitchData.length);
-        let logPitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        let logPitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", "None", "None", 0, 0, 0);
         Logger.debug("Log pitch data frames: " + logPitchData.length);
 
         let userAmplitudeData = wavFileApi.getAmplitude(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
@@ -105,7 +105,7 @@ Page {
         Logger.debug("DP result length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
-        userUMP = wavFileApi.getUMP(scaledPitch, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        userUMP = wavFileApi.getUMP(scaledPitch, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], false);
         Logger.debug("UMP calculated with " + userUMP.cuePoints.length + " cue points");
 
         umpGraph.waveData = [referenceUMP.ump, userUMP.ump];

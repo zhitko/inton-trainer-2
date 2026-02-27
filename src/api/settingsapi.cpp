@@ -204,6 +204,7 @@ void SettingsApi::load()
     emit amplitudeShiftChanged();
     emit showAmplitudeChanged();
     emit showAmplitudeDerivativeChanged();
+    emit showLogPitchChanged();
 
     emit pitchSplineSmoothingPenaltyChanged();
     emit specFftLengthChanged();
@@ -379,6 +380,14 @@ bool SettingsApi::showF0() const
     return result;
 }
 
+bool SettingsApi::showLogPitch() const
+{
+    LOG_DEBUG() << "Start: showLogPitch";
+    bool result = m_settings.showLogPitch;
+    LOG_DEBUG() << "Finish: showLogPitch - result=" << result;
+    return result;
+}
+
 bool SettingsApi::showProcessedPitch() const
 {
     LOG_DEBUG() << "Start: showProcessedPitch";
@@ -440,6 +449,17 @@ void SettingsApi::setShowF0(bool showF0)
         emit showF0Changed();
     }
     LOG_DEBUG() << "Finish: setShowF0";
+}
+
+void SettingsApi::setShowLogPitch(bool showLogPitch)
+{
+    LOG_DEBUG() << "Start: setShowLogPitch - showLogPitch=" << showLogPitch;
+    if (m_settings.showLogPitch != showLogPitch) {
+        m_settings.showLogPitch = showLogPitch;
+        save();
+        emit showLogPitchChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowLogPitch";
 }
 
 void SettingsApi::setShowProcessedPitch(bool showProcessedPitch)

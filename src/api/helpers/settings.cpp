@@ -53,6 +53,7 @@ AppSettings Settings::loadSettings() {
     settings.showAmplitude = qsettings.value("showAmplitude", true).toBool();
     settings.showAmplitudeDerivative = qsettings.value("showAmplitudeDerivative", true).toBool();
     settings.showF0 = qsettings.value("showF0", true).toBool();
+    settings.showLogPitch = qsettings.value("showLogPitch", true).toBool();
     settings.showProcessedPitch = qsettings.value("showProcessedPitch", true).toBool();
     qsettings.endGroup();
     
@@ -106,6 +107,7 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("showAmplitude", settings.showAmplitude);
     qsettings.setValue("showAmplitudeDerivative", settings.showAmplitudeDerivative);
     qsettings.setValue("showF0", settings.showF0);
+    qsettings.setValue("showLogPitch", settings.showLogPitch);
     qsettings.setValue("showProcessedPitch", settings.showProcessedPitch);
     qsettings.endGroup();
 
