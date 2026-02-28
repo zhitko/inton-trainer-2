@@ -71,7 +71,7 @@ public slots:
                                        const QVariantList& pitch,
                                        const int targetLength);
 
-    Q_INVOKABLE QVariantList getDP(const QVariantList& patternAmplitude,
+    Q_INVOKABLE QVariantMap getDP(const QVariantList& patternAmplitude,
                                    const QVariantList& patternAmplitudeDerivative,
                                    const QVariantList& patternPitch,
                                    const QVariantList& patternCepstrum,
@@ -80,7 +80,7 @@ public slots:
                                    const QVariantList& signalPitch,
                                    const QVariantList& signalCepstrum,
                                    const QVariantList& pitchToTransform,
-                                   const int targetLength);
+                                   const QVariantList& cuePointsToTransform);
 
     Q_INVOKABLE QVariantList getAmplitude(WaveFile* waveFile,
                                          int window,

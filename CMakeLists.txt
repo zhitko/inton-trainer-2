@@ -36,6 +36,8 @@ qt_add_executable(appinton-trainer-2
     src/services/umpservice.cpp
     src/services/dpservice.h
     src/services/dpservice.cpp
+    src/services/cdtwservice.h
+    src/services/cdtwservice.cpp
     src/services/helpers/wavFile.h
     src/services/helpers/wavFile.cpp
     src/services/helpers/vectorutils.h

@@ -101,8 +101,9 @@ Page {
 
         // Generate UMP from DP result
         Logger.debug("Calculating DP...");
-        let scaledPitch = wavFileApi.getDP(referenceAmplitudeData, referenceAmplitudeDerivData, referenceLogPitchData, referenceCepstrData, userAmplitudeData, userAmplitudeDerivData, logPitchData, userCepstrData, pitchData, referencePitchData.length);
-        Logger.debug("DP result length: " + scaledPitch.length);
+        let dpResult = wavFileApi.getDP(referenceAmplitudeData, referenceAmplitudeDerivData, referenceLogPitchData, referenceCepstrData, userAmplitudeData, userAmplitudeDerivData, logPitchData, userCepstrData, pitchData, referenceCuePoints);
+        let scaledPitch = dpResult.pitch;
+        Logger.debug("DP result pitch length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
         userUMP = wavFileApi.getUMP(scaledPitch, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], false);

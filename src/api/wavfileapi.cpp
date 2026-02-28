@@ -5,6 +5,7 @@
 #include "src/services/specservice.h"
 #include "src/services/umpservice.h"
 #include "src/services/dpservice.h"
+#include "src/services/cdtwservice.h"
 #include "src/services/helpers/vectorutils.h"
 #include "src/services/amplitudeservice.h"
 #include <QDebug>
@@ -86,7 +87,7 @@ QVariantList WavFileApi::getSpecDP(const QVariantList& patternSpectrum,
     return pathDataList;
 }
 
-QVariantList WavFileApi::getDP(const QVariantList& patternAmplitude,
+QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
                                const QVariantList& patternAmplitudeDerivative,
                                const QVariantList& patternPitch,
                                const QVariantList& patternCepstrum,
@@ -95,15 +96,15 @@ QVariantList WavFileApi::getDP(const QVariantList& patternAmplitude,
                                const QVariantList& signalPitch,
                                const QVariantList& signalCepstrum,
                                const QVariantList& pitchToTransform,
-                               const int targetLength)
+                               const QVariantList& cuePointsToTransform)
 {
     LOG_DEBUG() << "Start: getDP - pattern data size=" << patternAmplitude.size();
 
-    QVariantList pathDataList;
+    QVariantMap result;
 
     if (patternAmplitude.isEmpty() || signalAmplitude.isEmpty() || pitchToTransform.isEmpty()) {
         LOG_WARNING() << "Input data is empty in getDP";
-        return pathDataList;
+        return result;
     }
 
     auto parse1D = [](const QVariantList& list) {
@@ -132,16 +133,16 @@ QVariantList WavFileApi::getDP(const QVariantList& patternAmplitude,
     };
 
     std::vector<std::vector<std::vector<double>>> patternData;
-    if (!patternAmplitude.isEmpty()) patternData.push_back(parse1D(patternAmplitude));
-    if (!patternAmplitudeDerivative.isEmpty()) patternData.push_back(parse1D(patternAmplitudeDerivative));
     if (!patternPitch.isEmpty()) patternData.push_back(parse1D(patternPitch));
     if (!patternCepstrum.isEmpty()) patternData.push_back(parse2D(patternCepstrum));
+    if (!patternAmplitude.isEmpty()) patternData.push_back(parse1D(patternAmplitude));
+    if (!patternAmplitudeDerivative.isEmpty()) patternData.push_back(parse1D(patternAmplitudeDerivative));
 
     std::vector<std::vector<std::vector<double>>> signalData;
-    if (!signalAmplitude.isEmpty()) signalData.push_back(parse1D(signalAmplitude));
-    if (!signalAmplitudeDerivative.isEmpty()) signalData.push_back(parse1D(signalAmplitudeDerivative));
     if (!signalPitch.isEmpty()) signalData.push_back(parse1D(signalPitch));
     if (!signalCepstrum.isEmpty()) signalData.push_back(parse2D(signalCepstrum));
+    if (!signalAmplitude.isEmpty()) signalData.push_back(parse1D(signalAmplitude));
+    if (!signalAmplitudeDerivative.isEmpty()) signalData.push_back(parse1D(signalAmplitudeDerivative));
 
     std::vector<double> pitchVec;
     pitchVec.reserve(pitchToTransform.size());
@@ -153,17 +154,44 @@ QVariantList WavFileApi::getDP(const QVariantList& patternAmplitude,
         }
     }
 
-    DPService dpService(patternData, signalData);
-    dpService.compute();
-    
-    std::vector<double> pitchTransformed = dpService.applyPathToVector(pitchVec, targetLength);
+    std::vector<CuePointData> cuePointsVec;
+    cuePointsVec.reserve(cuePointsToTransform.size());
+    for (const auto& val : cuePointsToTransform) {
+        QVariantMap cpMap = val.toMap();
+        CuePointData cp;
+        cp.id = cpMap["id"].toUInt();
+        cp.position = cpMap["position"].toUInt();
+        cp.length = cpMap["length"].toUInt();
+        cp.label = cpMap["label"].toString().toStdString();
+        cp.type = static_cast<CuePointType>(cpMap["type"].toInt());
+        cuePointsVec.push_back(cp);
+    }
 
+    CDTWService cdtwService(patternData, signalData);
+    cdtwService.compute();
+    
+    std::vector<double> pitchTransformed = cdtwService.applyPathToVector(pitchVec, patternPitch.size());
+    std::vector<CuePointData> cuePointsTransformed = cdtwService.applyPathToCuePoints(cuePointsVec);
+
+    QVariantList pathDataList;
     for (size_t i = 0; i < pitchTransformed.size(); ++i) {
         pathDataList.append(QPointF(i, pitchTransformed[i]));
     }
+    result["pitch"] = pathDataList;
 
-    LOG_DEBUG() << "Finish: getDP - path points=" << pathDataList.size();
-    return pathDataList;
+    QVariantList modifiedCuePoints;
+    for (const auto& cp : cuePointsTransformed) {
+        QVariantMap cpMap;
+        cpMap["id"] = cp.id;
+        cpMap["label"] = QString::fromStdString(cp.label);
+        cpMap["position"] = cp.position;
+        cpMap["length"] = cp.length;
+        modifiedCuePoints.append(cpMap);
+    }
+    result["cuePoints"] = modifiedCuePoints;
+
+    LOG_DEBUG() << "Finish: getDP - pitch size=" << pathDataList.size() << ", cuePoints size=" << modifiedCuePoints.size();
+    return result;
 }
 
 WavFileApi::WavFileApi(QObject *parent) : QObject(parent)

@@ -12,7 +12,8 @@ Page {
     id: root
 
     property var loadedCuePoints: []
-    property var loadedWaveData: []
+    property var refWaveData: []
+    property var userWaveData: []
     property var refAmplitudeData: []
     property var refAmplitudeDerivData: []
     property string refFilePath: ""
@@ -81,9 +82,9 @@ Page {
         // Scale loadedCuePoints to match pitch data length
         let scaledCuePoints = loadedCuePoints.map(cp => {
             return {
-                position: Math.round(cp.position * refPitchData.length / loadedWaveData.length),
+                position: Math.round(cp.position * refPitchData.length / refWaveData.length),
                 label: cp.label,
-                length: Math.round(cp.length * refPitchData.length / loadedWaveData.length)
+                length: Math.round(cp.length * refPitchData.length / refWaveData.length)
             };
         });
         refPitchProcessedWaveFormGraph.cuePoints = scaledCuePoints;
@@ -91,7 +92,7 @@ Page {
 
         // Calculate UMP
         Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(refPitchData, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        let umpResult = wavFileApi.getUMP(refPitchData, loadedCuePoints, 50, 100, 50, refWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
         refUmpWaveFormGraph.waveData = umpResult.ump;
         refUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
@@ -154,17 +155,45 @@ Page {
 
         // Run DP comparison
         Logger.debug("Calculating DP...");
-        let scaledPitch = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refPatternData, ampData, ampDeriv, logPitchData, cepstrData, pitchData, refLogPitchData.length);
-        Logger.debug("DP result length: " + scaledPitch.length);
+        // Scale loadedCuePoints to match user pitch data length
+        let scaledLoadedCuePoints = loadedCuePoints.map(cp => {
+            return {
+                position: Math.round(cp.position * refPitchData.length / refWaveData.length),
+                label: cp.label,
+                length: Math.round(cp.length * refPitchData.length / refWaveData.length)
+            };
+        });
+
+        let dpResult = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refPatternData, ampData, ampDeriv, logPitchData, cepstrData, pitchData, scaledLoadedCuePoints);
+        let scaledPitch = dpResult.pitch;
+        Logger.debug("DP result pitch length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, loadedWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
+        let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, refWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
 
         userUmpWaveFormGraph.waveData = umpResult.ump;
         userUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
 
-        userWaveFormGraph.cuePoints = umpResult.waveCuePoints;
+        // Scale dpResult.cuePoints to match userWaveFormGraph.waveData length
+        let scaledCuePoints = dpResult.cuePoints.map(cp => {
+            return {
+                position: Math.round(cp.position * userWaveData.length / logPitchData.length),
+                label: cp.label,
+                length: Math.round(cp.length * userWaveData.length / logPitchData.length)
+            };
+        });
+        userWaveFormGraph.cuePoints = scaledCuePoints;
+
+        // Scale dpResult.cuePoints to match userPitchProcessedWaveFormGraph.waveData length
+        let processedScaledCuePoints = dpResult.cuePoints.map(cp => {
+            return {
+                position: Math.round(cp.position * pitchData.length / logPitchData.length),
+                label: cp.label,
+                length: Math.round(cp.length * pitchData.length / logPitchData.length)
+            };
+        });
+        userPitchProcessedWaveFormGraph.cuePoints = processedScaledCuePoints;
     }
 
     title: refFilePath.substring(refFilePath.lastIndexOf('/') + 1)
@@ -181,17 +210,17 @@ Page {
             Logger.debug("Found " + loadedCuePoints.length + " cue points");
 
             Logger.debug("Extracting wave data...");
-            loadedWaveData = wavFileApi.getWaveData(refWavFileHandle);
-            Logger.debug("Wave data length: " + loadedWaveData.length);
+            refWaveData = wavFileApi.getWaveData(refWavFileHandle);
+            Logger.debug("Wave data length: " + refWaveData.length);
 
-            refWaveFormGraph.waveData = loadedWaveData;
+            refWaveFormGraph.waveData = refWaveData;
             refWaveFormGraph.cuePoints = loadedCuePoints;
         }
 
         if (userFilePath) {
             Logger.debug("Opening user WAV file: " + userFilePath);
             userWavFileHandle = wavFileApi.openWavFile(userFilePath);
-            let userWaveData = wavFileApi.getWaveData(userWavFileHandle);
+            userWaveData = wavFileApi.getWaveData(userWavFileHandle);
             Logger.debug("User wave data length: " + userWaveData.length);
             userWaveFormGraph.waveData = userWaveData;
         }
