@@ -55,12 +55,12 @@ Page {
             return;
         // Extract amplitude data
         Logger.debug("Extracting amplitude data");
-        let ampData = wavFileApi.getAmplitude(refWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        let ampData = wavFileApi.getAmplitude(refWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
         refAmplitudeWaveFormGraph.waveData = [ampData];
         root.refAmplitudeData = ampData;
 
         Logger.debug("Extracting amplitude derivative data");
-        let ampDeriv = wavFileApi.getAmplitudeDerivative(refWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        let ampDeriv = wavFileApi.getAmplitudeDerivative(refWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
         refAmplitudeDerivWaveFormGraph.waveData = [ampDeriv];
         root.refAmplitudeDerivData = ampDeriv;
         // Extract pitch data
@@ -117,11 +117,11 @@ Page {
             return;
         // Extract amplitude data
         Logger.debug("Extracting amplitude data");
-        let ampData = wavFileApi.getAmplitude(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        let ampData = wavFileApi.getAmplitude(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
         userAmplitudeWaveFormGraph.waveData = [ampData];
 
         Logger.debug("Extracting amplitude derivative data");
-        let ampDeriv = wavFileApi.getAmplitudeDerivative(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        let ampDeriv = wavFileApi.getAmplitudeDerivative(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
         userAmplitudeDerivWaveFormGraph.waveData = [ampDeriv];
         // Extract pitch data
         Logger.debug("Extracting pitch original data with algorithm: " + window.settingsApi.algorithm);
@@ -164,18 +164,7 @@ Page {
             };
         });
 
-        let dpResult = wavFileApi.getDP(
-            root.refAmplitudeData, 
-            root.refAmplitudeDerivData, 
-            root.refLogPitchData, 
-            root.refPatternData, 
-            ampData, 
-            ampDeriv, 
-            logPitchData, 
-            cepstrData, 
-            pitchData, 
-            scaledLoadedCuePoints
-        );
+        let dpResult = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refPatternData, ampData, ampDeriv, logPitchData, cepstrData, pitchData, scaledLoadedCuePoints);
         let scaledPitch = dpResult.pitch;
         Logger.debug("DP result pitch length: " + scaledPitch.length);
 
@@ -255,6 +244,18 @@ Page {
 
     Connections {
         function onAlgorithmChanged() {
+            updateData();
+        }
+
+        function onAmplitudeGaussianSmoothingSigmaChanged() {
+            updateData();
+        }
+
+        function onAmplitudeSmoothingChanged() {
+            updateData();
+        }
+
+        function onAmplitudeSmoothingWindowSizeChanged() {
             updateData();
         }
 

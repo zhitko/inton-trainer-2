@@ -50,6 +50,9 @@ AppSettings Settings::loadSettings() {
     qsettings.beginGroup("Amplitude");
     settings.amplitudeWindow = qsettings.value("window", 1024).toInt();
     settings.amplitudeShift = qsettings.value("shift", 512).toInt();
+    settings.amplitudeSmoothing = qsettings.value("amplitudeSmoothing", "Median").toString().toStdString();
+    settings.amplitudeSmoothingWindowSize = qsettings.value("amplitudeSmoothingWindowSize", 16).toInt();
+    settings.amplitudeGaussianSmoothingSigma = qsettings.value("amplitudeGaussianSmoothingSigma", 1.0).toDouble();
     settings.showAmplitude = qsettings.value("showAmplitude", true).toBool();
     settings.showAmplitudeDerivative = qsettings.value("showAmplitudeDerivative", true).toBool();
     settings.showF0 = qsettings.value("showF0", true).toBool();
@@ -104,6 +107,9 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.beginGroup("Amplitude");
     qsettings.setValue("window", settings.amplitudeWindow);
     qsettings.setValue("shift", settings.amplitudeShift);
+    qsettings.setValue("amplitudeSmoothing", QString::fromStdString(settings.amplitudeSmoothing));
+    qsettings.setValue("amplitudeSmoothingWindowSize", settings.amplitudeSmoothingWindowSize);
+    qsettings.setValue("amplitudeGaussianSmoothingSigma", settings.amplitudeGaussianSmoothingSigma);
     qsettings.setValue("showAmplitude", settings.showAmplitude);
     qsettings.setValue("showAmplitudeDerivative", settings.showAmplitudeDerivative);
     qsettings.setValue("showF0", settings.showF0);

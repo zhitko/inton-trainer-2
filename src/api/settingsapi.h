@@ -33,6 +33,9 @@ class SettingsApi : public QObject
 
     Q_PROPERTY(int amplitudeWindow READ amplitudeWindow WRITE setAmplitudeWindow NOTIFY amplitudeWindowChanged)
     Q_PROPERTY(int amplitudeShift READ amplitudeShift WRITE setAmplitudeShift NOTIFY amplitudeShiftChanged)
+    Q_PROPERTY(AmplitudeSmoothingType amplitudeSmoothing READ amplitudeSmoothing WRITE setAmplitudeSmoothing NOTIFY amplitudeSmoothingChanged)
+    Q_PROPERTY(int amplitudeSmoothingWindowSize READ amplitudeSmoothingWindowSize WRITE setAmplitudeSmoothingWindowSize NOTIFY amplitudeSmoothingWindowSizeChanged)
+    Q_PROPERTY(double amplitudeGaussianSmoothingSigma READ amplitudeGaussianSmoothingSigma WRITE setAmplitudeGaussianSmoothingSigma NOTIFY amplitudeGaussianSmoothingSigmaChanged)
     Q_PROPERTY(bool showAmplitude READ showAmplitude WRITE setShowAmplitude NOTIFY showAmplitudeChanged)
     Q_PROPERTY(bool showAmplitudeDerivative READ showAmplitudeDerivative WRITE setShowAmplitudeDerivative NOTIFY showAmplitudeDerivativeChanged)
     Q_PROPERTY(bool showF0 READ showF0 WRITE setShowF0 NOTIFY showF0Changed)
@@ -67,6 +70,14 @@ public:
         Spline
     };
     Q_ENUM(PitchSmoothingType)
+
+    enum class AmplitudeSmoothingType {
+        None,
+        MovingAverage,
+        Median,
+        Gaussian
+    };
+    Q_ENUM(AmplitudeSmoothingType)
     explicit SettingsApi(QObject *parent = nullptr);
 
     QString language() const;
@@ -135,6 +146,9 @@ public:
 
     int amplitudeWindow() const;
     int amplitudeShift() const;
+    AmplitudeSmoothingType amplitudeSmoothing() const;
+    int amplitudeSmoothingWindowSize() const;
+    double amplitudeGaussianSmoothingSigma() const;
     bool showAmplitude() const;
     bool showAmplitudeDerivative() const;
     bool showF0() const;
@@ -143,6 +157,9 @@ public:
 
     void setAmplitudeWindow(int amplitudeWindow);
     void setAmplitudeShift(int amplitudeShift);
+    void setAmplitudeSmoothing(AmplitudeSmoothingType amplitudeSmoothing);
+    void setAmplitudeSmoothingWindowSize(int amplitudeSmoothingWindowSize);
+    void setAmplitudeGaussianSmoothingSigma(double amplitudeGaussianSmoothingSigma);
     void setShowAmplitude(bool showAmplitude);
     void setShowAmplitudeDerivative(bool showAmplitudeDerivative);
     void setShowF0(bool showF0);
@@ -157,6 +174,9 @@ public:
 signals:
     void amplitudeWindowChanged();
     void amplitudeShiftChanged();
+    void amplitudeSmoothingChanged();
+    void amplitudeSmoothingWindowSizeChanged();
+    void amplitudeGaussianSmoothingSigmaChanged();
     void showAmplitudeChanged();
     void showAmplitudeDerivativeChanged();
     void showF0Changed();

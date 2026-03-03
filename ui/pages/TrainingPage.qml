@@ -64,8 +64,8 @@ Page {
         referenceLogPitchData = wavFileApi.getPitch(referenceWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", "None", "None", 0, 0, 0);
         Logger.debug("Reference log pitch data frames: " + referenceLogPitchData.length);
 
-        referenceAmplitudeData = wavFileApi.getAmplitude(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
-        referenceAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        referenceAmplitudeData = wavFileApi.getAmplitude(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
+        referenceAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
 
         referenceUMP = wavFileApi.getUMP(referencePitchData, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], false);
 
@@ -91,8 +91,8 @@ Page {
         let logPitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", "None", "None", 0, 0, 0);
         Logger.debug("Log pitch data frames: " + logPitchData.length);
 
-        let userAmplitudeData = wavFileApi.getAmplitude(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
-        let userAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift);
+        let userAmplitudeData = wavFileApi.getAmplitude(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
+        let userAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(userWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
 
         // Extract cepstrum data for user
         Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
@@ -101,18 +101,7 @@ Page {
 
         // Generate UMP from DP result
         Logger.debug("Calculating DP...");
-        let dpResult = wavFileApi.getDP(
-            referenceAmplitudeData, 
-            referenceAmplitudeDerivData, 
-            referenceLogPitchData, 
-            referenceCepstrData, 
-            userAmplitudeData, 
-            userAmplitudeDerivData, 
-            logPitchData, 
-            userCepstrData, 
-            pitchData, 
-            referenceCuePoints
-        );
+        let dpResult = wavFileApi.getDP(referenceAmplitudeData, referenceAmplitudeDerivData, referenceLogPitchData, referenceCepstrData, userAmplitudeData, userAmplitudeDerivData, logPitchData, userCepstrData, pitchData, referenceCuePoints);
         let scaledPitch = dpResult.pitch;
         Logger.debug("DP result pitch length: " + scaledPitch.length);
 

@@ -202,6 +202,9 @@ void SettingsApi::load()
 
     emit amplitudeWindowChanged();
     emit amplitudeShiftChanged();
+    emit amplitudeSmoothingChanged();
+    emit amplitudeSmoothingWindowSizeChanged();
+    emit amplitudeGaussianSmoothingSigmaChanged();
     emit showAmplitudeChanged();
     emit showAmplitudeDerivativeChanged();
     emit showLogPitchChanged();
@@ -354,6 +357,78 @@ int SettingsApi::amplitudeShift() const
     int result = m_settings.amplitudeShift;
     LOG_DEBUG() << "Finish: amplitudeShift - result=" << result;
     return result;
+}
+
+SettingsApi::AmplitudeSmoothingType SettingsApi::amplitudeSmoothing() const
+{
+    LOG_DEBUG() << "Start: amplitudeSmoothing";
+    AmplitudeSmoothingType result = AmplitudeSmoothingType::None;
+    std::string type = m_settings.amplitudeSmoothing;
+
+    if (type == "None") result = AmplitudeSmoothingType::None;
+    else if (type == "MovingAverage") result = AmplitudeSmoothingType::MovingAverage;
+    else if (type == "Median") result = AmplitudeSmoothingType::Median;
+    else if (type == "Gaussian") result = AmplitudeSmoothingType::Gaussian;
+
+    LOG_DEBUG() << "Finish: amplitudeSmoothing - result=" << static_cast<int>(result);
+    return result;
+}
+
+void SettingsApi::setAmplitudeSmoothing(AmplitudeSmoothingType amplitudeSmoothing)
+{
+    LOG_DEBUG() << "Start: setAmplitudeSmoothing - amplitudeSmoothing=" << static_cast<int>(amplitudeSmoothing);
+    std::string type = "None";
+    switch (amplitudeSmoothing) {
+        case AmplitudeSmoothingType::None: type = "None"; break;
+        case AmplitudeSmoothingType::MovingAverage: type = "MovingAverage"; break;
+        case AmplitudeSmoothingType::Median: type = "Median"; break;
+        case AmplitudeSmoothingType::Gaussian: type = "Gaussian"; break;
+    }
+
+    if (m_settings.amplitudeSmoothing != type) {
+        m_settings.amplitudeSmoothing = type;
+        save();
+        emit amplitudeSmoothingChanged();
+    }
+    LOG_DEBUG() << "Finish: setAmplitudeSmoothing";
+}
+
+int SettingsApi::amplitudeSmoothingWindowSize() const
+{
+    LOG_DEBUG() << "Start: amplitudeSmoothingWindowSize";
+    int result = m_settings.amplitudeSmoothingWindowSize;
+    LOG_DEBUG() << "Finish: amplitudeSmoothingWindowSize - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAmplitudeSmoothingWindowSize(int amplitudeSmoothingWindowSize)
+{
+    LOG_DEBUG() << "Start: setAmplitudeSmoothingWindowSize - amplitudeSmoothingWindowSize=" << amplitudeSmoothingWindowSize;
+    if (m_settings.amplitudeSmoothingWindowSize != amplitudeSmoothingWindowSize) {
+        m_settings.amplitudeSmoothingWindowSize = amplitudeSmoothingWindowSize;
+        save();
+        emit amplitudeSmoothingWindowSizeChanged();
+    }
+    LOG_DEBUG() << "Finish: setAmplitudeSmoothingWindowSize";
+}
+
+double SettingsApi::amplitudeGaussianSmoothingSigma() const
+{
+    LOG_DEBUG() << "Start: amplitudeGaussianSmoothingSigma";
+    double result = m_settings.amplitudeGaussianSmoothingSigma;
+    LOG_DEBUG() << "Finish: amplitudeGaussianSmoothingSigma - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAmplitudeGaussianSmoothingSigma(double amplitudeGaussianSmoothingSigma)
+{
+    LOG_DEBUG() << "Start: setAmplitudeGaussianSmoothingSigma - amplitudeGaussianSmoothingSigma=" << amplitudeGaussianSmoothingSigma;
+    if (qAbs(m_settings.amplitudeGaussianSmoothingSigma - amplitudeGaussianSmoothingSigma) > 0.0001) {
+        m_settings.amplitudeGaussianSmoothingSigma = amplitudeGaussianSmoothingSigma;
+        save();
+        emit amplitudeGaussianSmoothingSigmaChanged();
+    }
+    LOG_DEBUG() << "Finish: setAmplitudeGaussianSmoothingSigma";
 }
 
 bool SettingsApi::showAmplitude() const

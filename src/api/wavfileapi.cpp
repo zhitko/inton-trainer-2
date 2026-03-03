@@ -18,7 +18,9 @@ QVariantList WavFileApi::getSpecDP(
     const QVariantList& pitch,
     const int targetLength
 ) {
-    LOG_DEBUG() << "Start: getSpecDP - pattern.size=" << patternSpectrum.size() << ", signal.size=" << signalSpectrum.size() << ", pitch.size=" << pitch.size();
+    LOG_DEBUG() << "Start: getSpecDP - pattern.size=" << patternSpectrum.size() 
+                << ", signal.size=" << signalSpectrum.size() 
+                << ", pitch.size=" << pitch.size();
 
     QVariantList pathDataList;
 
@@ -264,9 +266,17 @@ QVariantList WavFileApi::getAmplitude(
     WaveFile* waveFile,
     int window,
     int shift,
-    bool normalized)
-{
-    LOG_DEBUG() << "Start: getAmplitude - window=" << window << ", shift=" << shift << ", normalized=" << normalized;
+    const QString& amplitudeSmoothing,
+    int amplitudeSmoothingWindowSize,
+    double amplitudeGaussianSmoothingSigma,
+    bool normalized
+) {
+    LOG_DEBUG() << "Start: getAmplitude - window=" << window
+                << ", shift=" << shift
+                << ", smoothing=" << amplitudeSmoothing
+                << ", smoothingWindow=" << amplitudeSmoothingWindowSize
+                << ", sigma=" << amplitudeGaussianSmoothingSigma
+                << ", normalized=" << normalized;
     QVariantList result;
 
     if (!waveFile) {
@@ -282,6 +292,20 @@ QVariantList WavFileApi::getAmplitude(
 
     AmplitudeService ampService;
     std::vector<double> amps = ampService.getAmplitude(samples, window, shift);
+
+    // Apply smoothing
+    if (!amps.empty() && amplitudeSmoothing != "None") {
+        std::string smoothType = amplitudeSmoothing.toStdString();
+        double param1 = static_cast<double>(amplitudeSmoothingWindowSize);
+        double param2 = 0.0;
+
+        if (smoothType == "Gaussian") {
+            param2 = amplitudeGaussianSmoothingSigma;
+        }
+
+        amps = VectorUtils::smooth(smoothType, amps, param1, param2);
+    }
+
     if (normalized) {
         amps = VectorUtils::normalizeFromTo(0.0, 1.0, amps);
     }
@@ -297,9 +321,17 @@ QVariantList WavFileApi::getAmplitudeDerivative(
     WaveFile* waveFile,
     int window,
     int shift,
-    bool normalized)
-{
-    LOG_DEBUG() << "Start: getAmplitudeDerivative - window=" << window << ", shift=" << shift << ", normalized=" << normalized;
+    const QString& amplitudeSmoothing,
+    int amplitudeSmoothingWindowSize,
+    double amplitudeGaussianSmoothingSigma,
+    bool normalized
+) {
+    LOG_DEBUG() << "Start: getAmplitudeDerivative - window=" << window
+                << ", shift=" << shift
+                << ", smoothing=" << amplitudeSmoothing
+                << ", smoothingWindow=" << amplitudeSmoothingWindowSize
+                << ", sigma=" << amplitudeGaussianSmoothingSigma
+                << ", normalized=" << normalized;
     QVariantList result;
 
     if (!waveFile) {
@@ -315,6 +347,20 @@ QVariantList WavFileApi::getAmplitudeDerivative(
 
     AmplitudeService ampService;
     std::vector<double> deriv = ampService.getAmplitudeDerivative(samples, window, shift);
+
+    // Apply smoothing
+    if (!deriv.empty() && amplitudeSmoothing != "None") {
+        std::string smoothType = amplitudeSmoothing.toStdString();
+        double param1 = static_cast<double>(amplitudeSmoothingWindowSize);
+        double param2 = 0.0;
+
+        if (smoothType == "Gaussian") {
+            param2 = amplitudeGaussianSmoothingSigma;
+        }
+
+        deriv = VectorUtils::smooth(smoothType, deriv, param1, param2);
+    }
+
     if (normalized) {
         deriv = VectorUtils::normalizeFromTo(0.0, 1.0, deriv);
     }
@@ -343,7 +389,20 @@ QVariantList WavFileApi::getPitch(
     double pitchSplineSmoothingPenalty,
     bool normalized
 ) {
-    LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate << ", minF0=" << minF0 << ", maxF0=" << maxF0 << ", voicingThreshold=" << voicingThreshold << ", outputFormat=" << outputFormat << ", normalizationMode=" << normalizationMode << ", interpolation=" << pitchInterpolationType << ", smoothing=" << pitchSmoothing << ", smoothingWindow=" << pitchSmoothingWindowSize << ", sigma=" << pitchGaussianSmoothingSigma << ", penalty=" << pitchSplineSmoothingPenalty << ", normalized=" << normalized;
+    LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm 
+                << ", frameShift=" << frameShift 
+                << ", sampleRate=" << sampleRate 
+                << ", minF0=" << minF0 
+                << ", maxF0=" << maxF0 
+                << ", voicingThreshold=" << voicingThreshold 
+                << ", outputFormat=" << outputFormat 
+                << ", normalizationMode=" << normalizationMode 
+                << ", interpolation=" << pitchInterpolationType 
+                << ", smoothing=" << pitchSmoothing 
+                << ", smoothingWindow=" << pitchSmoothingWindowSize 
+                << ", sigma=" << pitchGaussianSmoothingSigma 
+                << ", penalty=" << pitchSplineSmoothingPenalty 
+                << ", normalized=" << normalized;
     QVariantList pitchData;
     
     if (!waveFile) {
@@ -454,16 +513,24 @@ QVariantList WavFileApi::getPitch(
     return pitchData;
 }
 
-QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
+QVariantMap WavFileApi::getUMP(
+    const QVariantList& pitch,
     const QVariantList& cuePoints,
     int pLength,
     int nLength,
     int tLength,
     int waveDataSize,
     const QString& pitchInterpolationType,
-    bool normalized)
-{
-    LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size() << ", cuePoints.size=" << cuePoints.size() << ", pLength=" << pLength << ", nLength=" << nLength << ", tLength=" << tLength << ", waveDataSize=" << waveDataSize << ", interpolation=" << pitchInterpolationType << ", normalized=" << normalized;
+    bool normalized
+) {
+    LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size() 
+                << ", cuePoints.size=" << cuePoints.size() 
+                << ", pLength=" << pLength 
+                << ", nLength=" << nLength 
+                << ", tLength=" << tLength 
+                << ", waveDataSize=" << waveDataSize 
+                << ", interpolation=" << pitchInterpolationType 
+                << ", normalized=" << normalized;
     
     QVariantMap result;
 
@@ -559,17 +626,18 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
     return result;
 }
 
-QVariantList WavFileApi::getSpec(WaveFile* waveFile,
-                                 int fftLength,
-                                 int frameShift,
-                                 double sampleRate,
-                                 const QString& algorithm,
-                                 double minF0,
-                                 double maxF0,
-                                 double voicingThreshold,
-                                 bool f0Refinement,
-                                 bool normalized)
-{
+QVariantList WavFileApi::getSpec(
+    WaveFile* waveFile,
+    int fftLength,
+    int frameShift,
+    double sampleRate,
+    const QString& algorithm,
+    double minF0,
+    double maxF0,
+    double voicingThreshold,
+    bool f0Refinement,
+    bool normalized
+) {
     LOG_DEBUG() << "Start: getSpec - fftLength=" << fftLength 
                 << ", frameShift=" << frameShift 
                 << ", sampleRate=" << sampleRate

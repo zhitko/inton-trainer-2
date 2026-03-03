@@ -35,6 +35,9 @@ struct AppSettings {
     // Amplitude analysis
     int amplitudeWindow = 1024;
     int amplitudeShift = 512;
+    std::string amplitudeSmoothing = "Median";
+    int amplitudeSmoothingWindowSize = 16;
+    double amplitudeGaussianSmoothingSigma = 1.0;
     bool showAmplitude = true;
     bool showAmplitudeDerivative = true;
 

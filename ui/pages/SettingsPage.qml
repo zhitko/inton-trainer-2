@@ -335,6 +335,44 @@ Page {
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
                         }
+
+                        Label {
+                            text: qsTr("Smoothing")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        ComboBox {
+                            model: ["None", "MovingAverage", "Median", "Gaussian"]
+                            currentIndex: ApplicationWindow.window.settingsApi.amplitudeSmoothing
+                            onActivated: ApplicationWindow.window.settingsApi.amplitudeSmoothing = currentIndex
+                            Layout.fillWidth: true
+                        }
+
+                        Label {
+                            text: qsTr("Smoothing Window Size")
+                            color: Theme.onSurface(Material.theme)
+                            visible: ApplicationWindow.window.settingsApi.amplitudeSmoothing !== 0 // Hide for None
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.amplitudeSmoothingWindowSize.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.amplitudeSmoothingWindowSize = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            visible: ApplicationWindow.window.settingsApi.amplitudeSmoothing !== 0 // Hide for None
+                        }
+
+                        Label {
+                            text: qsTr("Gaussian Sigma")
+                            color: Theme.onSurface(Material.theme)
+                            visible: ApplicationWindow.window.settingsApi.amplitudeSmoothing === 3 // Show only for Gaussian (3)
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.amplitudeGaussianSmoothingSigma.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.amplitudeGaussianSmoothingSigma = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: ApplicationWindow.window.settingsApi.amplitudeSmoothing === 3 // Show only for Gaussian (3)
+                        }
                     }
                 }
             }
