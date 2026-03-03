@@ -205,3 +205,46 @@ std::vector<double> VectorUtils::normalizeByMeanDeviation(const std::vector<doub
     LOG_DEBUG() << "Finish: normalizeByMeanDeviation - result.size=" << result.size();
     return result;
 }
+
+std::vector<std::vector<double>> VectorUtils::normalizeFromTo2D(
+    double from,
+    double to,
+    const std::vector<std::vector<double>>& data
+) {
+    if (data.empty()) {
+        return data;
+    }
+
+    // Find global minimum and maximum across all frames
+    double globalMin = std::numeric_limits<double>::max();
+    double globalMax = std::numeric_limits<double>::lowest();
+
+    for (const auto& frame : data) {
+        for (double val : frame) {
+            if (val < globalMin) globalMin = val;
+            if (val > globalMax) globalMax = val;
+        }
+    }
+
+    // If all values are the same, return data as-is
+    if (globalMin == globalMax) {
+        return data;
+    }
+
+    // Normalize all frames using global min/max
+    std::vector<std::vector<double>> result;
+    result.reserve(data.size());
+
+    double range = globalMax - globalMin;
+    for (const auto& frame : data) {
+        std::vector<double> normalizedFrame;
+        normalizedFrame.reserve(frame.size());
+        for (double val : frame) {
+            double normalized = from + (val - globalMin) / range * (to - from);
+            normalizedFrame.push_back(normalized);
+        }
+        result.push_back(normalizedFrame);
+    }
+
+    return result;
+}

@@ -66,17 +66,43 @@ double CDTWService::calculateDistance(int templateIndex, int signalIndex) {
             const std::vector<double>& templateValue = templateData[k][templateIndex];
             const std::vector<double>& signalValue = signalData[k][signalIndex];
             
-            double sum = 0.0;
-            for (size_t f = 0; f < templateValue.size() && f < signalValue.size(); ++f) {
-                double diff = templateValue[f] - signalValue[f];
-                sum += diff * diff;
-            }
-            totalDistance += std::sqrt(sum);
+            totalDistance += calculateDistance(templateValue, signalValue);
             count++;
         }
     }
             
     return (count > 0) ? (totalDistance / count) : 0.0;
+}
+
+double CDTWService::calculateDistance(const std::vector<double>& vec1, const std::vector<double>& vec2) {
+    if (vec1.empty() || vec2.empty()) {
+        return 0.0;
+    }
+    
+    // Get the maximum dimension to normalize
+    size_t maxDim = std::max(vec1.size(), vec2.size());
+    
+    double distance = 0.0;
+    size_t minDim = std::min(vec1.size(), vec2.size());
+    
+    // Calculate distance for common dimensions
+    for (size_t i = 0; i < minDim; ++i) {
+        double diff = vec1[i] - vec2[i];
+        distance += diff * diff;
+    }
+    
+    // Add penalty for mismatched dimensions (if any)
+    for (size_t i = minDim; i < maxDim; ++i) {
+        double val = (i < vec1.size()) ? vec1[i] : vec2[i];
+        distance += val * val;
+    }
+    
+    // Apply normalization coefficient based on dimension
+    // Normalize by maximum dimension to make distances comparable
+    double normalizationCoeff = 1.0 / std::sqrt(static_cast<double>(maxDim));
+    distance = std::sqrt(distance) * normalizationCoeff;
+    
+    return distance;
 }
 
 void CDTWService::compute() {
@@ -120,16 +146,16 @@ void CDTWService::compute() {
             int minStart = prevStart[j - 1];
             int move = 0; // 0 for match, 1 for insertion, 2 for deletion
 
-            if (insertion < minVal) {
-                minVal = insertion;
-                minStart = prevStart[j];
-                move = 1;
-            }
             if (deletion < minVal) {
                 minVal = deletion;
                 minStart = currStart[j - 1];
                 move = 2;
             }
+            if (insertion < minVal) {
+                minVal = insertion;
+                minStart = prevStart[j];
+                move = 1;
+            } 
 
             currRow[j] = cost + minVal;
             currStart[j] = minStart;

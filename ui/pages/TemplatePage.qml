@@ -164,7 +164,18 @@ Page {
             };
         });
 
-        let dpResult = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refPatternData, ampData, ampDeriv, logPitchData, cepstrData, pitchData, scaledLoadedCuePoints);
+        let dpResult = wavFileApi.getDP(
+            root.refAmplitudeData, 
+            root.refAmplitudeDerivData, 
+            root.refLogPitchData, 
+            root.refPatternData, 
+            ampData, 
+            ampDeriv, 
+            logPitchData, 
+            cepstrData, 
+            pitchData, 
+            scaledLoadedCuePoints
+        );
         let scaledPitch = dpResult.pitch;
         Logger.debug("DP result pitch length: " + scaledPitch.length);
 
@@ -388,7 +399,7 @@ Page {
                         color: Theme.onSurface(root.Material.theme)
                         font.bold: true
                         font.pixelSize: 14
-                        text: qsTr("Reference")
+                        text: qsTr("Reference") + " - " + root.refFilePath.substring(root.refFilePath.lastIndexOf('/') + 1)
                     }
 
                     WaveFormGraph {
@@ -411,7 +422,7 @@ Page {
                         color: Theme.onSurface(root.Material.theme)
                         font.bold: true
                         font.pixelSize: 16
-                        text: qsTr("User")
+                        text: qsTr("User") + " - " + root.userFilePath.substring(root.userFilePath.lastIndexOf('/') + 1)
                     }
 
                     WaveFormGraph {
@@ -737,6 +748,7 @@ Page {
 
                         height: 200
                         width: parent.width - 80
+                        lineWidth: 5
                     }
 
                     Text {
@@ -751,6 +763,7 @@ Page {
 
                         height: 200
                         width: parent.width - 80
+                        lineWidth: 5
                     }
                 }
             }

@@ -43,6 +43,10 @@ protected:
         int templateIndex,
         int signalIndex
     );
+    double calculateDistance(
+        const std::vector<double>& vec1, 
+        const std::vector<double>& vec2
+    );
 };
 
 #endif // CDTWSERVICE_H

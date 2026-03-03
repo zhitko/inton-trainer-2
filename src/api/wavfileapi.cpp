@@ -12,11 +12,12 @@
 #include <QPointF>
 #include <limits>
 
-QVariantList WavFileApi::getSpecDP(const QVariantList& patternSpectrum,
-                                   const QVariantList& signalSpectrum,
-                                   const QVariantList& pitch,
-                                   const int targetLength)
-{
+QVariantList WavFileApi::getSpecDP(
+    const QVariantList& patternSpectrum,
+    const QVariantList& signalSpectrum,
+    const QVariantList& pitch,
+    const int targetLength
+) {
     LOG_DEBUG() << "Start: getSpecDP - pattern.size=" << patternSpectrum.size() << ", signal.size=" << signalSpectrum.size() << ", pitch.size=" << pitch.size();
 
     QVariantList pathDataList;
@@ -87,17 +88,18 @@ QVariantList WavFileApi::getSpecDP(const QVariantList& patternSpectrum,
     return pathDataList;
 }
 
-QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
-                               const QVariantList& patternAmplitudeDerivative,
-                               const QVariantList& patternPitch,
-                               const QVariantList& patternCepstrum,
-                               const QVariantList& signalAmplitude,
-                               const QVariantList& signalAmplitudeDerivative,
-                               const QVariantList& signalPitch,
-                               const QVariantList& signalCepstrum,
-                               const QVariantList& pitchToTransform,
-                               const QVariantList& cuePointsToTransform)
-{
+QVariantMap WavFileApi::getDP(
+    const QVariantList& patternAmplitude,
+    const QVariantList& patternAmplitudeDerivative,
+    const QVariantList& patternPitch,
+    const QVariantList& patternCepstrum,
+    const QVariantList& signalAmplitude,
+    const QVariantList& signalAmplitudeDerivative,
+    const QVariantList& signalPitch,
+    const QVariantList& signalCepstrum,
+    const QVariantList& pitchToTransform,
+    const QVariantList& cuePointsToTransform
+) {
     LOG_DEBUG() << "Start: getDP - pattern data size=" << patternAmplitude.size();
 
     QVariantMap result;
@@ -223,15 +225,15 @@ QVariantList WavFileApi::getCuePoints(WaveFile* waveFile)
         cuePoint["type"] = static_cast<int>(cp.type);
         
         if (cp.length > 0) {
-             cuePoint["length"] = cp.length;
+            cuePoint["length"] = cp.length;
         }
 
         LOG_DEBUG() << "Cue Point" 
-                 << ": ID=" << cp.id
-                 << "Label=" << cuePoint["label"].toString()
-                 << "Position=" << cp.position
-                 << "Length=" << cp.length
-                 << "Type=" << static_cast<int>(cp.type);
+                    << ": ID=" << cp.id
+                    << "Label=" << cuePoint["label"].toString()
+                    << "Position=" << cp.position
+                    << "Length=" << cp.length
+                    << "Type=" << static_cast<int>(cp.type);
 
         cuePoints.append(cuePoint);
     }
@@ -258,10 +260,11 @@ QVariantList WavFileApi::getWaveData(WaveFile* waveFile, bool normalized)
     return waveData;
 }
 
-QVariantList WavFileApi::getAmplitude(WaveFile* waveFile,
-                                       int window,
-                                       int shift,
-                                       bool normalized)
+QVariantList WavFileApi::getAmplitude(
+    WaveFile* waveFile,
+    int window,
+    int shift,
+    bool normalized)
 {
     LOG_DEBUG() << "Start: getAmplitude - window=" << window << ", shift=" << shift << ", normalized=" << normalized;
     QVariantList result;
@@ -290,10 +293,11 @@ QVariantList WavFileApi::getAmplitude(WaveFile* waveFile,
     return result;
 }
 
-QVariantList WavFileApi::getAmplitudeDerivative(WaveFile* waveFile,
-                                                  int window,
-                                                  int shift,
-                                                  bool normalized)
+QVariantList WavFileApi::getAmplitudeDerivative(
+    WaveFile* waveFile,
+    int window,
+    int shift,
+    bool normalized)
 {
     LOG_DEBUG() << "Start: getAmplitudeDerivative - window=" << window << ", shift=" << shift << ", normalized=" << normalized;
     QVariantList result;
@@ -322,22 +326,23 @@ QVariantList WavFileApi::getAmplitudeDerivative(WaveFile* waveFile,
     return result;
 }
 
-QVariantList WavFileApi::getPitch(WaveFile* waveFile,
-                                  const QString& algorithm,
-                                  double frameShift,
-                                  double sampleRate,
-                                  double minF0,
-                                  double maxF0,
-                                  double voicingThreshold,
-                                  const QString& outputFormat,
-                                  const QString& normalizationMode,
-                                  const QString& pitchInterpolationType,
-                                  const QString& pitchSmoothing,
-                                  int pitchSmoothingWindowSize,
-                                  double pitchGaussianSmoothingSigma,
-                                  double pitchSplineSmoothingPenalty,
-                                  bool normalized)
-{
+QVariantList WavFileApi::getPitch(
+    WaveFile* waveFile,
+    const QString& algorithm,
+    double frameShift,
+    double sampleRate,
+    double minF0,
+    double maxF0,
+    double voicingThreshold,
+    const QString& outputFormat,
+    const QString& normalizationMode,
+    const QString& pitchInterpolationType,
+    const QString& pitchSmoothing,
+    int pitchSmoothingWindowSize,
+    double pitchGaussianSmoothingSigma,
+    double pitchSplineSmoothingPenalty,
+    bool normalized
+) {
     LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate << ", minF0=" << minF0 << ", maxF0=" << maxF0 << ", voicingThreshold=" << voicingThreshold << ", outputFormat=" << outputFormat << ", normalizationMode=" << normalizationMode << ", interpolation=" << pitchInterpolationType << ", smoothing=" << pitchSmoothing << ", smoothingWindow=" << pitchSmoothingWindowSize << ", sigma=" << pitchGaussianSmoothingSigma << ", penalty=" << pitchSplineSmoothingPenalty << ", normalized=" << normalized;
     QVariantList pitchData;
     
@@ -439,6 +444,7 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
         if (normalized) {
             normalizedPitch = VectorUtils::normalizeFromTo(0.0, 1.0, normalizedPitch);
         }
+
         for (size_t i = 0; i < normalizedPitch.size(); ++i) {
             pitchData.append(QPointF(i, normalizedPitch[i]));
         }
@@ -449,13 +455,13 @@ QVariantList WavFileApi::getPitch(WaveFile* waveFile,
 }
 
 QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
-                               const QVariantList& cuePoints,
-                               int pLength,
-                               int nLength,
-                               int tLength,
-                               int waveDataSize,
-                               const QString& pitchInterpolationType,
-                               bool normalized)
+    const QVariantList& cuePoints,
+    int pLength,
+    int nLength,
+    int tLength,
+    int waveDataSize,
+    const QString& pitchInterpolationType,
+    bool normalized)
 {
     LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size() << ", cuePoints.size=" << cuePoints.size() << ", pLength=" << pLength << ", nLength=" << nLength << ", tLength=" << tLength << ", waveDataSize=" << waveDataSize << ", interpolation=" << pitchInterpolationType << ", normalized=" << normalized;
     
@@ -468,8 +474,8 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
         if (val.canConvert<QPointF>()) {
             pitchVec.push_back(val.toPointF().y());
         } else {
-             // Fallback if it's just a list of numbers
-             pitchVec.push_back(val.toDouble());
+            // Fallback if it's just a list of numbers
+            pitchVec.push_back(val.toDouble());
         }
     }
     LOG_DEBUG() << "  Converted pitch vector size:" << pitchVec.size();
@@ -488,9 +494,9 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
         cuePointsVec.push_back(cp);
         
         LOG_DEBUG() << "  Cue point" << cp.id << ":" 
-                 << "position=" << cp.position 
-                 << "length=" << cp.length 
-                 << "label=" << QString::fromStdString(cp.label);
+                    << "position=" << cp.position 
+                    << "length=" << cp.length 
+                    << "label=" << QString::fromStdString(cp.label);
     }
 
     // Call UMPService
@@ -531,8 +537,8 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
         modifiedCuePoints.append(cpMap);
         position += length;
         LOG_DEBUG() << "  Modified cue point" << cpMap["id"].toUInt() << ":" 
-                 << "position=" << cpMap["position"].toUInt() 
-                 << "length=" << cpMap["length"].toUInt();
+                    << "position=" << cpMap["position"].toUInt() 
+                    << "length=" << cpMap["length"].toUInt();
 
         // Also create scaled cue points for the original wave data
         QVariantMap scaledCpMap;
@@ -542,8 +548,8 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
         scaledCpMap["length"] = cp.length;
         scaledCuePoints.append(scaledCpMap);
         LOG_DEBUG() << "  Scaled cue point" << scaledCpMap["id"].toUInt() << ":" 
-                 << "position=" << scaledCpMap["position"].toUInt() 
-                 << "length=" << scaledCpMap["length"].toUInt();
+                    << "position=" << scaledCpMap["position"].toUInt() 
+                    << "length=" << scaledCpMap["length"].toUInt();
     }
     result["cuePoints"] = modifiedCuePoints;
 
@@ -663,18 +669,19 @@ QVariantList WavFileApi::getSpec(WaveFile* waveFile,
     return specData;
 }
 
-QVariantList WavFileApi::getCepstr(WaveFile* waveFile,
-                                   int fftLength,
-                                   int frameShift,
-                                   double sampleRate,
-                                   int numOrder,
-                                   const QString& algorithm,
-                                   double minF0,
-                                   double maxF0,
-                                   double voicingThreshold,
-                                   bool f0Refinement,
-                                   bool normalized)
-{
+QVariantList WavFileApi::getCepstr(
+    WaveFile* waveFile,
+    int fftLength,
+    int frameShift,
+    double sampleRate,
+    int numOrder,
+    const QString& algorithm,
+    double minF0,
+    double maxF0,
+    double voicingThreshold,
+    bool f0Refinement,
+    bool normalized
+) {
     LOG_DEBUG() << "Start: getCepstr - fftLength=" << fftLength 
                 << ", frameShift=" << frameShift 
                 << ", sampleRate=" << sampleRate
@@ -753,19 +760,19 @@ QVariantList WavFileApi::getCepstr(WaveFile* waveFile,
         LOG_WARNING() << "Cepstrum extraction returned empty result";
         return cepstrData;
     }
+
+    std::vector<std::vector<double>> outCepstrum = cepstrum;
+    if (normalized) {
+        outCepstrum = VectorUtils::normalizeFromTo2D(0.0, 1.0, cepstrum);
+    }
     
-    // Convert 2D cepstrum vector to QVariantList
-    // Each frame becomes a QVariantList of cepstral coefficients
-    for (size_t frameIdx = 0; frameIdx < cepstrum.size(); ++frameIdx) {
-        const std::vector<double>& rawFrame = cepstrum[frameIdx];
-        const std::vector<double> outFrame = normalized
-            ? VectorUtils::normalizeFromTo(0.0, 1.0, rawFrame)
-            : rawFrame;
-        QVariantList frame;
-        for (size_t coeffIdx = 0; coeffIdx < outFrame.size(); ++coeffIdx) {
-            frame.append(outFrame[coeffIdx]);
+    for (size_t frameIdx = 0; frameIdx < outCepstrum.size(); ++frameIdx) {
+        const std::vector<double>& frame = outCepstrum[frameIdx];
+        QVariantList frameData;
+        for (size_t coeffIdx = 0; coeffIdx < frame.size(); ++coeffIdx) {
+            frameData.append(frame[coeffIdx]);
         }
-        cepstrData.append(QVariant::fromValue(frame));
+        cepstrData.append(QVariant::fromValue(frameData));
     }
     
     LOG_DEBUG() << "Finish: getCepstr - frames=" << cepstrData.size();

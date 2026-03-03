@@ -47,6 +47,16 @@ public:
     static std::vector<double> normalizeByMeanDeviation(const std::vector<double>& data, bool skipZeros = true);
 
     /**
+     * Normalize a 2D vector (matrix) to a range [from, to] using global min/max
+     * Finds the global minimum and maximum across all frames, then normalizes all values accordingly
+     */
+    static std::vector<std::vector<double>> normalizeFromTo2D(
+        double from,
+        double to,
+        const std::vector<std::vector<double>>& data
+    );
+
+    /**
      * @brief Resamples the input vector to the target length using linear interpolation.
      * @param data Input vector.
      * @param targetLength Target length of the output vector.
