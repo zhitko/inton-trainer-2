@@ -1,25 +1,27 @@
 #include "amplitudeservice.h"
-#include <cmath>
 #include "helpers/logger.h"
 #include "helpers/vectorutils.h"
+#include <cmath>
 
-AmplitudeService::AmplitudeService() {
+AmplitudeService::AmplitudeService()
+{
     LOG_DEBUG() << "Start: AmplitudeService constructor";
     LOG_DEBUG() << "Finish: AmplitudeService constructor";
 }
 
-AmplitudeService::~AmplitudeService() {
+AmplitudeService::~AmplitudeService()
+{
     LOG_DEBUG() << "Start: AmplitudeService destructor";
     LOG_DEBUG() << "Finish: AmplitudeService destructor";
 }
 
-std::vector<double> AmplitudeService::getAmplitude(
-    const std::vector<double>& inputWaveData,
-    int window,
-    int shift
-) {
-    LOG_DEBUG() << "Start: getAmplitude - inputWaveData.size=" << inputWaveData.size()
-                << ", window=" << window << ", shift=" << shift;
+std::vector<double>
+AmplitudeService::getAmplitude(const std::vector<double>& inputWaveData,
+    int window, int shift)
+{
+    LOG_DEBUG() << "Start: getAmplitude - inputWaveData.size="
+                << inputWaveData.size() << ", window=" << window
+                << ", shift=" << shift;
 
     std::vector<double> result;
     if (window <= 0 || shift <= 0) {
@@ -28,7 +30,8 @@ std::vector<double> AmplitudeService::getAmplitude(
     }
 
     const size_t total = inputWaveData.size();
-    for (size_t pos = 0; pos + static_cast<size_t>(window) <= total; pos += shift) {
+    for (size_t pos = 0; pos + static_cast<size_t>(window) <= total;
+         pos += shift) {
         double sumSq = 0.0;
         for (int i = 0; i < window; ++i) {
             double s = inputWaveData[pos + i];
@@ -46,12 +49,11 @@ std::vector<double> AmplitudeService::getAmplitude(
 }
 
 std::vector<double> AmplitudeService::getAmplitudeDerivative(
-    const std::vector<double>& inputWaveData,
-    int window,
-    int shift
-) {
-    LOG_DEBUG() << "Start: getAmplitudeDerivative - inputWaveData.size=" << inputWaveData.size()
-                << ", window=" << window << ", shift=" << shift;
+    const std::vector<double>& inputWaveData, int window, int shift)
+{
+    LOG_DEBUG() << "Start: getAmplitudeDerivative - inputWaveData.size="
+                << inputWaveData.size() << ", window=" << window
+                << ", shift=" << shift;
 
     std::vector<double> amp = getAmplitude(inputWaveData, window, shift);
     std::vector<double> deriv;

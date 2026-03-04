@@ -1,15 +1,16 @@
 #include "fileapi.h"
 #include "helpers/logger.h"
-#include <QDirIterator>
+#include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
+#include <QDirIterator>
+#include <QFile>
 #include <QFileInfo>
 #include <QRegularExpression>
-#include <QFile>
-#include <QCoreApplication>
-#include <QDir>
 
 namespace {
-void insert(QVariantMap& map, const QStringList& path, bool isFile) {
+void insert(QVariantMap& map, const QStringList& path, bool isFile)
+{
     if (path.isEmpty()) {
         return;
     }
@@ -19,7 +20,8 @@ void insert(QVariantMap& map, const QStringList& path, bool isFile) {
 
     if (remainingPath.isEmpty()) {
         if (isFile) {
-            map.insert(key, QVariant()); // It's a file, represented by a null QVariant
+            map.insert(key,
+                QVariant()); // It's a file, represented by a null QVariant
         } else { // It's a directory
             if (!map.contains(key)) {
                 map.insert(key, QVariantMap());
@@ -36,14 +38,14 @@ void insert(QVariantMap& map, const QStringList& path, bool isFile) {
     insert(innerMap, remainingPath, isFile);
     map[key] = innerMap;
 }
-}
+} // namespace
 
-FileApi::FileApi(QObject *parent) : QObject(parent)
+FileApi::FileApi(QObject* parent)
+    : QObject(parent)
 {
-
 }
 
-void FileApi::deleteFile(const QString &file)
+void FileApi::deleteFile(const QString& file)
 {
     LOG_DEBUG() << "Start: deleteFile - file=" << file;
     QString basePath = QCoreApplication::applicationDirPath();
@@ -58,24 +60,28 @@ QString FileApi::getApplicationDirPath()
     return QCoreApplication::applicationDirPath();
 }
 
-bool FileApi::directoryExists(const QString &path)
+bool FileApi::directoryExists(const QString& path)
 {
     LOG_DEBUG() << "Start: directoryExists - path=" << path;
     QString basePath = QCoreApplication::applicationDirPath();
     QString searchPath = QDir(basePath).filePath(path);
     bool exists = QDir(searchPath).exists();
-    LOG_DEBUG() << "Finish: directoryExists - exists=" << exists << ", path=" << searchPath;
+    LOG_DEBUG() << "Finish: directoryExists - exists=" << exists
+                << ", path=" << searchPath;
     return exists;
 }
 
-QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilters)
+QVariantMap FileApi::getFiles(const QString& path,
+    const QStringList& nameFilters)
 {
-    LOG_DEBUG() << "Start: getFiles - path=" << path << ", nameFilters=" << nameFilters;
+    LOG_DEBUG() << "Start: getFiles - path=" << path
+                << ", nameFilters=" << nameFilters;
     QString basePath = QCoreApplication::applicationDirPath();
     QString searchPath = QDir(basePath).filePath(path);
 
     QVariantMap fileTree;
-    QDirIterator it(searchPath, QDir::AllEntries | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it(searchPath, QDir::AllEntries | QDir::NoDotAndDotDot,
+        QDirIterator::Subdirectories);
 
     while (it.hasNext()) {
         it.next();
@@ -86,8 +92,9 @@ QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilter
             if (nameFilters.isEmpty()) {
                 match = true;
             } else {
-                for (const QString &filter : nameFilters) {
-                    QRegularExpression re(QRegularExpression::wildcardToRegularExpression(filter));
+                for (const QString& filter : nameFilters) {
+                    QRegularExpression re(
+                        QRegularExpression::wildcardToRegularExpression(filter));
                     if (re.match(fileInfo.fileName()).hasMatch()) {
                         match = true;
                         break;
@@ -107,7 +114,7 @@ QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilter
         } else {
             relativePath.remove(0, searchPath.length() + 1);
         }
-        
+
         if (relativePath.isEmpty()) {
             continue;
         }
@@ -119,7 +126,7 @@ QVariantMap FileApi::getFiles(const QString &path, const QStringList &nameFilter
     return fileTree;
 }
 
-QVariantList FileApi::getFolders(const QString &path)
+QVariantList FileApi::getFolders(const QString& path)
 {
     LOG_DEBUG() << "Start: getFolders - path=" << path;
     QString basePath = QCoreApplication::applicationDirPath();
@@ -129,7 +136,7 @@ QVariantList FileApi::getFolders(const QString &path)
     QStringList folders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 
     QVariantList result;
-    for (const QString &folder : folders) {
+    for (const QString& folder : folders) {
         result << folder;
     }
 
@@ -137,14 +144,17 @@ QVariantList FileApi::getFolders(const QString &path)
     return result;
 }
 
-QVariantList FileApi::getFilesList(const QString &path, const QStringList &nameFilters)
+QVariantList FileApi::getFilesList(const QString& path,
+    const QStringList& nameFilters)
 {
-    LOG_DEBUG() << "Start: getFilesList - path=" << path << ", nameFilters=" << nameFilters;
+    LOG_DEBUG() << "Start: getFilesList - path=" << path
+                << ", nameFilters=" << nameFilters;
     QString basePath = QCoreApplication::applicationDirPath();
     QString searchPath = QDir(basePath).filePath(path);
 
     QVariantList fileList;
-    QDirIterator it(searchPath, QDir::AllEntries | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it(searchPath, QDir::AllEntries | QDir::NoDotAndDotDot,
+        QDirIterator::Subdirectories);
 
     while (it.hasNext()) {
         it.next();
@@ -155,8 +165,9 @@ QVariantList FileApi::getFilesList(const QString &path, const QStringList &nameF
             if (nameFilters.isEmpty()) {
                 match = true;
             } else {
-                for (const QString &filter : nameFilters) {
-                    QRegularExpression re(QRegularExpression::wildcardToRegularExpression(filter));
+                for (const QString& filter : nameFilters) {
+                    QRegularExpression re(
+                        QRegularExpression::wildcardToRegularExpression(filter));
                     if (re.match(fileInfo.fileName()).hasMatch()) {
                         match = true;
                         break;
@@ -186,33 +197,37 @@ QVariantList FileApi::getFilesList(const QString &path, const QStringList &nameF
             } else {
                 directory = "Root"; // Or handled as empty/top level
             }
-            
+
             // Format directory for display (capitalize, maybe?)
-            // For now, keep as is or just take the immediate parent folder name if we want to mimic "Categories" style?
-            // "Basic/Sentence 1.wav" -> directory "Basic"
-            // "Advanced/Sentences/S1.wav" -> directory "Advanced/Sentences"
-            
-            // If the user wants "Grouped by parent subdirectories", "Advanced/Sentences" is good.
-            
+            // For now, keep as is or just take the immediate parent folder name if we
+            // want to mimic "Categories" style? "Basic/Sentence 1.wav" -> directory
+            // "Basic" "Advanced/Sentences/S1.wav" -> directory "Advanced/Sentences"
+
+            // If the user wants "Grouped by parent subdirectories",
+            // "Advanced/Sentences" is good.
+
             QVariantMap fileData;
             fileData["fileName"] = fileInfo.fileName();
             fileData["filePath"] = relativePath;
             fileData["directory"] = directory;
-            
+
             fileList.append(fileData);
         }
     }
-    
-    // Sort logic? Maybe the UI will sort or the iterator order is filesystem dependent.
-    // Let's sort by directory then filename to ensure consistent grouping.
-    std::sort(fileList.begin(), fileList.end(), [](const QVariant &a, const QVariant &b) {
-        QVariantMap mapA = a.toMap();
-        QVariantMap mapB = b.toMap();
-        if (mapA["directory"].toString() != mapB["directory"].toString()) {
-            return mapA["directory"].toString() < mapB["directory"].toString();
-        }
-        return mapA["fileName"].toString() < mapB["fileName"].toString();
-    });
+
+    // Sort logic? Maybe the UI will sort or the iterator order is filesystem
+    // dependent. Let's sort by directory then filename to ensure consistent
+    // grouping.
+    std::sort(
+        fileList.begin(), fileList.end(),
+        [](const QVariant& a, const QVariant& b) {
+            QVariantMap mapA = a.toMap();
+            QVariantMap mapB = b.toMap();
+            if (mapA["directory"].toString() != mapB["directory"].toString()) {
+                return mapA["directory"].toString() < mapB["directory"].toString();
+            }
+            return mapA["fileName"].toString() < mapB["fileName"].toString();
+        });
 
     LOG_DEBUG() << "Finish: getFilesList - fileCount=" << fileList.count();
     return fileList;

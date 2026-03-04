@@ -1,77 +1,66 @@
 #include "pitchservice.h"
-#include <iostream>
-#include <cmath>
 #include "SPTK/analysis/pitch_extraction.h"
 #include "helpers/logger.h"
+#include <cmath>
+#include <iostream>
 
-PitchService::PitchService() {
+PitchService::PitchService()
+{
     LOG_DEBUG() << "Start: PitchService constructor";
     LOG_DEBUG() << "Finish: PitchService constructor";
 }
 
-PitchService::~PitchService() {
+PitchService::~PitchService()
+{
     LOG_DEBUG() << "Start: PitchService destructor";
     LOG_DEBUG() << "Finish: PitchService destructor";
 }
 
 std::vector<double> PitchService::getPitch(
-    const std::vector<double>& inputWaveData,
-    PitchAlgorithm algorithm,
-    double frameShift,
-    double sampleRate,
-    double minF0,
-    double maxF0,
-    double voicingThreshold,
-    PitchOutputFormat outputFormat
-) {
+    const std::vector<double>& inputWaveData, PitchAlgorithm algorithm,
+    double frameShift, double sampleRate, double minF0, double maxF0,
+    double voicingThreshold, PitchOutputFormat outputFormat)
+{
     LOG_DEBUG() << "Start: getPitch - inputWaveData.size=" << inputWaveData.size()
                 << ", algorithm=" << static_cast<int>(algorithm)
-                << ", frameShift=" << frameShift
-                << ", sampleRate=" << sampleRate
-                << ", minF0=" << minF0
-                << ", maxF0=" << maxF0
+                << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate
+                << ", minF0=" << minF0 << ", maxF0=" << maxF0
                 << ", voicingThreshold=" << voicingThreshold
                 << ", outputFormat=" << static_cast<int>(outputFormat);
-    
+
     std::vector<double> result;
 
     // Map PitchAlgorithm to SPTK's Algorithms
     sptk::PitchExtraction::Algorithms sptkAlgorithm;
     switch (algorithm) {
-        case PitchAlgorithm::RAPT:
-            sptkAlgorithm = sptk::PitchExtraction::kRapt;
-            break;
-        case PitchAlgorithm::SWIPE:
-            sptkAlgorithm = sptk::PitchExtraction::kSwipe;
-            break;
-        case PitchAlgorithm::REAPER:
-            sptkAlgorithm = sptk::PitchExtraction::kReaper;
-            break;
-        case PitchAlgorithm::DIO:
-            sptkAlgorithm = sptk::PitchExtraction::kDio;
-            break;
-        case PitchAlgorithm::Harvest:
-            sptkAlgorithm = sptk::PitchExtraction::kHarvest;
-            break;
-        case PitchAlgorithm::NumAlgorithm:
-            sptkAlgorithm = sptk::PitchExtraction::kNumAlgorithms;
-            break;
-        default:
-            LOG_WARNING() << "Unknown algorithm";
-            return result;
+    case PitchAlgorithm::RAPT:
+        sptkAlgorithm = sptk::PitchExtraction::kRapt;
+        break;
+    case PitchAlgorithm::SWIPE:
+        sptkAlgorithm = sptk::PitchExtraction::kSwipe;
+        break;
+    case PitchAlgorithm::REAPER:
+        sptkAlgorithm = sptk::PitchExtraction::kReaper;
+        break;
+    case PitchAlgorithm::DIO:
+        sptkAlgorithm = sptk::PitchExtraction::kDio;
+        break;
+    case PitchAlgorithm::Harvest:
+        sptkAlgorithm = sptk::PitchExtraction::kHarvest;
+        break;
+    case PitchAlgorithm::NumAlgorithm:
+        sptkAlgorithm = sptk::PitchExtraction::kNumAlgorithms;
+        break;
+    default:
+        LOG_WARNING() << "Unknown algorithm";
+        return result;
     }
 
     // Create PitchExtraction instance
     // Note: frame_shift is in samples (points)
     int frameShiftSamples = static_cast<int>(frameShift);
-    sptk::PitchExtraction pitchExtractor(
-        frameShiftSamples,
-        sampleRate,
-        minF0,
-        maxF0,
-        voicingThreshold,
-        sptkAlgorithm
-    );
+    sptk::PitchExtraction pitchExtractor(frameShiftSamples, sampleRate, minF0,
+        maxF0, voicingThreshold, sptkAlgorithm);
 
     if (!pitchExtractor.IsValid()) {
         LOG_CRITICAL() << "PitchExtraction initialization failed";
@@ -82,7 +71,7 @@ std::vector<double> PitchService::getPitch(
     std::vector<double> f0;
     std::vector<double> epochs;
     sptk::PitchExtractionInterface::Polarity polarity;
-    
+
     if (!pitchExtractor.Run(inputWaveData, &f0, &epochs, &polarity)) {
         LOG_CRITICAL() << "Pitch extraction failed";
         return result;
@@ -90,26 +79,26 @@ std::vector<double> PitchService::getPitch(
 
     // Convert output format
     switch (outputFormat) {
-        case PitchOutputFormat::PITCH:
-        case PitchOutputFormat::F0:
-            // F0 values are already in Hz, return as is
-            result = f0;
-            break;
-        case PitchOutputFormat::LOG_F0:
-            // Convert to log(F0)
-            result.reserve(f0.size());
-            for (double value : f0) {
-                if (value > 0.0) {
-                    result.push_back(std::log(value));
-                } else {
-                    // For unvoiced frames (F0 = 0), keep as 0 or use a sentinel value
-                    result.push_back(0.0);
-                }
+    case PitchOutputFormat::PITCH:
+    case PitchOutputFormat::F0:
+        // F0 values are already in Hz, return as is
+        result = f0;
+        break;
+    case PitchOutputFormat::LOG_F0:
+        // Convert to log(F0)
+        result.reserve(f0.size());
+        for (double value : f0) {
+            if (value > 0.0) {
+                result.push_back(std::log(value));
+            } else {
+                // For unvoiced frames (F0 = 0), keep as 0 or use a sentinel value
+                result.push_back(0.0);
             }
-            break;
-        default:
-            LOG_WARNING() << "Unknown output format";
-            return result;
+        }
+        break;
+    default:
+        LOG_WARNING() << "Unknown output format";
+        return result;
     }
 
     LOG_DEBUG() << "Finish: getPitch - result.size=" << result.size();

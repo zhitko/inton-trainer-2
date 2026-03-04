@@ -1,10 +1,11 @@
 #include "settingsapi.h"
 #include "helpers/logger.h"
-#include <QDebug>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QQmlEngine>
 
-SettingsApi::SettingsApi(QObject *parent) : QObject(parent)
+SettingsApi::SettingsApi(QObject* parent)
+    : QObject(parent)
 {
     load();
 }
@@ -17,7 +18,7 @@ QString SettingsApi::language() const
     return result;
 }
 
-void SettingsApi::setLanguage(const QString &language)
+void SettingsApi::setLanguage(const QString& language)
 {
     LOG_DEBUG() << "Start: setLanguage - language=" << language;
     if (m_settings.language != language.toStdString()) {
@@ -37,7 +38,7 @@ QString SettingsApi::theme() const
     return result;
 }
 
-void SettingsApi::setTheme(const QString &theme)
+void SettingsApi::setTheme(const QString& theme)
 {
     LOG_DEBUG() << "Start: setTheme - theme=" << theme;
     if (m_settings.theme != theme.toStdString()) {
@@ -56,7 +57,7 @@ QString SettingsApi::algorithm() const
     return result;
 }
 
-void SettingsApi::setAlgorithm(const QString &algorithm)
+void SettingsApi::setAlgorithm(const QString& algorithm)
 {
     LOG_DEBUG() << "Start: setAlgorithm - algorithm=" << algorithm;
     if (m_settings.algorithm != algorithm.toStdString()) {
@@ -153,7 +154,8 @@ double SettingsApi::voicingThreshold() const
 
 void SettingsApi::setVoicingThreshold(double voicingThreshold)
 {
-    LOG_DEBUG() << "Start: setVoicingThreshold - voicingThreshold=" << voicingThreshold;
+    LOG_DEBUG() << "Start: setVoicingThreshold - voicingThreshold="
+                << voicingThreshold;
     if (qAbs(m_settings.voicingThreshold - voicingThreshold) > 0.0001) {
         m_settings.voicingThreshold = voicingThreshold;
         save();
@@ -170,9 +172,10 @@ QString SettingsApi::pitchNormalization() const
     return result;
 }
 
-void SettingsApi::setPitchNormalization(const QString &pitchNormalization)
+void SettingsApi::setPitchNormalization(const QString& pitchNormalization)
 {
-    LOG_DEBUG() << "Start: setPitchNormalization - pitchNormalization=" << pitchNormalization;
+    LOG_DEBUG() << "Start: setPitchNormalization - pitchNormalization="
+                << pitchNormalization;
     if (m_settings.pitchNormalization != pitchNormalization.toStdString()) {
         m_settings.pitchNormalization = pitchNormalization.toStdString();
         save();
@@ -244,32 +247,51 @@ void SettingsApi::save()
     LOG_DEBUG() << "Finish: save";
 }
 
-SettingsApi::PitchInterpolationType SettingsApi::pitchInterpolationType() const
+SettingsApi::PitchInterpolationType
+SettingsApi::pitchInterpolationType() const
 {
     LOG_DEBUG() << "Start: pitchInterpolationType";
     PitchInterpolationType result = PitchInterpolationType::Linear;
     std::string type = m_settings.pitchInterpolationType;
-    if (type == "None") result = PitchInterpolationType::None;
-    else if (type == "Linear") result = PitchInterpolationType::Linear;
-    else if (type == "Cubic") result = PitchInterpolationType::Cubic;
-    else if (type == "Akima") result = PitchInterpolationType::Akima;
-    else if (type == "Monotone") result = PitchInterpolationType::Monotone;
-    LOG_DEBUG() << "Finish: pitchInterpolationType - result=" << static_cast<int>(result);
+    if (type == "None")
+        result = PitchInterpolationType::None;
+    else if (type == "Linear")
+        result = PitchInterpolationType::Linear;
+    else if (type == "Cubic")
+        result = PitchInterpolationType::Cubic;
+    else if (type == "Akima")
+        result = PitchInterpolationType::Akima;
+    else if (type == "Monotone")
+        result = PitchInterpolationType::Monotone;
+    LOG_DEBUG() << "Finish: pitchInterpolationType - result="
+                << static_cast<int>(result);
     return result;
 }
 
-void SettingsApi::setPitchInterpolationType(PitchInterpolationType pitchInterpolationType)
+void SettingsApi::setPitchInterpolationType(
+    PitchInterpolationType pitchInterpolationType)
 {
-    LOG_DEBUG() << "Start: setPitchInterpolationType - pitchInterpolationType=" << static_cast<int>(pitchInterpolationType);
+    LOG_DEBUG() << "Start: setPitchInterpolationType - pitchInterpolationType="
+                << static_cast<int>(pitchInterpolationType);
     std::string type = "Linear";
     switch (pitchInterpolationType) {
-        case PitchInterpolationType::None: type = "None"; break;
-        case PitchInterpolationType::Linear: type = "Linear"; break;
-        case PitchInterpolationType::Cubic: type = "Cubic"; break;
-        case PitchInterpolationType::Akima: type = "Akima"; break;
-        case PitchInterpolationType::Monotone: type = "Monotone"; break;
+    case PitchInterpolationType::None:
+        type = "None";
+        break;
+    case PitchInterpolationType::Linear:
+        type = "Linear";
+        break;
+    case PitchInterpolationType::Cubic:
+        type = "Cubic";
+        break;
+    case PitchInterpolationType::Akima:
+        type = "Akima";
+        break;
+    case PitchInterpolationType::Monotone:
+        type = "Monotone";
+        break;
     }
-    
+
     if (m_settings.pitchInterpolationType != type) {
         m_settings.pitchInterpolationType = type;
         save();
@@ -283,31 +305,47 @@ SettingsApi::PitchSmoothingType SettingsApi::pitchSmoothing() const
     LOG_DEBUG() << "Start: pitchSmoothing";
     PitchSmoothingType result = PitchSmoothingType::None;
     std::string type = m_settings.pitchSmoothing;
-    
-    if (type == "None") result = PitchSmoothingType::None;
-    else if (type == "MovingAverage") result = PitchSmoothingType::MovingAverage;
-    else if (type == "Median") result = PitchSmoothingType::Median;
-    else if (type == "Gaussian") result = PitchSmoothingType::Gaussian;
 
-    else if (type == "Spline") result = PitchSmoothingType::Spline;
-    
+    if (type == "None")
+        result = PitchSmoothingType::None;
+    else if (type == "MovingAverage")
+        result = PitchSmoothingType::MovingAverage;
+    else if (type == "Median")
+        result = PitchSmoothingType::Median;
+    else if (type == "Gaussian")
+        result = PitchSmoothingType::Gaussian;
+
+    else if (type == "Spline")
+        result = PitchSmoothingType::Spline;
+
     LOG_DEBUG() << "Finish: pitchSmoothing - result=" << static_cast<int>(result);
     return result;
 }
 
 void SettingsApi::setPitchSmoothing(PitchSmoothingType pitchSmoothing)
 {
-    LOG_DEBUG() << "Start: setPitchSmoothing - pitchSmoothing=" << static_cast<int>(pitchSmoothing);
+    LOG_DEBUG() << "Start: setPitchSmoothing - pitchSmoothing="
+                << static_cast<int>(pitchSmoothing);
     std::string type = "None";
     switch (pitchSmoothing) {
-        case PitchSmoothingType::None: type = "None"; break;
-        case PitchSmoothingType::MovingAverage: type = "MovingAverage"; break;
-        case PitchSmoothingType::Median: type = "Median"; break;
-        case PitchSmoothingType::Gaussian: type = "Gaussian"; break;
+    case PitchSmoothingType::None:
+        type = "None";
+        break;
+    case PitchSmoothingType::MovingAverage:
+        type = "MovingAverage";
+        break;
+    case PitchSmoothingType::Median:
+        type = "Median";
+        break;
+    case PitchSmoothingType::Gaussian:
+        type = "Gaussian";
+        break;
 
-        case PitchSmoothingType::Spline: type = "Spline"; break;
+    case PitchSmoothingType::Spline:
+        type = "Spline";
+        break;
     }
-    
+
     if (m_settings.pitchSmoothing != type) {
         m_settings.pitchSmoothing = type;
         save();
@@ -326,7 +364,9 @@ int SettingsApi::pitchSmoothingWindowSize() const
 
 void SettingsApi::setPitchSmoothingWindowSize(int pitchSmoothingWindowSize)
 {
-    LOG_DEBUG() << "Start: setPitchSmoothingWindowSize - pitchSmoothingWindowSize=" << pitchSmoothingWindowSize;
+    LOG_DEBUG()
+        << "Start: setPitchSmoothingWindowSize - pitchSmoothingWindowSize="
+        << pitchSmoothingWindowSize;
     if (m_settings.pitchSmoothingWindowSize != pitchSmoothingWindowSize) {
         m_settings.pitchSmoothingWindowSize = pitchSmoothingWindowSize;
         save();
@@ -365,24 +405,39 @@ SettingsApi::AmplitudeSmoothingType SettingsApi::amplitudeSmoothing() const
     AmplitudeSmoothingType result = AmplitudeSmoothingType::None;
     std::string type = m_settings.amplitudeSmoothing;
 
-    if (type == "None") result = AmplitudeSmoothingType::None;
-    else if (type == "MovingAverage") result = AmplitudeSmoothingType::MovingAverage;
-    else if (type == "Median") result = AmplitudeSmoothingType::Median;
-    else if (type == "Gaussian") result = AmplitudeSmoothingType::Gaussian;
+    if (type == "None")
+        result = AmplitudeSmoothingType::None;
+    else if (type == "MovingAverage")
+        result = AmplitudeSmoothingType::MovingAverage;
+    else if (type == "Median")
+        result = AmplitudeSmoothingType::Median;
+    else if (type == "Gaussian")
+        result = AmplitudeSmoothingType::Gaussian;
 
-    LOG_DEBUG() << "Finish: amplitudeSmoothing - result=" << static_cast<int>(result);
+    LOG_DEBUG() << "Finish: amplitudeSmoothing - result="
+                << static_cast<int>(result);
     return result;
 }
 
-void SettingsApi::setAmplitudeSmoothing(AmplitudeSmoothingType amplitudeSmoothing)
+void SettingsApi::setAmplitudeSmoothing(
+    AmplitudeSmoothingType amplitudeSmoothing)
 {
-    LOG_DEBUG() << "Start: setAmplitudeSmoothing - amplitudeSmoothing=" << static_cast<int>(amplitudeSmoothing);
+    LOG_DEBUG() << "Start: setAmplitudeSmoothing - amplitudeSmoothing="
+                << static_cast<int>(amplitudeSmoothing);
     std::string type = "None";
     switch (amplitudeSmoothing) {
-        case AmplitudeSmoothingType::None: type = "None"; break;
-        case AmplitudeSmoothingType::MovingAverage: type = "MovingAverage"; break;
-        case AmplitudeSmoothingType::Median: type = "Median"; break;
-        case AmplitudeSmoothingType::Gaussian: type = "Gaussian"; break;
+    case AmplitudeSmoothingType::None:
+        type = "None";
+        break;
+    case AmplitudeSmoothingType::MovingAverage:
+        type = "MovingAverage";
+        break;
+    case AmplitudeSmoothingType::Median:
+        type = "Median";
+        break;
+    case AmplitudeSmoothingType::Gaussian:
+        type = "Gaussian";
+        break;
     }
 
     if (m_settings.amplitudeSmoothing != type) {
@@ -401,9 +456,12 @@ int SettingsApi::amplitudeSmoothingWindowSize() const
     return result;
 }
 
-void SettingsApi::setAmplitudeSmoothingWindowSize(int amplitudeSmoothingWindowSize)
+void SettingsApi::setAmplitudeSmoothingWindowSize(
+    int amplitudeSmoothingWindowSize)
 {
-    LOG_DEBUG() << "Start: setAmplitudeSmoothingWindowSize - amplitudeSmoothingWindowSize=" << amplitudeSmoothingWindowSize;
+    LOG_DEBUG() << "Start: setAmplitudeSmoothingWindowSize - "
+                   "amplitudeSmoothingWindowSize="
+                << amplitudeSmoothingWindowSize;
     if (m_settings.amplitudeSmoothingWindowSize != amplitudeSmoothingWindowSize) {
         m_settings.amplitudeSmoothingWindowSize = amplitudeSmoothingWindowSize;
         save();
@@ -420,9 +478,12 @@ double SettingsApi::amplitudeGaussianSmoothingSigma() const
     return result;
 }
 
-void SettingsApi::setAmplitudeGaussianSmoothingSigma(double amplitudeGaussianSmoothingSigma)
+void SettingsApi::setAmplitudeGaussianSmoothingSigma(
+    double amplitudeGaussianSmoothingSigma)
 {
-    LOG_DEBUG() << "Start: setAmplitudeGaussianSmoothingSigma - amplitudeGaussianSmoothingSigma=" << amplitudeGaussianSmoothingSigma;
+    LOG_DEBUG() << "Start: setAmplitudeGaussianSmoothingSigma - "
+                   "amplitudeGaussianSmoothingSigma="
+                << amplitudeGaussianSmoothingSigma;
     if (qAbs(m_settings.amplitudeGaussianSmoothingSigma - amplitudeGaussianSmoothingSigma) > 0.0001) {
         m_settings.amplitudeGaussianSmoothingSigma = amplitudeGaussianSmoothingSigma;
         save();
@@ -473,7 +534,8 @@ bool SettingsApi::showProcessedPitch() const
 
 void SettingsApi::setAmplitudeWindow(int amplitudeWindow)
 {
-    LOG_DEBUG() << "Start: setAmplitudeWindow - amplitudeWindow=" << amplitudeWindow;
+    LOG_DEBUG() << "Start: setAmplitudeWindow - amplitudeWindow="
+                << amplitudeWindow;
     if (m_settings.amplitudeWindow != amplitudeWindow) {
         m_settings.amplitudeWindow = amplitudeWindow;
         save();
@@ -506,7 +568,8 @@ void SettingsApi::setShowAmplitude(bool showAmplitude)
 
 void SettingsApi::setShowAmplitudeDerivative(bool showAmplitudeDerivative)
 {
-    LOG_DEBUG() << "Start: setShowAmplitudeDerivative - showAmplitudeDerivative=" << showAmplitudeDerivative;
+    LOG_DEBUG() << "Start: setShowAmplitudeDerivative - showAmplitudeDerivative="
+                << showAmplitudeDerivative;
     if (m_settings.showAmplitudeDerivative != showAmplitudeDerivative) {
         m_settings.showAmplitudeDerivative = showAmplitudeDerivative;
         save();
@@ -539,7 +602,8 @@ void SettingsApi::setShowLogPitch(bool showLogPitch)
 
 void SettingsApi::setShowProcessedPitch(bool showProcessedPitch)
 {
-    LOG_DEBUG() << "Start: setShowProcessedPitch - showProcessedPitch=" << showProcessedPitch;
+    LOG_DEBUG() << "Start: setShowProcessedPitch - showProcessedPitch="
+                << showProcessedPitch;
     if (m_settings.showProcessedPitch != showProcessedPitch) {
         m_settings.showProcessedPitch = showProcessedPitch;
         save();
@@ -548,9 +612,12 @@ void SettingsApi::setShowProcessedPitch(bool showProcessedPitch)
     LOG_DEBUG() << "Finish: setShowProcessedPitch";
 }
 
-void SettingsApi::setPitchGaussianSmoothingSigma(double pitchGaussianSmoothingSigma)
+void SettingsApi::setPitchGaussianSmoothingSigma(
+    double pitchGaussianSmoothingSigma)
 {
-    LOG_DEBUG() << "Start: setPitchGaussianSmoothingSigma - pitchGaussianSmoothingSigma=" << pitchGaussianSmoothingSigma;
+    LOG_DEBUG()
+        << "Start: setPitchGaussianSmoothingSigma - pitchGaussianSmoothingSigma="
+        << pitchGaussianSmoothingSigma;
     if (qAbs(m_settings.pitchGaussianSmoothingSigma - pitchGaussianSmoothingSigma) > 0.0001) {
         m_settings.pitchGaussianSmoothingSigma = pitchGaussianSmoothingSigma;
         save();
@@ -558,8 +625,6 @@ void SettingsApi::setPitchGaussianSmoothingSigma(double pitchGaussianSmoothingSi
     }
     LOG_DEBUG() << "Finish: setPitchGaussianSmoothingSigma";
 }
-
-
 
 double SettingsApi::pitchSplineSmoothingPenalty() const
 {
@@ -569,9 +634,12 @@ double SettingsApi::pitchSplineSmoothingPenalty() const
     return result;
 }
 
-void SettingsApi::setPitchSplineSmoothingPenalty(double pitchSplineSmoothingPenalty)
+void SettingsApi::setPitchSplineSmoothingPenalty(
+    double pitchSplineSmoothingPenalty)
 {
-    LOG_DEBUG() << "Start: setPitchSplineSmoothingPenalty - pitchSplineSmoothingPenalty=" << pitchSplineSmoothingPenalty;
+    LOG_DEBUG()
+        << "Start: setPitchSplineSmoothingPenalty - pitchSplineSmoothingPenalty="
+        << pitchSplineSmoothingPenalty;
     if (m_settings.pitchSplineSmoothingPenalty != pitchSplineSmoothingPenalty) {
         m_settings.pitchSplineSmoothingPenalty = pitchSplineSmoothingPenalty;
         save();
@@ -609,7 +677,8 @@ bool SettingsApi::specF0Refinement() const
 
 void SettingsApi::setSpecF0Refinement(bool specF0Refinement)
 {
-    LOG_DEBUG() << "Start: setSpecF0Refinement - specF0Refinement=" << specF0Refinement;
+    LOG_DEBUG() << "Start: setSpecF0Refinement - specF0Refinement="
+                << specF0Refinement;
     if (m_settings.specF0Refinement != specF0Refinement) {
         m_settings.specF0Refinement = specF0Refinement;
         save();
@@ -628,7 +697,8 @@ bool SettingsApi::specUseLogScale() const
 
 void SettingsApi::setSpecUseLogScale(bool specUseLogScale)
 {
-    LOG_DEBUG() << "Start: setSpecUseLogScale - specUseLogScale=" << specUseLogScale;
+    LOG_DEBUG() << "Start: setSpecUseLogScale - specUseLogScale="
+                << specUseLogScale;
     if (m_settings.specUseLogScale != specUseLogScale) {
         m_settings.specUseLogScale = specUseLogScale;
         save();
@@ -680,27 +750,41 @@ SettingsApi::SpecColorScheme SettingsApi::specColorScheme() const
     LOG_DEBUG() << "Start: specColorScheme";
     SpecColorScheme result = SpecColorScheme::Viridis;
     std::string scheme = m_settings.specColorScheme;
-    
-    if (scheme == "Viridis") result = SpecColorScheme::Viridis;
-    else if (scheme == "Plasma") result = SpecColorScheme::Plasma;
-    else if (scheme == "Hot") result = SpecColorScheme::Hot;
-    else if (scheme == "Cool") result = SpecColorScheme::Cool;
-    
-    LOG_DEBUG() << "Finish: specColorScheme - result=" << static_cast<int>(result);
+
+    if (scheme == "Viridis")
+        result = SpecColorScheme::Viridis;
+    else if (scheme == "Plasma")
+        result = SpecColorScheme::Plasma;
+    else if (scheme == "Hot")
+        result = SpecColorScheme::Hot;
+    else if (scheme == "Cool")
+        result = SpecColorScheme::Cool;
+
+    LOG_DEBUG() << "Finish: specColorScheme - result="
+                << static_cast<int>(result);
     return result;
 }
 
 void SettingsApi::setSpecColorScheme(SpecColorScheme specColorScheme)
 {
-    LOG_DEBUG() << "Start: setSpecColorScheme - specColorScheme=" << static_cast<int>(specColorScheme);
+    LOG_DEBUG() << "Start: setSpecColorScheme - specColorScheme="
+                << static_cast<int>(specColorScheme);
     std::string scheme = "Viridis";
     switch (specColorScheme) {
-        case SpecColorScheme::Viridis: scheme = "Viridis"; break;
-        case SpecColorScheme::Plasma: scheme = "Plasma"; break;
-        case SpecColorScheme::Hot: scheme = "Hot"; break;
-        case SpecColorScheme::Cool: scheme = "Cool"; break;
+    case SpecColorScheme::Viridis:
+        scheme = "Viridis";
+        break;
+    case SpecColorScheme::Plasma:
+        scheme = "Plasma";
+        break;
+    case SpecColorScheme::Hot:
+        scheme = "Hot";
+        break;
+    case SpecColorScheme::Cool:
+        scheme = "Cool";
+        break;
     }
-    
+
     if (m_settings.specColorScheme != scheme) {
         m_settings.specColorScheme = scheme;
         save();
@@ -714,9 +798,10 @@ void SettingsApi::updateTranslator()
     LOG_DEBUG() << "Start: updateTranslator";
     QCoreApplication::removeTranslator(&m_translator);
     QString lang = QString::fromStdString(m_settings.language);
-    if (m_translator.load("inton-trainer-2_" + lang, QCoreApplication::applicationDirPath())) {
+    if (m_translator.load("inton-trainer-2_" + lang,
+            QCoreApplication::applicationDirPath())) {
         QCoreApplication::installTranslator(&m_translator);
-        QQmlEngine *engine = qmlEngine(this);
+        QQmlEngine* engine = qmlEngine(this);
         if (engine) {
             engine->retranslate();
         }

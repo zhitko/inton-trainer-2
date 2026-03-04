@@ -1,20 +1,23 @@
 #include "wavfileservice.h"
-#include "helpers/wavFile.h"
-#include <iostream>
-#include <filesystem>
-#include <algorithm>
-#include <sstream>
 #include "helpers/logger.h"
+#include "helpers/wavFile.h"
+#include <algorithm>
+#include <filesystem>
+#include <iostream>
+#include <sstream>
 
 namespace fs = std::filesystem;
 
-WavFileService::WavFileService(const std::string &rootPath) : m_rootPath(rootPath)
+WavFileService::WavFileService(const std::string& rootPath)
+    : m_rootPath(rootPath)
 {
     LOG_DEBUG() << "Start: WavFileService constructor - rootPath=" << rootPath;
     LOG_DEBUG() << "Finish: WavFileService constructor";
 }
 
-std::string WavFileService::writeWaveFile(const std::string &fileName, const std::vector<char> &buffer, const AudioFormat &format)
+std::string WavFileService::writeWaveFile(const std::string& fileName,
+    const std::vector<char>& buffer,
+    const AudioFormat& format)
 {
     LOG_DEBUG() << "Start: writeWaveFile - fileName=" << fileName
                 << ", buffer.size=" << buffer.size()
@@ -31,26 +34,16 @@ std::string WavFileService::writeWaveFile(const std::string &fileName, const std
     fs::path relativePath = fs::path("data") / "records" / (fileName + ".wav");
     fs::path absoluteFilePath = appDir / relativePath;
 
-    WaveHeader *waveHeader = makeWaveHeader(buffer.size());
-    FormatChunk *formatChunk = makeFormatChunk(
-        format.channelCount,
-        format.sampleRate,
-        format.bitsPerSample
-    );
-    
-    // Cast constness away because makeDataChunk expects char* but likely doesn't modify it (it copies).
-    DataChunk *dataChunk = makeDataChunk(buffer.size(), const_cast<char*>(buffer.data()));
+    WaveHeader* waveHeader = makeWaveHeader(buffer.size());
+    FormatChunk* formatChunk = makeFormatChunk(
+        format.channelCount, format.sampleRate, format.bitsPerSample);
 
-    WaveFile *waveFile = makeWaveFile(
-        waveHeader,
-        formatChunk,
-        dataChunk,
-        nullptr,
-        nullptr,
-        0,
-        nullptr,
-        0
-    );
+    // Cast constness away because makeDataChunk expects char* but likely doesn't
+    // modify it (it copies).
+    DataChunk* dataChunk = makeDataChunk(buffer.size(), const_cast<char*>(buffer.data()));
+
+    WaveFile* waveFile = makeWaveFile(waveHeader, formatChunk, dataChunk, nullptr,
+        nullptr, 0, nullptr, 0);
 
     saveWaveFile(waveFile, absoluteFilePath.string());
     waveCloseFile(waveFile);
@@ -59,7 +52,7 @@ std::string WavFileService::writeWaveFile(const std::string &fileName, const std
     return relativePath.string();
 }
 
-std::vector<double> WavFileService::readWaveData(WaveFile *waveFile)
+std::vector<double> WavFileService::readWaveData(WaveFile* waveFile)
 {
     LOG_DEBUG() << "Start: readWaveData";
     std::vector<double> samples;
@@ -68,17 +61,18 @@ std::vector<double> WavFileService::readWaveData(WaveFile *waveFile)
         return samples;
     }
 
-    void *data = waveFile->dataChunk->waveformData;
+    void* data = waveFile->dataChunk->waveformData;
     uint32_t dataSize = littleEndianBytesToUInt32(waveFile->dataChunk->chunkDataSize);
-    uint16_t bitDepth = littleEndianBytesToUInt16(waveFile->formatChunk->significantBitsPerSample);
+    uint16_t bitDepth = littleEndianBytesToUInt16(
+        waveFile->formatChunk->significantBitsPerSample);
 
     samples = waveformDataToVector(data, dataSize, bitDepth);
-    
+
     LOG_DEBUG() << "Finish: readWaveData - samples.size=" << samples.size();
     return samples;
 }
 
-std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
+std::vector<CuePointData> WavFileService::readCuePoints(WaveFile* waveFile)
 {
     LOG_DEBUG() << "Start: readCuePoints";
     std::vector<CuePointData> cuePoints;
@@ -92,11 +86,11 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
 
     for (uint32_t i = 0; i < cuePointsCount; ++i) {
         CuePointData cuePoint;
-        CuePoint *cp = &waveFile->cueChunk->cuePoints[i];
-        
+        CuePoint* cp = &waveFile->cueChunk->cuePoints[i];
+
         cuePoint.id = littleEndianBytesToUInt32(cp->cuePointID);
         cuePoint.position = littleEndianBytesToUInt32(cp->playOrderPosition);
-        
+
         // Initialize optional fields
         cuePoint.length = 0;
 
@@ -105,10 +99,10 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
         bool ltxtFound = false;
         if (waveFile->listCount > 0) {
             for (uint32_t j = 0; j < waveFile->listCount; ++j) {
-                ListChunk *listChunk = &waveFile->listChunks[j];
+                ListChunk* listChunk = &waveFile->listChunks[j];
                 if (label.empty()) {
                     for (uint32_t k = 0; k < listChunk->lablCount; ++k) {
-                        LablChunk *lablChunk = &listChunk->lablChunks[k];
+                        LablChunk* lablChunk = &listChunk->lablChunks[k];
                         if (littleEndianBytesToUInt32(lablChunk->cuePointID) == cuePoint.id) {
                             if (lablChunk->text) {
                                 label = std::string(lablChunk->text);
@@ -120,7 +114,7 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
 
                 if (!ltxtFound) {
                     for (uint32_t k = 0; k < listChunk->ltxtCount; ++k) {
-                        LtxtChunk *ltxtChunk = &listChunk->ltxtChunks[k];
+                        LtxtChunk* ltxtChunk = &listChunk->ltxtChunks[k];
                         if (littleEndianBytesToUInt32(ltxtChunk->cuePointID) == cuePoint.id) {
                             cuePoint.length = littleEndianBytesToUInt32(ltxtChunk->sampleLength);
                             ltxtFound = true;
@@ -145,15 +139,14 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
             } else if (firstChar == 't') {
                 cuePoint.type = CuePointType::POST_NUCLEUS;
             } else {
-                 cuePoint.type = CuePointType::NUCLEUS; // Default
+                cuePoint.type = CuePointType::NUCLEUS; // Default
             }
         } else {
             cuePoint.type = CuePointType::NUCLEUS; // Default
         }
-        
-        LOG_DEBUG() << "Cue Point " << i 
-                    << ": ID=" << cuePoint.id 
-                    << " Label=" << cuePoint.label 
+
+        LOG_DEBUG() << "Cue Point " << i << ": ID=" << cuePoint.id
+                    << " Label=" << cuePoint.label
                     << " Position=" << cuePoint.position
                     << " Length=" << cuePoint.length
                     << " Type=" << static_cast<int>(cuePoint.type);
@@ -161,9 +154,10 @@ std::vector<CuePointData> WavFileService::readCuePoints(WaveFile *waveFile)
         cuePoints.push_back(cuePoint);
     }
 
-    std::sort(cuePoints.begin(), cuePoints.end(), [](const CuePointData& a, const CuePointData& b) {
-        return a.position < b.position;
-    });
+    std::sort(cuePoints.begin(), cuePoints.end(),
+        [](const CuePointData& a, const CuePointData& b) {
+            return a.position < b.position;
+        });
 
     LOG_DEBUG() << "Finish: readCuePoints - cuePoints.size=" << cuePoints.size();
     return cuePoints;

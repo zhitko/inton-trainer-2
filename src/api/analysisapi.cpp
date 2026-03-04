@@ -1,20 +1,20 @@
 #include "analysisapi.h"
 #include "helpers/logger.h"
-#include "src/services/umpservice.h"
 #include "src/services/helpers/vectorutils.h"
+#include "src/services/umpservice.h"
 #include <QPointF>
 
-AnalysisApi::AnalysisApi(QObject *parent) : QObject(parent)
+AnalysisApi::AnalysisApi(QObject* parent)
+    : QObject(parent)
 {
 }
 
 QVariantMap AnalysisApi::compareUMP(const QVariantList& referenceUmp,
-                                     const QVariantList& userUmp,
-                                     double fullMin,
-                                     double fullMax)
+    const QVariantList& userUmp, double fullMin,
+    double fullMax)
 {
-    LOG_DEBUG() << "Start: AnalysisApi::compareUMP - reference.size=" << referenceUmp.size()
-                << ", user.size=" << userUmp.size();
+    LOG_DEBUG() << "Start: AnalysisApi::compareUMP - reference.size="
+                << referenceUmp.size() << ", user.size=" << userUmp.size();
 
     QVariantMap out;
 
@@ -42,8 +42,8 @@ QVariantMap AnalysisApi::compareUMP(const QVariantList& referenceUmp,
     out["rangeSimilarity"] = cmp.rangeSimilarity;
     out["shapeSimilarity"] = cmp.shapeSimilarity;
 
-    LOG_DEBUG() << "Finish: AnalysisApi::compareUMP - refRange=" << cmp.referenceRange
-                << ", userRange=" << cmp.userRange
+    LOG_DEBUG() << "Finish: AnalysisApi::compareUMP - refRange="
+                << cmp.referenceRange << ", userRange=" << cmp.userRange
                 << ", rangeSim=" << cmp.rangeSimilarity
                 << ", shapeSim=" << cmp.shapeSimilarity;
 

@@ -4,59 +4,133 @@
 #include <QString>
 #include <string>
 
+/*
+ * AppSettings struct holds all the configurable settings for the application.
+ * This includes settings for pitch extraction, spectrum analysis, amplitude
+ * analysis, and general UI preferences. The Settings class provides static
+ * methods to load and save these settings to a file, as well as to get default
+ * settings.
+ *
+ * The settings are designed to be easily extendable in the future as new
+ * features are added to the application.
+ */
 struct AppSettings {
-    // General
+    // == General settings ==
+    // Language options: "en", "ru", etc.
     std::string language = "ru";
+    // Theme options: "light", "dark"
     std::string theme = "light";
 
-    // Pitch
+    // == Pitch extraction settings ==
+    // Show F0 contour in the UI
+    bool showF0 = true;
+    // Show log F0 contour in the UI
+    bool showLogPitch = true;
+    // Show processed pitch contour in the UI (after smoothing and interpolation)
+    bool showProcessedPitch = true;
+    // Algorithm options: "RAPT", "SWIPE", "REAPER", "DIO", "Harvest",
+    // "NumAlgorithm"
     std::string algorithm = "RAPT";
+    // Frame shift in milliseconds
     double frameShift = 32.0;
+    // Sample rate for pitch extraction
     double sampleRate = 8000.0;
+    // Minimum and maximum F0 for pitch extraction
     double minF0 = 80.0;
+    // Maximum F0 for pitch extraction
     double maxF0 = 500.0;
+    // Voicing threshold for pitch extraction
     double voicingThreshold = 0;
+    // Normalization mode options: "max", "min_max", "mean", "mean_deviation"
     std::string pitchNormalization = "min_max";
+    // Interpolation type options: "None", "Linear", "Cubic", "Akima", "Monotone"
     std::string pitchInterpolationType = "Linear";
+    // Smoothing type options: "None", "MovingAverage", "Median", "Gaussian",
+    // "Spline"
     std::string pitchSmoothing = "Median";
+    // Smoothing window size for moving average, median, and Gaussian smoothing
     int pitchSmoothingWindowSize = 16;
+    // Sigma for Gaussian smoothing
     double pitchGaussianSmoothingSigma = 1.0;
-
+    // Penalty for spline smoothing (higher values result in smoother curves)
     double pitchSplineSmoothingPenalty = 1.0;
 
-    // Spectrum
-    int specFftLength = 1024;
-    bool specF0Refinement = true;
-    bool specUseLogScale = true;
-    std::string specColorScheme = "Viridis";
+    // == Spectrum analysis settings ==
+    // Show spectrum in the UI
     bool showSpectrum = false;
+    // Show cepstrum in the UI
     bool showCepstrum = false;
-
-    // Amplitude analysis
-    int amplitudeWindow = 1024;
-    int amplitudeShift = 512;
-    std::string amplitudeSmoothing = "Median";
-    int amplitudeSmoothingWindowSize = 16;
-    double amplitudeGaussianSmoothingSigma = 1.0;
-    bool showAmplitude = true;
-    bool showAmplitudeDerivative = true;
-
-    // Pitch display
-    bool showF0 = true;
-    bool showLogPitch = true;
-    bool showProcessedPitch = true;
-
+    // FFT length for spectrum analysis
+    int specFftLength = 1024;
+    // Hop length for spectrum analysis
+    bool specF0Refinement = true;
+    // Logarithmic scale for spectrum display
+    bool specUseLogScale = true;
+    // Color scheme for spectrum display (e.g., "Viridis", "Plasma", "Hot",
+    // "Cool")
+    std::string specColorScheme = "Viridis";
     // Cepstrum
     int cepstrNumOrder = 25;
+
+    // == Amplitude analysis settings ==
+    // Show amplitude in the UI
+    bool showAmplitude = true;
+    // Show amplitude derivative in the UI
+    bool showAmplitudeDerivative = true;
+    // Window size for amplitude analysis
+    int amplitudeWindow = 1024;
+    // Shift for amplitude analysis
+    int amplitudeShift = 512;
+    // Smoothing type options: "None", "MovingAverage", "Median", "Gaussian",
+    // "Spline"
+    std::string amplitudeSmoothing = "Median";
+    // Smoothing window size for moving average, median, and Gaussian smoothing
+    int amplitudeSmoothingWindowSize = 16;
+    // Sigma for Gaussian smoothing
+    double amplitudeGaussianSmoothingSigma = 1.0;
 };
 
+/*
+ * The Settings class provides static methods to load and save the application
+ * settings to a file, as well as to get default settings. The settings are
+ * stored in a JSON file in the user's home directory.
+ */
 class Settings {
 public:
+    /**
+     * Loads the application settings from a JSON file. If the file does not exist
+     * or is invalid, it returns the default settings.
+     *
+     * @return An AppSettings object containing the loaded settings or default
+     * settings if loading fails.
+     */
     static AppSettings loadSettings();
+
+    /**
+     * Saves the given application settings to a JSON file in the user's home
+     * directory. If the file cannot be written, it should handle the error
+     * gracefully (e.g., by logging an error message).
+     *
+     * @param settings An AppSettings object containing the settings to be saved.
+     */
     static void saveSettings(const AppSettings& settings);
+
+    /**
+     * Returns an AppSettings object initialized with default values. This can be
+     * used as a fallback when loading settings fails or when the application is
+     * run for the first time.
+     *
+     * @return An AppSettings object containing the default settings.
+     */
     static AppSettings getDefaultSettings();
 
 private:
+    /**
+     * Returns the file path for the settings JSON file. This is typically located
+     * in the user's home directory under a hidden folder for the application.
+     *
+     * @return A QString containing the full file path to the settings JSON file.
+     */
     static QString getSettingsFilePath();
 };
 

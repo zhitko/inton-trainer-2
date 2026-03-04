@@ -1,27 +1,35 @@
 #include "settings.h"
-#include "logger.h"
-#include <QSettings>
-#include <QFileInfo>
+
 #include <QCoreApplication>
 #include <QDebug>
+#include <QFileInfo>
+#include <QSettings>
 
-AppSettings Settings::getDefaultSettings() {
+#include "logger.h"
+
+AppSettings
+Settings::getDefaultSettings()
+{
     return AppSettings();
 }
 
-QString Settings::getSettingsFilePath() {
+QString
+Settings::getSettingsFilePath()
+{
     QString path = QCoreApplication::applicationDirPath() + "/settings.ini";
     return path;
 }
 
-AppSettings Settings::loadSettings() {
+AppSettings
+Settings::loadSettings()
+{
     AppSettings settings;
     QString filePath = getSettingsFilePath();
-    
+
     // Use absolute path for QSettings
     QFileInfo fileInfo(filePath);
     QString absolutePath = fileInfo.absoluteFilePath();
-    
+
     QSettings qsettings(absolutePath, QSettings::IniFormat);
     LOG_INFO() << "Loading settings from:" << absolutePath;
 
@@ -38,14 +46,16 @@ AppSettings Settings::loadSettings() {
     settings.maxF0 = qsettings.value("maxF0", 600.0).toDouble();
     settings.voicingThreshold = qsettings.value("voicingThreshold", 0.3).toDouble();
     settings.pitchNormalization = qsettings.value("pitchNormalization", "max").toString().toStdString();
-    settings.pitchInterpolationType = qsettings.value("pitchInterpolationType", "Linear").toString().toStdString();
+    settings.pitchInterpolationType = qsettings.value("pitchInterpolationType", "Linear")
+                                          .toString()
+                                          .toStdString();
     settings.pitchSmoothing = qsettings.value("pitchSmoothing", "None").toString().toStdString();
     settings.pitchSmoothingWindowSize = qsettings.value("pitchSmoothingWindowSize", 5).toInt();
     settings.pitchGaussianSmoothingSigma = qsettings.value("pitchGaussianSmoothingSigma", 2.0).toDouble();
 
     settings.pitchSplineSmoothingPenalty = qsettings.value("pitchSplineSmoothingPenalty", 10.0).toDouble();
     qsettings.endGroup();
-    
+
     // Amplitude settings
     qsettings.beginGroup("Amplitude");
     settings.amplitudeWindow = qsettings.value("window", 1024).toInt();
@@ -59,7 +69,7 @@ AppSettings Settings::loadSettings() {
     settings.showLogPitch = qsettings.value("showLogPitch", true).toBool();
     settings.showProcessedPitch = qsettings.value("showProcessedPitch", true).toBool();
     qsettings.endGroup();
-    
+
     qsettings.beginGroup("Spectrum");
     settings.specFftLength = qsettings.value("specFftLength", 2048).toInt();
     settings.specF0Refinement = qsettings.value("specF0Refinement", false).toBool();
@@ -72,13 +82,14 @@ AppSettings Settings::loadSettings() {
     return settings;
 }
 
-void Settings::saveSettings(const AppSettings& settings) {
+void Settings::saveSettings(const AppSettings& settings)
+{
     QString filePath = getSettingsFilePath();
-    
+
     // Use absolute path for QSettings
     QFileInfo fileInfo(filePath);
     QString absolutePath = fileInfo.absoluteFilePath();
-    
+
     QSettings qsettings(absolutePath, QSettings::IniFormat);
     LOG_INFO() << "Saving settings to:" << absolutePath;
 
@@ -94,24 +105,34 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("minF0", settings.minF0);
     qsettings.setValue("maxF0", settings.maxF0);
     qsettings.setValue("voicingThreshold", settings.voicingThreshold);
-    qsettings.setValue("pitchNormalization", QString::fromStdString(settings.pitchNormalization));
-    qsettings.setValue("pitchInterpolationType", QString::fromStdString(settings.pitchInterpolationType));
-    qsettings.setValue("pitchSmoothing", QString::fromStdString(settings.pitchSmoothing));
-    qsettings.setValue("pitchSmoothingWindowSize", settings.pitchSmoothingWindowSize);
-    qsettings.setValue("pitchGaussianSmoothingSigma", settings.pitchGaussianSmoothingSigma);
+    qsettings.setValue("pitchNormalization",
+        QString::fromStdString(settings.pitchNormalization));
+    qsettings.setValue("pitchInterpolationType",
+        QString::fromStdString(settings.pitchInterpolationType));
+    qsettings.setValue("pitchSmoothing",
+        QString::fromStdString(settings.pitchSmoothing));
+    qsettings.setValue("pitchSmoothingWindowSize",
+        settings.pitchSmoothingWindowSize);
+    qsettings.setValue("pitchGaussianSmoothingSigma",
+        settings.pitchGaussianSmoothingSigma);
 
-    qsettings.setValue("pitchSplineSmoothingPenalty", settings.pitchSplineSmoothingPenalty);
+    qsettings.setValue("pitchSplineSmoothingPenalty",
+        settings.pitchSplineSmoothingPenalty);
     qsettings.endGroup();
 
     // Amplitude settings
     qsettings.beginGroup("Amplitude");
     qsettings.setValue("window", settings.amplitudeWindow);
     qsettings.setValue("shift", settings.amplitudeShift);
-    qsettings.setValue("amplitudeSmoothing", QString::fromStdString(settings.amplitudeSmoothing));
-    qsettings.setValue("amplitudeSmoothingWindowSize", settings.amplitudeSmoothingWindowSize);
-    qsettings.setValue("amplitudeGaussianSmoothingSigma", settings.amplitudeGaussianSmoothingSigma);
+    qsettings.setValue("amplitudeSmoothing",
+        QString::fromStdString(settings.amplitudeSmoothing));
+    qsettings.setValue("amplitudeSmoothingWindowSize",
+        settings.amplitudeSmoothingWindowSize);
+    qsettings.setValue("amplitudeGaussianSmoothingSigma",
+        settings.amplitudeGaussianSmoothingSigma);
     qsettings.setValue("showAmplitude", settings.showAmplitude);
-    qsettings.setValue("showAmplitudeDerivative", settings.showAmplitudeDerivative);
+    qsettings.setValue("showAmplitudeDerivative",
+        settings.showAmplitudeDerivative);
     qsettings.setValue("showF0", settings.showF0);
     qsettings.setValue("showLogPitch", settings.showLogPitch);
     qsettings.setValue("showProcessedPitch", settings.showProcessedPitch);
@@ -121,13 +142,14 @@ void Settings::saveSettings(const AppSettings& settings) {
     qsettings.setValue("specFftLength", settings.specFftLength);
     qsettings.setValue("specF0Refinement", settings.specF0Refinement);
     qsettings.setValue("specUseLogScale", settings.specUseLogScale);
-    qsettings.setValue("specColorScheme", QString::fromStdString(settings.specColorScheme));
+    qsettings.setValue("specColorScheme",
+        QString::fromStdString(settings.specColorScheme));
     qsettings.setValue("showSpectrum", settings.showSpectrum);
     qsettings.setValue("showCepstrum", settings.showCepstrum);
     qsettings.endGroup();
-    
+
     qsettings.sync();
-    
+
     LOG_DEBUG() << "QSettings status:" << qsettings.status();
     if (qsettings.status() != QSettings::NoError) {
         LOG_WARNING() << "Failed to save settings. Status:" << qsettings.status();

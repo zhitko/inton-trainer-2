@@ -4,7 +4,6 @@
 #include <vector>
 
 /**
- * 
  * AmplitudeService provides simple envelope/level calculations over a waveform.
  * It is intentionally lightweight and does not depend on external libraries.
  */
@@ -26,11 +25,8 @@ public:
      * @param shift       hop size between successive windows in samples
      * @return vector containing the RMS amplitude for each frame
      */
-    std::vector<double> getAmplitude(
-        const std::vector<double>& inputWaveData,
-        int window,
-        int shift
-    );
+    std::vector<double> getAmplitude(const std::vector<double>& inputWaveData,
+        int window, int shift);
 
     /**
      * Compute the first-order derivative of the amplitude envelope returned by
@@ -42,11 +38,9 @@ public:
      * @param shift       hop size between successive windows in samples
      * @return derivative of the amplitude envelope
      */
-    std::vector<double> getAmplitudeDerivative(
-        const std::vector<double>& inputWaveData,
-        int window,
-        int shift
-    );
+    std::vector<double>
+    getAmplitudeDerivative(const std::vector<double>& inputWaveData, int window,
+        int shift);
 };
 
 #endif // AMPLITUDESERVICE_H

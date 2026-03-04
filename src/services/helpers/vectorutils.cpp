@@ -1,16 +1,18 @@
 #include "vectorutils.h"
 #include "logger.h"
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
-double VectorUtils::pearsonCorrelation(const std::vector<double>& vec1, const std::vector<double>& vec2)
+double VectorUtils::pearsonCorrelation(const std::vector<double>& vec1,
+    const std::vector<double>& vec2)
 {
-    LOG_DEBUG() << "Start: pearsonCorrelation - vec1.size=" << vec1.size() << ", vec2.size=" << vec2.size();
-    
+    LOG_DEBUG() << "Start: pearsonCorrelation - vec1.size=" << vec1.size()
+                << ", vec2.size=" << vec2.size();
+
     // Validate inputs
     if (vec1.empty() || vec2.empty() || vec1.size() != vec2.size()) {
-        LOG_WARNING() << "pearsonCorrelation: Invalid input - vec1 size=" << vec1.size()
-                      << ", vec2 size=" << vec2.size();
+        LOG_WARNING() << "pearsonCorrelation: Invalid input - vec1 size="
+                      << vec1.size() << ", vec2 size=" << vec2.size();
         return 0.0;
     }
 
@@ -33,7 +35,7 @@ double VectorUtils::pearsonCorrelation(const std::vector<double>& vec1, const st
     for (size_t i = 0; i < n; ++i) {
         double dev1 = vec1[i] - mean1;
         double dev2 = vec2[i] - mean2;
-        
+
         covariance += dev1 * dev2;
         variance1 += dev1 * dev1;
         variance2 += dev2 * dev2;

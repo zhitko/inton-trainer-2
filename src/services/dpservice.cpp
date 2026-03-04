@@ -1,18 +1,19 @@
 #include "dpservice.h"
 
-#include <vector>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <vector>
 
-
-DPService::DPService(
-    std::vector<std::vector<std::vector<double>>> templateData,
-    std::vector<std::vector<std::vector<double>>> signalData
-) : templateData(templateData), signalData(signalData) {
+DPService::DPService(std::vector<std::vector<std::vector<double>>> templateData,
+    std::vector<std::vector<std::vector<double>>> signalData)
+    : templateData(templateData)
+    , signalData(signalData)
+{
     normalizeData();
 }
 
-void DPService::normalizeData() {
+void DPService::normalizeData()
+{
     if (!templateData.empty()) {
         size_t targetLength = templateData[0].size();
         for (size_t k = 1; k < templateData.size(); ++k) {
@@ -21,7 +22,7 @@ void DPService::normalizeData() {
             }
         }
     }
-    
+
     if (!signalData.empty()) {
         size_t targetLength = signalData[0].size();
         for (size_t k = 1; k < signalData.size(); ++k) {
@@ -32,11 +33,14 @@ void DPService::normalizeData() {
     }
 }
 
-std::vector<std::vector<double>> DPService::scaleStream(const std::vector<std::vector<double>>& stream, size_t targetLength) {
+std::vector<std::vector<double>>
+DPService::scaleStream(const std::vector<std::vector<double>>& stream,
+    size_t targetLength)
+{
     if (stream.empty() || targetLength == 0) {
         return stream;
     }
-    
+
     std::vector<std::vector<double>> transformed(targetLength);
     double scalingFactor = static_cast<double>(stream.size()) / targetLength;
     for (size_t i = 0; i < targetLength; ++i) {
@@ -50,11 +54,13 @@ std::vector<std::vector<double>> DPService::scaleStream(const std::vector<std::v
     return transformed;
 }
 
-DPService::~DPService() {
+DPService::~DPService()
+{
     // Destructor implementation (if needed)
 }
 
-void DPService::compute() {
+void DPService::compute()
+{
     // Example implementation of the compute function
     if (templateData.empty() || signalData.empty() || templateData[0].empty() || signalData[0].empty()) {
         return; // Handle empty data case
@@ -76,7 +82,8 @@ void DPService::compute() {
     return;
 }
 
-void DPService::computeDistanceMatrix() {
+void DPService::computeDistanceMatrix()
+{
     // Example implementation of distance matrix computation
     int templateLength = templateData[0].size();
     int signalLength = signalData[0].size();
@@ -86,7 +93,7 @@ void DPService::computeDistanceMatrix() {
         for (int j = 0; j < signalLength; ++j) {
             double totalDistance = 0.0;
             int count = 0;
-            
+
             size_t minStreams = std::min(templateData.size(), signalData.size());
             for (size_t k = 0; k < minStreams; ++k) {
                 if (i < templateData[k].size() && j < signalData[k].size()) {
@@ -94,16 +101,15 @@ void DPService::computeDistanceMatrix() {
                     count++;
                 }
             }
-            
+
             distanceMatrix[i][j] = (count > 0) ? (totalDistance / count) : 0.0;
         }
     }
 }
 
-double DPService::calculateDistance(
-    const std::vector<double>& templateValue,
-    const std::vector<double>& signalValue
-) {
+double DPService::calculateDistance(const std::vector<double>& templateValue,
+    const std::vector<double>& signalValue)
+{
     // Example implementation of distance calculation (Euclidean distance)
     double sum = 0.0;
     for (size_t k = 0; k < templateValue.size(); ++k) {
@@ -113,11 +119,13 @@ double DPService::calculateDistance(
     return std::sqrt(sum);
 }
 
-void DPService::computeIntegralTimeDistanceMatrix() {
+void DPService::computeIntegralTimeDistanceMatrix()
+{
     // Example implementation of integral time distance matrix computation
     int templateLength = templateData[0].size();
     int signalLength = signalData[0].size();
-    integralTimeDistanceMatrix.resize(templateLength, std::vector<double>(signalLength, 0.0));
+    integralTimeDistanceMatrix.resize(templateLength,
+        std::vector<double>(signalLength, 0.0));
 
     for (int i = 0; i < templateLength; ++i) {
         for (int j = 0; j < signalLength; ++j) {
@@ -137,7 +145,8 @@ void DPService::computeIntegralTimeDistanceMatrix() {
     }
 }
 
-int DPService::findPositionForSignalStart() {
+int DPService::findPositionForSignalStart()
+{
     // implementation to find minimum position for signal start
     int minPos = 0;
     double minValue = integralTimeDistanceMatrix[0][0];
@@ -150,7 +159,8 @@ int DPService::findPositionForSignalStart() {
     return minPos;
 }
 
-int DPService::findPositionForSignalEnd() {
+int DPService::findPositionForSignalEnd()
+{
     // implementation to find minimum position for signal end
     int minPos = 0;
     double minValue = integralTimeDistanceMatrix.back()[0];
@@ -163,7 +173,9 @@ int DPService::findPositionForSignalEnd() {
     return minPos;
 }
 
-std::vector<int> DPService::performBacktracking(int signalStartPos, int signalEndPos) {
+std::vector<int> DPService::performBacktracking(int signalStartPos,
+    int signalEndPos)
+{
     // Example implementation of backtracking to find the optimal path
     std::vector<int> path;
     int i = templateData[0].size() - 1; // Start from the end of the template
@@ -187,7 +199,10 @@ std::vector<int> DPService::performBacktracking(int signalStartPos, int signalEn
     return path;
 }
 
-std::vector<double> DPService::applyPathToVector(const std::vector<double>& input, const int targetLength) {
+std::vector<double>
+DPService::applyPathToVector(const std::vector<double>& input,
+    const int targetLength)
+{
     // Implementation of applying the computed DP path to a given vector
     std::vector<double> transformed(targetLength, 0.0);
     double scalingFactor = static_cast<double>(input.size()) / targetLength; // Scaling factor based on input size and target length

@@ -1,13 +1,17 @@
-#include "vectorutils.h"
 #include "logger.h"
+#include "vectorutils.h"
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <vector>
 
-std::vector<double> VectorUtils::normalizeFromTo(double from, double to, const std::vector<double>& data) {
-    LOG_DEBUG() << "Start: normalizeFromTo - from=" << from << ", to=" << to << ", data.size=" << data.size();
-    
+std::vector<double>
+VectorUtils::normalizeFromTo(double from, double to,
+    const std::vector<double>& data)
+{
+    LOG_DEBUG() << "Start: normalizeFromTo - from=" << from << ", to=" << to
+                << ", data.size=" << data.size();
+
     if (data.empty()) {
         LOG_DEBUG() << "Finish: normalizeFromTo - result.size=0 (empty input)";
         return {};
@@ -17,8 +21,10 @@ std::vector<double> VectorUtils::normalizeFromTo(double from, double to, const s
     double maxVal = std::numeric_limits<double>::lowest();
 
     for (double val : data) {
-        if (val < minVal) minVal = val;
-        if (val > maxVal) maxVal = val;
+        if (val < minVal)
+            minVal = val;
+        if (val > maxVal)
+            maxVal = val;
     }
 
     if (std::abs(maxVal - minVal) < std::numeric_limits<double>::epsilon()) {
@@ -41,9 +47,13 @@ std::vector<double> VectorUtils::normalizeFromTo(double from, double to, const s
     return result;
 }
 
-std::vector<double> VectorUtils::normalizeByMinMax(const std::vector<double>& data, bool skipZeros) {
-    LOG_DEBUG() << "Start: normalizeByMinMax - data.size=" << data.size() << ", skipZeros=" << skipZeros;
-    
+std::vector<double>
+VectorUtils::normalizeByMinMax(const std::vector<double>& data,
+    bool skipZeros)
+{
+    LOG_DEBUG() << "Start: normalizeByMinMax - data.size=" << data.size()
+                << ", skipZeros=" << skipZeros;
+
     if (data.empty()) {
         LOG_DEBUG() << "Finish: normalizeByMinMax - result.size=0 (empty input)";
         return {};
@@ -55,11 +65,14 @@ std::vector<double> VectorUtils::normalizeByMinMax(const std::vector<double>& da
     for (double val : data) {
         if (skipZeros && std::abs(val) < std::numeric_limits<double>::epsilon()) {
             // Skip zero values when skipZeros is true
-            if (val > maxVal) maxVal = val;
+            if (val > maxVal)
+                maxVal = val;
             continue;
         }
-        if (val < minVal) minVal = val;
-        if (val > maxVal) maxVal = val;
+        if (val < minVal)
+            minVal = val;
+        if (val > maxVal)
+            maxVal = val;
     }
 
     if (std::abs(maxVal - minVal) < std::numeric_limits<double>::epsilon()) {
@@ -84,9 +97,12 @@ std::vector<double> VectorUtils::normalizeByMinMax(const std::vector<double>& da
     return result;
 }
 
-std::vector<double> VectorUtils::normalizeTo(double to, const std::vector<double>& data) {
-    LOG_DEBUG() << "Start: normalizeTo - to=" << to << ", data.size=" << data.size();
-    
+std::vector<double> VectorUtils::normalizeTo(double to,
+    const std::vector<double>& data)
+{
+    LOG_DEBUG() << "Start: normalizeTo - to=" << to
+                << ", data.size=" << data.size();
+
     if (data.empty()) {
         LOG_DEBUG() << "Finish: normalizeTo - result.size=0 (empty input)";
         return {};
@@ -94,7 +110,8 @@ std::vector<double> VectorUtils::normalizeTo(double to, const std::vector<double
 
     double maxVal = std::numeric_limits<double>::lowest();
     for (double val : data) {
-        if (val > maxVal) maxVal = val;
+        if (val > maxVal)
+            maxVal = val;
     }
 
     if (std::abs(maxVal) < std::numeric_limits<double>::epsilon()) {
@@ -113,9 +130,12 @@ std::vector<double> VectorUtils::normalizeTo(double to, const std::vector<double
     return result;
 }
 
-std::vector<double> VectorUtils::normalizeByMean(const std::vector<double>& data, bool skipZeros) {
-    LOG_DEBUG() << "Start: normalizeByMean - data.size=" << data.size() << ", skipZeros=" << skipZeros;
-    
+std::vector<double>
+VectorUtils::normalizeByMean(const std::vector<double>& data, bool skipZeros)
+{
+    LOG_DEBUG() << "Start: normalizeByMean - data.size=" << data.size()
+                << ", skipZeros=" << skipZeros;
+
     if (data.empty()) {
         LOG_DEBUG() << "Finish: normalizeByMean - result.size=0 (empty input)";
         return {};
@@ -131,7 +151,7 @@ std::vector<double> VectorUtils::normalizeByMean(const std::vector<double>& data
         sum += val;
         count++;
     }
-    
+
     // If all values are zero (or count is 0), mean is 0
     double mean = (count > 0) ? (sum / count) : 0.0;
 
@@ -151,11 +171,16 @@ std::vector<double> VectorUtils::normalizeByMean(const std::vector<double>& data
     return result;
 }
 
-std::vector<double> VectorUtils::normalizeByMeanDeviation(const std::vector<double>& data, bool skipZeros) {
-    LOG_DEBUG() << "Start: normalizeByMeanDeviation - data.size=" << data.size() << ", skipZeros=" << skipZeros;
-    
+std::vector<double>
+VectorUtils::normalizeByMeanDeviation(const std::vector<double>& data,
+    bool skipZeros)
+{
+    LOG_DEBUG() << "Start: normalizeByMeanDeviation - data.size=" << data.size()
+                << ", skipZeros=" << skipZeros;
+
     if (data.empty()) {
-        LOG_DEBUG() << "Finish: normalizeByMeanDeviation - result.size=0 (empty input)";
+        LOG_DEBUG()
+            << "Finish: normalizeByMeanDeviation - result.size=0 (empty input)";
         return {};
     }
 
@@ -169,7 +194,7 @@ std::vector<double> VectorUtils::normalizeByMeanDeviation(const std::vector<doub
         sum += val;
         count++;
     }
-    
+
     // If all values are zero (or count is 0), mean is 0
     double mean = (count > 0) ? (sum / count) : 0.0;
 
@@ -181,7 +206,7 @@ std::vector<double> VectorUtils::normalizeByMeanDeviation(const std::vector<doub
         }
         deviationSum += std::abs(val - mean);
     }
-    
+
     // Calculate deviation only from non-zero values
     double deviation = (count > 0) ? (deviationSum / count) : 0.0;
 
@@ -202,15 +227,15 @@ std::vector<double> VectorUtils::normalizeByMeanDeviation(const std::vector<doub
         result.push_back((val - mean) / deviation);
     }
 
-    LOG_DEBUG() << "Finish: normalizeByMeanDeviation - result.size=" << result.size();
+    LOG_DEBUG() << "Finish: normalizeByMeanDeviation - result.size="
+                << result.size();
     return result;
 }
 
-std::vector<std::vector<double>> VectorUtils::normalizeFromTo2D(
-    double from,
-    double to,
-    const std::vector<std::vector<double>>& data
-) {
+std::vector<std::vector<double>>
+VectorUtils::normalizeFromTo2D(double from, double to,
+    const std::vector<std::vector<double>>& data)
+{
     if (data.empty()) {
         return data;
     }
@@ -221,8 +246,10 @@ std::vector<std::vector<double>> VectorUtils::normalizeFromTo2D(
 
     for (const auto& frame : data) {
         for (double val : frame) {
-            if (val < globalMin) globalMin = val;
-            if (val > globalMax) globalMax = val;
+            if (val < globalMin)
+                globalMin = val;
+            if (val > globalMax)
+                globalMax = val;
         }
     }
 

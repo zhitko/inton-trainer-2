@@ -1,39 +1,42 @@
 #include "audioapi.h"
 #include "helpers/logger.h"
-#include <QDebug>
-#include <QStandardPaths>
-#include <QDir>
-#include <QDateTime>
-#include <QMediaDevices>
-#include <QUrl>
-#include <QCoreApplication>
 #include <QBuffer>
+#include <QCoreApplication>
+#include <QDateTime>
+#include <QDebug>
+#include <QDir>
 #include <QIODevice>
+#include <QMediaDevices>
+#include <QStandardPaths>
+#include <QUrl>
 
 #include <cmath>
 
-#include <QMediaPlayer>
 #include <QAudioOutput>
+#include <QMediaPlayer>
 
-AudioApi::AudioApi(QObject *parent) : QObject(parent)
+AudioApi::AudioApi(QObject* parent)
+    : QObject(parent)
 {
     m_audioDevice = QMediaDevices::defaultAudioInput();
     m_format.setSampleRate(8000);
     m_format.setChannelCount(1);
     m_format.setSampleFormat(QAudioFormat::Int16);
-    m_wavFileService = std::make_unique<WavFileService>(QCoreApplication::applicationDirPath().toStdString());
+    m_wavFileService = std::make_unique<WavFileService>(
+        QCoreApplication::applicationDirPath().toStdString());
 
     m_player = new QMediaPlayer(this);
-    QAudioOutput *audioOutput = new QAudioOutput(this);
+    QAudioOutput* audioOutput = new QAudioOutput(this);
     m_player->setAudioOutput(audioOutput);
 
-    connect(m_player, &QMediaPlayer::playbackStateChanged, this, [this](QMediaPlayer::PlaybackState state) {
-        bool isPlaying = (state == QMediaPlayer::PlayingState);
-        if (m_isPlaying != isPlaying) {
-            m_isPlaying = isPlaying;
-            emit isPlayingChanged();
-        }
-    });
+    connect(m_player, &QMediaPlayer::playbackStateChanged, this,
+        [this](QMediaPlayer::PlaybackState state) {
+            bool isPlaying = (state == QMediaPlayer::PlayingState);
+            if (m_isPlaying != isPlaying) {
+                m_isPlaying = isPlaying;
+                emit isPlayingChanged();
+            }
+        });
 }
 
 bool AudioApi::isRecording() const
@@ -100,7 +103,7 @@ void AudioApi::startRecording(int durationSeconds)
     setAudioLevel(0.0);
 
     m_audioSource = new QAudioSource(m_audioDevice, m_format, this);
-    QIODevice *io = m_audioSource->start();
+    QIODevice* io = m_audioSource->start();
 
     connect(io, &QIODevice::readyRead, this, [this, io, durationSeconds]() {
         const qint64 len = m_audioSource->bytesAvailable();
@@ -119,7 +122,6 @@ void AudioApi::startRecording(int durationSeconds)
             double level = maxValue / 4000.0;
             setAudioLevel(level > 1.0 ? 1.0 : level);
         }
-
 
         if (durationSeconds > 0) {
             const int maxBufferSize = m_format.sampleRate() * m_format.bytesPerSample() * durationSeconds;
@@ -162,14 +164,23 @@ QString AudioApi::saveWavFile(QString fileName)
     }
 
     std::vector<char> buffer(m_buffer.begin(), m_buffer.end());
-    
+
     int bitsPerSample = 16;
     switch (m_format.sampleFormat()) {
-        case QAudioFormat::UInt8: bitsPerSample = 8; break;
-        case QAudioFormat::Int16: bitsPerSample = 16; break;
-        case QAudioFormat::Int32: bitsPerSample = 32; break;
-        case QAudioFormat::Float: bitsPerSample = 32; break;
-        default: bitsPerSample = 16;
+    case QAudioFormat::UInt8:
+        bitsPerSample = 8;
+        break;
+    case QAudioFormat::Int16:
+        bitsPerSample = 16;
+        break;
+    case QAudioFormat::Int32:
+        bitsPerSample = 32;
+        break;
+    case QAudioFormat::Float:
+        bitsPerSample = 32;
+        break;
+    default:
+        bitsPerSample = 16;
     }
 
     AudioFormat format;
@@ -182,9 +193,3 @@ QString AudioApi::saveWavFile(QString fileName)
     LOG_DEBUG() << "Finish: saveWavFile - result=" << qResult;
     return qResult;
 }
-
-    
-
-
-
-    
