@@ -22,6 +22,8 @@ Page {
     property var refPatternData: []
     property var refPitchData: []
     property var refWavFileHandle: null
+    property var refSpecData: []
+    property var refPitchDerivData: []
     property bool showSettings: false
     property string userFilePath: ""
     property var userWavFileHandle: null
@@ -101,6 +103,7 @@ Page {
         Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
         let specData = wavFileApi.getSpec(refWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
         Logger.debug("Spectrum data frames: " + specData.length);
+        root.refSpecData = specData;
 
         // Pass spectrum data directly to the 2D graph
         refSpectrumGraph.spectrumData = specData;
@@ -110,6 +113,11 @@ Page {
         refPatternData = wavFileApi.getCepstr(refWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
         Logger.debug("Cepstrum data frames: " + refPatternData.length);
         refCepstrogramGraph.spectrumData = refPatternData;
+
+        // Extract pitch derivative data
+        Logger.debug("Extracting pitch derivative data");
+        root.refPitchDerivData = wavFileApi.getPitchDerivative(refWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0");
+        Logger.debug("Pitch derivative data length: " + root.refPitchDerivData.length);
     }
 
     function updateUserData() {
@@ -153,6 +161,11 @@ Page {
         Logger.debug("Cepstrum data frames: " + cepstrData.length);
         userCepstrogramGraph.spectrumData = cepstrData;
 
+        // Extract pitch derivative data
+        Logger.debug("Extracting pitch derivative data");
+        let pitchDerivData = wavFileApi.getPitchDerivative(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0");
+        Logger.debug("Pitch derivative data length: " + pitchDerivData.length);
+
         // Run DP comparison
         Logger.debug("Calculating DP...");
         // Scale loadedCuePoints to match user pitch data length
@@ -164,7 +177,7 @@ Page {
             };
         });
 
-        let dpResult = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refPatternData, ampData, ampDeriv, logPitchData, cepstrData, pitchData, scaledLoadedCuePoints);
+        let dpResult = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refLogPitchData, root.refPitchDerivData, root.refSpecData, root.refPatternData, ampData, ampDeriv, logPitchData, logPitchData, pitchDerivData, specData, cepstrData, pitchData, scaledLoadedCuePoints);
         let scaledPitch = dpResult.pitch;
         Logger.debug("DP result pitch length: " + scaledPitch.length);
 

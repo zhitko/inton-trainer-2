@@ -86,6 +86,21 @@ class SettingsApi : public QObject {
     Q_PROPERTY(int cepstrNumOrder READ cepstrNumOrder WRITE setCepstrNumOrder
             NOTIFY cepstrNumOrderChanged)
 
+    Q_PROPERTY(bool dpUsePitch READ dpUsePitch WRITE setDpUsePitch NOTIFY dpUsePitchChanged)
+    Q_PROPERTY(double dpPitchCoef READ dpPitchCoef WRITE setDpPitchCoef NOTIFY dpPitchCoefChanged)
+    Q_PROPERTY(bool dpUsePitchDerivative READ dpUsePitchDerivative WRITE setDpUsePitchDerivative NOTIFY dpUsePitchDerivativeChanged)
+    Q_PROPERTY(double dpPitchDerivativeCoef READ dpPitchDerivativeCoef WRITE setDpPitchDerivativeCoef NOTIFY dpPitchDerivativeCoefChanged)
+    Q_PROPERTY(bool dpUsePitchLog READ dpUsePitchLog WRITE setDpUsePitchLog NOTIFY dpUsePitchLogChanged)
+    Q_PROPERTY(double dpPitchLogCoef READ dpPitchLogCoef WRITE setDpPitchLogCoef NOTIFY dpPitchLogCoefChanged)
+    Q_PROPERTY(bool dpUseAmplitude READ dpUseAmplitude WRITE setDpUseAmplitude NOTIFY dpUseAmplitudeChanged)
+    Q_PROPERTY(double dpAmplitudeCoef READ dpAmplitudeCoef WRITE setDpAmplitudeCoef NOTIFY dpAmplitudeCoefChanged)
+    Q_PROPERTY(bool dpUseAmplitudeDerivative READ dpUseAmplitudeDerivative WRITE setDpUseAmplitudeDerivative NOTIFY dpUseAmplitudeDerivativeChanged)
+    Q_PROPERTY(double dpAmplitudeDerivativeCoef READ dpAmplitudeDerivativeCoef WRITE setDpAmplitudeDerivativeCoef NOTIFY dpAmplitudeDerivativeCoefChanged)
+    Q_PROPERTY(bool dpUseSpectrum READ dpUseSpectrum WRITE setDpUseSpectrum NOTIFY dpUseSpectrumChanged)
+    Q_PROPERTY(double dpSpectrumCoef READ dpSpectrumCoef WRITE setDpSpectrumCoef NOTIFY dpSpectrumCoefChanged)
+    Q_PROPERTY(bool dpUseCepstrum READ dpUseCepstrum WRITE setDpUseCepstrum NOTIFY dpUseCepstrumChanged)
+    Q_PROPERTY(double dpCepstrumCoef READ dpCepstrumCoef WRITE setDpCepstrumCoef NOTIFY dpCepstrumCoefChanged)
+
 public:
     enum class SpecColorScheme { Viridis,
         Plasma,
@@ -203,6 +218,35 @@ public:
 
     void setCepstrNumOrder(int cepstrNumOrder);
 
+    bool dpUsePitch() const;
+    void setDpUsePitch(bool dpUsePitch);
+    double dpPitchCoef() const;
+    void setDpPitchCoef(double dpPitchCoef);
+    bool dpUsePitchDerivative() const;
+    void setDpUsePitchDerivative(bool dpUsePitchDerivative);
+    double dpPitchDerivativeCoef() const;
+    void setDpPitchDerivativeCoef(double dpPitchDerivativeCoef);
+    bool dpUsePitchLog() const;
+    void setDpUsePitchLog(bool dpUsePitchLog);
+    double dpPitchLogCoef() const;
+    void setDpPitchLogCoef(double dpPitchLogCoef);
+    bool dpUseAmplitude() const;
+    void setDpUseAmplitude(bool dpUseAmplitude);
+    double dpAmplitudeCoef() const;
+    void setDpAmplitudeCoef(double dpAmplitudeCoef);
+    bool dpUseAmplitudeDerivative() const;
+    void setDpUseAmplitudeDerivative(bool dpUseAmplitudeDerivative);
+    double dpAmplitudeDerivativeCoef() const;
+    void setDpAmplitudeDerivativeCoef(double dpAmplitudeDerivativeCoef);
+    bool dpUseSpectrum() const;
+    void setDpUseSpectrum(bool dpUseSpectrum);
+    double dpSpectrumCoef() const;
+    void setDpSpectrumCoef(double dpSpectrumCoef);
+    bool dpUseCepstrum() const;
+    void setDpUseCepstrum(bool dpUseCepstrum);
+    double dpCepstrumCoef() const;
+    void setDpCepstrumCoef(double dpCepstrumCoef);
+
     /**
      * Loads the settings from a file and updates the internal state of the
      * SettingsApi object. This method should be called when the application
@@ -251,6 +295,21 @@ signals:
     void showSpectrumChanged();
     void showCepstrumChanged();
     void cepstrNumOrderChanged();
+
+    void dpUsePitchChanged();
+    void dpPitchCoefChanged();
+    void dpUsePitchDerivativeChanged();
+    void dpPitchDerivativeCoefChanged();
+    void dpUsePitchLogChanged();
+    void dpPitchLogCoefChanged();
+    void dpUseAmplitudeChanged();
+    void dpAmplitudeCoefChanged();
+    void dpUseAmplitudeDerivativeChanged();
+    void dpAmplitudeDerivativeCoefChanged();
+    void dpUseSpectrumChanged();
+    void dpSpectrumCoefChanged();
+    void dpUseCepstrumChanged();
+    void dpCepstrumCoefChanged();
 
 private:
     AppSettings m_settings;

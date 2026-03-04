@@ -69,6 +69,30 @@ public:
         double sampleRate, double minF0, double maxF0,
         double voicingThreshold,
         PitchOutputFormat outputFormat);
+
+    /**
+     * Computes the frame-to-frame derivative of the pitch contour extracted
+     * from the given input waveform data. The derivative is calculated as the
+     * finite difference between consecutive pitch values (pitchDerivative[i] =
+     * pitch[i+1] - pitch[i]). The first element is set to 0.0.
+     *
+     * @param inputWaveData - A vector of doubles representing the input waveform
+     * data (single channel).
+     * @param algorithm - The pitch extraction algorithm to use.
+     * @param frameShift - The frame shift in milliseconds for pitch extraction.
+     * @param sampleRate - The sample rate to use for pitch extraction.
+     * @param minF0 - The minimum F0 value for pitch extraction.
+     * @param maxF0 - The maximum F0 value for pitch extraction.
+     * @param voicingThreshold - The voicing threshold for pitch extraction.
+     * @param outputFormat - The format of the output pitch data prior to
+     * differentiation (e.g., PITCH, F0, LOG_F0).
+     * @return A vector of doubles containing the pitch derivative contour.
+     */
+    std::vector<double> getPitchDerivative(const std::vector<double>& inputWaveData,
+        PitchAlgorithm algorithm, double frameShift,
+        double sampleRate, double minF0, double maxF0,
+        double voicingThreshold,
+        PitchOutputFormat outputFormat);
 };
 
 #endif // PITCHSERVICE_H

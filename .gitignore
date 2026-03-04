@@ -86,3 +86,4 @@ CMakeLists.txt.user*
 .uic/
 /build*/
 application.log
+.cache/

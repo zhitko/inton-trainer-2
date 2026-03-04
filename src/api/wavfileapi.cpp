@@ -1,5 +1,6 @@
 #include "wavfileapi.h"
 #include "helpers/logger.h"
+#include "helpers/settings.h"
 #include "src/services/amplitudeservice.h"
 #include "src/services/cdtwservice.h"
 #include "src/services/dpservice.h"
@@ -93,10 +94,16 @@ QVariantList WavFileApi::getSpecDP(const QVariantList& patternSpectrum,
 QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
     const QVariantList& patternAmplitudeDerivative,
     const QVariantList& patternPitch,
+    const QVariantList& patternPitchLog,
+    const QVariantList& patternPitchDerivative,
+    const QVariantList& patternSpectrum,
     const QVariantList& patternCepstrum,
     const QVariantList& signalAmplitude,
     const QVariantList& signalAmplitudeDerivative,
     const QVariantList& signalPitch,
+    const QVariantList& signalPitchLog,
+    const QVariantList& signalPitchDerivative,
+    const QVariantList& signalSpectrum,
     const QVariantList& signalCepstrum,
     const QVariantList& pitchToTransform,
     const QVariantList& cuePointsToTransform)
@@ -137,25 +144,46 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
         return res;
     };
 
+    AppSettings settings = Settings::loadSettings();
     std::vector<std::vector<std::vector<double>>> patternData;
-    if (!patternPitch.isEmpty())
-        patternData.push_back(parse1D(patternPitch));
-    if (!patternCepstrum.isEmpty())
-        patternData.push_back(parse2D(patternCepstrum));
-    if (!patternAmplitude.isEmpty())
-        patternData.push_back(parse1D(patternAmplitude));
-    if (!patternAmplitudeDerivative.isEmpty())
-        patternData.push_back(parse1D(patternAmplitudeDerivative));
-
     std::vector<std::vector<std::vector<double>>> signalData;
-    if (!signalPitch.isEmpty())
+    std::vector<double> weights;
+
+    if (settings.dpUsePitch && !patternPitch.isEmpty()) {
+        patternData.push_back(parse1D(patternPitch));
         signalData.push_back(parse1D(signalPitch));
-    if (!signalCepstrum.isEmpty())
+        weights.push_back(settings.dpPitchCoef);
+    }
+    if (settings.dpUsePitchLog && !patternPitchLog.isEmpty()) {
+        patternData.push_back(parse1D(patternPitchLog));
+        signalData.push_back(parse1D(signalPitchLog));
+        weights.push_back(settings.dpPitchLogCoef);
+    }
+    if (settings.dpUsePitchDerivative && !patternPitchDerivative.isEmpty()) {
+        patternData.push_back(parse1D(patternPitchDerivative));
+        signalData.push_back(parse1D(signalPitchDerivative));
+        weights.push_back(settings.dpPitchDerivativeCoef);
+    }
+    if (settings.dpUseSpectrum && !patternSpectrum.isEmpty()) {
+        patternData.push_back(parse2D(patternSpectrum));
+        signalData.push_back(parse2D(signalSpectrum));
+        weights.push_back(settings.dpSpectrumCoef);
+    }
+    if (settings.dpUseCepstrum && !patternCepstrum.isEmpty()) {
+        patternData.push_back(parse2D(patternCepstrum));
         signalData.push_back(parse2D(signalCepstrum));
-    if (!signalAmplitude.isEmpty())
+        weights.push_back(settings.dpCepstrumCoef);
+    }
+    if (settings.dpUseAmplitude && !patternAmplitude.isEmpty()) {
+        patternData.push_back(parse1D(patternAmplitude));
         signalData.push_back(parse1D(signalAmplitude));
-    if (!signalAmplitudeDerivative.isEmpty())
+        weights.push_back(settings.dpAmplitudeCoef);
+    }
+    if (settings.dpUseAmplitudeDerivative && !patternAmplitudeDerivative.isEmpty()) {
+        patternData.push_back(parse1D(patternAmplitudeDerivative));
         signalData.push_back(parse1D(signalAmplitudeDerivative));
+        weights.push_back(settings.dpAmplitudeDerivativeCoef);
+    }
 
     std::vector<double> pitchVec;
     pitchVec.reserve(pitchToTransform.size());
@@ -180,7 +208,7 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
         cuePointsVec.push_back(cp);
     }
 
-    CDTWService cdtwService(patternData, signalData);
+    CDTWService cdtwService(patternData, signalData, weights);
     cdtwService.compute();
 
     std::vector<double> pitchTransformed = cdtwService.applyPathToVector(pitchVec, patternPitch.size());
@@ -211,6 +239,77 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
 WavFileApi::WavFileApi(QObject* parent)
     : QObject(parent)
 {
+}
+
+QVariantList WavFileApi::getPitchDerivative(
+    WaveFile* waveFile, const QString& algorithm, double frameShift,
+    double sampleRate, double minF0, double maxF0,
+    double voicingThreshold, const QString& outputFormat,
+    bool normalized)
+{
+    LOG_DEBUG() << "Start: getPitchDerivative - algorithm=" << algorithm
+                << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate
+                << ", minF0=" << minF0 << ", maxF0=" << maxF0
+                << ", voicingThreshold=" << voicingThreshold
+                << ", outputFormat=" << outputFormat
+                << ", normalized=" << normalized;
+
+    QVariantList result;
+
+    if (!waveFile) {
+        LOG_WARNING() << "WaveFile is null";
+        return result;
+    }
+
+    std::vector<double> samples = WavFileService::readWaveData(waveFile);
+    if (samples.empty()) {
+        LOG_WARNING() << "No wave data found";
+        return result;
+    }
+
+    PitchAlgorithm algo;
+    if (algorithm == "RAPT") {
+        algo = PitchAlgorithm::RAPT;
+    } else if (algorithm == "SWIPE") {
+        algo = PitchAlgorithm::SWIPE;
+    } else if (algorithm == "REAPER") {
+        algo = PitchAlgorithm::REAPER;
+    } else if (algorithm == "DIO") {
+        algo = PitchAlgorithm::DIO;
+    } else if (algorithm == "Harvest") {
+        algo = PitchAlgorithm::Harvest;
+    } else {
+        LOG_WARNING() << "Unknown algorithm:" << algorithm;
+        return result;
+    }
+
+    PitchOutputFormat format;
+    if (outputFormat == "PITCH") {
+        format = PitchOutputFormat::PITCH;
+    } else if (outputFormat == "F0") {
+        format = PitchOutputFormat::F0;
+    } else if (outputFormat == "LOG_F0") {
+        format = PitchOutputFormat::LOG_F0;
+    } else {
+        LOG_WARNING() << "Unknown output format:" << outputFormat;
+        return result;
+    }
+
+    PitchService pitchService;
+    std::vector<double> derivative = pitchService.getPitchDerivative(
+        samples, algo, frameShift, sampleRate, minF0, maxF0,
+        voicingThreshold, format);
+
+    if (normalized && !derivative.empty()) {
+        derivative = VectorUtils::normalizeFromTo(0.0, 1.0, derivative);
+    }
+
+    for (size_t i = 0; i < derivative.size(); ++i) {
+        result.append(QPointF(i, derivative[i]));
+    }
+
+    LOG_DEBUG() << "Finish: getPitchDerivative - size=" << result.size();
+    return result;
 }
 
 WaveFile* WavFileApi::openWavFile(const QString& filePath)
@@ -671,22 +770,25 @@ QVariantList WavFileApi::getSpec(WaveFile* waveFile, int fftLength,
         return specData;
     }
 
+    std::vector<std::vector<double>> outSpec = spectrum;
+    if (normalized) {
+        outSpec = VectorUtils::normalizeFromTo2D(0.0, 1.0, spectrum);
+    }
+
     // Convert 2D spectrum vector to QVariantList
     // Each frame becomes a QVariantList of spectral values
-    for (size_t frameIdx = 0; frameIdx < spectrum.size(); ++frameIdx) {
-        const std::vector<double>& rawFrame = spectrum[frameIdx];
-        const std::vector<double> outFrame = normalized ? VectorUtils::normalizeFromTo(0.0, 1.0, rawFrame)
-                                                        : rawFrame;
-        QVariantList frame;
-        for (size_t binIdx = 0; binIdx < outFrame.size(); ++binIdx) {
-            frame.append(outFrame[binIdx]);
+    for (size_t frameIdx = 0; frameIdx < outSpec.size(); ++frameIdx) {
+        const std::vector<double>& frame = outSpec[frameIdx];
+        QVariantList specFrame;
+        for (size_t binIdx = 0; binIdx < frame.size(); ++binIdx) {
+            specFrame.append(frame[binIdx]);
         }
-        specData.append(QVariant::fromValue(frame));
+        specData.append(QVariant::fromValue(specFrame));
     }
 
     LOG_DEBUG() << "Finish: getSpec - frames=" << specData.size();
-    if (!spectrum.empty()) {
-        LOG_DEBUG() << "First frame bins=" << spectrum[0].size();
+    if (!outSpec.empty()) {
+        LOG_DEBUG() << "First frame bins=" << outSpec[0].size();
     }
 
     return specData;

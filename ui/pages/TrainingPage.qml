@@ -24,11 +24,13 @@ Page {
     property var referenceUMP: null
     property var referenceCuePoints: null
     property var referenceCepstrData: null
+    property var referenceSpecData: null
     property var referenceWaveData: null
     property var referencePitchData: null
     property var referenceLogPitchData: null
     property var referenceAmplitudeData: null
     property var referenceAmplitudeDerivData: null
+    property var referencePitchDerivData: null
 
     property var userUMP: null
     property double referenceRange: 0
@@ -76,6 +78,16 @@ Page {
         Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
         referenceCepstrData = wavFileApi.getCepstr(referenceWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
         Logger.debug("Cepstrum data frames: " + referenceCepstrData.length);
+
+        // Extract spectrum data for reference
+        Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
+        referenceSpecData = wavFileApi.getSpec(referenceWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("Reference spectrum data frames: " + referenceSpecData.length);
+
+        // Extract pitch derivative data for reference
+        Logger.debug("Extracting pitch derivative data for reference");
+        referencePitchDerivData = wavFileApi.getPitchDerivative(referenceWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0");
+        Logger.debug("Reference pitch derivative data frames: " + referencePitchDerivData.length);
     }
 
     function updateUserUMP(fileFullPath) {
@@ -99,9 +111,19 @@ Page {
         let userCepstrData = wavFileApi.getCepstr(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.cepstrNumOrder, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
         Logger.debug("Cepstrum data frames: " + userCepstrData.length);
 
+        // Extract spectrum data for user
+        Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
+        let userSpecData = wavFileApi.getSpec(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
+        Logger.debug("User spectrum data frames: " + userSpecData.length);
+
+        // Extract pitch derivative data for user
+        Logger.debug("Extracting pitch derivative data for user");
+        let userPitchDerivData = wavFileApi.getPitchDerivative(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0");
+        Logger.debug("User pitch derivative data frames: " + userPitchDerivData.length);
+
         // Generate UMP from DP result
         Logger.debug("Calculating DP...");
-        let dpResult = wavFileApi.getDP(referenceAmplitudeData, referenceAmplitudeDerivData, referenceLogPitchData, referenceCepstrData, userAmplitudeData, userAmplitudeDerivData, logPitchData, userCepstrData, pitchData, referenceCuePoints);
+        let dpResult = wavFileApi.getDP(referenceAmplitudeData, referenceAmplitudeDerivData, referenceLogPitchData, referenceLogPitchData, referencePitchDerivData, referenceSpecData, referenceCepstrData, userAmplitudeData, userAmplitudeDerivData, logPitchData, logPitchData, userPitchDerivData, userSpecData, userCepstrData, pitchData, referenceCuePoints);
         let scaledPitch = dpResult.pitch;
         Logger.debug("DP result pitch length: " + scaledPitch.length);
 

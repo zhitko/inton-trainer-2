@@ -476,6 +476,189 @@ Page {
                     }
                 }
             }
+            Frame {
+                Layout.fillWidth: true
+
+                background: Rectangle {
+                    color: "transparent"
+                    border.color: Theme.outlineVariant(Material.theme)
+                    radius: 8
+                }
+
+                ColumnLayout {
+                    width: parent.width
+                    spacing: 10
+
+                    Label {
+                        text: qsTr("DP Calculation")
+                        font.bold: true
+                        font.pixelSize: 20
+                        color: Theme.primary(Material.theme)
+                        Layout.fillWidth: true
+                    }
+
+                    GridLayout {
+                        columns: 4
+                        columnSpacing: 20
+                        rowSpacing: 10
+                        Layout.fillWidth: true
+
+                        // Pitch
+                        Label {
+                            text: qsTr("Use Pitch")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.dpUsePitch
+                            onToggled: ApplicationWindow.window.settingsApi.dpUsePitch = checked
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: ApplicationWindow.window.settingsApi.dpUsePitch
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.dpPitchCoef.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.dpPitchCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: ApplicationWindow.window.settingsApi.dpUsePitch
+                        }
+
+                        // Pitch Derivative
+                        Label {
+                            text: qsTr("Use Pitch Derivative")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.dpUsePitchDerivative
+                            onToggled: ApplicationWindow.window.settingsApi.dpUsePitchDerivative = checked
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: ApplicationWindow.window.settingsApi.dpUsePitchDerivative
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.dpPitchDerivativeCoef.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.dpPitchDerivativeCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: ApplicationWindow.window.settingsApi.dpUsePitchDerivative
+                        }
+
+                        // Pitch Log
+                        Label {
+                            text: qsTr("Use Pitch Log")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.dpUsePitchLog
+                            onToggled: ApplicationWindow.window.settingsApi.dpUsePitchLog = checked
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: ApplicationWindow.window.settingsApi.dpUsePitchLog
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.dpPitchLogCoef.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.dpPitchLogCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: ApplicationWindow.window.settingsApi.dpUsePitchLog
+                        }
+
+                        // Amplitude
+                        Label {
+                            text: qsTr("Use Amplitude")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.dpUseAmplitude
+                            onToggled: ApplicationWindow.window.settingsApi.dpUseAmplitude = checked
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: ApplicationWindow.window.settingsApi.dpUseAmplitude
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.dpAmplitudeCoef.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.dpAmplitudeCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: ApplicationWindow.window.settingsApi.dpUseAmplitude
+                        }
+
+                        // Amplitude Derivative
+                        Label {
+                            text: qsTr("Use Amp Derivative")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.dpUseAmplitudeDerivative
+                            onToggled: ApplicationWindow.window.settingsApi.dpUseAmplitudeDerivative = checked
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: ApplicationWindow.window.settingsApi.dpUseAmplitudeDerivative
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.dpAmplitudeDerivativeCoef.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.dpAmplitudeDerivativeCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: ApplicationWindow.window.settingsApi.dpUseAmplitudeDerivative
+                        }
+
+                        // Spectrum
+                        Label {
+                            text: qsTr("Use Spectrum")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.dpUseSpectrum
+                            onToggled: ApplicationWindow.window.settingsApi.dpUseSpectrum = checked
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: ApplicationWindow.window.settingsApi.dpUseSpectrum
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.dpSpectrumCoef.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.dpSpectrumCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: ApplicationWindow.window.settingsApi.dpUseSpectrum
+                        }
+
+                        // Cepstrum
+                        Label {
+                            text: qsTr("Use Cepstrum")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: ApplicationWindow.window.settingsApi.dpUseCepstrum
+                            onToggled: ApplicationWindow.window.settingsApi.dpUseCepstrum = checked
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: ApplicationWindow.window.settingsApi.dpUseCepstrum
+                        }
+                        TextField {
+                            text: ApplicationWindow.window.settingsApi.dpCepstrumCoef.toString()
+                            onEditingFinished: ApplicationWindow.window.settingsApi.dpCepstrumCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: ApplicationWindow.window.settingsApi.dpUseCepstrum
+                        }
+                    }
+                }
+            }
         }
     }
 }

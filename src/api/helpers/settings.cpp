@@ -79,6 +79,23 @@ Settings::loadSettings()
     settings.showCepstrum = qsettings.value("showCepstrum", false).toBool();
     qsettings.endGroup();
 
+    qsettings.beginGroup("DP");
+    settings.dpUsePitch = qsettings.value("dpUsePitch", true).toBool();
+    settings.dpPitchCoef = qsettings.value("dpPitchCoef", 1.0).toDouble();
+    settings.dpUsePitchDerivative = qsettings.value("dpUsePitchDerivative", true).toBool();
+    settings.dpPitchDerivativeCoef = qsettings.value("dpPitchDerivativeCoef", 1.0).toDouble();
+    settings.dpUsePitchLog = qsettings.value("dpUsePitchLog", true).toBool();
+    settings.dpPitchLogCoef = qsettings.value("dpPitchLogCoef", 1.0).toDouble();
+    settings.dpUseAmplitude = qsettings.value("dpUseAmplitude", true).toBool();
+    settings.dpAmplitudeCoef = qsettings.value("dpAmplitudeCoef", 1.0).toDouble();
+    settings.dpUseAmplitudeDerivative = qsettings.value("dpUseAmplitudeDerivative", true).toBool();
+    settings.dpAmplitudeDerivativeCoef = qsettings.value("dpAmplitudeDerivativeCoef", 1.0).toDouble();
+    settings.dpUseSpectrum = qsettings.value("dpUseSpectrum", true).toBool();
+    settings.dpSpectrumCoef = qsettings.value("dpSpectrumCoef", 1.0).toDouble();
+    settings.dpUseCepstrum = qsettings.value("dpUseCepstrum", true).toBool();
+    settings.dpCepstrumCoef = qsettings.value("dpCepstrumCoef", 1.0).toDouble();
+    qsettings.endGroup();
+
     return settings;
 }
 
@@ -146,6 +163,23 @@ void Settings::saveSettings(const AppSettings& settings)
         QString::fromStdString(settings.specColorScheme));
     qsettings.setValue("showSpectrum", settings.showSpectrum);
     qsettings.setValue("showCepstrum", settings.showCepstrum);
+    qsettings.endGroup();
+
+    qsettings.beginGroup("DP");
+    qsettings.setValue("dpUsePitch", settings.dpUsePitch);
+    qsettings.setValue("dpPitchCoef", settings.dpPitchCoef);
+    qsettings.setValue("dpUsePitchDerivative", settings.dpUsePitchDerivative);
+    qsettings.setValue("dpPitchDerivativeCoef", settings.dpPitchDerivativeCoef);
+    qsettings.setValue("dpUsePitchLog", settings.dpUsePitchLog);
+    qsettings.setValue("dpPitchLogCoef", settings.dpPitchLogCoef);
+    qsettings.setValue("dpUseAmplitude", settings.dpUseAmplitude);
+    qsettings.setValue("dpAmplitudeCoef", settings.dpAmplitudeCoef);
+    qsettings.setValue("dpUseAmplitudeDerivative", settings.dpUseAmplitudeDerivative);
+    qsettings.setValue("dpAmplitudeDerivativeCoef", settings.dpAmplitudeDerivativeCoef);
+    qsettings.setValue("dpUseSpectrum", settings.dpUseSpectrum);
+    qsettings.setValue("dpSpectrumCoef", settings.dpSpectrumCoef);
+    qsettings.setValue("dpUseCepstrum", settings.dpUseCepstrum);
+    qsettings.setValue("dpCepstrumCoef", settings.dpCepstrumCoef);
     qsettings.endGroup();
 
     qsettings.sync();

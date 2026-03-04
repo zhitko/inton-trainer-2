@@ -218,6 +218,20 @@ void SettingsApi::load()
     emit specUseLogScaleChanged();
     emit specColorSchemeChanged();
     emit cepstrNumOrderChanged();
+    emit dpUsePitchChanged();
+    emit dpPitchCoefChanged();
+    emit dpUsePitchDerivativeChanged();
+    emit dpPitchDerivativeCoefChanged();
+    emit dpUsePitchLogChanged();
+    emit dpPitchLogCoefChanged();
+    emit dpUseAmplitudeChanged();
+    emit dpAmplitudeCoefChanged();
+    emit dpUseAmplitudeDerivativeChanged();
+    emit dpAmplitudeDerivativeCoefChanged();
+    emit dpUseSpectrumChanged();
+    emit dpSpectrumCoefChanged();
+    emit dpUseCepstrumChanged();
+    emit dpCepstrumCoefChanged();
     LOG_DEBUG() << "Finish: load";
 }
 
@@ -791,6 +805,133 @@ void SettingsApi::setSpecColorScheme(SpecColorScheme specColorScheme)
         emit specColorSchemeChanged();
     }
     LOG_DEBUG() << "Finish: setSpecColorScheme";
+}
+
+bool SettingsApi::dpUsePitch() const { return m_settings.dpUsePitch; }
+void SettingsApi::setDpUsePitch(bool val)
+{
+    if (m_settings.dpUsePitch != val) {
+        m_settings.dpUsePitch = val;
+        save();
+        emit dpUsePitchChanged();
+    }
+}
+double SettingsApi::dpPitchCoef() const { return m_settings.dpPitchCoef; }
+void SettingsApi::setDpPitchCoef(double val)
+{
+    if (qAbs(m_settings.dpPitchCoef - val) > 0.0001) {
+        m_settings.dpPitchCoef = val;
+        save();
+        emit dpPitchCoefChanged();
+    }
+}
+bool SettingsApi::dpUsePitchDerivative() const { return m_settings.dpUsePitchDerivative; }
+void SettingsApi::setDpUsePitchDerivative(bool val)
+{
+    if (m_settings.dpUsePitchDerivative != val) {
+        m_settings.dpUsePitchDerivative = val;
+        save();
+        emit dpUsePitchDerivativeChanged();
+    }
+}
+double SettingsApi::dpPitchDerivativeCoef() const { return m_settings.dpPitchDerivativeCoef; }
+void SettingsApi::setDpPitchDerivativeCoef(double val)
+{
+    if (qAbs(m_settings.dpPitchDerivativeCoef - val) > 0.0001) {
+        m_settings.dpPitchDerivativeCoef = val;
+        save();
+        emit dpPitchDerivativeCoefChanged();
+    }
+}
+bool SettingsApi::dpUsePitchLog() const { return m_settings.dpUsePitchLog; }
+void SettingsApi::setDpUsePitchLog(bool val)
+{
+    if (m_settings.dpUsePitchLog != val) {
+        m_settings.dpUsePitchLog = val;
+        save();
+        emit dpUsePitchLogChanged();
+    }
+}
+double SettingsApi::dpPitchLogCoef() const { return m_settings.dpPitchLogCoef; }
+void SettingsApi::setDpPitchLogCoef(double val)
+{
+    if (qAbs(m_settings.dpPitchLogCoef - val) > 0.0001) {
+        m_settings.dpPitchLogCoef = val;
+        save();
+        emit dpPitchLogCoefChanged();
+    }
+}
+bool SettingsApi::dpUseAmplitude() const { return m_settings.dpUseAmplitude; }
+void SettingsApi::setDpUseAmplitude(bool val)
+{
+    if (m_settings.dpUseAmplitude != val) {
+        m_settings.dpUseAmplitude = val;
+        save();
+        emit dpUseAmplitudeChanged();
+    }
+}
+double SettingsApi::dpAmplitudeCoef() const { return m_settings.dpAmplitudeCoef; }
+void SettingsApi::setDpAmplitudeCoef(double val)
+{
+    if (qAbs(m_settings.dpAmplitudeCoef - val) > 0.0001) {
+        m_settings.dpAmplitudeCoef = val;
+        save();
+        emit dpAmplitudeCoefChanged();
+    }
+}
+bool SettingsApi::dpUseAmplitudeDerivative() const { return m_settings.dpUseAmplitudeDerivative; }
+void SettingsApi::setDpUseAmplitudeDerivative(bool val)
+{
+    if (m_settings.dpUseAmplitudeDerivative != val) {
+        m_settings.dpUseAmplitudeDerivative = val;
+        save();
+        emit dpUseAmplitudeDerivativeChanged();
+    }
+}
+double SettingsApi::dpAmplitudeDerivativeCoef() const { return m_settings.dpAmplitudeDerivativeCoef; }
+void SettingsApi::setDpAmplitudeDerivativeCoef(double val)
+{
+    if (qAbs(m_settings.dpAmplitudeDerivativeCoef - val) > 0.0001) {
+        m_settings.dpAmplitudeDerivativeCoef = val;
+        save();
+        emit dpAmplitudeDerivativeCoefChanged();
+    }
+}
+bool SettingsApi::dpUseSpectrum() const { return m_settings.dpUseSpectrum; }
+void SettingsApi::setDpUseSpectrum(bool val)
+{
+    if (m_settings.dpUseSpectrum != val) {
+        m_settings.dpUseSpectrum = val;
+        save();
+        emit dpUseSpectrumChanged();
+    }
+}
+double SettingsApi::dpSpectrumCoef() const { return m_settings.dpSpectrumCoef; }
+void SettingsApi::setDpSpectrumCoef(double val)
+{
+    if (qAbs(m_settings.dpSpectrumCoef - val) > 0.0001) {
+        m_settings.dpSpectrumCoef = val;
+        save();
+        emit dpSpectrumCoefChanged();
+    }
+}
+bool SettingsApi::dpUseCepstrum() const { return m_settings.dpUseCepstrum; }
+void SettingsApi::setDpUseCepstrum(bool val)
+{
+    if (m_settings.dpUseCepstrum != val) {
+        m_settings.dpUseCepstrum = val;
+        save();
+        emit dpUseCepstrumChanged();
+    }
+}
+double SettingsApi::dpCepstrumCoef() const { return m_settings.dpCepstrumCoef; }
+void SettingsApi::setDpCepstrumCoef(double val)
+{
+    if (qAbs(m_settings.dpCepstrumCoef - val) > 0.0001) {
+        m_settings.dpCepstrumCoef = val;
+        save();
+        emit dpCepstrumCoefChanged();
+    }
 }
 
 void SettingsApi::updateTranslator()

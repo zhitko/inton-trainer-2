@@ -104,3 +104,22 @@ std::vector<double> PitchService::getPitch(
     LOG_DEBUG() << "Finish: getPitch - result.size=" << result.size();
     return result;
 }
+
+std::vector<double> PitchService::getPitchDerivative(
+    const std::vector<double>& inputWaveData, PitchAlgorithm algorithm,
+    double frameShift, double sampleRate, double minF0, double maxF0,
+    double voicingThreshold, PitchOutputFormat outputFormat)
+{
+    LOG_DEBUG() << "Start: getPitchDerivative - inputWaveData.size=" << inputWaveData.size();
+
+    std::vector<double> pitch = getPitch(inputWaveData, algorithm, frameShift,
+        sampleRate, minF0, maxF0, voicingThreshold, outputFormat);
+
+    std::vector<double> derivative(pitch.size(), 0.0);
+    for (size_t i = 1; i < pitch.size(); ++i) {
+        derivative[i] = pitch[i] - pitch[i - 1];
+    }
+
+    LOG_DEBUG() << "Finish: getPitchDerivative - result.size=" << derivative.size();
+    return derivative;
+}

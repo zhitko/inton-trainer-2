@@ -26,7 +26,8 @@ public:
      * The dimensions should be organized as [feature][frame][value].
      */
     CDTWService(std::vector<std::vector<std::vector<double>>> templateData,
-        std::vector<std::vector<std::vector<double>>> signalData);
+        std::vector<std::vector<std::vector<double>>> signalData,
+        std::vector<double> streamWeights = {});
     ~CDTWService();
 
     /**
@@ -112,6 +113,7 @@ private:
     // Template and signal data
     std::vector<std::vector<std::vector<double>>> templateData;
     std::vector<std::vector<std::vector<double>>> signalData;
+    std::vector<double> streamWeights;
 
     int bestStartIndex;
     int bestEndIndex;

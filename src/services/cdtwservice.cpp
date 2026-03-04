@@ -9,9 +9,11 @@
 
 CDTWService::CDTWService(
     std::vector<std::vector<std::vector<double>>> templateData,
-    std::vector<std::vector<std::vector<double>>> signalData)
+    std::vector<std::vector<std::vector<double>>> signalData,
+    std::vector<double> streamWeights)
     : templateData(templateData)
     , signalData(signalData)
+    , streamWeights(streamWeights)
     , bestStartIndex(-1)
     , bestEndIndex(-1)
     , minFinalCost(std::numeric_limits<double>::infinity())
@@ -74,7 +76,9 @@ double CDTWService::calculateDistance(int templateIndex, int signalIndex)
             const std::vector<double>& templateValue = templateData[k][templateIndex];
             const std::vector<double>& signalValue = signalData[k][signalIndex];
 
-            totalDistance += calculateDistance(templateValue, signalValue);
+            double dist = calculateDistance(templateValue, signalValue);
+            double weight = (k < streamWeights.size()) ? streamWeights[k] : 1.0;
+            totalDistance += dist * weight;
             count++;
         }
     }

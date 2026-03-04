@@ -88,6 +88,22 @@ struct AppSettings {
     int amplitudeSmoothingWindowSize = 16;
     // Sigma for Gaussian smoothing
     double amplitudeGaussianSmoothingSigma = 1.0;
+
+    // == DP settings ==
+    bool dpUsePitch = true;
+    double dpPitchCoef = 1.0;
+    bool dpUsePitchDerivative = true;
+    double dpPitchDerivativeCoef = 1.0;
+    bool dpUsePitchLog = true;
+    double dpPitchLogCoef = 1.0;
+    bool dpUseAmplitude = true;
+    double dpAmplitudeCoef = 1.0;
+    bool dpUseAmplitudeDerivative = true;
+    double dpAmplitudeDerivativeCoef = 1.0;
+    bool dpUseSpectrum = true;
+    double dpSpectrumCoef = 1.0;
+    bool dpUseCepstrum = true;
+    double dpCepstrumCoef = 1.0;
 };
 
 /*

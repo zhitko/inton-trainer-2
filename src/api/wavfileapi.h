@@ -161,7 +161,7 @@ public slots:
         double minF0 = 71.0, double maxF0 = 800.0,
         double voicingThreshold = 0.9,
         bool f0Refinement = false,
-        bool normalized = false);
+        bool normalized = true);
     /**
      * Extracts the cepstrum from the given WaveFile object using the specified
      * parameters and returns it as a QVariantList. The method allows for
@@ -221,16 +221,24 @@ public slots:
 
     /**
      * Computes the dynamic programming distance between the pattern and signal
-     * features, including amplitude, amplitude derivative, pitch, and cepstrum.
+     * features, including amplitude, amplitude derivative, pitch, pitch log,
+     * pitch derivative, spectrum, and cepstrum.
      * The method returns a QVariantMap containing the computed distance values
      * for each feature type, allowing for a comprehensive analysis of the
      * similarity between the pattern and signal.
+     *
      * @param patternAmplitude - A QVariantList containing the amplitude data of
      * the pattern.
      * @param patternAmplitudeDerivative - A QVariantList containing the
      * amplitude derivative data of the pattern.
      * @param patternPitch - A QVariantList containing the pitch data of the
      * pattern.
+     * @param patternPitchLog - A QVariantList containing the log pitch (LOG_F0)
+     * data of the pattern.
+     * @param patternPitchDerivative - A QVariantList containing the pitch
+     * derivative data of the pattern.
+     * @param patternSpectrum - A QVariantList containing the spectrum (2D)
+     * data of the pattern.
      * @param patternCepstrum - A QVariantList containing the cepstrum data of
      * the pattern.
      * @param signalAmplitude - A QVariantList containing the amplitude data of
@@ -239,6 +247,12 @@ public slots:
      * amplitude derivative data of the signal.
      * @param signalPitch - A QVariantList containing the pitch data of the
      * signal.
+     * @param signalPitchLog - A QVariantList containing the log pitch (LOG_F0)
+     * data of the signal.
+     * @param signalPitchDerivative - A QVariantList containing the pitch
+     * derivative data of the signal.
+     * @param signalSpectrum - A QVariantList containing the spectrum (2D)
+     * data of the signal.
      * @param signalCepstrum - A QVariantList containing the cepstrum data of
      * the signal.
      * @param pitchToTransform - A QVariantList containing the pitch data to be
@@ -246,18 +260,48 @@ public slots:
      * @param cuePointsToTransform - A QVariantList containing the cue points to
      * be used for alignment and transformation.
      * @return A QVariantMap containing the computed dynamic programming
-     * distance values for each feature type (e.g., "amplitudeDistance",
-     * "pitchDistance", "cepstrumDistance").
+     * distance values for each feature type.
      */
     Q_INVOKABLE QVariantMap
     getDP(const QVariantList& patternAmplitude,
         const QVariantList& patternAmplitudeDerivative,
-        const QVariantList& patternPitch, const QVariantList& patternCepstrum,
+        const QVariantList& patternPitch,
+        const QVariantList& patternPitchLog,
+        const QVariantList& patternPitchDerivative,
+        const QVariantList& patternSpectrum,
+        const QVariantList& patternCepstrum,
         const QVariantList& signalAmplitude,
         const QVariantList& signalAmplitudeDerivative,
-        const QVariantList& signalPitch, const QVariantList& signalCepstrum,
+        const QVariantList& signalPitch,
+        const QVariantList& signalPitchLog,
+        const QVariantList& signalPitchDerivative,
+        const QVariantList& signalSpectrum,
+        const QVariantList& signalCepstrum,
         const QVariantList& pitchToTransform,
         const QVariantList& cuePointsToTransform);
+
+    /**
+     * Extracts the pitch derivative contour from the given WaveFile object.
+     * The derivative is the frame-to-frame difference of the pitch contour
+     * (finite difference). Uses the same parameters as getPitch.
+     *
+     * @param waveFile - A pointer to the WaveFile object.
+     * @param algorithm - The pitch extraction algorithm to use.
+     * @param frameShift - The frame shift in milliseconds.
+     * @param sampleRate - The sample rate.
+     * @param minF0 - The minimum F0 value.
+     * @param maxF0 - The maximum F0 value.
+     * @param voicingThreshold - The voicing threshold.
+     * @param outputFormat - The output format prior to differentiation
+     * (e.g., "PITCH", "F0", "LOG_F0").
+     * @param normalized - Whether to normalize the derivative output.
+     * @return A QVariantList of QPointF values containing the pitch derivative.
+     */
+    Q_INVOKABLE QVariantList getPitchDerivative(
+        WaveFile* waveFile, const QString& algorithm, double frameShift,
+        double sampleRate, double minF0, double maxF0,
+        double voicingThreshold, const QString& outputFormat,
+        bool normalized = true);
 
     /**
      * Extracts the amplitude contour from the given WaveFile object using the
