@@ -30,6 +30,12 @@ ApplicationWindow {
 
     property var theme: getTheme()
 
+    Binding {
+        target: Theme
+        property: "primaryColorName"
+        value: settingsApi.primaryColor
+    }
+
     Component.onCompleted: {
         Logger.info("Main window initialized");
         Logger.debug("Initial theme: " + window.theme);

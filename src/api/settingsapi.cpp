@@ -49,6 +49,25 @@ void SettingsApi::setTheme(const QString& theme)
     LOG_DEBUG() << "Finish: setTheme";
 }
 
+QString SettingsApi::primaryColor() const
+{
+    LOG_DEBUG() << "Start: primaryColor";
+    QString result = QString::fromStdString(m_settings.primaryColor);
+    LOG_DEBUG() << "Finish: primaryColor - result=" << result;
+    return result;
+}
+
+void SettingsApi::setPrimaryColor(const QString& primaryColor)
+{
+    LOG_DEBUG() << "Start: setPrimaryColor - primaryColor=" << primaryColor;
+    if (m_settings.primaryColor != primaryColor.toStdString()) {
+        m_settings.primaryColor = primaryColor.toStdString();
+        save();
+        emit primaryColorChanged();
+    }
+    LOG_DEBUG() << "Finish: setPrimaryColor";
+}
+
 QString SettingsApi::algorithm() const
 {
     LOG_DEBUG() << "Start: algorithm";
@@ -191,6 +210,7 @@ void SettingsApi::load()
     updateTranslator();
     emit languageChanged();
     emit themeChanged();
+    emit primaryColorChanged();
     emit algorithmChanged();
     emit frameShiftChanged();
     emit sampleRateChanged();

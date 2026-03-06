@@ -8,7 +8,9 @@ Page {
     id: root
     title: qsTr("Settings")
 
-    Material.theme: ApplicationWindow.window.theme
+    readonly property var settingsApi: ApplicationWindow.window ? ApplicationWindow.window.settingsApi : null
+
+    Material.theme: ApplicationWindow.window ? ApplicationWindow.window.theme : Material.Light
 
     ScrollView {
         anchors.fill: parent
@@ -52,8 +54,9 @@ Page {
                         }
                         ComboBox {
                             model: ["en", "ru"]
-                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.language)
-                            onActivated: ApplicationWindow.window.settingsApi.language = currentText
+                            currentIndex: settingsApi ? model.indexOf(settingsApi.language) : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.language = currentText
                             Layout.fillWidth: true
                         }
 
@@ -63,8 +66,56 @@ Page {
                         }
                         ComboBox {
                             model: ["light", "dark", "system"]
-                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.theme)
-                            onActivated: ApplicationWindow.window.settingsApi.theme = currentText
+                            currentIndex: settingsApi ? model.indexOf(settingsApi.theme) : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.theme = currentText
+                            Layout.fillWidth: true
+                        }
+
+                        Label {
+                            text: qsTr("Primary Color")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        ComboBox {
+                            textRole: "name"
+                            valueRole: "id"
+                            model: [
+                                {
+                                    name: qsTr("Blue"),
+                                    id: "blue"
+                                },
+                                {
+                                    name: qsTr("Green"),
+                                    id: "green"
+                                },
+                                {
+                                    name: qsTr("Purple"),
+                                    id: "purple"
+                                },
+                                {
+                                    name: qsTr("Orange"),
+                                    id: "orange"
+                                },
+                                {
+                                    name: qsTr("Red"),
+                                    id: "red"
+                                },
+                                {
+                                    name: qsTr("Stainless Steel"),
+                                    id: "stainless_steel"
+                                }
+                            ]
+                            currentIndex: {
+                                if (!settingsApi)
+                                    return 0;
+                                for (var i = 0; i < model.length; i++) {
+                                    if (model[i].id === settingsApi.primaryColor)
+                                        return i;
+                                }
+                                return 0;
+                            }
+                            onActivated: if (settingsApi)
+                                settingsApi.primaryColor = model[index].id
                             Layout.fillWidth: true
                         }
                     }

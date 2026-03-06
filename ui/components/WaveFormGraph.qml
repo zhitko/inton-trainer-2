@@ -120,7 +120,8 @@ Item {
                     min = perMinY[datasetIndex];
                     var max = perMaxY[datasetIndex];
                     range = max - min;
-                    if (range === 0) range = 1.0;
+                    if (range === 0)
+                        range = 1.0;
                 }
                 // Y is inverted in canvas, so we subtract from height
                 let scaledY = (y - min) / range * graphHeight;
@@ -182,7 +183,7 @@ Item {
                 ctx.beginPath();
                 ctx.moveTo(leftMargin, y0);
                 ctx.lineTo(leftMargin - 5, y0);
-                ctx.strokeStyle = "black";
+                ctx.strokeStyle = Theme.outline(Material.theme);
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
@@ -198,17 +199,17 @@ Item {
                 var width = scaleX(cue.position + cue.length) - x;
 
                 if (cue.label.toUpperCase().startsWith("P")) {
-                    ctx.fillStyle = 'rgba(255, 193, 7, 0.5)';
-                    ctx.strokeStyle = 'rgb(176, 190, 197)';
+                    ctx.fillStyle = Qt.alpha(Theme.harmonize("#FFC107", Material.theme), 0.5);
+                    ctx.strokeStyle = Theme.outline(Material.theme);
                 } else if (cue.label.toUpperCase().startsWith("N")) {
-                    ctx.fillStyle = 'rgba(76, 175, 80, 0.5)';
-                    ctx.strokeStyle = 'rgb(165, 214, 167)';
+                    ctx.fillStyle = Qt.alpha(Theme.harmonize("#4CAF50", Material.theme), 0.5);
+                    ctx.strokeStyle = Theme.outline(Material.theme);
                 } else if (cue.label.toUpperCase().startsWith("T")) {
-                    ctx.fillStyle = 'rgba(255, 193, 7, 0.5)';
-                    ctx.strokeStyle = 'rgb(176, 190, 197)';
+                    ctx.fillStyle = Qt.alpha(Theme.harmonize("#FF9800", Material.theme), 0.5);
+                    ctx.strokeStyle = Theme.outline(Material.theme);
                 } else {
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-                    ctx.strokeStyle = 'rgb(176, 190, 197)';
+                    ctx.fillStyle = Qt.alpha(Theme.harmonize("#FFFFFF", Material.theme), 0.1);
+                    ctx.strokeStyle = Theme.outline(Material.theme);
                 }
 
                 // Draw rectangle
@@ -224,9 +225,8 @@ Item {
 
             // Draw datasets
             // Build a color palette for datasets. Priority:
-            // 1) dataset.color property, 2) root.datasetColors, 3) graphics palette (Tableau/D3-like), 4) generated HSL colors
-            // Recommended palettes for clear graphics: Tableau 10, D3 Category10, ColorBrewer Set2 (colorblind-friendly). Using a Tableau-like palette by default.
-            var graphicsPalette = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"];
+            // 1) dataset.color property, 2) root.datasetColors, 3) theme graph palette, 4) generated HSL colors
+            var graphicsPalette = Theme.chartPalette(Material.theme);
             var colors = [];
             for (var i = 0; i < datasets.length; i++) {
                 var color = null;

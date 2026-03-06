@@ -18,8 +18,10 @@ struct AppSettings {
     // == General settings ==
     // Language options: "en", "ru", etc.
     std::string language = "ru";
-    // Theme options: "light", "dark"
     std::string theme = "light";
+
+    // Primary color options: "blue", "green", "purple", "orange", "red"
+    std::string primaryColor = "blue";
 
     // == Pitch extraction settings ==
     // Show F0 contour in the UI
