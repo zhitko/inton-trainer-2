@@ -21,24 +21,42 @@ Page {
             y: 24
             spacing: 24
 
-            // 1. Header Section
-            Column {
+            ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 4
+                Layout.topMargin: 40
+                Layout.bottomMargin: 20
+                spacing: 12
 
                 Label {
                     text: qsTr("Inton@Trainer 2.0")
-                    font.bold: true
-                    font.pixelSize: 28
-                    color: Theme.onSurface(Material.theme)
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.weight: Font.Bold
+                    font.pixelSize: 32
+                    color: Theme.primary(Material.theme)
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                Label {
+                    text: qsTr("Master Your Intonation")
+                    font.pixelSize: 18
+                    font.weight: Font.Medium
+                    color: Theme.onSurfaceVariant(Material.theme)
+                    Layout.alignment: Qt.AlignHCenter
+                    opacity: 0.8
                 }
 
                 Label {
                     text: qsTr("American English")
                     font.pixelSize: 16
-                    color: Theme.onSurfaceVariant(Material.theme)
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.weight: Font.Medium
+                    color: Theme.secondary(Material.theme)
+                    Layout.alignment: Qt.AlignHCenter
+                    background: Rectangle {
+                        color: Theme.secondaryContainer(Material.theme)
+                        radius: 12
+                    }
+                    padding: 6
+                    leftPadding: 16
+                    rightPadding: 16
                 }
             }
 
@@ -51,12 +69,13 @@ Page {
             // 3. Stats Row
             RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 100
-                spacing: 16
+                Layout.preferredHeight: 85
+                Layout.topMargin: 20
+                spacing: 12
 
                 StatBox {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 90
+                    Layout.preferredHeight: 75
                     icon: Icons.faBolt
                     title: qsTr("Streak:")
                     value: "7 Days"
@@ -64,17 +83,17 @@ Page {
 
                 StatBox {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 90
-                    icon: Icons.faClock // Or similar
+                    Layout.preferredHeight: 75
+                    icon: Icons.faClock
                     title: qsTr("Avg Accuracy:")
                     value: "92%"
                 }
 
                 StatBox {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 90
+                    Layout.preferredHeight: 75
                     icon: Icons.faChartSimple
-                    title: qsTr("Overall Accuracy")
+                    title: qsTr("Overall")
                     value: "92%"
                 }
             }
@@ -82,13 +101,13 @@ Page {
             // 4. Overall Progress
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 300
+                Layout.preferredHeight: 180
 
                 CircularProgress {
                     anchors.centerIn: parent
-                    height: parent.height * 0.8
+                    height: parent.height * 0.95
                     width: height
-                    lineWidth: 24
+                    lineWidth: 14
                     progress: 0.85
                     color: Theme.primary(Material.theme)
                     backgroundColor: Theme.surfaceContainerHighest(Material.theme)
@@ -98,8 +117,8 @@ Page {
                         anchors.centerIn: parent
 
                         Text {
-                            text: qsTr("Overall Progress:")
-                            font.pixelSize: 18
+                            text: qsTr("Overall Progress")
+                            font.pixelSize: 14
                             color: Theme.onSurfaceVariant(Material.theme)
                             anchors.horizontalCenter: parent.horizontalCenter
                         }

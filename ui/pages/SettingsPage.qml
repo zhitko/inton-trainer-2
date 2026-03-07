@@ -25,9 +25,8 @@ Page {
                 Layout.fillWidth: true
 
                 background: Rectangle {
-                    color: "transparent"
-                    border.color: Theme.outlineVariant(Material.theme)
-                    radius: 8
+                    color: Theme.surfaceContainerLow(Material.theme)
+                    radius: 16
                 }
 
                 ColumnLayout {
@@ -126,9 +125,8 @@ Page {
                 Layout.fillWidth: true
 
                 background: Rectangle {
-                    color: "transparent"
-                    border.color: Theme.outlineVariant(Material.theme)
-                    radius: 8
+                    color: Theme.surfaceContainerLow(Material.theme)
+                    radius: 16
                 }
 
                 ColumnLayout {
@@ -321,9 +319,8 @@ Page {
                 Layout.fillWidth: true
 
                 background: Rectangle {
-                    color: "transparent"
-                    border.color: Theme.outlineVariant(Material.theme)
-                    radius: 8
+                    color: Theme.surfaceContainerLow(Material.theme)
+                    radius: 16
                 }
 
                 ColumnLayout {
@@ -432,9 +429,8 @@ Page {
                 Layout.fillWidth: true
 
                 background: Rectangle {
-                    color: "transparent"
-                    border.color: Theme.outlineVariant(Material.theme)
-                    radius: 8
+                    color: Theme.surfaceContainerLow(Material.theme)
+                    radius: 16
                 }
 
                 ColumnLayout {
@@ -531,9 +527,8 @@ Page {
                 Layout.fillWidth: true
 
                 background: Rectangle {
-                    color: "transparent"
-                    border.color: Theme.outlineVariant(Material.theme)
-                    radius: 8
+                    color: Theme.surfaceContainerLow(Material.theme)
+                    radius: 16
                 }
 
                 ColumnLayout {

@@ -11,7 +11,9 @@ Item {
     property var cuePoints: []
     property bool independentScale: false
     property var datasetColors: []
+    property var cueNLabels: []
     property double lineWidth: 2.5
+    property bool showCueLabels: true
 
     Canvas {
         id: canvas
@@ -98,7 +100,7 @@ Item {
             // Reserve space for Y axis and paddings
             var leftMargin = 40;
             var topPadding = 10;
-            var bottomPadding = 20;
+            var bottomPadding = (root.cueNLabels && root.cueNLabels.length > 0) ? 40 : 20;
             var graphWidth = canvas.width - leftMargin;
             var graphHeight = canvas.height - topPadding - bottomPadding;
 
@@ -193,6 +195,7 @@ Item {
                 ctx.fillText("0", leftMargin - 8, y0);
             }
 
+            var nIdx = 0;
             for (var i = 0; i < root.cuePoints.length; i++) {
                 var cue = root.cuePoints[i];
                 var x = scaleX(cue.position);
@@ -219,8 +222,27 @@ Item {
                 ctx.stroke();
 
                 // Draw label
-                ctx.fillStyle = Theme.onSurface(Material.theme);
-                ctx.fillText(cue.label, x + width / 2, canvas.height - bottomPadding / 2);
+                if (root.showCueLabels || root.cueNLabels.length > 0) {
+                    ctx.fillStyle = Theme.onSurface(Material.theme);
+                    ctx.font = "10px sans-serif";
+                    var labelY = canvas.height - bottomPadding + 15;
+                    if (root.showCueLabels)
+                        ctx.fillText(cue.label, x + width / 2, labelY);
+
+                    if (cue.label.toUpperCase().startsWith("N")) {
+                        if (root.cueNLabels && nIdx < root.cueNLabels.length) {
+                            var nLabel = root.cueNLabels[nIdx];
+                            if (nLabel) {
+                                ctx.save();
+                                ctx.font = "bold 21px sans-serif";
+                                ctx.fillStyle = Theme.primary(Material.theme);
+                                ctx.fillText(nLabel, x + width / 2, labelY + 16);
+                                ctx.restore();
+                            }
+                        }
+                        nIdx++;
+                    }
+                }
             }
 
             // Draw datasets
@@ -284,6 +306,14 @@ Item {
     }
 
     onDatasetColorsChanged: {
+        canvas.requestPaint();
+    }
+
+    onShowCueLabelsChanged: {
+        canvas.requestPaint();
+    }
+
+    onCueNLabelsChanged: {
         canvas.requestPaint();
     }
 }

@@ -48,8 +48,6 @@ ApplicationWindow {
     Material.background: Theme.background(window.theme)
 
     // ── Scaled root ───────────────────────────────────────────────────────────
-    // Always the original design size; the Scale transform zooms it to fit the
-    // actual window. When factor == 1.0 the transform is a no-op.
     Item {
         id: scaledRoot
         width: window.width / AppScale.factor
@@ -64,91 +62,167 @@ ApplicationWindow {
         ToolBar {
             id: toolbar
             width: parent.width
-            contentHeight: 56
+            contentHeight: 64
             anchors.top: parent.top
 
             background: Rectangle {
                 anchors.fill: parent
-                color: Theme.surfaceContainer(Material.theme)
+                color: Theme.surface(Material.theme)
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    width: parent.width
+                    height: 1
+                    color: Theme.outlineVariant(Material.theme)
+                    opacity: 0.5
+                }
             }
 
-            Button {
-                id: menuButton
-                font.family: Icons.familyRegular
-                font.pointSize: menuButton.hovered ? 18 : 16
-                text: Icons.faBars
-                height: toolbar.height
-                width: toolbar.height
-                hoverEnabled: true
-                onClicked: {
-                    Logger.debug("Menu button clicked");
-                    drawer.open();
-                }
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 8
+                anchors.rightMargin: 8
+                spacing: 8
 
-                background: Rectangle {
-                    color: "transparent"
-                }
+                ToolButton {
+                    id: menuButton
+                    font.family: Icons.familyRegular
+                    text: Icons.faBars
+                    font.pixelSize: 20
+                    onClicked: drawer.open()
 
-                transitions: Transition {
-                    NumberAnimation {
-                        property: "font.pointSize"
-                        duration: 100
+                    background: Rectangle {
+                        implicitWidth: 48
+                        implicitHeight: 48
+                        radius: 24
+                        color: menuButton.hovered ? Theme.surfaceContainerLow(Material.theme) : "transparent"
                     }
                 }
-            }
 
-            Label {
-                text: stackView.currentItem.title || qsTr("Inton Trainer")
-                anchors.centerIn: parent
-            }
-
-            Button {
-                id: backButton
-                anchors.right: parent.right
-                font.family: Icons.familySolid
-                font.pointSize: backButton.hovered ? 18 : 16
-                text: Icons.faCircleLeft
-                height: toolbar.height
-                width: toolbar.height
-                hoverEnabled: true
-                onClicked: stackView.pop()
-                visible: stackView.depth > 1
-
-                background: Rectangle {
-                    color: "transparent"
+                Label {
+                    text: stackView.currentItem.title || qsTr("Inton Trainer")
+                    font.pixelSize: 22
+                    font.weight: Font.Normal
+                    Layout.fillWidth: true
+                    elide: Label.ElideRight
+                    color: Theme.onSurface(Material.theme)
+                    leftPadding: 8
                 }
 
-                transitions: Transition {
-                    NumberAnimation {
-                        property: "font.pointSize"
-                        duration: 100
+                ToolButton {
+                    id: backButton
+                    font.family: Icons.familySolid
+                    text: Icons.faArrowLeft
+                    font.pixelSize: 20
+                    onClicked: stackView.pop()
+                    visible: stackView.depth > 1
+
+                    background: Rectangle {
+                        implicitWidth: 48
+                        implicitHeight: 48
+                        radius: 24
+                        color: backButton.hovered ? Theme.surfaceContainerLow(Material.theme) : "transparent"
                     }
                 }
             }
         }
 
-        // ── Tab bar ───────────────────────────────────────────────────────────
-        TabBar {
-            id: tabBar
+        // ── Navigation Bar ─────────────────────────────
+        Rectangle {
+            id: navigationBar
             width: parent.width
+            height: 80
             anchors.bottom: parent.bottom
+            color: Theme.surfaceContainer(Material.theme)
 
-            TabButton {
-                id: homeTabButton
-                onClicked: {
-                    stackView.clear();
-                    stackView.push("pages/HomePage.qml");
+            Row {
+                anchors.fill: parent
+
+                // Home Tab
+                Item {
+                    width: parent.width / 2
+                    height: parent.height
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 4
+
+                        Rectangle {
+                            width: 64
+                            height: 32
+                            radius: 16
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: stackView.depth <= 1 ? Theme.secondaryContainer(Material.theme) : "transparent"
+
+                            Text {
+                                anchors.centerIn: parent
+                                font.family: Icons.familySolid
+                                font.pixelSize: 20
+                                text: Icons.faHome
+                                color: stackView.depth <= 1 ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
+                            }
+                        }
+
+                        Text {
+                            text: qsTr("Home")
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.pixelSize: 12
+                            font.weight: stackView.depth <= 1 ? Font.Bold : Font.Normal
+                            color: stackView.depth <= 1 ? Theme.onSurface(Material.theme) : Theme.onSurfaceVariant(Material.theme)
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            stackView.clear();
+                            stackView.push("pages/HomePage.qml");
+                        }
+                    }
                 }
-                font.family: Icons.familyRegular
-                font.pointSize: 20
-                text: Icons.faHome
-            }
-            TabButton {
-                onClicked: stackView.push("pages/SettingsPage.qml")
-                font.family: Icons.familySolid
-                font.pointSize: 20
-                font.bold: true
-                text: Icons.faGear
+
+                // Settings Tab
+                Item {
+                    width: parent.width / 2
+                    height: parent.height
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 4
+
+                        Rectangle {
+                            width: 64
+                            height: 32
+                            radius: 16
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: stackView.currentItem && stackView.currentItem.title === qsTr("Settings") ? Theme.secondaryContainer(Material.theme) : "transparent"
+
+                            Text {
+                                anchors.centerIn: parent
+                                font.family: Icons.familySolid
+                                font.pixelSize: 20
+                                text: Icons.faGear
+                                color: stackView.currentItem && stackView.currentItem.title === qsTr("Settings") ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
+                            }
+                        }
+
+                        Text {
+                            text: qsTr("Settings")
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.pixelSize: 12
+                            font.weight: stackView.currentItem && stackView.currentItem.title === qsTr("Settings") ? Font.Bold : Font.Normal
+                            color: stackView.currentItem && stackView.currentItem.title === qsTr("Settings") ? Theme.onSurface(Material.theme) : Theme.onSurfaceVariant(Material.theme)
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (stackView.currentItem.title !== qsTr("Settings")) {
+                                stackView.push("pages/SettingsPage.qml");
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -157,7 +231,7 @@ ApplicationWindow {
             id: stackView
             anchors {
                 top: toolbar.bottom
-                bottom: tabBar.top
+                bottom: navigationBar.top
                 left: parent.left
                 right: parent.right
             }
@@ -168,150 +242,121 @@ ApplicationWindow {
         // ── Side drawer ───────────────────────────────────────────────────────
         Drawer {
             id: drawer
-            width: scaledRoot.width * 0.8
+            width: Math.min(scaledRoot.width * 0.8, 360)
             height: scaledRoot.height
-            z: 1
+            z: 2
 
-            Column {
+            background: Rectangle {
+                color: Theme.surface(Material.theme)
+                radius: 16
+                layer.enabled: true
+            }
+
+            ColumnLayout {
                 anchors.fill: parent
-                spacing: 10
-                padding: 10
+                anchors.margins: 12
+                spacing: 0
 
-                RowLayout {
-                    RoundButton {
-                        id: drawerCloseButton
-                        font.family: Icons.familySolid
-                        font.pixelSize: 24
-                        font.bold: true
-                        text: Icons.faAngleLeft
-                        onClicked: drawer.close()
-                        hoverEnabled: true
-                        Layout.fillWidth: false
-                        Layout.minimumWidth: height
-                        Layout.maximumWidth: height
+                Label {
+                    text: qsTr("Inton Trainer")
+                    font.pixelSize: 14
+                    font.weight: Font.Medium
+                    color: Theme.onSurfaceVariant(Material.theme)
+                    Layout.topMargin: 16
+                    Layout.leftMargin: 16
+                    Layout.bottomMargin: 16
+                }
+
+                Repeater {
+                    model: [
+                        {
+                            text: qsTr("Home"),
+                            icon: Icons.faHome,
+                            page: "pages/HomePage.qml",
+                            clear: true
+                        },
+                        {
+                            text: qsTr("Patterns"),
+                            icon: Icons.faFolderTree,
+                            page: "pages/TemplatesPage.qml",
+                            clear: false
+                        },
+                        {
+                            text: qsTr("My Records"),
+                            icon: Icons.faBoxArchive,
+                            page: "pages/RecordsPage.qml",
+                            clear: false
+                        },
+                        {
+                            text: qsTr("Settings"),
+                            icon: Icons.faGear,
+                            page: "pages/SettingsPage.qml",
+                            clear: false
+                        }
+                    ]
+
+                    delegate: ItemDelegate {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 56
+
+                        contentItem: RowLayout {
+                            spacing: 12
+                            Text {
+                                font.family: Icons.familySolid
+                                text: modelData.icon
+                                font.pixelSize: 18
+                                font.bold: true
+                                color: parent.parent.highlighted ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
+                                Layout.leftMargin: 4
+                            }
+                            Label {
+                                text: modelData.text
+                                font.pixelSize: 14
+                                font.weight: parent.parent.highlighted ? Font.Bold : Font.Normal
+                                color: parent.parent.highlighted ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
+                                Layout.fillWidth: true
+                            }
+                        }
+
+                        highlighted: {
+                            if (modelData.text === qsTr("Home"))
+                                return stackView.depth <= 1;
+                            return stackView.currentItem && stackView.currentItem.title === modelData.text;
+                        }
 
                         background: Rectangle {
-                            anchors.fill: parent
-                            radius: parent.radius
-                            color: drawerCloseButton.hovered ? Material.rippleColor : "transparent"
+                            radius: 28
+                            color: parent.highlighted ? Theme.secondaryContainer(Material.theme) : (parent.hovered ? Theme.surfaceContainerLow(Material.theme) : "transparent")
                         }
-                    }
-                    Label {
-                        text: qsTr("Menu")
-                        font.pixelSize: 24
-                        Layout.fillWidth: true
-                    }
-                }
 
-                ItemDelegate {
-                    id: homeItemDelegate
-                    text: qsTr("Home")
-                    width: parent.width - parent.padding
-                    onClicked: {
-                        stackView.clear();
-                        stackView.push("pages/HomePage.qml");
-                        drawer.close();
-                    }
-                    contentItem: RowLayout {
-                        spacing: 10
-                        Text {
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            font.family: Icons.familyRegular
-                            text: Icons.faHome
-                            color: Theme.onSurface(Material.theme)
-                        }
-                        Text {
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            Layout.fillWidth: true
-                            text: parent.parent.text
-                            font: parent.parent.font
-                            color: Theme.onSurface(Material.theme)
+                        onClicked: {
+                            if (modelData.clear) {
+                                stackView.clear();
+                            }
+                            stackView.push(modelData.page);
+                            drawer.close();
                         }
                     }
                 }
 
-                ItemDelegate {
-                    text: qsTr("Patterns")
-                    width: parent.width - parent.padding
-                    onClicked: {
-                        stackView.push("pages/TemplatesPage.qml");
-                        drawer.close();
-                    }
-                    contentItem: RowLayout {
-                        spacing: 10
-                        Text {
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            font.family: Icons.familySolid
-                            font.bold: true
-                            text: Icons.faFolderTree
-                            color: Theme.onSurface(Material.theme)
-                        }
-                        Text {
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            Layout.fillWidth: true
-                            text: parent.parent.text
-                            font: parent.parent.font
-                            color: Theme.onSurface(Material.theme)
-                        }
-                    }
-                }
+                Item {
+                    Layout.fillHeight: true
+                } // Spacer
 
-                ItemDelegate {
-                    text: qsTr("My Records")
-                    width: parent.width - parent.padding
-                    onClicked: {
-                        stackView.push("pages/RecordsPage.qml");
-                        drawer.close();
-                    }
-                    contentItem: RowLayout {
-                        spacing: 10
-                        Text {
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            font.family: Icons.familySolid
-                            font.bold: true
-                            text: Icons.faBoxArchive
-                            color: Theme.onSurface(Material.theme)
-                        }
-                        Text {
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            Layout.fillWidth: true
-                            text: parent.parent.text
-                            font: parent.parent.font
-                            color: Theme.onSurface(Material.theme)
-                        }
-                    }
-                }
-
-                ItemDelegate {
-                    text: qsTr("Settings")
-                    width: parent.width - parent.padding
-                    onClicked: {
-                        stackView.push("pages/SettingsPage.qml");
-                        drawer.close();
-                    }
-                    contentItem: RowLayout {
-                        spacing: 10
-                        Text {
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            font.family: Icons.familySolid
-                            font.bold: true
-                            text: Icons.faGear
-                            color: Theme.onSurface(Material.theme)
-                        }
-                        Text {
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            Layout.fillWidth: true
-                            text: parent.parent.text
-                            font: parent.parent.font
-                            color: Theme.onSurface(Material.theme)
-                        }
-                    }
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 1
+                    color: Theme.outlineVariant(Material.theme)
+                    Layout.bottomMargin: 8
                 }
 
                 RowLayout {
-                    width: parent.width - parent.padding * 2
+                    Layout.fillWidth: true
+                    Layout.margins: 16
                     Label {
                         text: qsTr("Dark Mode")
+                        Layout.fillWidth: true
+                        color: Theme.onSurface(Material.theme)
                     }
                     Switch {
                         checked: window.theme === Material.Dark

@@ -4,7 +4,7 @@ import QtQuick 6.8
 QtObject {
     // Design dimensions the UI was built for
     readonly property int designWidth: 640
-    readonly property int designHeight: 920
+    readonly property int designHeight: 950
 
     // Available screen real estate from the primary screen.
     // Qt.application.screens[0] is safe to use from a QtObject singleton.

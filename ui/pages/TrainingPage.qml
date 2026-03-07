@@ -33,9 +33,6 @@ Page {
     property var referencePitchDerivData: null
 
     property var userUMP: null
-    property double referenceRange: 0
-    property double userRange: 0
-    property double rangeSimilarity: 0
     property double shapeSimilarity: 0
 
     WavFileApi {
@@ -69,10 +66,10 @@ Page {
         referenceAmplitudeData = wavFileApi.getAmplitude(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
         referenceAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
 
-        referenceUMP = wavFileApi.getUMP(referencePitchData, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], false);
+        root.referenceUMP = wavFileApi.getUMP(referencePitchData, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], false);
 
-        umpGraph.waveData = referenceUMP.ump;
-        umpGraph.cuePoints = referenceUMP.cuePoints;
+        umpGraph.waveData = root.referenceUMP.ump;
+        umpGraph.cuePoints = root.referenceUMP.cuePoints;
 
         // Extract cepstrum data for reference
         Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
@@ -128,17 +125,14 @@ Page {
         Logger.debug("DP result pitch length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
-        userUMP = wavFileApi.getUMP(scaledPitch, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], false);
-        Logger.debug("UMP calculated with " + userUMP.cuePoints.length + " cue points");
+        root.userUMP = wavFileApi.getUMP(scaledPitch, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], false);
+        Logger.debug("UMP calculated with " + root.userUMP.cuePoints.length + " cue points");
 
-        umpGraph.waveData = [referenceUMP.ump, userUMP.ump];
-        umpGraph.cuePoints = referenceUMP.cuePoints;
+        umpGraph.waveData = [root.referenceUMP.ump, root.userUMP.ump];
+        umpGraph.cuePoints = root.referenceUMP.cuePoints;
 
-        // Compare UMPs using AnalysisApi
-        var cmp = analysisApi.compareUMP(referenceUMP.ump, userUMP.ump, window.settingsApi.minF0, window.settingsApi.maxF0);
-        root.referenceRange = cmp.referenceRange || 0;
-        root.userRange = cmp.userRange || 0;
-        root.rangeSimilarity = cmp.rangeSimilarity || 0;
+        // Compare UMPs using AnalysisApi to get similarity
+        var cmp = analysisApi.compareUMP(root.referenceUMP.ump, root.userUMP.ump, window.settingsApi.minF0, window.settingsApi.maxF0);
         root.shapeSimilarity = cmp.shapeSimilarity || 0;
     }
 
@@ -158,117 +152,39 @@ Page {
             y: 16
             spacing: 24
 
-            // Stats Card
+            // Shape Similarity Card
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 100
                 color: Theme.secondaryContainer(root.Material.theme)
-                radius: 12
+                radius: 16
 
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: Qt.rgba(0, 0, 0, 0.15)
-                    blur: 0.34
+                    shadowColor: Qt.rgba(0, 0, 0, 0.1)
+                    blur: 0.4
                     shadowVerticalOffset: 4
-                    shadowHorizontalOffset: 0
-                }
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 16
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 2
-                        Text {
-                            text: qsTr("Range:")
-                            font.pixelSize: 14
-                            color: Theme.onSecondaryContainer(root.Material.theme)
-                        }
-                        Text {
-                            text: Math.round(root.rangeSimilarity) + "%"
-                            font.pixelSize: 28
-                            font.weight: 700
-                            color: Theme.primary(root.Material.theme)
-                        }
-                    }
-
-                    Rectangle {
-                        width: 1
-                        Layout.fillHeight: true
-                        color: Theme.outlineVariant(root.Material.theme)
-                        opacity: 0.5
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 2
-                        Text {
-                            text: qsTr("Shape:")
-                            font.pixelSize: 14
-                            color: Theme.onSurfaceVariant(root.Material.theme)
-                        }
-                        Text {
-                            text: Math.round(root.shapeSimilarity) + "%"
-                            font.pixelSize: 28
-                            font.weight: 700
-                            color: Theme.primary(root.Material.theme)
-                        }
-                    }
-                }
-            }
-
-            // Comparison Labels and Bars
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: 12
-
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 4
-                    Text {
-                        text: qsTr("Reference range")
-                        font.pixelSize: 14
-                        font.weight: 600
-                        color: Theme.onSurface(root.Material.theme)
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 18
-                        color: Theme.surfaceContainerHighest(root.Material.theme)
-                        radius: 4
-                        Rectangle {
-                            width: parent.width * (root.referenceRange / 100.0)
-                            height: parent.height
-                            color: Theme.primary(root.Material.theme)
-                            radius: 4
-                        }
-                    }
                 }
 
                 ColumnLayout {
-                    Layout.fillWidth: true
+                    anchors.centerIn: parent
                     spacing: 4
                     Text {
-                        text: qsTr("My range")
+                        text: qsTr("Shape Similarity")
                         font.pixelSize: 14
+                        font.letterSpacing: 0.5
                         font.weight: 600
-                        color: Theme.onSurfaceVariant(root.Material.theme)
+                        color: Theme.onSecondaryContainer(root.Material.theme)
+                        opacity: 0.8
+                        Layout.alignment: Qt.AlignHCenter
                     }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 18
-                        color: Theme.surfaceContainerHighest(root.Material.theme)
-                        radius: 4
-                        Rectangle {
-                            width: parent.width * (root.userRange / 100.0)
-                            height: parent.height
-                            color: Theme.secondary(root.Material.theme)
-                            radius: 4
-                        }
+                    Text {
+                        text: Math.round(root.shapeSimilarity) + "%"
+                        font.pixelSize: 40
+                        font.weight: 800
+                        color: Theme.primary(root.Material.theme)
+                        Layout.alignment: Qt.AlignHCenter
                     }
                 }
             }
@@ -282,6 +198,8 @@ Page {
                 independentScale: true
                 datasetColors: ["#d62728", "#83270b"]
                 lineWidth: 5
+                showCueLabels: false
+                cueNLabels: root.titleText.split(",").map(s => s.replace(/\([^)]*\)/g, "").replace(/\d+/, "").replace("-", "").trim())
             }
 
             // Controls

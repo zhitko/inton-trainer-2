@@ -1,45 +1,55 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material 6.8
+import "../utils"
 
-RoundButton {
+Button {
     id: control
-    property bool showLabel: false
-    property string label: ""
+    property string iconText: ""
+    property bool primary: false
 
-    width: 50
-    height: width
-    radius: width / 2
+    implicitWidth: 56
+    implicitHeight: 56
 
-    background: Rectangle {
-        radius: control.radius
-        anchors.fill: parent
-        color: "transparent"
-        Label {
-            id: label
-            font.family: Icons.familySolid
-            font.bold: true
-            text: control.label
-            color: Theme.onSurface(Material.theme)
-            anchors.left: parent.left
-            anchors.leftMargin: parent.width / 3
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            font.pixelSize: parent.width / 2
-            verticalAlignment: Label.AlignVCenter
-        }
-        MouseArea {
-            id: mouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            onEntered: {
-                parent.color = Theme.surfaceContainerLow(Material.theme);
-                label.font.pixelSize += 4;
-            }
-            onExited: {
-                parent.color = "transparent";
-                label.font.pixelSize -= 4;
+    contentItem: Text {
+        text: control.iconText
+        font.family: Icons.familySolid
+        font.pixelSize: 24
+        color: control.primary ? Theme.onPrimary(Material.theme) : Theme.onSurface(Material.theme)
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+
+        Behavior on font.pixelSize {
+            NumberAnimation {
+                duration: 100
             }
         }
     }
+
+    background: Rectangle {
+        implicitWidth: 56
+        implicitHeight: 56
+        radius: 28 // MD3 pill shape
+        color: control.primary ? Theme.primary(Material.theme) : (control.pressed ? Theme.surfaceContainerHighest(Material.theme) : control.hovered ? Theme.surfaceContainerHigh(Material.theme) : Theme.surfaceContainerLow(Material.theme))
+
+        border.color: control.primary ? "transparent" : Theme.outlineVariant(Material.theme)
+        border.width: control.primary ? 0 : 1
+
+        Behavior on color {
+            ColorAnimation {
+                duration: 150
+            }
+        }
+    }
+
+    states: [
+        State {
+            name: "hovered"
+            when: control.hovered
+            PropertyChanges {
+                target: control.contentItem
+                font.pixelSize: 28
+            }
+        }
+    ]
 }

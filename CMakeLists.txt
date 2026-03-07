@@ -101,6 +101,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/pages/TrainingPage.qml
         ui/pages/SettingsPage.qml
         ui/components/cards/Card.qml
+        ui/components/GraphCard.qml
         ui/components/FileTreeView.qml
         ui/components/FileTreeViewItem.qml
         ui/components/ListItem.qml
