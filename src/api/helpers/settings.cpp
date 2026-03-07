@@ -35,6 +35,7 @@ Settings::loadSettings()
 
     qsettings.beginGroup("General");
     settings.language = qsettings.value("language", "ru").toString().toStdString();
+    settings.languageTitle = qsettings.value("languageTitle", "Русский").toString().toStdString();
     settings.theme = qsettings.value("theme", "light").toString().toStdString();
     settings.primaryColor = qsettings.value("primaryColor", "blue").toString().toStdString();
     qsettings.endGroup();
@@ -113,6 +114,7 @@ void Settings::saveSettings(const AppSettings& settings)
 
     qsettings.beginGroup("General");
     qsettings.setValue("language", QString::fromStdString(settings.language));
+    qsettings.setValue("languageTitle", QString::fromStdString(settings.languageTitle));
     qsettings.setValue("theme", QString::fromStdString(settings.theme));
     qsettings.setValue("primaryColor", QString::fromStdString(settings.primaryColor));
     qsettings.endGroup();

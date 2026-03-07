@@ -18,6 +18,8 @@ struct AppSettings {
     // == General settings ==
     // Language options: "en", "ru", etc.
     std::string language = "ru";
+    // Language title for display (e.g., "American English", "Русский")
+    std::string languageTitle = "Русский";
     std::string theme = "light";
 
     // Primary color options: "blue", "green", "purple", "orange", "red"

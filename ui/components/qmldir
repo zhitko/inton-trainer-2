@@ -11,3 +11,4 @@ ListItem ListItem.qml
 CircularProgress CircularProgress.qml
 SearchBar SearchBar.qml
 StatBox StatBox.qml
+Chip Chip.qml

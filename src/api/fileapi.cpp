@@ -195,7 +195,7 @@ QVariantList FileApi::getFilesList(const QString& path,
             if (relativePath.contains('/')) {
                 directory = relativePath.section('/', 0, -2);
             } else {
-                directory = "Root"; // Or handled as empty/top level
+                directory = "Patterns"; // Or handled as empty/top level
             }
 
             // Format directory for display (capitalize, maybe?)

@@ -30,8 +30,9 @@ ColumnLayout {
             anchors.fill: parent
             radius: width / 2
             color: "transparent"
-            border.color: Theme.error(Material.theme)
-            border.width: 2
+            // MD3 outlined button - uses outline color with 1dp stroke
+            border.color: Theme.outline(Material.theme)
+            border.width: 1
 
             Behavior on border.color {
                 ColorAnimation {

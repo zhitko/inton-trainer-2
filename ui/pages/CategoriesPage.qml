@@ -11,7 +11,7 @@ import QtQuick.Effects
 
 Page {
     id: root
-    title: qsTr("Categories")
+    title: qsTr("Reference samples")
 
     property string path: "data/patterns"
     property var allFolders: []

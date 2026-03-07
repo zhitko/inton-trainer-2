@@ -34,45 +34,25 @@ ColumnLayout {
 
         hoverEnabled: true
 
-        states: [
-            State {
-                name: "hovered"
-                when: button.hovered && !root.isPlaying
-                PropertyChanges {
-                    target: button
-                    scale: 1.05
-                }
-            },
-            State {
-                name: "playing"
-                when: root.isPlaying
-                PropertyChanges {
-                    target: button
-                    scale: 1.0
-                }
-            }
-        ]
-
-        transitions: [
-            Transition {
-                from: "*"
-                to: "hovered"
-                NumberAnimation {
-                    properties: "scale"
-                    duration: 200
-                    easing.type: Easing.OutBack
-                }
-            },
-            Transition {
-                from: "hovered"
-                to: "*"
-                NumberAnimation {
-                    properties: "scale"
-                    duration: 200
-                    easing.type: Easing.OutCubic
+        // MD3 State Layer overlay for hover state (8% opacity)
+        background: Rectangle {
+            radius: button.radius
+            color: button.Material.backgroundColor
+            
+            Rectangle {
+                anchors.fill: parent
+                radius: parent.radius
+                color: button.Material.foreground
+                opacity: button.hovered && !root.isPlaying ? 0.08 : 0
+                
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 150
+                        easing.type: Easing.OutQuad
+                    }
                 }
             }
-        ]
+        }
 
         onClicked: {
             if (audioApi.isPlaying) {

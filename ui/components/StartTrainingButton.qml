@@ -3,6 +3,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
+import QtQuick.Effects
+import "../utils"
 
 Item {
     id: root
@@ -62,50 +64,24 @@ Item {
             width: 180
             height: 180
 
-            // Glow
+            // MD3 Elevation shadow effect (replaces glow)
             Rectangle {
                 id: buttonGlow
                 anchors.centerIn: parent
                 width: 200
                 height: 200
                 radius: 100
-                color: Theme.primaryContainer(Material.theme)
-                opacity: startButtonMouseArea.containsMouse ? 0.8 : 0.4
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: 200
-                    }
-                }
-
-                // Pulsing effect when hovered
-                SequentialAnimation on width {
-                    running: startButtonMouseArea.containsMouse
-                    loops: Animation.Infinite
-                    NumberAnimation {
-                        to: 220
-                        duration: 1000
-                        easing.type: Easing.InOutQuad
-                    }
-                    NumberAnimation {
-                        to: 200
-                        duration: 1000
-                        easing.type: Easing.InOutQuad
-                    }
-                }
-                SequentialAnimation on height {
-                    running: startButtonMouseArea.containsMouse
-                    loops: Animation.Infinite
-                    NumberAnimation {
-                        to: 220
-                        duration: 1000
-                        easing.type: Easing.InOutQuad
-                    }
-                    NumberAnimation {
-                        to: 200
-                        duration: 1000
-                        easing.type: Easing.InOutQuad
-                    }
+                color: "transparent"
+                opacity: 0
+                
+                // MD3 Elevation 3 shadow for prominent button
+                layer.enabled: startButtonMouseArea.containsMouse
+                layer.effect: MultiEffect {
+                    shadowEnabled: true
+                    shadowColor: Qt.rgba(0, 0, 0, 0.3)
+                    blur: 0.8
+                    shadowVerticalOffset: 8
+                    shadowHorizontalOffset: 0
                 }
             }
 

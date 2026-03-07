@@ -4,10 +4,13 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
 import "../components"
 import "../components/cards"
+import "../utils"
 
 Page {
     id: root
     title: qsTr("Home")
+
+    readonly property var settingsApi: ApplicationWindow.window ? ApplicationWindow.window.settingsApi : null
 
     ScrollView {
         id: scrollView
@@ -44,19 +47,13 @@ Page {
                     opacity: 0.8
                 }
 
-                Label {
-                    text: qsTr("American English")
-                    font.pixelSize: 16
-                    font.weight: Font.Medium
-                    color: Theme.secondary(Material.theme)
+                // MD3 Chip component for language selection
+                Chip {
                     Layout.alignment: Qt.AlignHCenter
-                    background: Rectangle {
-                        color: Theme.secondaryContainer(Material.theme)
-                        radius: 12
-                    }
-                    padding: 6
-                    leftPadding: 16
-                    rightPadding: 16
+                    text: settingsApi ? settingsApi.languageTitle : ""
+                    selected: true
+                    icon: Icons.faGlobe
+                    enabled: false
                 }
             }
 

@@ -60,6 +60,18 @@ Page {
                         }
 
                         Label {
+                            text: qsTr("Language Title")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.languageTitle : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.languageTitle = text
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                        }
+
+                        Label {
                             text: qsTr("Theme")
                             color: Theme.onSurface(Material.theme)
                         }

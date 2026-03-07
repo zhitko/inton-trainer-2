@@ -23,20 +23,37 @@ Item {
         anchors.margins: 4 // Space for shadow
         anchors.rightMargin: 8
         anchors.leftMargin: 8
-        radius: 16
+        radius: 12 // MD3 medium shape token
         color: mouseArea.containsMouse ? Theme.surfaceContainerLow(Material.theme) : Theme.surface(Material.theme)
+        
+        // MD3 Elevation 1 - base elevation for cards
         layer.enabled: true
         layer.effect: MultiEffect {
             shadowEnabled: true
-            shadowColor: Qt.rgba(0, 0, 0, 0.15)
+            shadowColor: Qt.rgba(0, 0, 0, 0.12)
             blur: 0.34
-            shadowVerticalOffset: 4
+            shadowVerticalOffset: 2
             shadowHorizontalOffset: 0
         }
 
-        // Shadow effect (basic simulation with border for now or simplified)
-        border.color: Theme.outlineVariant(Material.theme)
+        // MD3 outline for surface containers
+        border.color: Theme.outline(Material.theme)
         border.width: 1
+        
+        // MD3 State Layer - hover effect (8% opacity)
+        Rectangle {
+            anchors.fill: parent
+            radius: parent.radius
+            color: Theme.onSurface(Material.theme)
+            opacity: mouseArea.containsMouse ? 0.08 : 0
+            
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 150
+                    easing.type: Easing.OutQuad
+                }
+            }
+        }
 
         // Icon Circle
         Rectangle {

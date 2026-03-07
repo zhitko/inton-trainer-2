@@ -199,7 +199,7 @@ Page {
                 datasetColors: ["#d62728", "#83270b"]
                 lineWidth: 5
                 showCueLabels: false
-                cueNLabels: root.titleText.split(",").map(s => s.replace(/\([^)]*\)/g, "").replace(/\d+/, "").replace("-", "").trim())
+                cueNLabels: root.titleText.replace(/\([^)]*\)/g, "").replace(/\d+/, "").replace("-", "").split(",").map(s => s.trim())
             }
 
             // Controls

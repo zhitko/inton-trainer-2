@@ -8,7 +8,7 @@ import "../utils"
 
 Page {
     id: templatesPage
-    title: qsTr("Patterns")
+    title: qsTr("Reference samples")
 
     property string path: "data/patterns"
 

@@ -30,6 +30,25 @@ void SettingsApi::setLanguage(const QString& language)
     LOG_DEBUG() << "Finish: setLanguage";
 }
 
+QString SettingsApi::languageTitle() const
+{
+    LOG_DEBUG() << "Start: languageTitle";
+    QString result = QString::fromStdString(m_settings.languageTitle);
+    LOG_DEBUG() << "Finish: languageTitle - result=" << result;
+    return result;
+}
+
+void SettingsApi::setLanguageTitle(const QString& languageTitle)
+{
+    LOG_DEBUG() << "Start: setLanguageTitle - languageTitle=" << languageTitle;
+    if (m_settings.languageTitle != languageTitle.toStdString()) {
+        m_settings.languageTitle = languageTitle.toStdString();
+        save();
+        emit languageTitleChanged();
+    }
+    LOG_DEBUG() << "Finish: setLanguageTitle";
+}
+
 QString SettingsApi::theme() const
 {
     LOG_DEBUG() << "Start: theme";
@@ -209,6 +228,7 @@ void SettingsApi::load()
     m_settings = Settings::loadSettings();
     updateTranslator();
     emit languageChanged();
+    emit languageTitleChanged();
     emit themeChanged();
     emit primaryColorChanged();
     emit algorithmChanged();

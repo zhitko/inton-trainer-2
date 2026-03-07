@@ -3,6 +3,13 @@ import QtQuick 6.8
 import QtQuick.Controls.Material 6.8
 
 Item {
+    // ── MD3 Shape Tokens ──────────────────────────────────────────────────────
+    // Shape tokens define corner radius values for different component sizes
+    readonly property int shapeExtraSmall: 4    // Extra small components (chips, small buttons)
+    readonly property int shapeSmall: 8         // Small components (text fields, small cards)
+    readonly property int shapeMedium: 12       // Medium components (buttons, cards, dialogs)
+    readonly property int shapeLarge: 16        // Large components (large cards, sheets)
+    readonly property int shapeExtraLarge: 28   // Extra large components (full-screen dialogs)
     Item {
         id: lightTheme
         readonly property color primary: "#415F91"

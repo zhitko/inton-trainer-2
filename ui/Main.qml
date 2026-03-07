@@ -93,8 +93,23 @@ ApplicationWindow {
                     background: Rectangle {
                         implicitWidth: 48
                         implicitHeight: 48
-                        radius: 24
+                        radius: Theme.shapeMedium // MD3 medium shape token
                         color: menuButton.hovered ? Theme.surfaceContainerLow(Material.theme) : "transparent"
+                        
+                        // MD3 State Layer - hover effect (8% opacity)
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: parent.radius
+                            color: Theme.onSurface(Material.theme)
+                            opacity: menuButton.hovered ? 0.08 : 0
+                            
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: 150
+                                    easing.type: Easing.OutQuad
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -119,8 +134,23 @@ ApplicationWindow {
                     background: Rectangle {
                         implicitWidth: 48
                         implicitHeight: 48
-                        radius: 24
+                        radius: Theme.shapeMedium // MD3 medium shape token
                         color: backButton.hovered ? Theme.surfaceContainerLow(Material.theme) : "transparent"
+                        
+                        // MD3 State Layer - hover effect (8% opacity)
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: parent.radius
+                            color: Theme.onSurface(Material.theme)
+                            opacity: backButton.hovered ? 0.08 : 0
+                            
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: 150
+                                    easing.type: Easing.OutQuad
+                                }
+                            }
+                        }
                     }
                 }
             }
