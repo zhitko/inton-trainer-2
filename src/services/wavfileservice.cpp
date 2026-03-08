@@ -35,15 +35,33 @@ std::string WavFileService::writeWaveFile(const std::string& fileName,
     fs::path absoluteFilePath = appDir / relativePath;
 
     WaveHeader* waveHeader = makeWaveHeader(buffer.size());
+    if (!waveHeader) {
+        LOG_CRITICAL() << "Failed to create wave header";
+        return "";
+    }
+
     FormatChunk* formatChunk = makeFormatChunk(
         format.channelCount, format.sampleRate, format.bitsPerSample);
+    if (!formatChunk) {
+        LOG_CRITICAL() << "Failed to create format chunk";
+        // Note: waveHeader cleanup is handled by makeWaveFile or caller
+        return "";
+    }
 
     // Cast constness away because makeDataChunk expects char* but likely doesn't
     // modify it (it copies).
     DataChunk* dataChunk = makeDataChunk(buffer.size(), const_cast<char*>(buffer.data()));
+    if (!dataChunk) {
+        LOG_CRITICAL() << "Failed to create data chunk";
+        return "";
+    }
 
     WaveFile* waveFile = makeWaveFile(waveHeader, formatChunk, dataChunk, nullptr,
         nullptr, 0, nullptr, 0);
+    if (!waveFile) {
+        LOG_CRITICAL() << "Failed to create wave file structure";
+        return "";
+    }
 
     saveWaveFile(waveFile, absoluteFilePath.string());
     waveCloseFile(waveFile);

@@ -26,8 +26,8 @@ AudioApi::AudioApi(QObject* parent)
         QCoreApplication::applicationDirPath().toStdString());
 
     m_player = new QMediaPlayer(this);
-    QAudioOutput* audioOutput = new QAudioOutput(this);
-    m_player->setAudioOutput(audioOutput);
+    m_audioOutput = new QAudioOutput(this);
+    m_player->setAudioOutput(m_audioOutput);
 
     connect(m_player, &QMediaPlayer::playbackStateChanged, this,
         [this](QMediaPlayer::PlaybackState state) {
@@ -66,6 +66,10 @@ qreal AudioApi::audioLevel() const
 void AudioApi::play(const QString& filePath)
 {
     LOG_DEBUG() << "Start: play - filePath=" << filePath;
+    if (!m_player) {
+        LOG_CRITICAL() << "QMediaPlayer is not initialized";
+        return;
+    }
     QString fullPath = QDir(QCoreApplication::applicationDirPath()).filePath(filePath);
     m_player->setSource(QUrl::fromLocalFile(fullPath));
     m_player->play();
@@ -75,7 +79,9 @@ void AudioApi::play(const QString& filePath)
 void AudioApi::stopPlayback()
 {
     LOG_DEBUG() << "Start: stopPlayback";
-    m_player->stop();
+    if (m_player) {
+        m_player->stop();
+    }
     LOG_DEBUG() << "Finish: stopPlayback";
 }
 
@@ -102,7 +108,7 @@ void AudioApi::startRecording(int durationSeconds)
     m_buffer.clear();
     setAudioLevel(0.0);
 
-    m_audioSource = new QAudioSource(m_audioDevice, m_format, this);
+    m_audioSource = std::make_unique<QAudioSource>(m_audioDevice, m_format, this);
     QIODevice* io = m_audioSource->start();
 
     connect(io, &QIODevice::readyRead, this, [this, io, durationSeconds]() {
@@ -145,9 +151,10 @@ void AudioApi::stopRecording()
         return;
     }
 
-    m_audioSource->stop();
-    m_audioSource->deleteLater();
-    m_audioSource = nullptr;
+    if (m_audioSource) {
+        m_audioSource->stop();
+    }
+    m_audioSource.reset();
     setAudioLevel(0.0);
 
     m_isRecording = false;

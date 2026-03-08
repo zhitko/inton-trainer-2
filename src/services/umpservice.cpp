@@ -35,7 +35,15 @@ UMPResult UMPService::getUMP(const std::string& interpolationType,
     std::vector<CuePointData> processedCuePoints;
     processedCuePoints.push_back(cuePoints[0]);
 
-    for (int i = 1; i < cuePoints.size() - 1; ++i) {
+    // Ensure we have at least 3 cue points to avoid underflow
+    if (cuePoints.size() < 3) {
+        processedCuePoints.push_back(cuePoints.back());
+        UMPResult emptyOut;
+        emptyOut.processedCuePoints = processedCuePoints;
+        return emptyOut;
+    }
+
+    for (int i = 1; i < static_cast<int>(cuePoints.size()) - 1; ++i) {
         const CuePointData& cuePoint = cuePoints[i];
         if (cuePoint.type == CuePointType::NUCLEUS) {
             // Just add NUCLEUS points directly to the processed list

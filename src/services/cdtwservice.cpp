@@ -196,16 +196,22 @@ void CDTWService::compute()
             }
         }
 
-        if (currRow[m] < minFinalCost) {
-            minFinalCost = currRow[m];
-            bestEndIndex = i - 1;
-            bestStartIndex = currStart[m];
-            optimalPath = currPath[m];
-        }
+         if (currRow[m] < minFinalCost) {
+             minFinalCost = currRow[m];
+             bestEndIndex = i - 1;
+             bestStartIndex = currStart[m];
+             optimalPath = currPath[m];
+         }
 
-        std::swap(prevRow, currRow);
-        std::swap(prevStart, currStart);
-        std::swap(prevPath, currPath);
+         // Use move semantics instead of swap for better performance
+         prevRow = std::move(currRow);
+         prevStart = std::move(currStart);
+         prevPath = std::move(currPath);
+         
+         currRow.assign(m + 1, std::numeric_limits<double>::infinity());
+         currStart.assign(m + 1, -1);
+         currPath.clear();
+         currPath.resize(m + 1);
     }
     LOG_DEBUG() << "Finish: CDTWService::compute - bestStartIndex="
                 << bestStartIndex << ", bestEndIndex=" << bestEndIndex

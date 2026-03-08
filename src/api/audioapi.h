@@ -126,15 +126,16 @@ private:
      */
     void setAudioLevel(qreal level = 0.0);
 
-    QAudioDevice m_audioDevice;
-    QAudioSource* m_audioSource = nullptr;
-    QAudioFormat m_format;
-    QByteArray m_buffer;
-    bool m_isRecording = false;
-    qreal m_audioLevel = 0.0;
-    std::unique_ptr<WavFileService> m_wavFileService;
-    QMediaPlayer* m_player = nullptr;
-    bool m_isPlaying = false;
+     QAudioDevice m_audioDevice;
+     std::unique_ptr<QAudioSource> m_audioSource;
+     QAudioFormat m_format;
+     QByteArray m_buffer;
+     bool m_isRecording = false;
+     qreal m_audioLevel = 0.0;
+     std::unique_ptr<WavFileService> m_wavFileService;
+     QMediaPlayer* m_player = nullptr;
+     QAudioOutput* m_audioOutput = nullptr;
+     bool m_isPlaying = false;
 };
 
 #endif // AUDIOAPI_H

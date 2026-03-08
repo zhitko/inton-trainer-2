@@ -111,11 +111,27 @@ double DPService::calculateDistance(const std::vector<double>& templateValue,
     const std::vector<double>& signalValue)
 {
     // Example implementation of distance calculation (Euclidean distance)
+    if (templateValue.empty() || signalValue.empty()) {
+        return 0.0;
+    }
+
     double sum = 0.0;
-    for (size_t k = 0; k < templateValue.size(); ++k) {
+    size_t minSize = std::min(templateValue.size(), signalValue.size());
+    
+    // Calculate distance for common dimensions
+    for (size_t k = 0; k < minSize; ++k) {
         double diff = templateValue[k] - signalValue[k];
         sum += diff * diff;
     }
+    
+    // Add penalty for mismatched dimensions (if any)
+    for (size_t k = minSize; k < templateValue.size(); ++k) {
+        sum += templateValue[k] * templateValue[k];
+    }
+    for (size_t k = minSize; k < signalValue.size(); ++k) {
+        sum += signalValue[k] * signalValue[k];
+    }
+    
     return std::sqrt(sum);
 }
 

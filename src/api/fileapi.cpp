@@ -215,19 +215,21 @@ QVariantList FileApi::getFilesList(const QString& path,
         }
     }
 
-    // Sort logic? Maybe the UI will sort or the iterator order is filesystem
-    // dependent. Let's sort by directory then filename to ensure consistent
-    // grouping.
-    std::sort(
-        fileList.begin(), fileList.end(),
-        [](const QVariant& a, const QVariant& b) {
-            QVariantMap mapA = a.toMap();
-            QVariantMap mapB = b.toMap();
-            if (mapA["directory"].toString() != mapB["directory"].toString()) {
-                return mapA["directory"].toString() < mapB["directory"].toString();
-            }
-            return mapA["fileName"].toString() < mapB["fileName"].toString();
-        });
+     // Sort logic? Maybe the UI will sort or the iterator order is filesystem
+     // dependent. Let's sort by directory then filename to ensure consistent
+     // grouping.
+     std::sort(
+         fileList.begin(), fileList.end(),
+         [](const QVariant& a, const QVariant& b) -> bool {
+             const QVariantMap& mapA = a.toMap();
+             const QVariantMap& mapB = b.toMap();
+             const QString& dirA = mapA["directory"].toString();
+             const QString& dirB = mapB["directory"].toString();
+             if (dirA != dirB) {
+                 return dirA < dirB;
+             }
+             return mapA["fileName"].toString() < mapB["fileName"].toString();
+         });
 
     LOG_DEBUG() << "Finish: getFilesList - fileCount=" << fileList.count();
     return fileList;
