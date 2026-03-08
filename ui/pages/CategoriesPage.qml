@@ -30,7 +30,6 @@ Page {
         spacing: 24
 
         // Search Bar
-        // Search Bar
         SearchBar {
             id: searchField
         }

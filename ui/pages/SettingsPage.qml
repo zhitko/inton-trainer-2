@@ -76,10 +76,33 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         ComboBox {
-                            model: ["light", "dark", "system"]
-                            currentIndex: settingsApi ? model.indexOf(settingsApi.theme) : 0
+                            textRole: "name"
+                            valueRole: "id"
+                            model: [
+                                {
+                                    "name": qsTr("Light"),
+                                    "id": "light"
+                                },
+                                {
+                                    "name": qsTr("Dark"),
+                                    "id": "dark"
+                                },
+                                {
+                                    "name": qsTr("System"),
+                                    "id": "system"
+                                }
+                            ]
+                            currentIndex: {
+                                if (!settingsApi)
+                                    return 0;
+                                for (var i = 0; i < model.length; i++) {
+                                    if (model[i].id === settingsApi.theme)
+                                        return i;
+                                }
+                                return 0;
+                            }
                             onActivated: if (settingsApi)
-                                settingsApi.theme = currentText
+                                settingsApi.theme = model[index].id
                             Layout.fillWidth: true
                         }
 
