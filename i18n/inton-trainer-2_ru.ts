@@ -37,6 +37,11 @@
         <translation>Серия:</translation>
     </message>
     <message>
+        <location filename="../ui/pages/HomePage.qml" line="78"/>
+        <source> Days</source>
+        <translation> Дней</translation>
+    </message>
+    <message>
         <location filename="../ui/pages/HomePage.qml" line="85"/>
         <source>Avg Accuracy:</source>
         <translation>Общая точность:</translation>

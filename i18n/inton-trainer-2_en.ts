@@ -37,6 +37,11 @@
         <translation>Streak:</translation>
     </message>
     <message>
+        <location filename="../ui/pages/HomePage.qml" line="78"/>
+        <source> Days</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../ui/pages/HomePage.qml" line="85"/>
         <source>Avg Accuracy:</source>
         <translation>Avg Accuracy:</translation>

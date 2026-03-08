@@ -75,7 +75,7 @@ Page {
                     Layout.preferredHeight: 75
                     icon: Icons.faBolt
                     title: qsTr("Streak:")
-                    value: "7 Days"
+                    value: "7" + qsTr(" Days")
                 }
 
                 StatBox {
