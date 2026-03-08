@@ -4,7 +4,7 @@
 <context>
     <name>CategoriesPage</name>
     <message>
-        <location filename="../ui/pages/CategoriesPage.qml" line="14"/>
+        <location filename="../ui/pages/CategoriesPage.qml" line="15"/>
         <source>Reference samples</source>
         <translation>Эталонные образцы</translation>
     </message>
@@ -12,49 +12,44 @@
 <context>
     <name>HomePage</name>
     <message>
-        <location filename="../ui/pages/HomePage.qml" line="11"/>
+        <location filename="../ui/pages/HomePage.qml" line="12"/>
         <source>Home</source>
         <translation>Начало</translation>
     </message>
     <message>
-        <location filename="../ui/pages/HomePage.qml" line="34"/>
+        <location filename="../ui/pages/HomePage.qml" line="65"/>
         <source>Inton@Trainer 2.0</source>
         <translation>Inton@Trainer 2.0</translation>
     </message>
     <message>
-        <location filename="../ui/pages/HomePage.qml" line="42"/>
+        <location filename="../ui/pages/HomePage.qml" line="73"/>
         <source>Master Your Intonation</source>
         <translation>Тренируй свою интонацию</translation>
     </message>
     <message>
-        <location filename="../ui/pages/HomePage.qml" line="62"/>
+        <location filename="../ui/pages/HomePage.qml" line="93"/>
         <source>Start Training</source>
         <translation>Начать</translation>
     </message>
     <message>
-        <location filename="../ui/pages/HomePage.qml" line="77"/>
-        <source>Streak:</source>
-        <translation>Серия:</translation>
-    </message>
-    <message>
-        <location filename="../ui/pages/HomePage.qml" line="78"/>
-        <source> Days</source>
-        <translation> Дней</translation>
-    </message>
-    <message>
-        <location filename="../ui/pages/HomePage.qml" line="85"/>
-        <source>Avg Accuracy:</source>
-        <translation>Общая точность:</translation>
-    </message>
-    <message>
-        <location filename="../ui/pages/HomePage.qml" line="93"/>
-        <source>Overall</source>
-        <translation>Общий балл</translation>
-    </message>
-    <message>
         <location filename="../ui/pages/HomePage.qml" line="117"/>
-        <source>Overall Progress</source>
-        <translation>Общий прогресс</translation>
+        <source>Total Results:</source>
+        <translation>Всего результатов:</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/HomePage.qml" line="125"/>
+        <source>Files Trained:</source>
+        <translation>Эталонов пройдено:</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/HomePage.qml" line="149"/>
+        <source>Completion</source>
+        <translation>Прогресс</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/HomePage.qml" line="109"/>
+        <source>Avg Accuracy:</source>
+        <translation>Средняя точность:</translation>
     </message>
 </context>
 <context>
@@ -536,7 +531,7 @@ Check analysis settings (e.g. increase FFT length).</source>
 <context>
     <name>TemplatesPage</name>
     <message>
-        <location filename="../ui/pages/TemplatesPage.qml" line="11"/>
+        <location filename="../ui/pages/TemplatesPage.qml" line="12"/>
         <source>Reference samples</source>
         <translation>Эталонные образцы</translation>
     </message>
@@ -544,36 +539,36 @@ Check analysis settings (e.g. increase FFT length).</source>
 <context>
     <name>TrainingPage</name>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="174"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="182"/>
         <source>Shape Similarity</source>
         <translation>Сходство</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="212"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="220"/>
         <source>Play
 Reference</source>
         <translation>Слушать
 Эталон</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="222"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="230"/>
         <source>Play
 Me</source>
         <translation>Слушать
 Запись</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="235"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="243"/>
         <source>Open Test File</source>
         <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="295"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="303"/>
         <source>Open test file</source>
         <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="347"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="355"/>
         <source>Advanced</source>
         <translation>Дополнительно</translation>
     </message>

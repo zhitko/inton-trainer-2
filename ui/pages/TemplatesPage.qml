@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
 import by.intontrainer.file 1.0
+import by.intontrainer.statistics 1.0
 import "../components"
 import "../utils"
 
@@ -16,10 +17,24 @@ Page {
 
     Component.onCompleted: {
         allFiles = fileApi.getFilesList(templatesPage.path, ["*.wav"]);
+        statisticsApi.reloadStatistics();
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            // Reload statistics when page becomes visible (e.g., when going back)
+            statisticsApi.reloadStatistics();
+            // Trigger update of list items
+            listView.forceLayout();
+        }
     }
 
     FileApi {
         id: fileApi
+    }
+
+    StatisticsApi {
+        id: statisticsApi
     }
 
     ColumnLayout {
@@ -70,10 +85,12 @@ Page {
                 itemData: modelData.fileName
                 itemIndex: index
                 icon: Icons.faFileAudio
+                filePath: fileApi.getApplicationDirPath() + "/" + templatesPage.path + "/" + modelData.filePath
+                isFolder: false
                 onClicked: {
                     console.log("Clicked template:", modelData.filePath);
                     stackView.push("TrainingPage.qml", {
-                        referenceFilePath: fileApi.getApplicationDirPath() + "/" + templatesPage.path + "/" + modelData.filePath
+                        referenceFilePath: filePath
                     });
                 }
             }

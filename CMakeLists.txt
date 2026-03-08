@@ -20,10 +20,14 @@ qt_add_executable(appinton-trainer-2
     src/api/analysisapi.cpp
     src/api/settingsapi.h
     src/api/settingsapi.cpp
+    src/api/statisticsapi.h
+    src/api/statisticsapi.cpp
     src/api/qmllogger.h
     src/api/qmllogger.cpp
     src/api/helpers/settings.h
     src/api/helpers/settings.cpp
+    src/api/helpers/statistics.h
+    src/api/helpers/statistics.cpp
     src/services/wavfileservice.h
     src/services/wavfileservice.cpp
     src/services/pitchservice.h

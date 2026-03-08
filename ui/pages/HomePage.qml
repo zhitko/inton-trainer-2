@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
+import by.intontrainer.statistics 1.0
 import "../components"
 import "../components/cards"
 import "../utils"
@@ -11,6 +12,36 @@ Page {
     title: qsTr("Home")
 
     readonly property var settingsApi: ApplicationWindow.window ? ApplicationWindow.window.settingsApi : null
+
+    StatisticsApi {
+        id: statisticsApi
+    }
+
+    Component.onCompleted: {
+        // Reload statistics when page becomes visible
+        statisticsApi.reloadStatistics();
+        // Force update of the UI by re-evaluating bindings
+        updateStatistics();
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            // Reload statistics when page becomes visible (e.g., when going back)
+            statisticsApi.reloadStatistics();
+            updateStatistics();
+        }
+    }
+
+    function updateStatistics() {
+        let stats = statisticsApi.getOverallStatistics();
+        avgAccuracyBox.value = Math.round(stats.avgResult) + "%";
+        totalResultsBox.value = Math.round(stats.totalResults);
+        filesCountBox.value = Math.round(stats.filesCount);
+
+        // Update overall progress circle with completeness
+        overallProgressCircle.progress = stats.completeness / 100;
+        overallProgressText.text = Math.round(stats.completeness) + "%";
+    }
 
     ScrollView {
         id: scrollView
@@ -71,27 +102,27 @@ Page {
                 spacing: 12
 
                 StatBox {
+                    id: avgAccuracyBox
                     Layout.fillWidth: true
                     Layout.preferredHeight: 75
-                    icon: Icons.faBolt
-                    title: qsTr("Streak:")
-                    value: "7" + qsTr(" Days")
-                }
-
-                StatBox {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 75
-                    icon: Icons.faClock
+                    icon: Icons.faChartLine
                     title: qsTr("Avg Accuracy:")
-                    value: "92%"
                 }
 
                 StatBox {
+                    id: totalResultsBox
                     Layout.fillWidth: true
                     Layout.preferredHeight: 75
-                    icon: Icons.faChartSimple
-                    title: qsTr("Overall")
-                    value: "92%"
+                    icon: Icons.faCheckCircle
+                    title: qsTr("Total Results:")
+                }
+
+                StatBox {
+                    id: filesCountBox
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 75
+                    icon: Icons.faFolderOpen
+                    title: qsTr("Files Trained:")
                 }
             }
 
@@ -101,6 +132,7 @@ Page {
                 Layout.preferredHeight: 180
 
                 CircularProgress {
+                    id: overallProgressCircle
                     anchors.centerIn: parent
                     height: parent.height * 0.95
                     width: height
@@ -114,12 +146,13 @@ Page {
                         anchors.centerIn: parent
 
                         Text {
-                            text: qsTr("Overall Progress")
+                            text: qsTr("Completion")
                             font.pixelSize: 14
                             color: Theme.onSurfaceVariant(Material.theme)
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text {
+                            id: overallProgressText
                             text: "85%"
                             font.pixelSize: 36
                             font.bold: true

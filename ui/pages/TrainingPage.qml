@@ -9,6 +9,7 @@ import Qt.labs.platform 1.1
 import by.intontrainer.wavfile 1.0
 import by.intontrainer.file 1.0
 import by.intontrainer.analysis 1.0
+import by.intontrainer.statistics 1.0
 
 import "../components"
 import "../utils"
@@ -45,6 +46,10 @@ Page {
 
     FileApi {
         id: fileApi
+    }
+
+    StatisticsApi {
+        id: statisticsApi
     }
 
     Component.onCompleted: {
@@ -134,6 +139,9 @@ Page {
         // Compare UMPs using AnalysisApi to get similarity
         var cmp = analysisApi.compareUMP(root.referenceUMP.ump, root.userUMP.ump, window.settingsApi.minF0, window.settingsApi.maxF0);
         root.shapeSimilarity = cmp.shapeSimilarity || 0;
+
+        // Register the result in statistics
+        statisticsApi.registerResult(root.referenceFilePath, root.shapeSimilarity);
     }
 
     background: Rectangle {

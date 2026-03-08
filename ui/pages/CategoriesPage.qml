@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
 import by.intontrainer.file 1.0
+import by.intontrainer.statistics 1.0
 import "../components"
 import "../components/cards"
 import "../utils"
@@ -20,8 +21,22 @@ Page {
         id: fileApi
     }
 
+    StatisticsApi {
+        id: statisticsApi
+    }
+
     Component.onCompleted: {
         allFolders = fileApi.getFolders(root.path);
+        statisticsApi.reloadStatistics();
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            // Reload statistics when page becomes visible (e.g., when going back)
+            statisticsApi.reloadStatistics();
+            // Trigger update of list items
+            listView.forceLayout();
+        }
     }
 
     ColumnLayout {
@@ -53,16 +68,19 @@ Page {
                 required property int index
                 itemData: modelData
                 itemIndex: index
+                filePath: root.path + "/" + modelData
+                isFolder: true
                 onClicked: {
                     console.log("Clicked category:", modelData);
-                    let subFolders = fileApi.getFolders(root.path + "/" + modelData);
+                    let folderPath = root.path + "/" + modelData;
+                    let subFolders = fileApi.getFolders(folderPath);
                     if (subFolders.length > 0) {
                         stackView.push("CategoriesPage.qml", {
-                            path: root.path + "/" + modelData
+                            path: folderPath
                         });
                     } else {
                         stackView.push("TemplatesPage.qml", {
-                            path: root.path + "/" + modelData
+                            path: folderPath
                         });
                     }
                 }

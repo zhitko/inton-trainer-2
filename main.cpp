@@ -8,6 +8,7 @@
 #include "wavfileapi.h"
 #include "analysisapi.h"
 #include "src/api/settingsapi.h"
+#include "src/api/statisticsapi.h"
 #include "src/api/qmllogger.h"
 
 // Logging
@@ -25,6 +26,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<WavFileApi>("by.intontrainer.wavfile", 1, 0, "WavFileApi");
     qmlRegisterType<AnalysisApi>("by.intontrainer.analysis", 1, 0, "AnalysisApi");
     qmlRegisterType<SettingsApi>("by.intontrainer.settings", 1, 0, "SettingsApi");
+    qmlRegisterType<StatisticsApi>("by.intontrainer.statistics", 1, 0, "StatisticsApi");
     qmlRegisterSingletonType<QmlLogger>("by.intontrainer.logger", 1, 0, "QmlLogger", &QmlLogger::create);
 
     QQmlApplicationEngine engine;
