@@ -58,7 +58,7 @@ Page {
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: 40
-                Layout.bottomMargin: 20
+                Layout.bottomMargin: 40
                 spacing: 12
 
                 Label {
@@ -98,7 +98,7 @@ Page {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 85
-                Layout.topMargin: 20
+                Layout.topMargin: 40
                 spacing: 12
 
                 StatBox {
