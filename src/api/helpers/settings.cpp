@@ -38,6 +38,7 @@ Settings::loadSettings()
     settings.languageTitle = qsettings.value("languageTitle", "Русский").toString().toStdString();
     settings.theme = qsettings.value("theme", "light").toString().toStdString();
     settings.primaryColor = qsettings.value("primaryColor", "blue").toString().toStdString();
+    settings.showNavigationMenu = qsettings.value("showNavigationMenu", false).toBool();
     qsettings.endGroup();
 
     qsettings.beginGroup("Pitch");
@@ -117,6 +118,7 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("languageTitle", QString::fromStdString(settings.languageTitle));
     qsettings.setValue("theme", QString::fromStdString(settings.theme));
     qsettings.setValue("primaryColor", QString::fromStdString(settings.primaryColor));
+    qsettings.setValue("showNavigationMenu", settings.showNavigationMenu);
     qsettings.endGroup();
 
     qsettings.beginGroup("Pitch");

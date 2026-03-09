@@ -21,6 +21,7 @@ class SettingsApi : public QObject {
         QString languageTitle READ languageTitle WRITE setLanguageTitle NOTIFY languageTitleChanged)
     Q_PROPERTY(QString theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QString primaryColor READ primaryColor WRITE setPrimaryColor NOTIFY primaryColorChanged)
+    Q_PROPERTY(bool showNavigationMenu READ showNavigationMenu WRITE setShowNavigationMenu NOTIFY showNavigationMenuChanged)
     Q_PROPERTY(QString algorithm READ algorithm WRITE setAlgorithm NOTIFY
             algorithmChanged)
     Q_PROPERTY(double frameShift READ frameShift WRITE setFrameShift NOTIFY
@@ -145,6 +146,9 @@ public:
 
     QString primaryColor() const;
     void setPrimaryColor(const QString& primaryColor);
+
+    bool showNavigationMenu() const;
+    void setShowNavigationMenu(bool showNavigationMenu);
 
     QString algorithm() const;
     void setAlgorithm(const QString& algorithm);
@@ -285,6 +289,7 @@ signals:
     void languageTitleChanged();
     void themeChanged();
     void primaryColorChanged();
+    void showNavigationMenuChanged();
     void algorithmChanged();
     void frameShiftChanged();
     void sampleRateChanged();

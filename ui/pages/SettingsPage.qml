@@ -152,6 +152,16 @@ Page {
                                 settingsApi.primaryColor = model[index].id
                             Layout.fillWidth: true
                         }
+
+                        Label {
+                            text: qsTr("Show Navigation Menu")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.showNavigationMenu : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showNavigationMenu = checked
+                        }
                     }
                 }
             }

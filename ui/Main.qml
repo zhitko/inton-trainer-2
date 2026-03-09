@@ -163,6 +163,7 @@ ApplicationWindow {
             height: 80
             anchors.bottom: parent.bottom
             color: Theme.surfaceContainer(Material.theme)
+            visible: settingsApi.showNavigationMenu
 
             Row {
                 anchors.fill: parent

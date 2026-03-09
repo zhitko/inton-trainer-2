@@ -87,6 +87,25 @@ void SettingsApi::setPrimaryColor(const QString& primaryColor)
     LOG_DEBUG() << "Finish: setPrimaryColor";
 }
 
+bool SettingsApi::showNavigationMenu() const
+{
+    LOG_DEBUG() << "Start: showNavigationMenu";
+    bool result = m_settings.showNavigationMenu;
+    LOG_DEBUG() << "Finish: showNavigationMenu - result=" << result;
+    return result;
+}
+
+void SettingsApi::setShowNavigationMenu(bool showNavigationMenu)
+{
+    LOG_DEBUG() << "Start: setShowNavigationMenu - showNavigationMenu=" << showNavigationMenu;
+    if (m_settings.showNavigationMenu != showNavigationMenu) {
+        m_settings.showNavigationMenu = showNavigationMenu;
+        save();
+        emit showNavigationMenuChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowNavigationMenu";
+}
+
 QString SettingsApi::algorithm() const
 {
     LOG_DEBUG() << "Start: algorithm";
@@ -231,6 +250,7 @@ void SettingsApi::load()
     emit languageTitleChanged();
     emit themeChanged();
     emit primaryColorChanged();
+    emit showNavigationMenuChanged();
     emit algorithmChanged();
     emit frameShiftChanged();
     emit sampleRateChanged();

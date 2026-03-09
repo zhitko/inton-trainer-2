@@ -24,6 +24,8 @@ struct AppSettings {
 
     // Primary color options: "blue", "green", "purple", "orange", "red"
     std::string primaryColor = "blue";
+    // Show navigation menu in the UI
+    bool showNavigationMenu = false;
 
     // == Pitch extraction settings ==
     // Show F0 contour in the UI
