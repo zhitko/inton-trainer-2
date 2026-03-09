@@ -36,14 +36,14 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             text: root.icon
             font.family: root.iconFamily
-            font.pixelSize: 24
+            font.pixelSize: 22
             color: Theme.primary(Material.theme)
         }
 
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: root.title
-            font.pixelSize: 14
+            font.pixelSize: 12
             color: Theme.onSecondaryContainer(Material.theme)
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
@@ -53,7 +53,7 @@ Rectangle {
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: root.value
-            font.pixelSize: 18
+            font.pixelSize: 16
             font.weight: 600
             color: Theme.onSurface(Material.theme)
         }
