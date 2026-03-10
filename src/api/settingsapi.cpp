@@ -1,8 +1,10 @@
 #include "settingsapi.h"
 #include "helpers/logger.h"
+#include "helpers/statistics.h"
 #include <QCoreApplication>
 #include <QDebug>
 #include <QQmlEngine>
+#include <QFile>
 
 SettingsApi::SettingsApi(QObject* parent)
     : QObject(parent)
@@ -319,6 +321,31 @@ void SettingsApi::save()
     LOG_DEBUG() << "Start: save";
     Settings::saveSettings(m_settings);
     LOG_DEBUG() << "Finish: save";
+}
+
+void SettingsApi::clearUserStatistics()
+{
+    LOG_DEBUG() << "Start: clearUserStatistics";
+    
+    // Get the statistics file path
+    QString filePath = QCoreApplication::applicationDirPath() + "/statistics.json";
+    QFile file(filePath);
+    
+    if (file.exists()) {
+        if (file.remove()) {
+            LOG_INFO() << "Statistics file deleted successfully";
+            // Reload statistics to clear the cache
+            Statistics::reloadStatistics();
+        } else {
+            LOG_WARNING() << "Failed to delete statistics file";
+        }
+    } else {
+        LOG_INFO() << "Statistics file does not exist";
+        // Still reload to clear cache
+        Statistics::reloadStatistics();
+    }
+    
+    LOG_DEBUG() << "Finish: clearUserStatistics";
 }
 
 SettingsApi::PitchInterpolationType

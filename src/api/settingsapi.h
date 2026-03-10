@@ -274,6 +274,13 @@ public:
      */
     Q_INVOKABLE void save();
 
+    /**
+     * Clears all user statistics data by deleting the statistics file.
+     * This removes all training results and resets the statistics to an empty state.
+     * The statistics file will be deleted from disk.
+     */
+    Q_INVOKABLE void clearUserStatistics();
+
 signals:
     void amplitudeWindowChanged();
     void amplitudeShiftChanged();

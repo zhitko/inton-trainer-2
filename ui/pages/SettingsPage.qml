@@ -14,7 +14,6 @@ Page {
 
     ScrollView {
         anchors.fill: parent
-        anchors.margins: 20
         contentWidth: availableWidth
 
         ColumnLayout {
@@ -23,6 +22,7 @@ Page {
 
             Frame {
                 Layout.fillWidth: true
+                Layout.margins: 20
 
                 background: Rectangle {
                     color: Theme.surfaceContainerLow(Material.theme)
@@ -163,11 +163,48 @@ Page {
                                 settingsApi.showNavigationMenu = checked
                         }
                     }
+
+                    Button {
+                        text: qsTr("Clear User Statistics")
+                        Layout.fillWidth: true
+                        Material.foreground: Theme.onError(Material.theme)
+                        
+                        background: Rectangle {
+                            color: Theme.error(Material.theme)
+                            radius: 4
+                        }
+                        
+                        onClicked: {
+                            confirmationDialog.open()
+                        }
+                    }
+
+                    Dialog {
+                        id: confirmationDialog
+                        title: qsTr("Clear User Statistics")
+                        modal: true
+                        standardButtons: Dialog.Yes | Dialog.No
+                        
+                        Label {
+                            text: qsTr("This action will permanently delete all user statistics. This cannot be undone. Are you sure?")
+                            color: Theme.onSurface(Material.theme)
+                            wrapMode: Text.Wrap
+                        }
+                        
+                        onAccepted: {
+                            if (settingsApi) {
+                                settingsApi.clearUserStatistics();
+                            }
+                        }
+                    }
                 }
             }
 
             Frame {
                 Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
+                Layout.bottomMargin: 20
 
                 background: Rectangle {
                     color: Theme.surfaceContainerLow(Material.theme)
@@ -362,6 +399,9 @@ Page {
 
             Frame {
                 Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
+                Layout.bottomMargin: 20
 
                 background: Rectangle {
                     color: Theme.surfaceContainerLow(Material.theme)
@@ -472,6 +512,9 @@ Page {
 
             Frame {
                 Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
+                Layout.bottomMargin: 20
 
                 background: Rectangle {
                     color: Theme.surfaceContainerLow(Material.theme)
@@ -568,8 +611,12 @@ Page {
                     }
                 }
             }
+
             Frame {
                 Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
+                Layout.bottomMargin: 20
 
                 background: Rectangle {
                     color: Theme.surfaceContainerLow(Material.theme)
