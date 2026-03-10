@@ -86,6 +86,7 @@ ApplicationWindow {
                 ToolButton {
                     id: menuButton
                     font.family: Icons.familyRegular
+                    font.weight: Icons.fontRegular.weight
                     text: Icons.faBars
                     font.pixelSize: 20
                     onClicked: drawer.open()
@@ -126,6 +127,7 @@ ApplicationWindow {
                 ToolButton {
                     id: backButton
                     font.family: Icons.familySolid
+                    font.weight: Icons.fontSolid.weight
                     text: Icons.faArrowLeft
                     font.pixelSize: 20
                     onClicked: stackView.pop()
@@ -187,6 +189,7 @@ ApplicationWindow {
                             Text {
                                 anchors.centerIn: parent
                                 font.family: Icons.familySolid
+                                font.weight: Icons.fontSolid.weight
                                 font.pixelSize: 20
                                 text: Icons.faHome
                                 color: stackView.depth <= 1 ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
@@ -230,6 +233,7 @@ ApplicationWindow {
                             Text {
                                 anchors.centerIn: parent
                                 font.family: Icons.familySolid
+                                font.weight: Icons.fontSolid.weight
                                 font.pixelSize: 20
                                 text: Icons.faGear
                                 color: stackView.currentItem && stackView.currentItem.title === qsTr("Settings") ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
@@ -349,6 +353,7 @@ ApplicationWindow {
                             spacing: 12
                             Text {
                                 font.family: Icons.familySolid
+                                font.weight: Icons.fontSolid.weight
                                 text: modelData.icon
                                 font.pixelSize: 18
                                 font.bold: true

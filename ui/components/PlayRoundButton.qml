@@ -27,6 +27,7 @@ ColumnLayout {
         Layout.preferredWidth: 56
         Layout.preferredHeight: 56
         font.family: Icons.familySolid
+        font.weight: Icons.fontSolid.weight
         text: root.isPlaying ? Icons.faStop : root.icon
         font.pixelSize: 20
         Material.background: root.isPlaying ? Theme.errorContainer(Material.theme) : Theme.primaryContainer(Material.theme)
@@ -38,13 +39,13 @@ ColumnLayout {
         background: Rectangle {
             radius: button.radius
             color: button.Material.backgroundColor
-            
+
             Rectangle {
                 anchors.fill: parent
                 radius: parent.radius
                 color: button.Material.foreground
                 opacity: button.hovered && !root.isPlaying ? 0.08 : 0
-                
+
                 Behavior on opacity {
                     NumberAnimation {
                         duration: 150

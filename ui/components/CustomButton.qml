@@ -15,6 +15,7 @@ Button {
     contentItem: Text {
         text: control.iconText
         font.family: Icons.familySolid
+        font.weight: Icons.fontSolid.weight
         font.pixelSize: 24
         color: control.primary ? Theme.onPrimary(Material.theme) : Theme.onSurface(Material.theme)
         horizontalAlignment: Text.AlignHCenter
@@ -41,14 +42,14 @@ Button {
             anchors.fill: parent
             radius: parent.radius
             color: "transparent"
-            
+
             // Hover state layer (8% opacity)
             Rectangle {
                 anchors.fill: parent
                 radius: parent.radius
                 color: control.primary ? Theme.onPrimary(Material.theme) : Theme.onSurface(Material.theme)
                 opacity: control.hovered && !control.pressed ? 0.08 : 0
-                
+
                 Behavior on opacity {
                     NumberAnimation {
                         duration: 150
@@ -56,14 +57,14 @@ Button {
                     }
                 }
             }
-            
+
             // Pressed state layer (16% opacity)
             Rectangle {
                 anchors.fill: parent
                 radius: parent.radius
                 color: control.primary ? Theme.onPrimary(Material.theme) : Theme.onSurface(Material.theme)
                 opacity: control.pressed ? 0.16 : 0
-                
+
                 Behavior on opacity {
                     NumberAnimation {
                         duration: 150
