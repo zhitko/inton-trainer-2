@@ -12,11 +12,6 @@
 <context>
     <name>HomePage</name>
     <message>
-        <location filename="../ui/pages/HomePage.qml" line="12"/>
-        <source>Home</source>
-        <translation>Начало</translation>
-    </message>
-    <message>
         <location filename="../ui/pages/HomePage.qml" line="65"/>
         <source>Inton@Trainer 2.0</source>
         <translation>Inton@Trainer 2.0</translation>
@@ -56,41 +51,41 @@
     <name>Main</name>
     <message>
         <location filename="../ui/Main.qml" line="16"/>
-        <location filename="../ui/Main.qml" line="117"/>
-        <location filename="../ui/Main.qml" line="292"/>
+        <location filename="../ui/Main.qml" line="118"/>
+        <location filename="../ui/Main.qml" line="311"/>
         <source>Inton Trainer</source>
         <translation>Inton Trainer</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="197"/>
-        <location filename="../ui/Main.qml" line="304"/>
-        <location filename="../ui/Main.qml" line="353"/>
+        <location filename="../ui/Main.qml" line="200"/>
+        <location filename="../ui/Main.qml" line="323"/>
+        <location filename="../ui/Main.qml" line="373"/>
         <source>Home</source>
         <translation>Начало</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="316"/>
+        <location filename="../ui/Main.qml" line="335"/>
         <source>My Records</source>
         <translation>Записи</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="228"/>
-        <location filename="../ui/Main.qml" line="235"/>
-        <location filename="../ui/Main.qml" line="240"/>
-        <location filename="../ui/Main.qml" line="243"/>
+        <location filename="../ui/Main.qml" line="231"/>
+        <location filename="../ui/Main.qml" line="239"/>
         <location filename="../ui/Main.qml" line="244"/>
-        <location filename="../ui/Main.qml" line="251"/>
-        <location filename="../ui/Main.qml" line="322"/>
+        <location filename="../ui/Main.qml" line="247"/>
+        <location filename="../ui/Main.qml" line="248"/>
+        <location filename="../ui/Main.qml" line="255"/>
+        <location filename="../ui/Main.qml" line="341"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="310"/>
+        <location filename="../ui/Main.qml" line="329"/>
         <source>Patterns</source>
         <translation>Эталоны</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="388"/>
+        <location filename="../ui/Main.qml" line="409"/>
         <source>Dark Mode</source>
         <translation>Темная тема</translation>
     </message>
@@ -140,7 +135,7 @@
 <context>
     <name>SearchBar</name>
     <message>
-        <location filename="../ui/components/SearchBar.qml" line="45"/>
+        <location filename="../ui/components/SearchBar.qml" line="46"/>
         <source>Search</source>
         <translation>Поиск</translation>
     </message>
