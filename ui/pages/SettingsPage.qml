@@ -168,33 +168,14 @@ Page {
                         text: qsTr("Clear User Statistics")
                         Layout.fillWidth: true
                         Material.foreground: Theme.onError(Material.theme)
-                        
+
                         background: Rectangle {
                             color: Theme.error(Material.theme)
                             radius: 4
                         }
-                        
-                        onClicked: {
-                            confirmationDialog.open()
-                        }
-                    }
 
-                    Dialog {
-                        id: confirmationDialog
-                        title: qsTr("Clear User Statistics")
-                        modal: true
-                        standardButtons: Dialog.Yes | Dialog.No
-                        
-                        Label {
-                            text: qsTr("This action will permanently delete all user statistics. This cannot be undone. Are you sure?")
-                            color: Theme.onSurface(Material.theme)
-                            wrapMode: Text.Wrap
-                        }
-                        
-                        onAccepted: {
-                            if (settingsApi) {
-                                settingsApi.clearUserStatistics();
-                            }
+                        onClicked: {
+                            confirmationDialog.open();
                         }
                     }
                 }
@@ -796,6 +777,37 @@ Page {
                         }
                     }
                 }
+            }
+        }
+    }
+    Dialog {
+        id: confirmationDialog
+        title: qsTr("Clear User Statistics")
+        modal: true
+
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+
+        Label {
+            text: qsTr("This action will permanently delete all user statistics.\nThis cannot be undone. Are you sure?")
+            color: Theme.onSurface(Material.theme)
+            wrapMode: Text.Wrap
+        }
+
+        footer: DialogButtonBox {
+            Button {
+                text: qsTr("Yes")
+                DialogButtonBox.buttonRole: DialogButtonBox.YesRole
+            }
+            Button {
+                text: qsTr("No")
+                DialogButtonBox.buttonRole: DialogButtonBox.NoRole
+            }
+        }
+
+        onAccepted: {
+            if (settingsApi) {
+                settingsApi.clearUserStatistics();
             }
         }
     }
