@@ -14,6 +14,7 @@ Item {
     property string icon: Icons.faBook
     property string filePath: ""
     property bool isFolder: false
+    property real avgScore: 0
 
     signal clicked
 
@@ -37,22 +38,57 @@ Item {
     }
 
     function updateStatistics() {
-        let stats = 0;
-        // Update percentage text with fresh statistics
+        let completeness = 0;
+        let totalFiles = 0;
+        let processedFiles = 0;
+        let avgScoreVal = 0;
+
         if (root.isFolder) {
             console.log("Updating stats for folder:", root.filePath);
-            stats = statisticsApi.getAvgResultForFolder(root.filePath).completeness;
-            console.log("Calculated completeness for folder:", stats);
+            let folderStats = statisticsApi.getAvgResultForFolder(root.filePath);
+            completeness = folderStats.completeness;
+            totalFiles = folderStats.totalFiles;
+            processedFiles = folderStats.processedFiles;
+            avgScoreVal = folderStats.avgResult;
+            console.log("Calculated completeness for folder:", completeness, "processed:", processedFiles, "total:", totalFiles);
+            percentageText.text = processedFiles + "/" + totalFiles + " (" + Math.round(completeness) + "% " + qsTr("Progress") + ")";
         } else {
             console.log("Updating stats for file:", root.filePath);
-            stats = statisticsApi.getAvgResultForFile(root.filePath);
-            console.log("Calculated average result for file:", stats);
+            avgScoreVal = statisticsApi.getAvgResultForFile(root.filePath);
+            console.log("Calculated average result for file:", avgScoreVal);
+
+            if (avgScoreVal >= 90)
+                percentageText.text = qsTr("Mastered");
+            else if (avgScoreVal >= 75)
+                percentageText.text = qsTr("Excellent");
+            else if (avgScoreVal >= 60)
+                percentageText.text = qsTr("Good");
+            else if (avgScoreVal >= 40)
+                percentageText.text = qsTr("Needs work");
+            else if (avgScoreVal > 0)
+                percentageText.text = qsTr("Poor");
+            else
+                percentageText.text = qsTr("Not practiced yet");
         }
-        percentageText.text = Math.round(stats) + "%";
-        
-        // Update progress circle
-        progressCircle.progress = Math.min(stats / 100, 1.0);
-        progressText.text = Math.round(stats) + "%";
+        root.avgScore = avgScoreVal;
+
+        // Update main progress circle on the RIGHT with Average Score (Accuracy)
+        progressCircle.progress = Math.min(avgScoreVal / 100, 1.0);
+
+        // Update circle color based on score
+        if (avgScoreVal >= 80)
+            progressCircle.color = "#4CAF50";
+        else
+        // Green
+        if (avgScoreVal >= 40)
+            progressCircle.color = "#FF9800";
+        else
+        // Orange
+        if (avgScoreVal > 0)
+            progressCircle.color = "#F44336";
+        else
+            // Red
+            progressCircle.color = Theme.primary(Material.theme);
     }
 
     width: ListView.view ? ListView.view.width : 0
@@ -66,7 +102,7 @@ Item {
         anchors.leftMargin: 8
         radius: 12 // MD3 medium shape token
         color: mouseArea.containsMouse ? Theme.surfaceContainerLow(Material.theme) : Theme.surface(Material.theme)
-        
+
         // MD3 Elevation 1 - base elevation for cards
         layer.enabled: true
         layer.effect: MultiEffect {
@@ -80,14 +116,14 @@ Item {
         // MD3 outline for surface containers
         border.color: Theme.outline(Material.theme)
         border.width: 1
-        
+
         // MD3 State Layer - hover effect (8% opacity)
         Rectangle {
             anchors.fill: parent
             radius: parent.radius
             color: Theme.onSurface(Material.theme)
             opacity: mouseArea.containsMouse ? 0.08 : 0
-            
+
             Behavior on opacity {
                 NumberAnimation {
                     duration: 150
@@ -96,17 +132,16 @@ Item {
             }
         }
 
-        // Icon Circle
+        // Icon Circle (Left)
         Rectangle {
             id: iconCircle
             width: 48
             height: 48
             radius: 24
             anchors.left: parent.left
-            anchors.leftMargin: 28
+            anchors.leftMargin: 24
             anchors.verticalCenter: parent.verticalCenter
             color: {
-                // Mocking different colors based on index or content
                 var colors = [Theme.primaryContainer(Material.theme), Theme.secondaryContainer(Material.theme), Theme.tertiaryContainer(Material.theme)];
                 return colors[root.itemIndex % colors.length];
             }
@@ -174,12 +209,23 @@ Item {
                     color: Theme.primary(Material.theme)
                     backgroundColor: Theme.surfaceContainerHighest(Material.theme)
 
-                    Text {
-                        id: progressText
+                    Column {
                         anchors.centerIn: parent
-                        text: Math.round(parent.progress * 100) + "%"
-                        font.pixelSize: 14
-                        color: Theme.onSurfaceVariant(Material.theme)
+                        Text {
+                            text: qsTr("Accuracy")
+                            font.pixelSize: 8
+                            font.weight: Font.Medium
+                            color: Theme.onSurfaceVariant(Material.theme)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        Text {
+                            id: progressText
+                            text: root.avgScore > 0 ? Math.round(root.avgScore) + "%" : "--"
+                            font.pixelSize: 14
+                            font.weight: Font.Bold
+                            color: Theme.onSurfaceVariant(Material.theme)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
                 }
             }

@@ -35,8 +35,8 @@ Page {
     function updateStatistics() {
         let stats = statisticsApi.getOverallStatistics();
         avgAccuracyBox.value = Math.round(stats.avgResult) + "%";
-        totalResultsBox.value = Math.round(stats.totalResults);
-        filesCountBox.value = Math.round(stats.filesCount);
+        totalResultsBox.value = Math.round(stats.wellTrainedFiles);
+        filesCountBox.value = Math.round(stats.processedFiles) + " / " + Math.round(stats.totalFiles);
 
         // Update overall progress circle with completeness
         overallProgressCircle.progress = stats.completeness / 100;
@@ -113,8 +113,8 @@ Page {
                     id: totalResultsBox
                     Layout.fillWidth: true
                     Layout.preferredHeight: 75
-                    icon: Icons.faCheckCircle
-                    title: qsTr("Total Results:")
+                    icon: Icons.faTrophy
+                    title: qsTr("Mastered Files:")
                 }
 
                 StatBox {

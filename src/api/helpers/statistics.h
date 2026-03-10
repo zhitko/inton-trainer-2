@@ -2,28 +2,35 @@
 #define STATISTICS_H
 
 #include <QString>
-#include <string>
-#include <map>
-#include <vector>
 #include <algorithm>
-#include <memory>
 #include <functional>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 /*
  * StatisticsItem represents a single item in the statistics hierarchy.
  * Can be either a file or a folder with nested items.
  */
 struct StatisticsItem {
-    enum Type { File, Folder };
-    
+    enum Type { File,
+        Folder };
+
     Type type;
     std::string name;
     double avgResult = 0.0;
-    double completeness = 0.0;  // For folders: completion percentage
-    std::vector<double> results;  // For files: individual results
-    std::vector<std::shared_ptr<StatisticsItem>> items;  // For folders: nested items
-    
-    StatisticsItem(Type t, const std::string& n) : type(t), name(n) {}
+    double completeness = 0.0; // For folders: completion percentage
+    int totalFiles = 0; // For folders: total number of files
+    int processedFiles = 0; // For folders: number of files with results
+    std::vector<double> results; // For files: individual results
+    std::vector<std::shared_ptr<StatisticsItem>> items; // For folders: nested items
+
+    StatisticsItem(Type t, const std::string& n)
+        : type(t)
+        , name(n)
+    {
+    }
 };
 
 /*
