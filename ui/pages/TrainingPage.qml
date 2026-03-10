@@ -4,7 +4,6 @@ import QtQuick.Controls.Material 6.8
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Effects
-import Qt.labs.platform 1.1
 
 import by.intontrainer.wavfile 1.0
 import by.intontrainer.file 1.0
@@ -285,14 +284,13 @@ Page {
                 }
 
                 onClicked: {
-                    console.log("Opening test file dialog: " + fileApi.getApplicationDirPath() + "/data/test");
-                    // Ensure the folder exists before opening the dialog
-                    if (!fileApi.directoryExists(fileApi.getApplicationDirPath() + "/data/test")) {
-                        console.warn("Directory does not exist: " + fileApi.getApplicationDirPath() + "/data/test");
+                    var testFolderPath = fileApi.getApplicationDirPath() + "/data/test";
+                    console.log("Opening test file dialog: " + testFolderPath);
+                    if (!fileApi.directoryExists(testFolderPath)) {
+                        console.warn("Directory does not exist: " + testFolderPath);
                     } else {
-                        // Ensure folder is set immediately before opening (avoid stale bindings)
-                        // Use file:// URL to ensure native dialogs interpret it as an absolute path
-                        testFileDialog.folder = "file://" + fileApi.getApplicationDirPath() + "/data/test";
+                        // Use FileApi helper to get properly formatted URL (crucial for Windows to avoid UNC timeout)
+                        testFileDialog.currentFolder = fileApi.getUrlFromPath(testFolderPath);
                         testFileDialog.open();
                     }
                 }
@@ -302,43 +300,11 @@ Page {
                 id: testFileDialog
                 title: qsTr("Open test file")
                 nameFilters: ["WAV files (*.wav)"]
-                folder: (fileApi.getApplicationDirPath() + "/data/test") // Set the initial folder to data/test
                 onAccepted: {
-                    console.log("testFileDialog accepted. folder: " + testFileDialog.folder + ", file: " + testFileDialog.file + ", fileUrl: " + testFileDialog.fileUrl);
-                    var selectedPath = null;
-                    if (testFileDialog.file !== undefined && testFileDialog.file !== "")
-                        selectedPath = testFileDialog.file;
-                    else if (testFileDialog.fileUrl)
-                        selectedPath = testFileDialog.fileUrl;
-                    else if (testFileDialog.fileUrls && testFileDialog.fileUrls.length > 0)
-                        selectedPath = testFileDialog.fileUrls[0];
-
-                    // Convert QUrl to string/local path if needed
-                    if (selectedPath && typeof selectedPath === "object") {
-                        if (selectedPath.toLocalFile)
-                            selectedPath = selectedPath.toLocalFile();
-                        else if (selectedPath.toString)
-                            selectedPath = selectedPath.toString();
-                    }
-
-                    if (selectedPath && typeof selectedPath === "string") {
-                        var selStr = selectedPath;
-                        // Handle file:// URI strings (may contain percent-encoding)
-                        if (selStr.indexOf("file://") === 0) {
-                            // Strip leading file:// or file:/// and decode percent-encodings
-                            selStr = selStr.replace(/^file:\/+/g, "");
-                            // For linux add leading slash (windows path started with drive letter 'Z:/')
-                            console.log("selStr.indexOf(':/') = " + selStr.indexOf(":/"));
-                            if (selStr.indexOf(":/") === -1)
-                                selStr = "/" + selStr;
-                            try {
-                                selStr = decodeURIComponent(selStr);
-                            } catch (e) {
-                                // ignore decode errors and keep as-is
-                            }
-                        }
-
-                        updateUserUMP(selStr);
+                    console.log("testFileDialog accepted: " + testFileDialog.selectedFile);
+                    var selectedPath = fileApi.getPathFromUrl(testFileDialog.selectedFile);
+                    if (selectedPath) {
+                        updateUserUMP(selectedPath);
                     }
                 }
             }

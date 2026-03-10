@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QUrl>
 #include <QVariantMap>
 
 /**
@@ -82,6 +83,25 @@ public:
      * directory.
      */
     Q_INVOKABLE QString getApplicationDirPath();
+
+    /**
+     * Converts a local file path into a properly formatted URL.
+     * This is especially important for Windows to avoid UNC path timeouts
+     * in native file dialogs when paths are manually prefixed with file://.
+     *
+     * @param path - The local filesystem path.
+     * @return A QUrl representing the path.
+     */
+    Q_INVOKABLE QUrl getUrlFromPath(const QString& path);
+
+    /**
+     * Converts a URL back into a local filesystem path.
+     * Handles percent-encoding and platform-specific path separators.
+     *
+     * @param url - The URL to convert.
+     * @return A local filesystem path string.
+     */
+    Q_INVOKABLE QString getPathFromUrl(const QUrl& url);
 
     /**
      * Checks if the specified directory exists in the file system. The method

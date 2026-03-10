@@ -60,6 +60,16 @@ QString FileApi::getApplicationDirPath()
     return QCoreApplication::applicationDirPath();
 }
 
+QUrl FileApi::getUrlFromPath(const QString& path)
+{
+    return QUrl::fromLocalFile(path);
+}
+
+QString FileApi::getPathFromUrl(const QUrl& url)
+{
+    return url.toLocalFile();
+}
+
 bool FileApi::directoryExists(const QString& path)
 {
     LOG_DEBUG() << "Start: directoryExists - path=" << path;
@@ -215,21 +225,21 @@ QVariantList FileApi::getFilesList(const QString& path,
         }
     }
 
-     // Sort logic? Maybe the UI will sort or the iterator order is filesystem
-     // dependent. Let's sort by directory then filename to ensure consistent
-     // grouping.
-     std::sort(
-         fileList.begin(), fileList.end(),
-         [](const QVariant& a, const QVariant& b) -> bool {
-             const QVariantMap& mapA = a.toMap();
-             const QVariantMap& mapB = b.toMap();
-             const QString& dirA = mapA["directory"].toString();
-             const QString& dirB = mapB["directory"].toString();
-             if (dirA != dirB) {
-                 return dirA < dirB;
-             }
-             return mapA["fileName"].toString() < mapB["fileName"].toString();
-         });
+    // Sort logic? Maybe the UI will sort or the iterator order is filesystem
+    // dependent. Let's sort by directory then filename to ensure consistent
+    // grouping.
+    std::sort(
+        fileList.begin(), fileList.end(),
+        [](const QVariant& a, const QVariant& b) -> bool {
+            const QVariantMap& mapA = a.toMap();
+            const QVariantMap& mapB = b.toMap();
+            const QString& dirA = mapA["directory"].toString();
+            const QString& dirB = mapB["directory"].toString();
+            if (dirA != dirB) {
+                return dirA < dirB;
+            }
+            return mapA["fileName"].toString() < mapB["fileName"].toString();
+        });
 
     LOG_DEBUG() << "Finish: getFilesList - fileCount=" << fileList.count();
     return fileList;
