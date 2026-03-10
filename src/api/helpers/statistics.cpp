@@ -493,19 +493,8 @@ std::map<std::string, double> Statistics::getOverallStatistics()
         collectResults(item);
     }
 
-    if (allResults.empty()) {
-        stats["avgResult"] = 0.0;
-        stats["totalResults"] = 0.0;
-        stats["filesCount"] = 0.0;
-        stats["processedFiles"] = 0.0;
-        stats["totalFiles"] = 0.0;
-        stats["wellTrainedFiles"] = 0.0;
-        stats["completeness"] = 0.0;
-        return stats;
-    }
-
     double sum = std::accumulate(allResults.begin(), allResults.end(), 0.0);
-    double avgResult = sum / allResults.size();
+    double avgResult = allResults.empty() ? 0.0 : sum / allResults.size();
     double completeness = totalFiles > 0 ? static_cast<double>(filesWithResults) / totalFiles : 0.0;
 
     stats["avgResult"] = avgResult;
