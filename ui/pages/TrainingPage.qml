@@ -163,7 +163,7 @@ Page {
             // Shape Similarity Card
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 100
+                Layout.preferredHeight: 70
                 color: Theme.secondaryContainer(root.Material.theme)
                 radius: 16
 
@@ -189,8 +189,8 @@ Page {
                     }
                     Text {
                         text: Math.round(root.shapeSimilarity) + "%"
-                        font.pixelSize: 40
-                        font.weight: 800
+                        font.pixelSize: 30
+                        font.weight: 600
                         color: Theme.primary(root.Material.theme)
                         Layout.alignment: Qt.AlignHCenter
                     }
@@ -202,7 +202,7 @@ Page {
                 id: umpGraph
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.minimumHeight: 240
+                Layout.minimumHeight: 400
                 independentScale: true
                 datasetColors: ["#d62728", "#83270b"]
                 lineWidth: 5
