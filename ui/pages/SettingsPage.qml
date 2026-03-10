@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
 import by.intontrainer.settings 1.0
+import "../utils"
 
 Page {
     id: root
@@ -785,22 +786,30 @@ Page {
         title: qsTr("Clear User Statistics")
         modal: true
 
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
+        width: AppScale.px(root.width * 0.9)
+        x: (AppScale.px(root.width) - width) / 2
+        y: (AppScale.px(root.height) - height) / 2
 
         Label {
             text: qsTr("This action will permanently delete all user statistics.\nThis cannot be undone. Are you sure?")
             color: Theme.onSurface(Material.theme)
             wrapMode: Text.Wrap
+            font.pixelSize: AppScale.font(14)
+            width: parent.width - AppScale.px(40)
         }
 
         footer: DialogButtonBox {
+            background: Rectangle {
+                color: "transparent"
+            }
             Button {
                 text: qsTr("Yes")
+                font.pixelSize: AppScale.font(14)
                 DialogButtonBox.buttonRole: DialogButtonBox.YesRole
             }
             Button {
                 text: qsTr("No")
+                font.pixelSize: AppScale.font(14)
                 DialogButtonBox.buttonRole: DialogButtonBox.NoRole
             }
         }
