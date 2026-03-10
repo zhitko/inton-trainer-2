@@ -95,14 +95,14 @@ ApplicationWindow {
                         implicitHeight: 48
                         radius: Theme.shapeMedium // MD3 medium shape token
                         color: menuButton.hovered ? Theme.surfaceContainerLow(Material.theme) : "transparent"
-                        
+
                         // MD3 State Layer - hover effect (8% opacity)
                         Rectangle {
                             anchors.fill: parent
                             radius: parent.radius
                             color: Theme.onSurface(Material.theme)
                             opacity: menuButton.hovered ? 0.08 : 0
-                            
+
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 150
@@ -136,14 +136,14 @@ ApplicationWindow {
                         implicitHeight: 48
                         radius: Theme.shapeMedium // MD3 medium shape token
                         color: backButton.hovered ? Theme.surfaceContainerLow(Material.theme) : "transparent"
-                        
+
                         // MD3 State Layer - hover effect (8% opacity)
                         Rectangle {
                             anchors.fill: parent
                             radius: parent.radius
                             color: Theme.onSurface(Material.theme)
                             opacity: backButton.hovered ? 0.08 : 0
-                            
+
                             Behavior on opacity {
                                 NumberAnimation {
                                     duration: 150
@@ -269,24 +269,39 @@ ApplicationWindow {
 
             initialItem: "pages/HomePage.qml"
         }
+    }
 
-        // ── Side drawer ───────────────────────────────────────────────────────
-        Drawer {
-            id: drawer
-            width: Math.min(scaledRoot.width * 0.8, 360)
-            height: scaledRoot.height
-            z: 2
+    // ── Side drawer ───────────────────────────────────────────────────────
+    Drawer {
+        id: drawer
+        width: Math.min(window.width * 0.8, 360 * AppScale.factor)
+        height: window.height
+        z: 2
 
-            background: Rectangle {
-                color: Theme.surface(Material.theme)
-                radius: 16
-                layer.enabled: true
-            }
+        background: Rectangle {
+            color: Theme.surface(Material.theme)
+            radius: 16 * AppScale.factor
+            layer.enabled: true
+        }
+
+        Flickable {
+            anchors.fill: parent
+            contentHeight: (drawerLayout.implicitHeight + 24) * AppScale.factor
+            clip: true
+            ScrollBar.vertical: ScrollBar {}
 
             ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 12
+                id: drawerLayout
+                width: (drawer.width - 24 * AppScale.factor) / AppScale.factor
+                x: 12 * AppScale.factor
+                y: 12 * AppScale.factor
                 spacing: 0
+                transformOrigin: Item.TopLeft
+
+                transform: Scale {
+                    xScale: AppScale.factor
+                    yScale: AppScale.factor
+                }
 
                 Label {
                     text: qsTr("Inton Trainer")
@@ -372,7 +387,8 @@ ApplicationWindow {
 
                 Item {
                     Layout.fillHeight: true
-                } // Spacer
+                    Layout.preferredHeight: 40 // Minimum spacer height
+                }
 
                 Rectangle {
                     Layout.fillWidth: true
