@@ -611,36 +611,36 @@ Check analysis settings (e.g. increase FFT length).</source>
 <context>
     <name>TrainingPage</name>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="181"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="210"/>
         <source>Shape Similarity</source>
         <translation>Сходство</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="219"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="363"/>
         <source>Play
 Reference</source>
         <translation>Слушать
 Эталон</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="229"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="373"/>
         <source>Play
 Me</source>
         <translation>Слушать
 Запись</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="242"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="386"/>
         <source>Open Test File</source>
         <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="301"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="445"/>
         <source>Open test file</source>
         <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="321"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="465"/>
         <source>Advanced</source>
         <translation>Дополнительно</translation>
     </message>
