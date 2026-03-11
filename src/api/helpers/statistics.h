@@ -20,6 +20,7 @@ struct StatisticsItem {
     Type type;
     std::string name;
     double avgResult = 0.0;
+    double bestResult = 0.0;
     double completeness = 0.0; // For folders: completion percentage
     int totalFiles = 0; // For folders: total number of files
     int processedFiles = 0; // For folders: number of files with results
@@ -84,6 +85,22 @@ public:
      * @return The average result for the file, or 0.0 if no results exist.
      */
     static double getAvgResultForFile(const std::string& filePath);
+
+    /**
+     * Gets the best result (maximum score) for a specific file.
+     *
+     * @param filePath The path to the training file.
+     * @return The best result for the file, or 0.0 if no results exist.
+     */
+    static double getBestResultForFile(const std::string& filePath);
+
+    /**
+     * Gets raw recent results for a specific file in chronological order.
+     *
+     * @param filePath The path to the training file.
+     * @return A vector of recent results (oldest -> newest), empty if none.
+     */
+    static std::vector<double> getResultsForFile(const std::string& filePath);
 
     /**
      * Gets the average result and completeness for all files in a specific folder.

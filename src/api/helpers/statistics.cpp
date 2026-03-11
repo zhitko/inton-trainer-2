@@ -32,6 +32,7 @@ static QJsonObject itemToJson(const std::shared_ptr<StatisticsItem>& item)
     obj["type"] = item->type == StatisticsItem::File ? "file" : "folder";
     obj["name"] = QString::fromStdString(item->name);
     obj["avg_result"] = item->avgResult;
+    obj["best_result"] = item->bestResult;
 
     if (item->type == StatisticsItem::Folder) {
         obj["completeness"] = item->completeness;
@@ -59,6 +60,7 @@ static std::shared_ptr<StatisticsItem> jsonToItem(const QJsonObject& obj)
     StatisticsItem::Type type = typeStr == "file" ? StatisticsItem::File : StatisticsItem::Folder;
     auto item = std::make_shared<StatisticsItem>(type, obj["name"].toString().toStdString());
     item->avgResult = obj["avg_result"].toDouble();
+    item->bestResult = obj["best_result"].toDouble();
 
     if (type == StatisticsItem::Folder) {
         item->completeness = obj["completeness"].toDouble();
@@ -385,6 +387,7 @@ void Statistics::registerResult(const std::string& filePath, double result)
         fileItem->results.erase(fileItem->results.begin());
     }
     fileItem->avgResult = calculateAverage(fileItem);
+    fileItem->bestResult = std::max(fileItem->bestResult, result);
 
     // Update parent folder averages and completeness
     std::string path = filePath;
@@ -422,6 +425,42 @@ double Statistics::getAvgResultForFile(const std::string& filePath)
     }
 
     return fileItem->avgResult;
+}
+
+double Statistics::getBestResultForFile(const std::string& filePath)
+{
+    // Load current statistics if not already loaded
+    if (!statisticsLoaded) {
+        cachedStatistics = loadStatistics();
+        statisticsLoaded = true;
+    }
+
+    auto fileItem = findOrCreateItem(filePath, false);
+    if (!fileItem) {
+        return 0.0;
+    }
+
+    if (fileItem->bestResult == 0.0 && !fileItem->results.empty()) {
+        fileItem->bestResult = *std::max_element(fileItem->results.begin(), fileItem->results.end());
+    }
+
+    return fileItem->bestResult;
+}
+
+std::vector<double> Statistics::getResultsForFile(const std::string& filePath)
+{
+    // Load current statistics if not already loaded
+    if (!statisticsLoaded) {
+        cachedStatistics = loadStatistics();
+        statisticsLoaded = true;
+    }
+
+    auto fileItem = findOrCreateItem(filePath, false);
+    if (!fileItem) {
+        return {};
+    }
+
+    return fileItem->results;
 }
 
 std::map<std::string, double> Statistics::getAvgResultForFolder(const std::string& folderPath)

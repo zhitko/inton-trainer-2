@@ -12,7 +12,7 @@ static QString removeApplicationPath(const QString& filePath)
 {
     QString appPath = QCoreApplication::applicationDirPath();
     QString normalizedPath = filePath;
-    
+
     // Remove application path prefix if present
     if (normalizedPath.startsWith(appPath)) {
         normalizedPath = normalizedPath.mid(appPath.length());
@@ -21,7 +21,7 @@ static QString removeApplicationPath(const QString& filePath)
             normalizedPath = normalizedPath.mid(1);
         }
     }
-    
+
     return normalizedPath;
 }
 
@@ -39,16 +39,35 @@ double StatisticsApi::getAvgResultForFile(const QString& filePath)
     return Statistics::getAvgResultForFile(relativePath.toStdString());
 }
 
+double StatisticsApi::getBestResultForFile(const QString& filePath)
+{
+    QString relativePath = removeApplicationPath(filePath);
+    return Statistics::getBestResultForFile(relativePath.toStdString());
+}
+
+QVariantList StatisticsApi::getResultsForFile(const QString& filePath)
+{
+    QString relativePath = removeApplicationPath(filePath);
+    const std::vector<double> results = Statistics::getResultsForFile(relativePath.toStdString());
+
+    QVariantList out;
+    for (double value : results) {
+        out.push_back(value);
+    }
+
+    return out;
+}
+
 QVariantMap StatisticsApi::getAvgResultForFolder(const QString& folderPath)
 {
     QString relativePath = removeApplicationPath(folderPath);
     std::map<std::string, double> stats = Statistics::getAvgResultForFolder(relativePath.toStdString());
     QVariantMap result;
-    
+
     for (const auto& pair : stats) {
         result[QString::fromStdString(pair.first)] = pair.second;
     }
-    
+
     return result;
 }
 
@@ -56,11 +75,11 @@ QVariantMap StatisticsApi::getOverallStatistics()
 {
     std::map<std::string, double> stats = Statistics::getOverallStatistics();
     QVariantMap result;
-    
+
     for (const auto& pair : stats) {
         result[QString::fromStdString(pair.first)] = pair.second;
     }
-    
+
     return result;
 }
 

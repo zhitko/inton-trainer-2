@@ -3,6 +3,7 @@
 
 #include "src/api/helpers/statistics.h"
 #include <QObject>
+#include <QVariantList>
 #include <QVariantMap>
 
 /**
@@ -33,6 +34,22 @@ public:
      * @return The average result for the file, or 0.0 if no results exist.
      */
     Q_INVOKABLE double getAvgResultForFile(const QString& filePath);
+
+    /**
+     * Gets the best result for a specific file.
+     *
+     * @param filePath The path to the training file.
+     * @return The best result for the file, or 0.0 if no results exist.
+     */
+    Q_INVOKABLE double getBestResultForFile(const QString& filePath);
+
+    /**
+     * Gets recent raw results for a specific file (oldest to newest).
+     *
+     * @param filePath The path to the training file.
+     * @return A QVariantList of double values.
+     */
+    Q_INVOKABLE QVariantList getResultsForFile(const QString& filePath);
 
     /**
      * Gets the average result and completeness for all files in a specific folder.

@@ -54,8 +54,8 @@ Item {
             percentageText.text = processedFiles + "/" + totalFiles + " (" + Math.round(completeness) + "% " + qsTr("Progress") + ")";
         } else {
             console.log("Updating stats for file:", root.filePath);
-            avgScoreVal = statisticsApi.getAvgResultForFile(root.filePath);
-            console.log("Calculated average result for file:", avgScoreVal);
+            avgScoreVal = statisticsApi.getBestResultForFile(root.filePath);
+            console.log("Calculated best result for file:", avgScoreVal);
 
             if (avgScoreVal >= 90)
                 percentageText.text = qsTr("Mastered");
@@ -72,7 +72,7 @@ Item {
         }
         root.avgScore = avgScoreVal;
 
-        // Update main progress circle on the RIGHT with Average Score (Accuracy)
+        // Update main progress circle on the RIGHT with Best Score (Accuracy)
         progressCircle.progress = Math.min(avgScoreVal / 100, 1.0);
 
         // Update circle color based on score
@@ -212,11 +212,12 @@ Item {
                     Column {
                         anchors.centerIn: parent
                         Text {
-                            text: qsTr("Accuracy")
+                            text: root.isFolder ? qsTr("Accuracy") : qsTr("Best result")
                             font.pixelSize: 8
                             font.weight: Font.Medium
                             color: Theme.onSurfaceVariant(Material.theme)
                             anchors.horizontalCenter: parent.horizontalCenter
+                            horizontalAlignment: Text.AlignHCenter
                         }
                         Text {
                             id: progressText

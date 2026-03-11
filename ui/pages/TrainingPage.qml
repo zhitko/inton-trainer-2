@@ -34,6 +34,7 @@ Page {
 
     property var userUMP: null
     property double shapeSimilarity: 0
+    property var previousShapeSimilarities: []
 
     WavFileApi {
         id: wavFileApi
@@ -53,6 +54,21 @@ Page {
 
     Component.onCompleted: {
         updateReferenceUMP();
+        loadPreviousResults();
+    }
+
+    function loadPreviousResults() {
+        let results = statisticsApi.getResultsForFile(root.referenceFilePath);
+        if (results && results.length > 0) {
+            // Exclude the latest (current) result, take up to 5 previous ones
+            // Reverse so index 0 = most recent previous (shown largest on the left)
+            let histResults = results.slice(0, -1).slice(-5).reverse();
+            root.previousShapeSimilarities = histResults.map(v => Math.round(v));
+            // Set current similarity to the latest result if no new recording yet
+            if (root.shapeSimilarity === 0) {
+                root.shapeSimilarity = results[results.length - 1];
+            }
+        }
     }
 
     function updateReferenceUMP() {
@@ -137,10 +153,18 @@ Page {
 
         // Compare UMPs using AnalysisApi to get similarity
         var cmp = analysisApi.compareUMP(root.referenceUMP.ump, root.userUMP.ump, window.settingsApi.minF0, window.settingsApi.maxF0);
-        root.shapeSimilarity = cmp.shapeSimilarity || 0;
+        var newShapeSimilarity = cmp.shapeSimilarity || 0;
 
-        // Register the result in statistics
+        if (root.shapeSimilarity > 0) {
+            root.previousShapeSimilarities = [Math.round(root.shapeSimilarity)].concat(root.previousShapeSimilarities).slice(0, 5);
+        }
+        root.shapeSimilarity = newShapeSimilarity;
+
+        // Register the result in statistics FIRST
         statisticsApi.registerResult(root.referenceFilePath, root.shapeSimilarity);
+
+        // Then reload history so previous results reflect the newly saved state
+        loadPreviousResults();
     }
 
     background: Rectangle {
@@ -157,41 +181,161 @@ Page {
             width: scrollView.width - 32
             x: 16
             y: 16
-            spacing: 24
+            spacing: 20
 
             // Shape Similarity Card
             Rectangle {
+                id: shapeSimilarityCard
                 Layout.fillWidth: true
-                Layout.preferredHeight: 70
+                Layout.preferredHeight: 90
                 color: Theme.secondaryContainer(root.Material.theme)
                 radius: 16
 
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: Qt.rgba(0, 0, 0, 0.1)
-                    blur: 0.4
-                    shadowVerticalOffset: 4
+                    shadowColor: Qt.rgba(0, 0, 0, 0.15)
+                    blur: 0.5
+                    shadowVerticalOffset: 6
                 }
 
-                ColumnLayout {
-                    anchors.centerIn: parent
-                    spacing: 4
-                    Text {
-                        text: qsTr("Shape Similarity")
-                        font.pixelSize: 14
-                        font.letterSpacing: 0.5
-                        font.weight: 600
-                        color: Theme.onSecondaryContainer(root.Material.theme)
-                        opacity: 0.8
-                        Layout.alignment: Qt.AlignHCenter
+                // Card title — top-left corner
+                Text {
+                    id: cardTitle
+                    anchors {
+                        verticalCenter: currentResultColumn.verticalCenter
+                        left: parent.left
+                        leftMargin: 36
                     }
+                    text: qsTr("Shape Similarity")
+                    font.pixelSize: 24
+                    font.weight: 600
+                    color: Theme.onSecondaryContainer(root.Material.theme)
+                    opacity: 0.55
+                }
+
+                // Current result — centered
+                Column {
+                    id: currentResultColumn
+                    anchors {
+                        centerIn: parent
+                        verticalCenterOffset: 0
+                    }
+                    spacing: 0
+
                     Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
                         text: Math.round(root.shapeSimilarity) + "%"
-                        font.pixelSize: 30
-                        font.weight: 600
+                        font.pixelSize: 46
+                        font.weight: 700
                         color: Theme.primary(root.Material.theme)
-                        Layout.alignment: Qt.AlignHCenter
+
+                        Behavior on text {
+                            SequentialAnimation {
+                                NumberAnimation {
+                                    target: currentResultColumn
+                                    property: "scale"
+                                    from: 1.0
+                                    to: 1.12
+                                    duration: 120
+                                    easing.type: Easing.OutQuad
+                                }
+                                NumberAnimation {
+                                    target: currentResultColumn
+                                    property: "scale"
+                                    from: 1.12
+                                    to: 1.0
+                                    duration: 180
+                                    easing.type: Easing.OutBack
+                                }
+                            }
+                        }
+                    }
+
+                    // Trend indicator: show delta vs most recent previous result
+                    Text {
+                        anchors {
+                            horizontalCenter: parent.horizontalCenter
+                            verticalCenterOffset: -10
+                        }
+                        visible: root.previousShapeSimilarities.length > 0
+                        property int delta: root.previousShapeSimilarities.length > 0 ? Math.round(root.shapeSimilarity) - root.previousShapeSimilarities[0] : 0
+                        text: delta > 0 ? ("▲ +" + delta + "%") : (delta < 0 ? ("▼ " + delta + "%") : "● 0%")
+                        font.pixelSize: 12
+                        font.weight: 600
+                        color: delta > 0 ? "#4caf50" : (delta < 0 ? "#ef5350" : Theme.onSecondaryContainer(root.Material.theme))
+                        opacity: 0.85
+                    }
+                }
+
+                // Separator arrow: current → history
+                Text {
+                    id: separatorArrow
+                    anchors {
+                        left: currentResultColumn.right
+                        leftMargin: 6
+                        verticalCenter: currentResultColumn.verticalCenter
+                    }
+                    visible: root.previousShapeSimilarities.length > 0
+                    text: "›"
+                    font.pixelSize: 20
+                    color: Theme.primary(root.Material.theme)
+                    opacity: 0.7
+                }
+
+                // Previous results — right side
+                // index 0 = most recent (closest to center, largest/boldest)
+                // index N = oldest (far right, smallest/most faded)
+                Row {
+                    id: previousResultsRow
+                    anchors {
+                        left: separatorArrow.right
+                        leftMargin: 16
+                        verticalCenter: parent.verticalCenter
+                        verticalCenterOffset: 0
+                    }
+                    spacing: 0
+                    visible: root.previousShapeSimilarities.length > 0
+
+                    Repeater {
+                        model: root.previousShapeSimilarities
+
+                        delegate: Item {
+                            property int baseSize: 22
+                            property int minSize: 10
+                            property real scaledSize: Math.max(minSize, baseSize - index * 3)
+                            property real scaledOpacity: Math.max(0.15, 0.55 - index * 0.10)
+
+                            width: valueText.implicitWidth + (arrowText.visible ? arrowText.implicitWidth : 0) + 2
+                            height: 60
+
+                            Text {
+                                id: valueText
+                                anchors {
+                                    left: parent.left
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                text: modelData + "%"
+                                font.pixelSize: scaledSize
+                                font.weight: index === 0 ? 600 : 500
+                                color: Theme.onSecondaryContainer(root.Material.theme)
+                                opacity: scaledOpacity
+                            }
+
+                            // Arrow separator after each value (except the last)
+                            Text {
+                                id: arrowText
+                                anchors {
+                                    left: valueText.right
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                visible: index < root.previousShapeSimilarities.length
+                                text: " ›"
+                                font.pixelSize: scaledSize * 0.7
+                                color: Theme.onSecondaryContainer(root.Material.theme)
+                                opacity: scaledOpacity * 0.6
+                            }
+                        }
                     }
                 }
             }
@@ -374,10 +518,6 @@ Page {
                         userFilePath: root.userFilePath
                     });
                 }
-            }
-
-            Item {
-                Layout.preferredHeight: 24
             }
         }
     }
