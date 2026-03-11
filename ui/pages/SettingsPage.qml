@@ -216,8 +216,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.showF0
-                            onToggled: ApplicationWindow.window.settingsApi.showF0 = checked
+                            checked: settingsApi ? settingsApi.showF0 : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showF0 = checked
                         }
 
                         Label {
@@ -225,8 +226,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.showProcessedPitch
-                            onToggled: ApplicationWindow.window.settingsApi.showProcessedPitch = checked
+                            checked: settingsApi ? settingsApi.showProcessedPitch : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showProcessedPitch = checked
                         }
 
                         Label {
@@ -234,8 +236,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.showLogPitch
-                            onToggled: ApplicationWindow.window.settingsApi.showLogPitch = checked
+                            checked: settingsApi ? settingsApi.showLogPitch : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showLogPitch = checked
                         }
 
                         Label {
@@ -244,8 +247,9 @@ Page {
                         }
                         ComboBox {
                             model: ["RAPT"]
-                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.algorithm)
-                            onActivated: ApplicationWindow.window.settingsApi.algorithm = currentText
+                            currentIndex: settingsApi ? model.indexOf(settingsApi.algorithm) : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.algorithm = currentText
                             Layout.fillWidth: true
                         }
 
@@ -254,8 +258,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.frameShift.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.frameShift = parseFloat(text)
+                            text: settingsApi ? settingsApi.frameShift.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.frameShift = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -265,8 +270,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.sampleRate.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.sampleRate = parseFloat(text)
+                            text: settingsApi ? settingsApi.sampleRate.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.sampleRate = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -276,8 +282,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.minF0.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.minF0 = parseFloat(text)
+                            text: settingsApi ? settingsApi.minF0.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.minF0 = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -287,8 +294,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.maxF0.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.maxF0 = parseFloat(text)
+                            text: settingsApi ? settingsApi.maxF0.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.maxF0 = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -298,8 +306,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.voicingThreshold.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.voicingThreshold = parseFloat(text)
+                            text: settingsApi ? settingsApi.voicingThreshold.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.voicingThreshold = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -310,8 +319,9 @@ Page {
                         }
                         ComboBox {
                             model: ["min_max", "mean"]
-                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.pitchNormalization)
-                            onActivated: ApplicationWindow.window.settingsApi.pitchNormalization = currentText
+                            currentIndex: settingsApi ? model.indexOf(settingsApi.pitchNormalization) : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.pitchNormalization = currentText
                             Layout.fillWidth: true
                         }
 
@@ -321,8 +331,9 @@ Page {
                         }
                         ComboBox {
                             model: ["None", "Linear", "Cubic", "Akima", "Monotone"]
-                            currentIndex: ApplicationWindow.window.settingsApi.pitchInterpolationType
-                            onActivated: ApplicationWindow.window.settingsApi.pitchInterpolationType = currentIndex
+                            currentIndex: settingsApi ? settingsApi.pitchInterpolationType : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.pitchInterpolationType = currentIndex
                             Layout.fillWidth: true
                         }
 
@@ -332,48 +343,52 @@ Page {
                         }
                         ComboBox {
                             model: ["None", "MovingAverage", "Median", "Gaussian", "Spline"]
-                            currentIndex: ApplicationWindow.window.settingsApi.pitchSmoothing
-                            onActivated: ApplicationWindow.window.settingsApi.pitchSmoothing = currentIndex
+                            currentIndex: settingsApi ? settingsApi.pitchSmoothing : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.pitchSmoothing = currentIndex
                             Layout.fillWidth: true
                         }
 
                         Label {
                             text: qsTr("Smoothing Window Size")
                             color: Theme.onSurface(Material.theme)
-                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing !== 4 // Hide for Spline (4)
+                            visible: settingsApi ? settingsApi.pitchSmoothing !== 4 : false // Hide for Spline (4)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.pitchSmoothingWindowSize.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.pitchSmoothingWindowSize = parseInt(text)
+                            text: settingsApi ? settingsApi.pitchSmoothingWindowSize.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.pitchSmoothingWindowSize = parseInt(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing !== 4 // Hide for Spline (4)
+                            visible: settingsApi ? settingsApi.pitchSmoothing !== 4 : false // Hide for Spline (4)
                         }
 
                         Label {
                             text: qsTr("Gaussian Sigma")
                             color: Theme.onSurface(Material.theme)
-                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing === 3 // Show only for Gaussian (3)
+                            visible: settingsApi ? settingsApi.pitchSmoothing === 3 : false // Show only for Gaussian (3)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.pitchGaussianSmoothingSigma.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.pitchGaussianSmoothingSigma = parseFloat(text)
+                            text: settingsApi ? settingsApi.pitchGaussianSmoothingSigma.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.pitchGaussianSmoothingSigma = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing === 3 // Show only for Gaussian (3)
+                            visible: settingsApi ? settingsApi.pitchSmoothing === 3 : false // Show only for Gaussian (3)
                         }
 
                         Label {
                             text: qsTr("Spline Penalty")
                             color: Theme.onSurface(Material.theme)
-                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing === 4 // Show only for Spline (4)
+                            visible: settingsApi ? settingsApi.pitchSmoothing === 4 : false // Show only for Spline (4)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.pitchSplineSmoothingPenalty.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.pitchSplineSmoothingPenalty = parseFloat(text)
+                            text: settingsApi ? settingsApi.pitchSplineSmoothingPenalty.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.pitchSplineSmoothingPenalty = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            visible: ApplicationWindow.window.settingsApi.pitchSmoothing === 4 // Show only for Spline (4)
+                            visible: settingsApi ? settingsApi.pitchSmoothing === 4 : false // Show only for Spline (4)
                         }
                     }
                 }
@@ -414,8 +429,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.showAmplitude
-                            onToggled: ApplicationWindow.window.settingsApi.showAmplitude = checked
+                            checked: settingsApi ? settingsApi.showAmplitude : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showAmplitude = checked
                         }
 
                         Label {
@@ -423,8 +439,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.showAmplitudeDerivative
-                            onToggled: ApplicationWindow.window.settingsApi.showAmplitudeDerivative = checked
+                            checked: settingsApi ? settingsApi.showAmplitudeDerivative : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showAmplitudeDerivative = checked
                         }
 
                         Label {
@@ -432,8 +449,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.amplitudeWindow.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.amplitudeWindow = parseInt(text)
+                            text: settingsApi ? settingsApi.amplitudeWindow.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.amplitudeWindow = parseInt(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
@@ -444,8 +462,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.amplitudeShift.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.amplitudeShift = parseInt(text)
+                            text: settingsApi ? settingsApi.amplitudeShift.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.amplitudeShift = parseInt(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
@@ -457,36 +476,39 @@ Page {
                         }
                         ComboBox {
                             model: ["None", "MovingAverage", "Median", "Gaussian"]
-                            currentIndex: ApplicationWindow.window.settingsApi.amplitudeSmoothing
-                            onActivated: ApplicationWindow.window.settingsApi.amplitudeSmoothing = currentIndex
+                            currentIndex: settingsApi ? settingsApi.amplitudeSmoothing : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.amplitudeSmoothing = currentIndex
                             Layout.fillWidth: true
                         }
 
                         Label {
                             text: qsTr("Smoothing Window Size")
                             color: Theme.onSurface(Material.theme)
-                            visible: ApplicationWindow.window.settingsApi.amplitudeSmoothing !== 0 // Hide for None
+                            visible: settingsApi ? settingsApi.amplitudeSmoothing !== 0 : false // Hide for None
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.amplitudeSmoothingWindowSize.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.amplitudeSmoothingWindowSize = parseInt(text)
+                            text: settingsApi ? settingsApi.amplitudeSmoothingWindowSize.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.amplitudeSmoothingWindowSize = parseInt(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
-                            visible: ApplicationWindow.window.settingsApi.amplitudeSmoothing !== 0 // Hide for None
+                            visible: settingsApi ? settingsApi.amplitudeSmoothing !== 0 : false // Hide for None
                         }
 
                         Label {
                             text: qsTr("Gaussian Sigma")
                             color: Theme.onSurface(Material.theme)
-                            visible: ApplicationWindow.window.settingsApi.amplitudeSmoothing === 3 // Show only for Gaussian (3)
+                            visible: settingsApi ? settingsApi.amplitudeSmoothing === 3 : false // Show only for Gaussian (3)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.amplitudeGaussianSmoothingSigma.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.amplitudeGaussianSmoothingSigma = parseFloat(text)
+                            text: settingsApi ? settingsApi.amplitudeGaussianSmoothingSigma.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.amplitudeGaussianSmoothingSigma = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            visible: ApplicationWindow.window.settingsApi.amplitudeSmoothing === 3 // Show only for Gaussian (3)
+                            visible: settingsApi ? settingsApi.amplitudeSmoothing === 3 : false // Show only for Gaussian (3)
                         }
                     }
                 }
@@ -526,8 +548,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.showSpectrum
-                            onToggled: ApplicationWindow.window.settingsApi.showSpectrum = checked
+                            checked: settingsApi ? settingsApi.showSpectrum : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showSpectrum = checked
                         }
 
                         Label {
@@ -535,8 +558,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.showCepstrum
-                            onToggled: ApplicationWindow.window.settingsApi.showCepstrum = checked
+                            checked: settingsApi ? settingsApi.showCepstrum : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showCepstrum = checked
                         }
 
                         Label {
@@ -545,8 +569,9 @@ Page {
                         }
                         ComboBox {
                             model: [1024, 2048, 4096, 8192]
-                            currentIndex: model.indexOf(ApplicationWindow.window.settingsApi.specFftLength)
-                            onActivated: ApplicationWindow.window.settingsApi.specFftLength = model[currentIndex]
+                            currentIndex: settingsApi ? model.indexOf(settingsApi.specFftLength) : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.specFftLength = model[currentIndex]
                             Layout.fillWidth: true
                         }
 
@@ -555,8 +580,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.specF0Refinement
-                            onToggled: ApplicationWindow.window.settingsApi.specF0Refinement = checked
+                            checked: settingsApi ? settingsApi.specF0Refinement : false
+                            onToggled: if (settingsApi)
+                                settingsApi.specF0Refinement = checked
                         }
 
                         Label {
@@ -564,8 +590,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.specUseLogScale
-                            onToggled: ApplicationWindow.window.settingsApi.specUseLogScale = checked
+                            checked: settingsApi ? settingsApi.specUseLogScale : false
+                            onToggled: if (settingsApi)
+                                settingsApi.specUseLogScale = checked
                         }
 
                         Label {
@@ -574,8 +601,9 @@ Page {
                         }
                         ComboBox {
                             model: ["Viridis", "Plasma", "Hot", "Cool"]
-                            currentIndex: ApplicationWindow.window.settingsApi.specColorScheme
-                            onActivated: ApplicationWindow.window.settingsApi.specColorScheme = currentIndex
+                            currentIndex: settingsApi ? settingsApi.specColorScheme : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.specColorScheme = currentIndex
                             Layout.fillWidth: true
                         }
 
@@ -584,8 +612,9 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.cepstrNumOrder.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.cepstrNumOrder = parseInt(text)
+                            text: settingsApi ? settingsApi.cepstrNumOrder.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.cepstrNumOrder = parseInt(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
@@ -629,20 +658,22 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.dpUsePitch
-                            onToggled: ApplicationWindow.window.settingsApi.dpUsePitch = checked
+                            checked: settingsApi ? settingsApi.dpUsePitch : false
+                            onToggled: if (settingsApi)
+                                settingsApi.dpUsePitch = checked
                         }
                         Label {
                             text: qsTr("Coefficient")
                             color: Theme.onSurface(Material.theme)
-                            enabled: ApplicationWindow.window.settingsApi.dpUsePitch
+                            enabled: settingsApi ? settingsApi.dpUsePitch : false
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.dpPitchCoef.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.dpPitchCoef = parseFloat(text)
+                            text: settingsApi ? settingsApi.dpPitchCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpPitchCoef = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            enabled: ApplicationWindow.window.settingsApi.dpUsePitch
+                            enabled: settingsApi ? settingsApi.dpUsePitch : false
                         }
 
                         // Pitch Derivative
@@ -651,20 +682,22 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.dpUsePitchDerivative
-                            onToggled: ApplicationWindow.window.settingsApi.dpUsePitchDerivative = checked
+                            checked: settingsApi ? settingsApi.dpUsePitchDerivative : false
+                            onToggled: if (settingsApi)
+                                settingsApi.dpUsePitchDerivative = checked
                         }
                         Label {
                             text: qsTr("Coefficient")
                             color: Theme.onSurface(Material.theme)
-                            enabled: ApplicationWindow.window.settingsApi.dpUsePitchDerivative
+                            enabled: settingsApi ? settingsApi.dpUsePitchDerivative : false
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.dpPitchDerivativeCoef.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.dpPitchDerivativeCoef = parseFloat(text)
+                            text: settingsApi ? settingsApi.dpPitchDerivativeCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpPitchDerivativeCoef = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            enabled: ApplicationWindow.window.settingsApi.dpUsePitchDerivative
+                            enabled: settingsApi ? settingsApi.dpUsePitchDerivative : false
                         }
 
                         // Pitch Log
@@ -673,20 +706,22 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.dpUsePitchLog
-                            onToggled: ApplicationWindow.window.settingsApi.dpUsePitchLog = checked
+                            checked: settingsApi ? settingsApi.dpUsePitchLog : false
+                            onToggled: if (settingsApi)
+                                settingsApi.dpUsePitchLog = checked
                         }
                         Label {
                             text: qsTr("Coefficient")
                             color: Theme.onSurface(Material.theme)
-                            enabled: ApplicationWindow.window.settingsApi.dpUsePitchLog
+                            enabled: settingsApi ? settingsApi.dpUsePitchLog : false
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.dpPitchLogCoef.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.dpPitchLogCoef = parseFloat(text)
+                            text: settingsApi ? settingsApi.dpPitchLogCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpPitchLogCoef = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            enabled: ApplicationWindow.window.settingsApi.dpUsePitchLog
+                            enabled: settingsApi ? settingsApi.dpUsePitchLog : false
                         }
 
                         // Amplitude
@@ -695,20 +730,22 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.dpUseAmplitude
-                            onToggled: ApplicationWindow.window.settingsApi.dpUseAmplitude = checked
+                            checked: settingsApi ? settingsApi.dpUseAmplitude : false
+                            onToggled: if (settingsApi)
+                                settingsApi.dpUseAmplitude = checked
                         }
                         Label {
                             text: qsTr("Coefficient")
                             color: Theme.onSurface(Material.theme)
-                            enabled: ApplicationWindow.window.settingsApi.dpUseAmplitude
+                            enabled: settingsApi ? settingsApi.dpUseAmplitude : false
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.dpAmplitudeCoef.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.dpAmplitudeCoef = parseFloat(text)
+                            text: settingsApi ? settingsApi.dpAmplitudeCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpAmplitudeCoef = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            enabled: ApplicationWindow.window.settingsApi.dpUseAmplitude
+                            enabled: settingsApi ? settingsApi.dpUseAmplitude : false
                         }
 
                         // Amplitude Derivative
@@ -717,20 +754,22 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.dpUseAmplitudeDerivative
-                            onToggled: ApplicationWindow.window.settingsApi.dpUseAmplitudeDerivative = checked
+                            checked: settingsApi ? settingsApi.dpUseAmplitudeDerivative : false
+                            onToggled: if (settingsApi)
+                                settingsApi.dpUseAmplitudeDerivative = checked
                         }
                         Label {
                             text: qsTr("Coefficient")
                             color: Theme.onSurface(Material.theme)
-                            enabled: ApplicationWindow.window.settingsApi.dpUseAmplitudeDerivative
+                            enabled: settingsApi ? settingsApi.dpUseAmplitudeDerivative : false
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.dpAmplitudeDerivativeCoef.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.dpAmplitudeDerivativeCoef = parseFloat(text)
+                            text: settingsApi ? settingsApi.dpAmplitudeDerivativeCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpAmplitudeDerivativeCoef = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            enabled: ApplicationWindow.window.settingsApi.dpUseAmplitudeDerivative
+                            enabled: settingsApi ? settingsApi.dpUseAmplitudeDerivative : false
                         }
 
                         // Spectrum
@@ -739,20 +778,22 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.dpUseSpectrum
-                            onToggled: ApplicationWindow.window.settingsApi.dpUseSpectrum = checked
+                            checked: settingsApi ? settingsApi.dpUseSpectrum : false
+                            onToggled: if (settingsApi)
+                                settingsApi.dpUseSpectrum = checked
                         }
                         Label {
                             text: qsTr("Coefficient")
                             color: Theme.onSurface(Material.theme)
-                            enabled: ApplicationWindow.window.settingsApi.dpUseSpectrum
+                            enabled: settingsApi ? settingsApi.dpUseSpectrum : false
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.dpSpectrumCoef.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.dpSpectrumCoef = parseFloat(text)
+                            text: settingsApi ? settingsApi.dpSpectrumCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpSpectrumCoef = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            enabled: ApplicationWindow.window.settingsApi.dpUseSpectrum
+                            enabled: settingsApi ? settingsApi.dpUseSpectrum : false
                         }
 
                         // Cepstrum
@@ -761,20 +802,22 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
-                            checked: ApplicationWindow.window.settingsApi.dpUseCepstrum
-                            onToggled: ApplicationWindow.window.settingsApi.dpUseCepstrum = checked
+                            checked: settingsApi ? settingsApi.dpUseCepstrum : false
+                            onToggled: if (settingsApi)
+                                settingsApi.dpUseCepstrum = checked
                         }
                         Label {
                             text: qsTr("Coefficient")
                             color: Theme.onSurface(Material.theme)
-                            enabled: ApplicationWindow.window.settingsApi.dpUseCepstrum
+                            enabled: settingsApi ? settingsApi.dpUseCepstrum : false
                         }
                         TextField {
-                            text: ApplicationWindow.window.settingsApi.dpCepstrumCoef.toString()
-                            onEditingFinished: ApplicationWindow.window.settingsApi.dpCepstrumCoef = parseFloat(text)
+                            text: settingsApi ? settingsApi.dpCepstrumCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpCepstrumCoef = parseFloat(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            enabled: ApplicationWindow.window.settingsApi.dpUseCepstrum
+                            enabled: settingsApi ? settingsApi.dpUseCepstrum : false
                         }
                     }
                 }
