@@ -27,13 +27,10 @@ Page {
 
     Component.onCompleted: {
         allFolders = fileApi.getFolders(root.path);
-        statisticsApi.reloadStatistics();
     }
 
     onVisibleChanged: {
         if (visible) {
-            // Reload statistics when page becomes visible (e.g., when going back)
-            statisticsApi.reloadStatistics();
             // Trigger update of list items
             listView.forceLayout();
         }

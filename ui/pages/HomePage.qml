@@ -18,8 +18,6 @@ Page {
     }
 
     Component.onCompleted: {
-        // Reload statistics when page becomes visible
-        statisticsApi.reloadStatistics();
         // Force update of the UI by re-evaluating bindings
         updateStatistics();
     }
@@ -27,7 +25,6 @@ Page {
     onVisibleChanged: {
         if (visible) {
             // Reload statistics when page becomes visible (e.g., when going back)
-            statisticsApi.reloadStatistics();
             updateStatistics();
         }
     }

@@ -23,8 +23,6 @@ Item {
     }
 
     Component.onCompleted: {
-        // Reload statistics when component becomes visible
-        statisticsApi.reloadStatistics();
         // Force update of the UI by re-evaluating bindings
         updateStatistics();
     }
@@ -32,7 +30,6 @@ Item {
     onVisibleChanged: {
         if (visible) {
             // Reload statistics when component becomes visible (e.g., when going back)
-            statisticsApi.reloadStatistics();
             updateStatistics();
         }
     }

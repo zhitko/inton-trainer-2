@@ -17,13 +17,11 @@ Page {
 
     Component.onCompleted: {
         allFiles = fileApi.getFilesList(templatesPage.path, ["*.wav"]);
-        statisticsApi.reloadStatistics();
     }
 
     onVisibleChanged: {
         if (visible) {
             // Reload statistics when page becomes visible (e.g., when going back)
-            statisticsApi.reloadStatistics();
             // Trigger update of list items
             listView.forceLayout();
         }
