@@ -517,7 +517,7 @@ std::map<std::string, double> Statistics::getOverallStatistics()
                     filesCount++;
                     filesWithResults++;
                     allResults.insert(allResults.end(), item->results.begin(), item->results.end());
-                    if (item->avgResult >= 60.0) {
+                    if (item->bestResult >= 60.0) {
                         wellTrainedFiles++;
                     }
                 }
