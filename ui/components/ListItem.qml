@@ -46,7 +46,7 @@ Item {
             completeness = folderStats.completeness;
             totalFiles = folderStats.totalFiles;
             processedFiles = folderStats.processedFiles;
-            avgScoreVal = folderStats.avgResult;
+            avgScoreVal = folderStats.avgBestResult;
             console.log("Calculated completeness for folder:", completeness, "processed:", processedFiles, "total:", totalFiles);
             percentageText.text = processedFiles + "/" + totalFiles + " (" + Math.round(completeness) + "% " + qsTr("Progress") + ")";
         } else {

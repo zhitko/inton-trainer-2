@@ -366,6 +366,42 @@ double Statistics::calculateAverage(const std::shared_ptr<StatisticsItem>& item)
     }
 }
 
+double Statistics::calculateAverageBest(const std::shared_ptr<StatisticsItem>& item)
+{
+    if (!item) {
+        return 0.0;
+    }
+
+    if (item->type == StatisticsItem::File) {
+        return item->bestResult;
+    } else {
+        // For folders, calculate average of bestResult of all nested files
+        std::vector<double> allBestResults;
+        std::function<void(const std::shared_ptr<StatisticsItem>&)> collectBestResults =
+            [&](const std::shared_ptr<StatisticsItem>& i) {
+                if (i->type == StatisticsItem::File) {
+                    if (i->bestResult > 0.0) {
+                        allBestResults.push_back(i->bestResult);
+                    }
+                } else {
+                    for (const auto& child : i->items) {
+                        collectBestResults(child);
+                    }
+                }
+            };
+
+        for (const auto& child : item->items) {
+            collectBestResults(child);
+        }
+
+        if (allBestResults.empty()) {
+            return 0.0;
+        }
+        double sum = std::accumulate(allBestResults.begin(), allBestResults.end(), 0.0);
+        return sum / allBestResults.size();
+    }
+}
+
 void Statistics::registerResult(const std::string& filePath, double result)
 {
     // Load current statistics if not already loaded
@@ -475,6 +511,7 @@ std::map<std::string, double> Statistics::getAvgResultForFolder(const std::strin
     auto folderItem = findOrCreateItem(folderPath, false);
     if (!folderItem) {
         result["avgResult"] = 0.0;
+        result["avgBestResult"] = 0.0;
         result["completeness"] = 0.0;
         result["totalFiles"] = 0.0;
         result["processedFiles"] = 0.0;
@@ -483,9 +520,11 @@ std::map<std::string, double> Statistics::getAvgResultForFolder(const std::strin
 
     // Update stats to ensure they are fresh
     folderItem->avgResult = calculateAverage(folderItem);
+    double avgBest = calculateAverageBest(folderItem);
     folderItem->completeness = calculateCompleteness(folderItem, folderPath);
 
     result["avgResult"] = folderItem->avgResult;
+    result["avgBestResult"] = avgBest;
     result["completeness"] = folderItem->completeness;
     result["totalFiles"] = static_cast<double>(folderItem->totalFiles);
     result["processedFiles"] = static_cast<double>(folderItem->processedFiles);
@@ -517,7 +556,7 @@ std::map<std::string, double> Statistics::getOverallStatistics()
                     filesCount++;
                     filesWithResults++;
                     allResults.insert(allResults.end(), item->results.begin(), item->results.end());
-                    if (item->bestResult >= 60.0) {
+                    if (item->bestResult >= 80.0) {
                         wellTrainedFiles++;
                     }
                 }

@@ -103,10 +103,10 @@ public:
     static std::vector<double> getResultsForFile(const std::string& filePath);
 
     /**
-     * Gets the average result and completeness for all files in a specific folder.
+     * Gets the average result, average best result, and completeness for all files in a specific folder.
      *
      * @param folderPath The path to the folder.
-     * @return A map containing "avgResult" and "completeness" values.
+     * @return A map containing "avgResult", "avgBestResult", "completeness", "totalFiles", "processedFiles" values.
      */
     static std::map<std::string, double> getAvgResultForFolder(const std::string& folderPath);
 
@@ -142,6 +142,14 @@ private:
      * @return The average result.
      */
     static double calculateAverage(const std::shared_ptr<StatisticsItem>& item);
+
+    /**
+     * Calculates the average of the best results for an item and all its children.
+     *
+     * @param item The item to calculate average best for.
+     * @return The average of best results.
+     */
+    static double calculateAverageBest(const std::shared_ptr<StatisticsItem>& item);
 
     /**
      * Calculates the completeness for a folder (percentage of files with results).
