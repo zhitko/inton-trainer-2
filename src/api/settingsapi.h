@@ -90,6 +90,7 @@ class SettingsApi : public QObject {
     Q_PROPERTY(int cepstrNumOrder READ cepstrNumOrder WRITE setCepstrNumOrder
             NOTIFY cepstrNumOrderChanged)
 
+    Q_PROPERTY(bool showDtwAlignment READ showDtwAlignment WRITE setShowDtwAlignment NOTIFY showDtwAlignmentChanged)
     Q_PROPERTY(bool dpUsePitch READ dpUsePitch WRITE setDpUsePitch NOTIFY dpUsePitchChanged)
     Q_PROPERTY(double dpPitchCoef READ dpPitchCoef WRITE setDpPitchCoef NOTIFY dpPitchCoefChanged)
     Q_PROPERTY(bool dpUsePitchDerivative READ dpUsePitchDerivative WRITE setDpUsePitchDerivative NOTIFY dpUsePitchDerivativeChanged)
@@ -231,6 +232,9 @@ public:
 
     void setCepstrNumOrder(int cepstrNumOrder);
 
+    bool showDtwAlignment() const;
+    void setShowDtwAlignment(bool showDtwAlignment);
+
     bool dpUsePitch() const;
     void setDpUsePitch(bool dpUsePitch);
     double dpPitchCoef() const;
@@ -319,6 +323,7 @@ signals:
     void showCepstrumChanged();
     void cepstrNumOrderChanged();
 
+    void showDtwAlignmentChanged();
     void dpUsePitchChanged();
     void dpPitchCoefChanged();
     void dpUsePitchDerivativeChanged();

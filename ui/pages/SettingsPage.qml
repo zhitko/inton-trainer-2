@@ -652,6 +652,19 @@ Page {
                         rowSpacing: 10
                         Layout.fillWidth: true
 
+                        // Show DTW Alignment
+                        Label {
+                            text: qsTr("Show DTW Distances")
+                            color: Theme.onSurface(Material.theme)
+                            Layout.columnSpan: 1
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.showDtwAlignment : true
+                            onToggled: if (settingsApi)
+                                settingsApi.showDtwAlignment = checked
+                            Layout.columnSpan: 3
+                        }
+
                         // Pitch
                         Label {
                             text: qsTr("Use Pitch")

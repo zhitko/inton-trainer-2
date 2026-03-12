@@ -96,6 +96,7 @@ struct AppSettings {
     double amplitudeGaussianSmoothingSigma = 1.0;
 
     // == DP settings ==
+    bool showDtwAlignment = true;
     bool dpUsePitch = true;
     double dpPitchCoef = 1.0;
     bool dpUsePitchDerivative = true;

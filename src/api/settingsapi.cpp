@@ -280,6 +280,7 @@ void SettingsApi::load()
     emit specUseLogScaleChanged();
     emit specColorSchemeChanged();
     emit cepstrNumOrderChanged();
+    emit showDtwAlignmentChanged();
     emit dpUsePitchChanged();
     emit dpPitchCoefChanged();
     emit dpUsePitchDerivativeChanged();
@@ -894,6 +895,15 @@ void SettingsApi::setSpecColorScheme(SpecColorScheme specColorScheme)
     LOG_DEBUG() << "Finish: setSpecColorScheme";
 }
 
+bool SettingsApi::showDtwAlignment() const { return m_settings.showDtwAlignment; }
+void SettingsApi::setShowDtwAlignment(bool val)
+{
+    if (m_settings.showDtwAlignment != val) {
+        m_settings.showDtwAlignment = val;
+        save();
+        emit showDtwAlignmentChanged();
+    }
+}
 bool SettingsApi::dpUsePitch() const { return m_settings.dpUsePitch; }
 void SettingsApi::setDpUsePitch(bool val)
 {

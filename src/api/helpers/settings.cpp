@@ -83,6 +83,7 @@ Settings::loadSettings()
     qsettings.endGroup();
 
     qsettings.beginGroup("DP");
+    settings.showDtwAlignment = qsettings.value("showDtwAlignment", true).toBool();
     settings.dpUsePitch = qsettings.value("dpUsePitch", true).toBool();
     settings.dpPitchCoef = qsettings.value("dpPitchCoef", 1.0).toDouble();
     settings.dpUsePitchDerivative = qsettings.value("dpUsePitchDerivative", true).toBool();
@@ -172,6 +173,7 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.endGroup();
 
     qsettings.beginGroup("DP");
+    qsettings.setValue("showDtwAlignment", settings.showDtwAlignment);
     qsettings.setValue("dpUsePitch", settings.dpUsePitch);
     qsettings.setValue("dpPitchCoef", settings.dpPitchCoef);
     qsettings.setValue("dpUsePitchDerivative", settings.dpUsePitchDerivative);

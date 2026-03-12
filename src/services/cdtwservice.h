@@ -34,7 +34,8 @@ public:
      * Computes the constrained dynamic time warping distance between the template
      * and signal data, and finds the optimal alignment path. The method updates
      * the internal state of the CDTWService object with the best start and end
-     * indices of the alignment, the minimum final cost, and the optimal path.
+     * indices of the alignment, the minimum final cost, the optimal path, and
+     * the per-signal-frame alignment cost vector (signalStreamDistances).
      * This method should be called after initializing the CDTWService with the
      * template and signal data.
      */
@@ -79,6 +80,13 @@ public:
      * @return The minimum final cost of the computed alignment.
      */
     double getMinFinalCost() const { return minFinalCost; }
+    /**
+     * @return A vector of DTW alignment costs at the full template length for
+     * each signal frame (index i corresponds to signal frame i). This represents
+     * the cost "curve" of the sliding-window alignment across the signal stream
+     * and is populated by compute().
+     */
+    std::vector<double> getSignalStreamDistances() const { return signalStreamDistances; }
 
 private:
     /**
@@ -119,6 +127,7 @@ private:
     int bestEndIndex;
     double minFinalCost;
     std::vector<int> optimalPath;
+    std::vector<double> signalStreamDistances;
 
 protected:
     /**

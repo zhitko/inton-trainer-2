@@ -27,6 +27,8 @@ Page {
     property bool showSettings: false
     property string userFilePath: ""
     property var userWavFileHandle: null
+    property double dpMinFinalCost: 0.0
+    property var dpSignalStreamDistances: []
 
     function updateColorScheme() {
         let scheme = window.settingsApi.specColorScheme;
@@ -180,6 +182,11 @@ Page {
         let dpResult = wavFileApi.getDP(root.refAmplitudeData, root.refAmplitudeDerivData, root.refLogPitchData, root.refLogPitchData, root.refPitchDerivData, root.refSpecData, root.refPatternData, ampData, ampDeriv, logPitchData, logPitchData, pitchDerivData, specData, cepstrData, pitchData, scaledLoadedCuePoints);
         let scaledPitch = dpResult.pitch;
         Logger.debug("DP result pitch length: " + scaledPitch.length);
+
+        root.dpMinFinalCost = dpResult.minFinalCost;
+        root.dpSignalStreamDistances = dpResult.signalStreamDistances;
+        dtwSignalStreamGraph.waveData = [dpResult.signalStreamDistances];
+        Logger.debug("DP minFinalCost: " + root.dpMinFinalCost + ", signalStreamDistances length: " + root.dpSignalStreamDistances.length);
 
         Logger.debug("Calculating UMP...");
         let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, refWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType]);
@@ -743,6 +750,40 @@ Page {
                         }
                     }
 
+                    // DTW Alignment section
+                    Column {
+                        spacing: 10
+                        width: parent.width
+                        visible: window.settingsApi ? window.settingsApi.showDtwAlignment : true
+
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("DTW Distances")
+                        }
+
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.pixelSize: 14
+                            text: qsTr("Best alignment cost: ") + root.dpMinFinalCost.toFixed(6)
+                        }
+
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 14
+                            text: qsTr("Signal Distances")
+                        }
+
+                        WaveFormGraph {
+                            id: dtwSignalStreamGraph
+
+                            height: 200
+                            width: parent.width - 80
+                        }
+                    }
+
                     Text {
                         color: Theme.onSurface(root.Material.theme)
                         font.bold: true
@@ -792,7 +833,7 @@ Page {
 
         SettingsPage {
             Layout.fillHeight: true
-            Layout.preferredWidth: 400
+            Layout.preferredWidth: 430
             visible: root.showSettings
 
             background: Rectangle {
