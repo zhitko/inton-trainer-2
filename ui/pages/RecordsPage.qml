@@ -215,6 +215,7 @@ Page {
 
     // Empty state label
     EmptyState {
+        anchors.centerIn: parent
         showEmpty: recordsPage.modelWrapper.items.length === 0 && !searchActionBar.searchText
         emptyMessage: qsTr("No records found")
     }

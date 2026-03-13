@@ -82,6 +82,7 @@ Page {
 
     // Empty state
     EmptyState {
+        anchors.centerIn: parent
         showEmpty: allFiles.length === 0 && !searchField.text
         emptyMessage: qsTr("No templates found")
     }

@@ -15,6 +15,19 @@
 
 #include "logger.h"
 
+// Helper function to normalize path separators to forward slashes
+static std::string normalizePath(const std::string& path) {
+    std::string normalized;
+    for (char c : path) {
+        if (c == '\\') {
+            normalized += '/';
+        } else {
+            normalized += c;
+        }
+    }
+    return normalized;
+}
+
 // Static member initialization
 UserStatistics Statistics::cachedStatistics;
 bool Statistics::statisticsLoaded = false;
@@ -157,9 +170,12 @@ Statistics::loadStatistics()
         QJsonArray historyArray = root["history"].toArray();
         for (const QJsonValue& val : historyArray) {
             QJsonObject historyObj = val.toObject();
+            // Normalize paths to use forward slashes for cross-platform consistency
+            std::string normalizedUserPath = normalizePath(historyObj["userRecordPath"].toString().toStdString());
+            std::string normalizedPatternPath = normalizePath(historyObj["patternPath"].toString().toStdString());
             HistoryEntry entry(
-                historyObj["userRecordPath"].toString().toStdString(),
-                historyObj["patternPath"].toString().toStdString(),
+                normalizedUserPath,
+                normalizedPatternPath,
                 historyObj["result"].toDouble()
             );
             entry.date = historyObj["date"].toString().toStdString();
@@ -621,8 +637,12 @@ void Statistics::registerHistoryEntry(const std::string& userRecordPath, const s
         statisticsLoaded = true;
     }
 
-    // Create history entry
-    HistoryEntry entry(userRecordPath, patternPath, result);
+    // Normalize paths to use forward slashes for cross-platform consistency
+    std::string normalizedUserPath = normalizePath(userRecordPath);
+    std::string normalizedPatternPath = normalizePath(patternPath);
+
+    // Create history entry with normalized paths
+    HistoryEntry entry(normalizedUserPath, normalizedPatternPath, result);
 
     // Add history entry to root-level history
     cachedStatistics.history.push_back(entry);
@@ -630,8 +650,8 @@ void Statistics::registerHistoryEntry(const std::string& userRecordPath, const s
     // Save updated statistics
     saveStatistics(cachedStatistics);
 
-    LOG_INFO() << "Registered history entry for user record:" << QString::fromStdString(userRecordPath)
-               << "Pattern:" << QString::fromStdString(patternPath) << "Result:" << result;
+    LOG_INFO() << "Registered history entry for user record:" << QString::fromStdString(normalizedUserPath)
+               << "Pattern:" << QString::fromStdString(normalizedPatternPath) << "Result:" << result;
 }
 
 std::vector<HistoryEntry> Statistics::getAllHistory()
@@ -707,12 +727,15 @@ void Statistics::removeHistoryEntry(const std::string& userRecordPath)
         statisticsLoaded = true;
     }
 
+    // Normalize path for comparison
+    std::string normalizedPath = normalizePath(userRecordPath);
+
     // Remove history entry with matching userRecordPath
     auto& history = cachedStatistics.history;
     history.erase(
         std::remove_if(history.begin(), history.end(),
-            [&userRecordPath](const HistoryEntry& entry) {
-                return entry.userRecordPath == userRecordPath;
+            [&normalizedPath](const HistoryEntry& entry) {
+                return entry.userRecordPath == normalizedPath;
             }),
         history.end()
     );

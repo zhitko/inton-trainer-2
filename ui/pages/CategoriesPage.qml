@@ -87,6 +87,7 @@ Page {
 
     // Empty state
     EmptyState {
+        anchors.centerIn: parent
         showEmpty: allFolders.length === 0 && !searchField.text
         emptyMessage: qsTr("No categories found")
     }
