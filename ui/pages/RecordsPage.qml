@@ -18,7 +18,7 @@ Page {
 
     property string path: "data/records"
     property var allFiles: []
-    
+
     // Wrapper object to help with QML model binding
     property var modelWrapper: {
         "items": []
@@ -30,9 +30,8 @@ Page {
             return recordsPage.allFiles;
         }
         var searchLower = searchActionBar.searchText.toLowerCase();
-        return recordsPage.allFiles.filter(function(item) {
-            return item.fileName.toLowerCase().includes(searchLower) ||
-                   (item.patternName && item.patternName.toLowerCase().includes(searchLower));
+        return recordsPage.allFiles.filter(function (item) {
+            return item.fileName.toLowerCase().includes(searchLower) || (item.patternName && item.patternName.toLowerCase().includes(searchLower));
         });
     }
 
@@ -50,26 +49,26 @@ Page {
     function loadRecords() {
         // Get all files from records folder
         var fileList = fileApi.getFilesList(recordsPage.path, ["*.wav"]);
-        
+
         // Get history from statistics (microphone recordings)
         var historyList = statisticsApi.getAllHistory();
-        
+
         // Create a map of userRecordPath -> history entry for quick lookup
         var historyMap = {};
         for (var i = 0; i < historyList.length; i++) {
             var entry = historyList[i];
             historyMap[entry.userRecordPath] = entry;
         }
-        
+
         // Merge file list with history info
         recordsPage.allFiles = [];
         for (var j = 0; j < fileList.length; j++) {
             var file = fileList[j];
             var fullPath = recordsPage.path + "/" + file.filePath;
-            
+
             // Check if this file has a history entry
             var historyEntry = historyMap[fullPath];
-            
+
             if (historyEntry) {
                 // This is a microphone recording with history
                 // Get pattern name without "data/patterns/" prefix
@@ -98,10 +97,12 @@ Page {
                 });
             }
         }
-        
+
         // Update wrapper to trigger model change
-        recordsPage.modelWrapper = {"items": recordsPage.getFilteredItems()};
-        
+        recordsPage.modelWrapper = {
+            "items": recordsPage.getFilteredItems()
+        };
+
         // Force ListView to update
         listView.forceLayout();
     }
@@ -127,12 +128,12 @@ Page {
                 // Use the full path from the recordsPage.path + filePath
                 let fullPath = recordsPage.path + "/" + recordsPage.allFiles[i].filePath;
                 let absolutePath = fileApi.getApplicationDirPath() + "/" + fullPath;
-                
+
                 // Also remove history entry if exists
                 if (recordsPage.allFiles[i].isHistory) {
                     statisticsApi.removeHistoryEntry(fullPath);
                 }
-                
+
                 fileApi.deleteFile(absolutePath);
             }
             loadRecords();
@@ -150,12 +151,14 @@ Page {
             Layout.fillWidth: true
             actionButtonText: qsTr("Delete All")
             actionButtonVisible: recordsPage.modelWrapper.items.length > 0
-            
+
             onSearchChanged: {
                 // Update the filtered model when search text changes
-                recordsPage.modelWrapper = {"items": recordsPage.getFilteredItems()};
+                recordsPage.modelWrapper = {
+                    "items": recordsPage.getFilteredItems()
+                };
             }
-            
+
             onActionButtonClicked: {
                 deleteAllDialog.open();
             }
@@ -183,7 +186,7 @@ Page {
                 recordName: modelData.fileName
                 itemIndex: index
                 filePath: fileApi.getApplicationDirPath() + "/" + recordsPage.path + "/" + modelData.filePath
-                
+
                 // History properties
                 isHistory: modelData.isHistory || false
                 patternName: modelData.patternName || ""

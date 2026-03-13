@@ -252,7 +252,7 @@ ApplicationWindow {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            if (stackView.currentItem.title !== qsTr("Settings")) {
+                            if (stackView.currentItem && stackView.currentItem.title !== qsTr("Settings")) {
                                 stackView.push("pages/SettingsPage.qml");
                             }
                         }

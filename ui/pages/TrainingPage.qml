@@ -15,6 +15,7 @@ import "../utils"
 
 Page {
     id: root
+
     property string referenceFilePath: ""
     property string userFilePath: ""
     property string titleText: referenceFilePath.substring(referenceFilePath.lastIndexOf('/') + 1).replace(".wav", "")

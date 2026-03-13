@@ -11,6 +11,9 @@ import by.intontrainer.wavfile 1.0
 Page {
     id: root
 
+    // Cache settingsApi with null safety
+    readonly property var settingsApi: ApplicationWindow.window ? ApplicationWindow.settingsApi : null
+
     property var loadedCuePoints: []
     property var refWaveData: []
     property var userWaveData: []
@@ -380,7 +383,7 @@ Page {
             updateData();
         }
 
-        target: window.settingsApi
+        target: settingsApi
     }
 
     Button {
@@ -754,7 +757,7 @@ Page {
                     Column {
                         spacing: 10
                         width: parent.width
-                        visible: window.settingsApi ? window.settingsApi.showDtwAlignment : true
+                        visible: settingsApi ? window.settingsApi.showDtwAlignment : true
 
                         Text {
                             color: Theme.onSurface(root.Material.theme)

@@ -41,18 +41,18 @@ Item {
         let avgScoreVal = 0;
 
         if (root.isFolder) {
-            console.log("Updating stats for folder:", root.filePath);
+            Logger.debug("Updating stats for folder: " + root.filePath);
             let folderStats = statisticsApi.getAvgResultForFolder(root.filePath);
             completeness = folderStats.completeness;
             totalFiles = folderStats.totalFiles;
             processedFiles = folderStats.processedFiles;
             avgScoreVal = folderStats.avgBestResult;
-            console.log("Calculated completeness for folder:", completeness, "processed:", processedFiles, "total:", totalFiles);
+            Logger.debug("Calculated completeness for folder: " + completeness + " processed: " + processedFiles + " total: " + totalFiles);
             percentageText.text = processedFiles + "/" + totalFiles + " (" + Math.round(completeness) + "% " + qsTr("Progress") + ")";
         } else {
-            console.log("Updating stats for file:", root.filePath);
+            Logger.debug("Updating stats for file: " + root.filePath);
             avgScoreVal = statisticsApi.getBestResultForFile(root.filePath);
-            console.log("Calculated best result for file:", avgScoreVal);
+            Logger.debug("Calculated best result for file: " + avgScoreVal);
 
             if (avgScoreVal >= 90)
                 percentageText.text = qsTr("Mastered");

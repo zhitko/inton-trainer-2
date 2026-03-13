@@ -22,28 +22,18 @@ RoundButton {
     background: Rectangle {
         radius: control.radius
         anchors.fill: parent
-        color: "transparent"
+        color: control.hovered ? Theme.surfaceContainerLow(Material.theme) : "transparent"
         Label {
             id: label
             anchors.centerIn: parent
             font.family: Icons.familySolid
             font.bold: true
             text: Icons.faTrash
-            font.pixelSize: parent.width / 2
+            font.pixelSize: (parent.width / 2) + (control.hovered ? 4 : 0)
             color: Theme.onSurface(Material.theme)
             horizontalAlignment: Label.AlignHCenter
-        }
-        MouseArea {
-            id: mouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            onEntered: {
-                parent.color = Theme.surfaceContainerLow(Material.theme);
-                label.font.pixelSize += 4;
-            }
-            onExited: {
-                parent.color = "transparent";
-                label.font.pixelSize -= 4;
+            Behavior on font.pixelSize {
+                NumberAnimation { duration: 100 }
             }
         }
     }
