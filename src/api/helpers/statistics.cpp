@@ -648,10 +648,55 @@ std::vector<HistoryEntry> Statistics::getAllHistory()
 
 void Statistics::clearAllStatistics()
 {
-    cachedStatistics = UserStatistics();
+    // Reinitialize statistics from patterns directory instead of just clearing
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString patternsDir = QDir(appDir).filePath("data/patterns");
+    
+    // Check if patterns directory exists
+    if (!QDir(patternsDir).exists()) {
+        LOG_WARNING() << "Patterns directory does not exist, cannot reinitialize statistics";
+        cachedStatistics = UserStatistics();
+        statisticsLoaded = true;
+        saveStatistics(cachedStatistics);
+        return;
+    }
+    
+    LOG_INFO() << "Reinitializing statistics from patterns directory:" << patternsDir;
+    
+    // Clear current statistics but keep history cleared
+    cachedStatistics.items.clear();
+    cachedStatistics.history.clear();
+    
+    // Create all items from patterns directory
+    QDirIterator it(patternsDir, QStringList() << "*.wav", QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString fullPath = it.next();
+        QString relPath = QDir(appDir).relativeFilePath(fullPath);
+        findOrCreateItem(relPath.toStdString(), true);
+    }
+    
+    // Recursive function to update completeness and stats for all folders
+    std::function<void(const std::shared_ptr<StatisticsItem>&, const std::string&)> updateAllFolderStats =
+        [&](const std::shared_ptr<StatisticsItem>& item, const std::string& currentPath) {
+            if (item->type == StatisticsItem::Folder) {
+                std::string itemPath = currentPath.empty() ? item->name : currentPath + "/" + item->name;
+                for (auto& child : item->items) {
+                    updateAllFolderStats(child, itemPath);
+                }
+                // Use calculateCompleteness to populate totalFiles and processedFiles
+                QString folderDiskPath = QDir(appDir).absoluteFilePath(QString::fromStdString(itemPath));
+                item->completeness = calculateCompleteness(item, folderDiskPath.toStdString());
+                item->avgResult = calculateAverage(item);
+            }
+        };
+    
+    for (auto& item : cachedStatistics.items) {
+        updateAllFolderStats(item, "");
+    }
+    
     statisticsLoaded = true;
     saveStatistics(cachedStatistics);
-    LOG_INFO() << "Cleared all statistics and history";
+    LOG_INFO() << "Cleared all statistics and reinitialized from patterns";
 }
 
 void Statistics::removeHistoryEntry(const std::string& userRecordPath)
