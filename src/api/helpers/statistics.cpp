@@ -152,6 +152,21 @@ Statistics::loadStatistics()
         statistics.items.push_back(jsonToItem(val.toObject()));
     }
 
+    // Load history entries at root level
+    if (root.contains("history")) {
+        QJsonArray historyArray = root["history"].toArray();
+        for (const QJsonValue& val : historyArray) {
+            QJsonObject historyObj = val.toObject();
+            HistoryEntry entry(
+                historyObj["userRecordPath"].toString().toStdString(),
+                historyObj["patternPath"].toString().toStdString(),
+                historyObj["result"].toDouble()
+            );
+            entry.date = historyObj["date"].toString().toStdString();
+            statistics.history.push_back(entry);
+        }
+    }
+
     LOG_INFO() << "Loaded statistics from:" << absolutePath;
     return statistics;
 }
@@ -171,6 +186,18 @@ void Statistics::saveStatistics(const UserStatistics& statistics)
     }
 
     root["items"] = itemsArray;
+
+    // Save history entries at root level
+    QJsonArray historyArray;
+    for (const auto& entry : statistics.history) {
+        QJsonObject historyObj;
+        historyObj["userRecordPath"] = QString::fromStdString(entry.userRecordPath);
+        historyObj["patternPath"] = QString::fromStdString(entry.patternPath);
+        historyObj["result"] = entry.result;
+        historyObj["date"] = QString::fromStdString(entry.date);
+        historyArray.append(historyObj);
+    }
+    root["history"] = historyArray;
 
     QJsonDocument doc(root);
     QFile file(absolutePath);
@@ -584,4 +611,69 @@ std::map<std::string, double> Statistics::getOverallStatistics()
     stats["completeness"] = completeness * 100.0;
 
     return stats;
+}
+
+void Statistics::registerHistoryEntry(const std::string& userRecordPath, const std::string& patternPath, double result)
+{
+    // Load current statistics if not already loaded
+    if (!statisticsLoaded) {
+        cachedStatistics = loadStatistics();
+        statisticsLoaded = true;
+    }
+
+    // Create history entry
+    HistoryEntry entry(userRecordPath, patternPath, result);
+
+    // Add history entry to root-level history
+    cachedStatistics.history.push_back(entry);
+
+    // Save updated statistics
+    saveStatistics(cachedStatistics);
+
+    LOG_INFO() << "Registered history entry for user record:" << QString::fromStdString(userRecordPath)
+               << "Pattern:" << QString::fromStdString(patternPath) << "Result:" << result;
+}
+
+std::vector<HistoryEntry> Statistics::getAllHistory()
+{
+    // Load current statistics if not already loaded
+    if (!statisticsLoaded) {
+        cachedStatistics = loadStatistics();
+        statisticsLoaded = true;
+    }
+
+    // Return history from root level
+    return cachedStatistics.history;
+}
+
+void Statistics::clearAllStatistics()
+{
+    cachedStatistics = UserStatistics();
+    statisticsLoaded = true;
+    saveStatistics(cachedStatistics);
+    LOG_INFO() << "Cleared all statistics and history";
+}
+
+void Statistics::removeHistoryEntry(const std::string& userRecordPath)
+{
+    // Load current statistics if not already loaded
+    if (!statisticsLoaded) {
+        cachedStatistics = loadStatistics();
+        statisticsLoaded = true;
+    }
+
+    // Remove history entry with matching userRecordPath
+    auto& history = cachedStatistics.history;
+    history.erase(
+        std::remove_if(history.begin(), history.end(),
+            [&userRecordPath](const HistoryEntry& entry) {
+                return entry.userRecordPath == userRecordPath;
+            }),
+        history.end()
+    );
+
+    // Save updated statistics
+    saveStatistics(cachedStatistics);
+
+    LOG_INFO() << "Removed history entry for user record:" << QString::fromStdString(userRecordPath);
 }

@@ -107,8 +107,8 @@ Page {
         Logger.debug("Reference pitch derivative data frames: " + referencePitchDerivData.length);
     }
 
-    function updateUserUMP(fileFullPath) {
-        Logger.info("Updating user UMP for file: " + fileFullPath);
+    function updateUserUMP(fileFullPath, isMicrophoneRecording) {
+        Logger.info("Updating user UMP for file: " + fileFullPath + " isMicrophone: " + isMicrophoneRecording);
 
         root.userFilePath = fileFullPath;
         let userWavFileHandle = wavFileApi.openWavFile(root.userFilePath);
@@ -162,6 +162,11 @@ Page {
 
         // Register the result in statistics FIRST
         statisticsApi.registerResult(root.referenceFilePath, root.shapeSimilarity);
+
+        // Register history entry for the user record only if it was a microphone recording
+        if (isMicrophoneRecording) {
+            statisticsApi.registerHistoryEntry(root.userFilePath, root.referenceFilePath, root.shapeSimilarity);
+        }
 
         // Then reload history so previous results reflect the newly saved state
         loadPreviousResults();
@@ -365,7 +370,7 @@ Page {
 
                 RecordRoundButton {
                     filePath: root.userFilePath
-                    onRecordingFinished: updateUserUMP(filePath)
+                    onRecordingFinished: updateUserUMP(filePath, true)
                 }
 
                 PlayRoundButton {
@@ -448,7 +453,7 @@ Page {
                     console.log("testFileDialog accepted: " + testFileDialog.selectedFile);
                     var selectedPath = fileApi.getPathFromUrl(testFileDialog.selectedFile);
                     if (selectedPath) {
-                        updateUserUMP(selectedPath);
+                        updateUserUMP(selectedPath, false);
                     }
                 }
             }

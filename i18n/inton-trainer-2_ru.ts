@@ -153,6 +153,34 @@
     </message>
 </context>
 <context>
+    <name>RecordItem</name>
+    <message>
+        <location filename="../ui/components/RecordItem.qml" line="134"/>
+        <source>Mastered</source>
+        <translation>Освоено</translation>
+    </message>
+    <message>
+        <location filename="../ui/components/RecordItem.qml" line="135"/>
+        <source>Excellent</source>
+        <translation>Отлично</translation>
+    </message>
+    <message>
+        <location filename="../ui/components/RecordItem.qml" line="136"/>
+        <source>Good</source>
+        <translation>Хорошо</translation>
+    </message>
+    <message>
+        <location filename="../ui/components/RecordItem.qml" line="137"/>
+        <source>Needs work</source>
+        <translation>Нужно поработать</translation>
+    </message>
+    <message>
+        <location filename="../ui/components/RecordItem.qml" line="138"/>
+        <source>Poor</source>
+        <translation>Плохо</translation>
+    </message>
+</context>
+<context>
     <name>RecordRoundButton</name>
     <message>
         <location filename="../ui/components/RecordRoundButton.qml" line="146"/>
@@ -176,9 +204,39 @@
 <context>
     <name>RecordsPage</name>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="10"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="15"/>
         <source>Records</source>
         <translation>Записи</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/RecordsPage.qml" line="110"/>
+        <source>Delete All Records</source>
+        <translation>Удалить все записи</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/RecordsPage.qml" line="122"/>
+        <source>Are you sure you want to delete all records?</source>
+        <translation>Вы уверены, что хотите удалить все записи?</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/RecordsPage.qml" line="130"/>
+        <source>Yes</source>
+        <translation>Да</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/RecordsPage.qml" line="135"/>
+        <source>No</source>
+        <translation>Нет</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/RecordsPage.qml" line="188"/>
+        <source>Delete All</source>
+        <translation>Удалить все</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/RecordsPage.qml" line="290"/>
+        <source>No records found</source>
+        <translation>Записей не найдено</translation>
     </message>
 </context>
 <context>
@@ -274,8 +332,8 @@
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="169"/>
         <location filename="../ui/pages/SettingsPage.qml" line="842"/>
-        <source>Clear User Statistics</source>
-        <translation>Очистить статистику</translation>
+        <source>Delete user data</source>
+        <translation>Удалить пользовательские данные</translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="201"/>
@@ -487,9 +545,9 @@
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="850"/>
-        <source>This action will permanently delete all user statistics.
+        <source>This action will permanently delete all user statistics and user records.
 This cannot be undone. Are you sure?</source>
-        <translation>Это действие безвозвратно удалит всю статистику пользователя.
+        <translation>Это действие безвозвратно удалит всю статистику и записи пользователя.
 Вы уверены?</translation>
     </message>
     <message>
@@ -631,36 +689,36 @@ Check analysis settings (e.g. increase FFT length).</source>
 <context>
     <name>TrainingPage</name>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="210"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="215"/>
         <source>Shape Similarity</source>
         <translation>Сходство</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="363"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="368"/>
         <source>Play
 Reference</source>
         <translation>Слушать
 Эталон</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="373"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="378"/>
         <source>Play
 Me</source>
         <translation>Слушать
 Запись</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="386"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="391"/>
         <source>Open Test File</source>
         <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="445"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="450"/>
         <source>Open test file</source>
         <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="465"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="470"/>
         <source>Advanced</source>
         <translation>Дополнительно</translation>
     </message>

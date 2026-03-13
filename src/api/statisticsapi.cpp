@@ -88,3 +88,41 @@ void StatisticsApi::reloadStatistics()
     Statistics::reloadStatistics();
     emit statisticsUpdated();
 }
+
+void StatisticsApi::registerHistoryEntry(const QString& userRecordPath, const QString& patternPath, double result)
+{
+    QString relativeUserPath = removeApplicationPath(userRecordPath);
+    QString relativePatternPath = removeApplicationPath(patternPath);
+    Statistics::registerHistoryEntry(relativeUserPath.toStdString(), relativePatternPath.toStdString(), result);
+    emit statisticsUpdated();
+}
+
+QVariantList StatisticsApi::getAllHistory()
+{
+    std::vector<HistoryEntry> history = Statistics::getAllHistory();
+    QVariantList out;
+
+    for (const auto& entry : history) {
+        QVariantMap map;
+        map["userRecordPath"] = QString::fromStdString(entry.userRecordPath);
+        map["patternPath"] = QString::fromStdString(entry.patternPath);
+        map["result"] = entry.result;
+        map["date"] = QString::fromStdString(entry.date);
+        out.push_back(map);
+    }
+
+    return out;
+}
+
+void StatisticsApi::clearAllStatistics()
+{
+    Statistics::clearAllStatistics();
+    emit statisticsUpdated();
+}
+
+void StatisticsApi::removeHistoryEntry(const QString& userRecordPath)
+{
+    QString relativePath = removeApplicationPath(userRecordPath);
+    Statistics::removeHistoryEntry(relativePath.toStdString());
+    emit statisticsUpdated();
+}

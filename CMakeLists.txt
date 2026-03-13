@@ -109,6 +109,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/FileTreeView.qml
         ui/components/FileTreeViewItem.qml
         ui/components/ListItem.qml
+        ui/components/RecordItem.qml
         ui/components/PlayButton.qml
         ui/components/PlayRoundButton.qml
         ui/components/RecordRoundButton.qml

@@ -166,7 +166,7 @@ Page {
                     }
 
                     Button {
-                        text: qsTr("Clear User Statistics")
+                        text: qsTr("Delete user data")
                         Layout.fillWidth: true
                         Material.foreground: Theme.onError(Material.theme)
 
@@ -839,7 +839,7 @@ Page {
     }
     Dialog {
         id: confirmationDialog
-        title: qsTr("Clear User Statistics")
+        title: qsTr("Delete user data")
         modal: true
 
         width: AppScale.px(root.width * 0.9)
@@ -847,7 +847,7 @@ Page {
         y: (AppScale.px(root.height) - height) / 2
 
         Label {
-            text: qsTr("This action will permanently delete all user statistics.\nThis cannot be undone. Are you sure?")
+            text: qsTr("This action will permanently delete all user statistics and user records.\nThis cannot be undone. Are you sure?")
             color: Theme.onSurface(Material.theme)
             wrapMode: Text.Wrap
             font.pixelSize: AppScale.font(14)

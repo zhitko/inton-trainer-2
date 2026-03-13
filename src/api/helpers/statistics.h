@@ -1,6 +1,7 @@
 #ifndef STATISTICS_H
 #define STATISTICS_H
 
+#include <QDateTime>
 #include <QString>
 #include <algorithm>
 #include <functional>
@@ -8,6 +9,24 @@
 #include <memory>
 #include <string>
 #include <vector>
+
+/*
+ * HistoryEntry represents a single training session entry with user recording details.
+ */
+struct HistoryEntry {
+    std::string userRecordPath;   // Path to the user's recording
+    std::string patternPath;      // Path to the reference pattern
+    double result;                // Shape similarity result
+    std::string date;             // Date of the recording in ISO format
+
+    HistoryEntry(const std::string& userPath, const std::string& pattern, double simResult)
+        : userRecordPath(userPath)
+        , patternPath(pattern)
+        , result(simResult)
+        , date(QDateTime::currentDateTime().toString(Qt::ISODate).toStdString())
+    {
+    }
+};
 
 /*
  * StatisticsItem represents a single item in the statistics hierarchy.
@@ -39,6 +58,7 @@ struct StatisticsItem {
  */
 struct UserStatistics {
     std::vector<std::shared_ptr<StatisticsItem>> items;
+    std::vector<HistoryEntry> history; // History of user recordings (at root level)
 };
 
 /*
@@ -116,6 +136,34 @@ public:
      * @return A map containing overall statistics with keys like "avgResult", "totalResults", "filesCount", "completeness".
      */
     static std::map<std::string, double> getOverallStatistics();
+
+    /**
+     * Registers a new history entry for a training session.
+     *
+     * @param userRecordPath The path to the user's recording.
+     * @param patternPath The path to the reference pattern.
+     * @param result The shape similarity result.
+     */
+    static void registerHistoryEntry(const std::string& userRecordPath, const std::string& patternPath, double result);
+
+    /**
+     * Gets all history entries from statistics.
+     *
+     * @return A vector of HistoryEntry objects.
+     */
+    static std::vector<HistoryEntry> getAllHistory();
+
+    /**
+     * Clears all statistics and history.
+     */
+    static void clearAllStatistics();
+
+    /**
+     * Removes a history entry by user record path.
+     *
+     * @param userRecordPath The path to the user's recording to remove from history.
+     */
+    static void removeHistoryEntry(const std::string& userRecordPath);
 
 private:
     /**

@@ -3,6 +3,7 @@
 #include "helpers/statistics.h"
 #include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
 #include <QQmlEngine>
 #include <QFile>
 
@@ -328,6 +329,9 @@ void SettingsApi::clearUserStatistics()
 {
     LOG_DEBUG() << "Start: clearUserStatistics";
     
+    // Clear statistics using Statistics helper (clears both stats and history)
+    Statistics::clearAllStatistics();
+    
     // Get the statistics file path
     QString filePath = QCoreApplication::applicationDirPath() + "/statistics.json";
     QFile file(filePath);
@@ -335,15 +339,34 @@ void SettingsApi::clearUserStatistics()
     if (file.exists()) {
         if (file.remove()) {
             LOG_INFO() << "Statistics file deleted successfully";
-            // Reload statistics to clear the cache
-            Statistics::reloadStatistics();
         } else {
             LOG_WARNING() << "Failed to delete statistics file";
         }
-    } else {
-        LOG_INFO() << "Statistics file does not exist";
-        // Still reload to clear cache
-        Statistics::reloadStatistics();
+    }
+    
+    // Delete all user records from data/records folder
+    QString recordsPath = QCoreApplication::applicationDirPath() + "/data/records";
+    QDir recordsDir(recordsPath);
+    
+    if (recordsDir.exists()) {
+        // Delete all files in the records directory
+        QFileInfoList fileInfoList = recordsDir.entryInfoList(QDir::Files);
+        for (const QFileInfo& fileInfo : fileInfoList) {
+            QFile fileToDelete(fileInfo.absoluteFilePath());
+            if (fileToDelete.remove()) {
+                LOG_INFO() << "Deleted user record:" << fileInfo.absoluteFilePath();
+            } else {
+                LOG_WARNING() << "Failed to delete user record:" << fileInfo.absoluteFilePath();
+            }
+        }
+        
+        // Also delete subdirectories
+        QFileInfoList dirInfoList = recordsDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+        for (const QFileInfo& dirInfo : dirInfoList) {
+            QDir subDir(dirInfo.absoluteFilePath());
+            subDir.removeRecursively();
+            LOG_INFO() << "Deleted records subdirectory:" << dirInfo.absoluteFilePath();
+        }
     }
     
     LOG_DEBUG() << "Finish: clearUserStatistics";

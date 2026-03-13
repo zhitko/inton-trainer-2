@@ -72,6 +72,34 @@ public:
      */
     Q_INVOKABLE void reloadStatistics();
 
+    /**
+     * Registers a new history entry for a training session.
+     *
+     * @param userRecordPath The path to the user's recording.
+     * @param patternPath The path to the reference pattern.
+     * @param result The shape similarity result.
+     */
+    Q_INVOKABLE void registerHistoryEntry(const QString& userRecordPath, const QString& patternPath, double result);
+
+    /**
+     * Gets all history entries from statistics.
+     *
+     * @return A QVariantList of history entries as QVariantMaps.
+     */
+    Q_INVOKABLE QVariantList getAllHistory();
+
+    /**
+     * Clears all statistics and history.
+     */
+    Q_INVOKABLE void clearAllStatistics();
+
+    /**
+     * Removes a history entry by user record path.
+     *
+     * @param userRecordPath The path to the user's recording to remove from history.
+     */
+    Q_INVOKABLE void removeHistoryEntry(const QString& userRecordPath);
+
 signals:
     /**
      * Emitted when a new result is successfully registered.
