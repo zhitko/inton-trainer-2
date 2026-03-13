@@ -8,6 +8,32 @@
         <source>Reference samples</source>
         <translation>Эталонные образцы</translation>
     </message>
+    <message>
+        <location filename="../ui/pages/CategoriesPage.qml" line="91"/>
+        <source>No categories found</source>
+        <translation>Категории не найдены</translation>
+    </message>
+</context>
+<context>
+    <name>ConfirmDialog</name>
+    <message>
+        <location filename="../ui/components/ConfirmDialog.qml" line="9"/>
+        <source>Yes</source>
+        <translation>Да</translation>
+    </message>
+    <message>
+        <location filename="../ui/components/ConfirmDialog.qml" line="10"/>
+        <source>No</source>
+        <translation>Нет</translation>
+    </message>
+</context>
+<context>
+    <name>EmptyState</name>
+    <message>
+        <location filename="../ui/components/EmptyState.qml" line="8"/>
+        <source>No items found</source>
+        <translation>Элементы не найдены</translation>
+    </message>
 </context>
 <context>
     <name>HomePage</name>
@@ -209,32 +235,32 @@
         <translation>Записи</translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="110"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="119"/>
         <source>Delete All Records</source>
         <translation>Удалить все записи</translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="122"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="120"/>
         <source>Are you sure you want to delete all records?</source>
         <translation>Вы уверены, что хотите удалить все записи?</translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="130"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="121"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="135"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="122"/>
         <source>No</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="188"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="151"/>
         <source>Delete All</source>
         <translation>Удалить все</translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="290"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="216"/>
         <source>No records found</source>
         <translation>Записей не найдено</translation>
     </message>
@@ -684,6 +710,11 @@ Check analysis settings (e.g. increase FFT length).</source>
         <location filename="../ui/pages/TemplatesPage.qml" line="12"/>
         <source>Reference samples</source>
         <translation>Эталонные образцы</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplatesPage.qml" line="86"/>
+        <source>No templates found</source>
+        <translation>Эталоны не найдены</translation>
     </message>
 </context>
 <context>

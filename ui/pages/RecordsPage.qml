@@ -24,6 +24,18 @@ Page {
         "items": []
     }
 
+    // Get filtered items based on search
+    function getFilteredItems() {
+        if (!searchActionBar || !searchActionBar.searchText) {
+            return recordsPage.allFiles;
+        }
+        var searchLower = searchActionBar.searchText.toLowerCase();
+        return recordsPage.allFiles.filter(function(item) {
+            return item.fileName.toLowerCase().includes(searchLower) ||
+                   (item.patternName && item.patternName.toLowerCase().includes(searchLower));
+        });
+    }
+
     Component.onCompleted: {
         loadRecords();
     }
@@ -63,7 +75,6 @@ Page {
                 // Get pattern name without "data/patterns/" prefix
                 var fullPatternPath = historyEntry.patternPath;
                 var patternDisplayName = fullPatternPath.replace("data/patterns/", "").replace(".wav", "");
-                var patternFileName = fullPatternPath.substring(fullPatternPath.lastIndexOf('/') + 1).replace(".wav", "");
                 recordsPage.allFiles.push({
                     fileName: file.fileName,
                     filePath: file.filePath,
@@ -89,7 +100,7 @@ Page {
         }
         
         // Update wrapper to trigger model change
-        recordsPage.modelWrapper = {"items": recordsPage.allFiles};
+        recordsPage.modelWrapper = {"items": recordsPage.getFilteredItems()};
         
         // Force ListView to update
         listView.forceLayout();
@@ -103,40 +114,13 @@ Page {
         id: statisticsApi
     }
 
-    Dialog {
+    ConfirmDialog {
         id: deleteAllDialog
-        anchors.centerIn: parent
-        modal: true
-        title: qsTr("Delete All Records")
-
-        header: Label {
-            text: deleteAllDialog.title
-            font.pixelSize: 20
-            font.bold: true
-            padding: 24
-            bottomPadding: 0
-            color: Theme.onSurface(Material.theme)
-        }
-
-        contentItem: Text {
-            text: qsTr("Are you sure you want to delete all records?")
-            color: Theme.onSurfaceVariant(Material.theme)
-            font.pixelSize: 16
-            padding: 24
-        }
-
-        footer: DialogButtonBox {
-            Button {
-                text: qsTr("Yes")
-                DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
-                Material.foreground: Theme.error(Material.theme)
-            }
-            Button {
-                text: qsTr("No")
-                DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
-                Material.foreground: Theme.primary(Material.theme)
-            }
-        }
+        titleText: qsTr("Delete All Records")
+        messageText: qsTr("Are you sure you want to delete all records?")
+        confirmText: qsTr("Yes")
+        cancelText: qsTr("No")
+        isDestructive: true
 
         onAccepted: {
             for (let i = 0; i < recordsPage.allFiles.length; i++) {
@@ -161,61 +145,19 @@ Page {
         spacing: 24
 
         // Action Bar (Search + Delete All)
-        RowLayout {
+        SearchActionBar {
+            id: searchActionBar
             Layout.fillWidth: true
-            spacing: 16
-
-            SearchBar {
-                id: searchField
-                Layout.fillWidth: true
+            actionButtonText: qsTr("Delete All")
+            actionButtonVisible: recordsPage.modelWrapper.items.length > 0
+            
+            onSearchChanged: {
+                // Update the filtered model when search text changes
+                recordsPage.modelWrapper = {"items": recordsPage.getFilteredItems()};
             }
-
-            Button {
-                id: deleteAllButton
-                visible: recordsPage.modelWrapper.items.length > 0
-                Layout.alignment: Qt.AlignVCenter
-
-                contentItem: RowLayout {
-                    spacing: 8
-                    Text {
-                        text: Icons.faTrash
-                        font.family: Icons.familySolid
-                        font.bold: true
-                        font.pixelSize: 16
-                        color: Theme.onError(Material.theme)
-                    }
-                    Text {
-                        text: qsTr("Delete All")
-                        font.pixelSize: 14
-                        font.weight: 600
-                        color: Theme.onError(Material.theme)
-                    }
-                }
-
-                background: Rectangle {
-                    radius: 20
-                    color: Theme.error(Material.theme)
-                    implicitHeight: 40
-                    implicitWidth: 120
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: parent.radius
-                        color: Theme.onError(Material.theme)
-                        opacity: deleteAllButton.hovered ? 0.08 : 0
-
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: 150
-                                easing.type: Easing.OutQuad
-                            }
-                        }
-                    }
-                }
-
-                onClicked: {
-                    deleteAllDialog.open();
-                }
+            
+            onActionButtonClicked: {
+                deleteAllDialog.open();
             }
         }
 
@@ -228,26 +170,10 @@ Page {
             spacing: 10
             model: recordsPage.modelWrapper.items
 
-            // Section is disabled for now - can be added back later
-            // section.property: "directory"
-            // section.criteria: ViewSection.FullString
-            section.delegate: Component {
-                Item {
-                    width: listView.width
-                    height: 40
-                    visible: section !== ""
-
-                    Text {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: section
-                        font.pixelSize: 16
-                        font.weight: 700
-                        color: Theme.onSurfaceVariant(Material.theme)
-                        opacity: 0.7
-                    }
-                }
+            section.property: "directory"
+            section.criteria: ViewSection.FullString
+            section.delegate: ListSectionHeader {
+                sectionText: section
             }
 
             delegate: RecordItem {
@@ -285,12 +211,8 @@ Page {
     }
 
     // Empty state label
-    Text {
-        visible: recordsPage.modelWrapper.items.length === 0 && !searchField.text
-        text: qsTr("No records found")
-        font.pixelSize: 18
-        color: Theme.onSurfaceVariant(Material.theme)
-        anchors.centerIn: parent
-        opacity: 0.7
+    EmptyState {
+        showEmpty: recordsPage.modelWrapper.items.length === 0 && !searchActionBar.searchText
+        emptyMessage: qsTr("No records found")
     }
 }

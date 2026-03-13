@@ -12,7 +12,6 @@ Page {
     title: qsTr("Reference samples")
 
     property string path: "data/patterns"
-
     property var allFiles: []
 
     Component.onCompleted: {
@@ -61,22 +60,8 @@ Page {
 
             section.property: "directory"
             section.criteria: ViewSection.FullString
-            section.delegate: Component {
-                Item {
-                    width: listView.width
-                    height: 40
-
-                    Text {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: section
-                        font.pixelSize: 16
-                        font.weight: 700
-                        color: Theme.onSurfaceVariant(templatesPage.Material.theme)
-                        opacity: 0.7
-                    }
-                }
+            section.delegate: ListSectionHeader {
+                sectionText: section
             }
 
             delegate: ListItem {
@@ -93,5 +78,11 @@ Page {
                 }
             }
         }
+    }
+
+    // Empty state
+    EmptyState {
+        showEmpty: allFiles.length === 0 && !searchField.text
+        emptyMessage: qsTr("No templates found")
     }
 }

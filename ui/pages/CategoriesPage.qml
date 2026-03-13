@@ -84,4 +84,10 @@ Page {
             }
         }
     }
+
+    // Empty state
+    EmptyState {
+        showEmpty: allFolders.length === 0 && !searchField.text
+        emptyMessage: qsTr("No categories found")
+    }
 }

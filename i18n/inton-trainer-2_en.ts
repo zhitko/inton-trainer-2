@@ -8,6 +8,32 @@
         <source>Reference samples</source>
         <translation>Reference samples</translation>
     </message>
+    <message>
+        <location filename="../ui/pages/CategoriesPage.qml" line="91"/>
+        <source>No categories found</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfirmDialog</name>
+    <message>
+        <location filename="../ui/components/ConfirmDialog.qml" line="9"/>
+        <source>Yes</source>
+        <translation type="unfinished">Yes</translation>
+    </message>
+    <message>
+        <location filename="../ui/components/ConfirmDialog.qml" line="10"/>
+        <source>No</source>
+        <translation type="unfinished">No</translation>
+    </message>
+</context>
+<context>
+    <name>EmptyState</name>
+    <message>
+        <location filename="../ui/components/EmptyState.qml" line="8"/>
+        <source>No items found</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HomePage</name>
@@ -208,32 +234,32 @@
         <translation>Records</translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="110"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="119"/>
         <source>Delete All Records</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="122"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="120"/>
         <source>Are you sure you want to delete all records?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="130"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="121"/>
         <source>Yes</source>
         <translation type="unfinished">Yes</translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="135"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="122"/>
         <source>No</source>
         <translation type="unfinished">No</translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="188"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="151"/>
         <source>Delete All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/pages/RecordsPage.qml" line="290"/>
+        <location filename="../ui/pages/RecordsPage.qml" line="216"/>
         <source>No records found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -683,6 +709,11 @@ Check analysis settings (e.g. increase FFT length).</translation>
         <location filename="../ui/pages/TemplatesPage.qml" line="12"/>
         <source>Reference samples</source>
         <translation>Reference samples</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplatesPage.qml" line="86"/>
+        <source>No templates found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

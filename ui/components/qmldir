@@ -13,3 +13,7 @@ SearchBar SearchBar.qml
 StatBox StatBox.qml
 Chip Chip.qml
 RecordItem RecordItem.qml
+SearchActionBar SearchActionBar.qml
+ListSectionHeader ListSectionHeader.qml
+EmptyState EmptyState.qml
+ConfirmDialog ConfirmDialog.qml

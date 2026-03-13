@@ -115,7 +115,7 @@ ApplicationWindow {
                 }
 
                 Label {
-                    text: stackView.currentItem.title || qsTr("Inton Trainer")
+                    text: (stackView.currentItem && stackView.currentItem.title) ? stackView.currentItem.title : qsTr("Inton Trainer")
                     font.pixelSize: 22
                     font.weight: Font.Normal
                     Layout.fillWidth: true
