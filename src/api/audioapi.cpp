@@ -1,5 +1,6 @@
 #include "audioapi.h"
 #include "helpers/logger.h"
+#include "helpers/settings.h"
 #include <QBuffer>
 #include <QCoreApplication>
 #include <QDateTime>
@@ -105,8 +106,20 @@ void AudioApi::startRecording(int durationSeconds)
         return;
     }
 
+    // Load settings for auto-stop recording
+    AppSettings settings = Settings::loadSettings();
+    m_autoStopEnabled = settings.autoStopRecording;
+    m_silenceDurationMs = settings.autoStopSilenceDuration;
+    // Threshold will be calculated when voice is first detected
+    m_thresholdCalculated = false;
+    m_silenceThreshold = 0.05;  // Initial threshold to detect voice start
+
     m_buffer.clear();
     setAudioLevel(0.0);
+
+    // Reset silence tracking for auto-stop
+    m_silenceStartTime = 0;
+    m_voiceDetected = false;
 
     m_audioSource = std::make_unique<QAudioSource>(m_audioDevice, m_format, this);
     QIODevice* io = m_audioSource->start();
@@ -117,16 +130,49 @@ void AudioApi::startRecording(int durationSeconds)
         m_buffer.append(data);
 
         qint64 numSamples = data.size() / (m_format.bytesPerSample());
+        qint16 maxValue = 0;
         if (numSamples > 0) {
             const auto samples = reinterpret_cast<const qint16*>(data.constData());
-            qint16 maxValue = 0;
             for (qint64 i = 0; i < numSamples; ++i) {
                 if (std::abs(samples[i]) > maxValue) {
                     maxValue = std::abs(samples[i]);
                 }
             }
-            double level = maxValue / 4000.0;
-            setAudioLevel(level > 1.0 ? 1.0 : level);
+        }
+        double level = maxValue / 4000.0;
+        setAudioLevel(level > 1.0 ? 1.0 : level);
+
+        // Auto-stop recording logic using VAD
+        if (m_autoStopEnabled) {
+            // First, detect if voice starts (using low initial threshold to detect voice onset)
+            if (!m_voiceDetected && level >= 0.05) {
+                // Voice detected, calculate silence threshold based on voice level
+                m_voiceDetected = true;
+                m_silenceThreshold = level * 0.3;  // Silence is 30% of voice level
+                m_thresholdCalculated = true;
+                LOG_DEBUG() << "AutoStop: Voice detected, silence threshold set to:" << m_silenceThreshold;
+            }
+            // After voice detected, monitor for silence
+            else if (m_voiceDetected && m_thresholdCalculated) {
+                if (level < m_silenceThreshold) {
+                    // Silence detected
+                    if (m_silenceStartTime == 0) {
+                        // Start tracking silence
+                        m_silenceStartTime = QDateTime::currentMSecsSinceEpoch();
+                    } else {
+                        // Check if silence duration exceeded threshold
+                        qint64 silenceDuration = QDateTime::currentMSecsSinceEpoch() - m_silenceStartTime;
+                        if (silenceDuration >= m_silenceDurationMs) {
+                            LOG_DEBUG() << "AutoStop: silence detected for" << silenceDuration << "ms, stopping recording";
+                            stopRecording();
+                            return;
+                        }
+                    }
+                } else {
+                    // Voice/level is back above threshold, reset silence tracking
+                    m_silenceStartTime = 0;
+                }
+            }
         }
 
         if (durationSeconds > 0) {

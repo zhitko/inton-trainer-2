@@ -163,6 +163,29 @@ Page {
                             onToggled: if (settingsApi)
                                 settingsApi.showNavigationMenu = checked
                         }
+
+                        Label {
+                            text: qsTr("Auto Stop Recording")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.autoStopRecording : true
+                            onToggled: if (settingsApi)
+                                settingsApi.autoStopRecording = checked
+                        }
+
+                        Label {
+                            text: qsTr("Silence Duration (ms)")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.autoStopSilenceDuration.toString() : "2000"
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.autoStopSilenceDuration = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                        }
                     }
 
                     Button {

@@ -13,6 +13,23 @@ Page {
         id: audioApi
     }
 
+    // Handle auto-stop recording - when recording stops automatically
+    Connections {
+        target: audioApi
+        onRecordingFinished: {
+            // Auto-stop triggered - save the file
+            lastRecordedFile = audioApi.saveWavFile();
+            Logger.debug("Auto-stop: Recording finished automatically: " + lastRecordedFile);
+        }
+        onIsRecordingChanged: {
+            if (!audioApi.isRecording && lastRecordedFile === "") {
+                // Recording was stopped automatically (auto-stop), save the file
+                lastRecordedFile = audioApi.saveWavFile();
+                Logger.debug("Auto-stop: Recording finished automatically: " + lastRecordedFile);
+            }
+        }
+    }
+
     RoundButton {
         id: recordButton
         anchors.centerIn: parent

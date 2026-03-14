@@ -109,6 +109,44 @@ void SettingsApi::setShowNavigationMenu(bool showNavigationMenu)
     LOG_DEBUG() << "Finish: setShowNavigationMenu";
 }
 
+bool SettingsApi::autoStopRecording() const
+{
+    LOG_DEBUG() << "Start: autoStopRecording";
+    bool result = m_settings.autoStopRecording;
+    LOG_DEBUG() << "Finish: autoStopRecording - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAutoStopRecording(bool autoStopRecording)
+{
+    LOG_DEBUG() << "Start: setAutoStopRecording - autoStopRecording=" << autoStopRecording;
+    if (m_settings.autoStopRecording != autoStopRecording) {
+        m_settings.autoStopRecording = autoStopRecording;
+        save();
+        emit autoStopRecordingChanged();
+    }
+    LOG_DEBUG() << "Finish: setAutoStopRecording";
+}
+
+int SettingsApi::autoStopSilenceDuration() const
+{
+    LOG_DEBUG() << "Start: autoStopSilenceDuration";
+    int result = m_settings.autoStopSilenceDuration;
+    LOG_DEBUG() << "Finish: autoStopSilenceDuration - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAutoStopSilenceDuration(int autoStopSilenceDuration)
+{
+    LOG_DEBUG() << "Start: setAutoStopSilenceDuration - autoStopSilenceDuration=" << autoStopSilenceDuration;
+    if (m_settings.autoStopSilenceDuration != autoStopSilenceDuration) {
+        m_settings.autoStopSilenceDuration = autoStopSilenceDuration;
+        save();
+        emit autoStopSilenceDurationChanged();
+    }
+    LOG_DEBUG() << "Finish: setAutoStopSilenceDuration";
+}
+
 QString SettingsApi::algorithm() const
 {
     LOG_DEBUG() << "Start: algorithm";

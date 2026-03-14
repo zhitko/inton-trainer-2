@@ -22,6 +22,8 @@ class SettingsApi : public QObject {
     Q_PROPERTY(QString theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QString primaryColor READ primaryColor WRITE setPrimaryColor NOTIFY primaryColorChanged)
     Q_PROPERTY(bool showNavigationMenu READ showNavigationMenu WRITE setShowNavigationMenu NOTIFY showNavigationMenuChanged)
+    Q_PROPERTY(bool autoStopRecording READ autoStopRecording WRITE setAutoStopRecording NOTIFY autoStopRecordingChanged)
+    Q_PROPERTY(int autoStopSilenceDuration READ autoStopSilenceDuration WRITE setAutoStopSilenceDuration NOTIFY autoStopSilenceDurationChanged)
     Q_PROPERTY(QString algorithm READ algorithm WRITE setAlgorithm NOTIFY
             algorithmChanged)
     Q_PROPERTY(double frameShift READ frameShift WRITE setFrameShift NOTIFY
@@ -150,6 +152,12 @@ public:
 
     bool showNavigationMenu() const;
     void setShowNavigationMenu(bool showNavigationMenu);
+
+    bool autoStopRecording() const;
+    void setAutoStopRecording(bool autoStopRecording);
+
+    int autoStopSilenceDuration() const;
+    void setAutoStopSilenceDuration(int autoStopSilenceDuration);
 
     QString algorithm() const;
     void setAlgorithm(const QString& algorithm);
@@ -301,6 +309,8 @@ signals:
     void themeChanged();
     void primaryColorChanged();
     void showNavigationMenuChanged();
+    void autoStopRecordingChanged();
+    void autoStopSilenceDurationChanged();
     void algorithmChanged();
     void frameShiftChanged();
     void sampleRateChanged();

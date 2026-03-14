@@ -19,6 +19,25 @@ ColumnLayout {
         id: audioApi
     }
 
+    // Handle auto-stop recording - when recording stops automatically
+    Connections {
+        target: audioApi
+        onRecordingFinished: {
+            // Auto-stop triggered - save the file
+            root.filePath = audioApi.saveWavFile();
+            root.recordingFinished(root.filePath);
+            Logger.debug("Auto-stop: Recording finished automatically: " + root.filePath);
+        }
+        onIsRecordingChanged: {
+            if (!audioApi.isRecording && root.filePath === "") {
+                // Recording was stopped automatically (auto-stop), save the file
+                root.filePath = audioApi.saveWavFile();
+                root.recordingFinished(root.filePath);
+                Logger.debug("Auto-stop: Recording finished automatically: " + root.filePath);
+            }
+        }
+    }
+
     Item {
         id: buttonContainer
         Layout.alignment: Qt.AlignHCenter
@@ -77,8 +96,8 @@ ColumnLayout {
                         root.recordingFinished(root.filePath);
                         Logger.debug("Recording finished: " + root.filePath);
                     } else {
-                        audioApi.startRecording();
                         root.filePath = "";
+                        audioApi.startRecording();
                         Logger.debug("Recording started");
                     }
                     root.clicked();

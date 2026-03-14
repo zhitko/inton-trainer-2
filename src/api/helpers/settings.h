@@ -26,6 +26,10 @@ struct AppSettings {
     std::string primaryColor = "blue";
     // Show navigation menu in the UI
     bool showNavigationMenu = false;
+    // Auto stop recording when silence is detected
+    bool autoStopRecording = true;
+    // Duration of silence in ms before auto-stop triggers
+    int autoStopSilenceDuration = 2000;
 
     // == Pitch extraction settings ==
     // Show F0 contour in the UI

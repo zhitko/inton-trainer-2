@@ -39,6 +39,8 @@ Settings::loadSettings()
     settings.theme = qsettings.value("theme", "light").toString().toStdString();
     settings.primaryColor = qsettings.value("primaryColor", "blue").toString().toStdString();
     settings.showNavigationMenu = qsettings.value("showNavigationMenu", false).toBool();
+    settings.autoStopRecording = qsettings.value("autoStopRecording", true).toBool();
+    settings.autoStopSilenceDuration = qsettings.value("autoStopSilenceDuration", 2000).toInt();
     qsettings.endGroup();
 
     qsettings.beginGroup("Pitch");
@@ -120,6 +122,8 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("theme", QString::fromStdString(settings.theme));
     qsettings.setValue("primaryColor", QString::fromStdString(settings.primaryColor));
     qsettings.setValue("showNavigationMenu", settings.showNavigationMenu);
+    qsettings.setValue("autoStopRecording", settings.autoStopRecording);
+    qsettings.setValue("autoStopSilenceDuration", settings.autoStopSilenceDuration);
     qsettings.endGroup();
 
     qsettings.beginGroup("Pitch");

@@ -136,6 +136,13 @@ private:
      QMediaPlayer* m_player = nullptr;
      QAudioOutput* m_audioOutput = nullptr;
      bool m_isPlaying = false;
+
+    bool m_autoStopEnabled = false;
+    double m_silenceThreshold = 0.01;
+    int m_silenceDurationMs = 2000;
+    qint64 m_silenceStartTime = 0;
+    bool m_voiceDetected = false;
+    bool m_thresholdCalculated = false;  // Whether dynamic threshold has been calculated
 };
 
 #endif // AUDIOAPI_H

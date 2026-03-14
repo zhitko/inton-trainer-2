@@ -3,6 +3,22 @@
 #include <algorithm>
 #include <cmath>
 
+/*
+    * Calculate the Pearson correlation coefficient between two vectors.
+    * Returns a value between -1 and 1, where 1 means perfect positive correlation,
+    * -1 means perfect negative correlation, and 0 means no correlation.
+    *
+    * The function first checks if the input vectors are valid (non-empty and of the same size).
+    * It then calculates the mean of each vector, followed by the covariance and variances.
+    * Finally, it computes the Pearson correlation coefficient and clamps it to the range [-1, 1].
+    *
+    * Math formula:
+    * r = (Σ((x_i - mean_x) * (y_i - mean_y))) / (sqrt(Σ((x_i - mean_x)^2)) * sqrt(Σ((y_i - mean_y)^2)))
+    *
+    * @param vec1 The first input vector.
+    * @param vec2 The second input vector.
+    * @return The Pearson correlation coefficient between vec1 and vec2.
+*/
 double VectorUtils::pearsonCorrelation(const std::vector<double>& vec1,
     const std::vector<double>& vec2)
 {
