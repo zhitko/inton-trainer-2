@@ -107,6 +107,9 @@ class SettingsApi : public QObject {
     Q_PROPERTY(double dpSpectrumCoef READ dpSpectrumCoef WRITE setDpSpectrumCoef NOTIFY dpSpectrumCoefChanged)
     Q_PROPERTY(bool dpUseCepstrum READ dpUseCepstrum WRITE setDpUseCepstrum NOTIFY dpUseCepstrumChanged)
     Q_PROPERTY(double dpCepstrumCoef READ dpCepstrumCoef WRITE setDpCepstrumCoef NOTIFY dpCepstrumCoefChanged)
+    Q_PROPERTY(double dpMatchCoef READ dpMatchCoef WRITE setDpMatchCoef NOTIFY dpMatchCoefChanged)
+    Q_PROPERTY(double dpInsertionCoef READ dpInsertionCoef WRITE setDpInsertionCoef NOTIFY dpInsertionCoefChanged)
+    Q_PROPERTY(double dpDeletionCoef READ dpDeletionCoef WRITE setDpDeletionCoef NOTIFY dpDeletionCoefChanged)
 
 public:
     enum class SpecColorScheme { Viridis,
@@ -271,6 +274,12 @@ public:
     void setDpUseCepstrum(bool dpUseCepstrum);
     double dpCepstrumCoef() const;
     void setDpCepstrumCoef(double dpCepstrumCoef);
+    double dpMatchCoef() const;
+    void setDpMatchCoef(double dpMatchCoef);
+    double dpInsertionCoef() const;
+    void setDpInsertionCoef(double dpInsertionCoef);
+    double dpDeletionCoef() const;
+    void setDpDeletionCoef(double dpDeletionCoef);
 
     /**
      * Loads the settings from a file and updates the internal state of the
@@ -348,6 +357,9 @@ signals:
     void dpSpectrumCoefChanged();
     void dpUseCepstrumChanged();
     void dpCepstrumCoefChanged();
+    void dpMatchCoefChanged();
+    void dpInsertionCoefChanged();
+    void dpDeletionCoefChanged();
 
 private:
     AppSettings m_settings;

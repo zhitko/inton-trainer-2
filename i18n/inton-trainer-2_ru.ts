@@ -367,7 +367,7 @@
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="192"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="865"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="928"/>
         <source>Delete user data</source>
         <translation>Удалить пользовательские данные</translation>
     </message>
@@ -546,6 +546,9 @@
         <location filename="../ui/pages/SettingsPage.qml" line="798"/>
         <location filename="../ui/pages/SettingsPage.qml" line="822"/>
         <location filename="../ui/pages/SettingsPage.qml" line="846"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="869"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="890"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="911"/>
         <source>Coefficient</source>
         <translation>Коэффициент</translation>
     </message>
@@ -580,19 +583,34 @@
         <translation>Использовать кепстр</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="873"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="861"/>
+        <source>Match Coefficient</source>
+        <translation>Коэффициент совпадения</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="882"/>
+        <source>Insertion Coefficient</source>
+        <translation>Коэффициент вставки</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="903"/>
+        <source>Deletion Coefficient</source>
+        <translation>Коэффициент удаления</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="936"/>
         <source>This action will permanently delete all user statistics and user records.
 This cannot be undone. Are you sure?</source>
         <translation>Это действие безвозвратно удалит всю статистику и записи пользователя.
 Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="885"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="948"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="890"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="953"/>
         <source>No</source>
         <translation>Нет</translation>
     </message>

@@ -100,6 +100,9 @@ Settings::loadSettings()
     settings.dpSpectrumCoef = qsettings.value("dpSpectrumCoef", 1.0).toDouble();
     settings.dpUseCepstrum = qsettings.value("dpUseCepstrum", true).toBool();
     settings.dpCepstrumCoef = qsettings.value("dpCepstrumCoef", 1.0).toDouble();
+    settings.dpMatchCoef = qsettings.value("dpMatchCoef", 1.0).toDouble();
+    settings.dpInsertionCoef = qsettings.value("dpInsertionCoef", 1.0).toDouble();
+    settings.dpDeletionCoef = qsettings.value("dpDeletionCoef", 1.0).toDouble();
     qsettings.endGroup();
 
     return settings;
@@ -192,6 +195,9 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("dpSpectrumCoef", settings.dpSpectrumCoef);
     qsettings.setValue("dpUseCepstrum", settings.dpUseCepstrum);
     qsettings.setValue("dpCepstrumCoef", settings.dpCepstrumCoef);
+    qsettings.setValue("dpMatchCoef", settings.dpMatchCoef);
+    qsettings.setValue("dpInsertionCoef", settings.dpInsertionCoef);
+    qsettings.setValue("dpDeletionCoef", settings.dpDeletionCoef);
     qsettings.endGroup();
 
     qsettings.sync();

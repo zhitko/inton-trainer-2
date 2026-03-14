@@ -27,7 +27,10 @@ public:
      */
     CDTWService(std::vector<std::vector<std::vector<double>>> templateData,
         std::vector<std::vector<std::vector<double>>> signalData,
-        std::vector<double> streamWeights = {});
+        std::vector<double> streamWeights = {},
+        double matchCoef = 1.0,
+        double insertionCoef = 1.0,
+        double deletionCoef = 1.0);
     ~CDTWService();
 
     /**
@@ -122,6 +125,11 @@ private:
     std::vector<std::vector<std::vector<double>>> templateData;
     std::vector<std::vector<std::vector<double>>> signalData;
     std::vector<double> streamWeights;
+
+    // DP editing coefficients
+    double matchCoef;
+    double insertionCoef;
+    double deletionCoef;
 
     int bestStartIndex;
     int bestEndIndex;

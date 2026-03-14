@@ -10,10 +10,16 @@
 CDTWService::CDTWService(
     std::vector<std::vector<std::vector<double>>> templateData,
     std::vector<std::vector<std::vector<double>>> signalData,
-    std::vector<double> streamWeights)
+    std::vector<double> streamWeights,
+    double matchCoef,
+    double insertionCoef,
+    double deletionCoef)
     : templateData(templateData)
     , signalData(signalData)
     , streamWeights(streamWeights)
+    , matchCoef(matchCoef)
+    , insertionCoef(insertionCoef)
+    , deletionCoef(deletionCoef)
     , bestStartIndex(-1)
     , bestEndIndex(-1)
     , minFinalCost(std::numeric_limits<double>::infinity())
@@ -156,9 +162,9 @@ void CDTWService::compute()
         for (int j = 1; j <= m; ++j) {
             double cost = calculateDistance(j - 1, i - 1);
 
-            double match = prevRow[j - 1];
-            double insertion = prevRow[j];
-            double deletion = currRow[j - 1];
+            double match = prevRow[j - 1] * matchCoef;
+            double insertion = prevRow[j] * insertionCoef;
+            double deletion = currRow[j - 1] * deletionCoef;
 
             double minVal = match;
             int minStart = prevStart[j - 1];

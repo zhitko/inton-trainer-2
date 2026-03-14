@@ -1091,6 +1091,33 @@ void SettingsApi::setDpCepstrumCoef(double val)
         emit dpCepstrumCoefChanged();
     }
 }
+double SettingsApi::dpMatchCoef() const { return m_settings.dpMatchCoef; }
+void SettingsApi::setDpMatchCoef(double val)
+{
+    if (qAbs(m_settings.dpMatchCoef - val) > 0.0001) {
+        m_settings.dpMatchCoef = val;
+        save();
+        emit dpMatchCoefChanged();
+    }
+}
+double SettingsApi::dpInsertionCoef() const { return m_settings.dpInsertionCoef; }
+void SettingsApi::setDpInsertionCoef(double val)
+{
+    if (qAbs(m_settings.dpInsertionCoef - val) > 0.0001) {
+        m_settings.dpInsertionCoef = val;
+        save();
+        emit dpInsertionCoefChanged();
+    }
+}
+double SettingsApi::dpDeletionCoef() const { return m_settings.dpDeletionCoef; }
+void SettingsApi::setDpDeletionCoef(double val)
+{
+    if (qAbs(m_settings.dpDeletionCoef - val) > 0.0001) {
+        m_settings.dpDeletionCoef = val;
+        save();
+        emit dpDeletionCoefChanged();
+    }
+}
 
 void SettingsApi::updateTranslator()
 {

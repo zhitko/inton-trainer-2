@@ -366,7 +366,7 @@
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="192"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="865"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="928"/>
         <source>Delete user data</source>
         <translation>Delete user data</translation>
     </message>
@@ -545,6 +545,9 @@
         <location filename="../ui/pages/SettingsPage.qml" line="798"/>
         <location filename="../ui/pages/SettingsPage.qml" line="822"/>
         <location filename="../ui/pages/SettingsPage.qml" line="846"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="869"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="890"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="911"/>
         <source>Coefficient</source>
         <translation>Coefficient</translation>
     </message>
@@ -579,19 +582,34 @@
         <translation>Use Cepstrum</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="873"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="861"/>
+        <source>Match Coefficient</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="882"/>
+        <source>Insertion Coefficient</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="903"/>
+        <source>Deletion Coefficient</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="936"/>
         <source>This action will permanently delete all user statistics and user records.
 This cannot be undone. Are you sure?</source>
         <translation>This action will permanently delete all user statistics and user records.
 This cannot be undone. Are you sure?</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="885"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="948"/>
         <source>Yes</source>
         <translation>Yes</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="890"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="953"/>
         <source>No</source>
         <translation>No</translation>
     </message>

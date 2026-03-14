@@ -855,6 +855,69 @@ Page {
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.dpUseCepstrum : false
                         }
+
+                        // Match Coefficient
+                        Label {
+                            text: qsTr("Match Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Label {
+                            text: ""
+                            enabled: false
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.dpMatchCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpMatchCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                        }
+
+                        // Insertion Coefficient
+                        Label {
+                            text: qsTr("Insertion Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Label {
+                            text: ""
+                            enabled: false
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.dpInsertionCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpInsertionCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                        }
+
+                        // Deletion Coefficient
+                        Label {
+                            text: qsTr("Deletion Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Label {
+                            text: ""
+                            enabled: false
+                        }
+                        Label {
+                            text: qsTr("Coefficient")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.dpDeletionCoef.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dpDeletionCoef = parseFloat(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                        }
                     }
                 }
             }

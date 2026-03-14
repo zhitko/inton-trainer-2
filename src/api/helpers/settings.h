@@ -115,6 +115,11 @@ struct AppSettings {
     double dpSpectrumCoef = 1.0;
     bool dpUseCepstrum = true;
     double dpCepstrumCoef = 1.0;
+
+    // == DP editing coefficients ==
+    double dpMatchCoef = 1.0;
+    double dpInsertionCoef = 1.0;
+    double dpDeletionCoef = 1.0;
 };
 
 /*

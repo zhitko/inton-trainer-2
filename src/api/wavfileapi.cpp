@@ -208,7 +208,8 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
         cuePointsVec.push_back(cp);
     }
 
-    CDTWService cdtwService(patternData, signalData, weights);
+    CDTWService cdtwService(patternData, signalData, weights,
+        settings.dpMatchCoef, settings.dpInsertionCoef, settings.dpDeletionCoef);
     cdtwService.compute();
 
     std::vector<double> pitchTransformed = cdtwService.applyPathToVector(pitchVec, patternPitch.size());
