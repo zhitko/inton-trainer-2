@@ -138,9 +138,10 @@ private:
      bool m_isPlaying = false;
 
     bool m_autoStopEnabled = false;
-    double m_silenceThreshold = 0.01;
+    double m_silenceThreshold = 0;
     int m_silenceDurationMs = 2000;
     qint64 m_silenceStartTime = 0;
+    int m_silenceBufferSize = 0;  // Buffer size when silence started
     bool m_voiceDetected = false;
     bool m_thresholdCalculated = false;  // Whether dynamic threshold has been calculated
 };

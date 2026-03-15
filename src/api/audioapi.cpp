@@ -58,9 +58,7 @@ bool AudioApi::isPlaying() const
 
 qreal AudioApi::audioLevel() const
 {
-    LOG_DEBUG() << "Start: audioLevel";
     qreal result = m_audioLevel;
-    LOG_DEBUG() << "Finish: audioLevel - result=" << result;
     return result;
 }
 
@@ -88,14 +86,11 @@ void AudioApi::stopPlayback()
 
 void AudioApi::setAudioLevel(qreal level)
 {
-    LOG_DEBUG() << "Start: setAudioLevel - level=" << level;
     if (qFuzzyCompare(m_audioLevel, level)) {
-        LOG_DEBUG() << "Finish: setAudioLevel - No change";
         return;
     }
     m_audioLevel = level;
     emit isAudioLevelChanged();
-    LOG_DEBUG() << "Finish: setAudioLevel";
 }
 
 void AudioApi::startRecording(int durationSeconds)
@@ -112,13 +107,14 @@ void AudioApi::startRecording(int durationSeconds)
     m_silenceDurationMs = settings.autoStopSilenceDuration;
     // Threshold will be calculated when voice is first detected
     m_thresholdCalculated = false;
-    m_silenceThreshold = 0.05;  // Initial threshold to detect voice start
+    m_silenceThreshold = 0.0;  // Initial threshold to detect voice start
 
     m_buffer.clear();
     setAudioLevel(0.0);
 
     // Reset silence tracking for auto-stop
     m_silenceStartTime = 0;
+    m_silenceBufferSize = 0;
     m_voiceDetected = false;
 
     m_audioSource = std::make_unique<QAudioSource>(m_audioDevice, m_format, this);
@@ -127,7 +123,6 @@ void AudioApi::startRecording(int durationSeconds)
     connect(io, &QIODevice::readyRead, this, [this, io, durationSeconds]() {
         const qint64 len = m_audioSource->bytesAvailable();
         QByteArray data = io->read(len);
-        m_buffer.append(data);
 
         qint64 numSamples = data.size() / (m_format.bytesPerSample());
         qint16 maxValue = 0;
@@ -144,26 +139,40 @@ void AudioApi::startRecording(int durationSeconds)
 
         // Auto-stop recording logic using VAD
         if (m_autoStopEnabled) {
+            if (!m_voiceDetected && m_silenceThreshold == 0) {
+                m_silenceThreshold = maxValue * 1.5;  // Set initial threshold above detected level to find voice onset
+                LOG_DEBUG() << "AutoStop: Initial silence threshold=" << m_silenceThreshold;
+            }
             // First, detect if voice starts (using low initial threshold to detect voice onset)
-            if (!m_voiceDetected && level >= 0.05) {
+            if (!m_voiceDetected && maxValue >= 200) {
+                LOG_DEBUG() << "AutoStop: Before voice detected maxValue=" << maxValue << ", m_silenceThreshold=" << m_silenceThreshold;
                 // Voice detected, calculate silence threshold based on voice level
                 m_voiceDetected = true;
-                m_silenceThreshold = level * 0.3;  // Silence is 30% of voice level
+                m_silenceThreshold = maxValue * 0.5;  // Set threshold at 50% of detected voice level
                 m_thresholdCalculated = true;
                 LOG_DEBUG() << "AutoStop: Voice detected, silence threshold set to:" << m_silenceThreshold;
             }
             // After voice detected, monitor for silence
             else if (m_voiceDetected && m_thresholdCalculated) {
-                if (level < m_silenceThreshold) {
+                LOG_DEBUG() << "AutoStop: After voice detected maxValue=" << maxValue << ", m_silenceThreshold=" << m_silenceThreshold;
+                if (maxValue < m_silenceThreshold) {
                     // Silence detected
                     if (m_silenceStartTime == 0) {
                         // Start tracking silence
                         m_silenceStartTime = QDateTime::currentMSecsSinceEpoch();
+                        // Track the buffer size at the start of silence
+                        m_silenceBufferSize = m_buffer.size();
                     } else {
                         // Check if silence duration exceeded threshold
                         qint64 silenceDuration = QDateTime::currentMSecsSinceEpoch() - m_silenceStartTime;
                         if (silenceDuration >= m_silenceDurationMs) {
                             LOG_DEBUG() << "AutoStop: silence detected for" << silenceDuration << "ms, stopping recording";
+                            // Remove silence from buffer - keep only audio before silence
+                            if (m_silenceBufferSize > 0 && m_buffer.size() > m_silenceBufferSize) {
+                                int silenceBytesToRemove = m_buffer.size() - m_silenceBufferSize;
+                                m_buffer.remove(m_silenceBufferSize, silenceBytesToRemove);
+                                LOG_DEBUG() << "AutoStop: Removed" << silenceBytesToRemove << "bytes of silence from buffer";
+                            }
                             stopRecording();
                             return;
                         }
@@ -171,8 +180,14 @@ void AudioApi::startRecording(int durationSeconds)
                 } else {
                     // Voice/level is back above threshold, reset silence tracking
                     m_silenceStartTime = 0;
+                    m_silenceBufferSize = 0;
                 }
             }
+        }
+
+        if (!m_autoStopEnabled || m_voiceDetected) {
+            // If auto-stop is disabled or voice already detected, append data for saving
+            m_buffer.append(data);
         }
 
         if (durationSeconds > 0) {

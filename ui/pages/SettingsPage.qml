@@ -185,6 +185,7 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
                         }
                     }
 
