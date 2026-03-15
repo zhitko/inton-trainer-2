@@ -144,6 +144,8 @@ private:
     int m_silenceBufferSize = 0;  // Buffer size when silence started
     bool m_voiceDetected = false;
     bool m_thresholdCalculated = false;  // Whether dynamic threshold has been calculated
+    QByteArray m_preBuffer;              // Rolling pre-buffer to keep ~500ms before voice
+    static constexpr int PRE_BUFFER_MS = 500;  // Pre/post buffer duration in ms
 };
 
 #endif // AUDIOAPI_H
