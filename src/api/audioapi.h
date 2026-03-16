@@ -139,13 +139,36 @@ private:
 
     bool m_autoStopEnabled = false;
     double m_silenceThreshold = 0;
+    double m_noiseFloor = 0;             // Baseline noise level
+    double m_peakLevel = 0;              // Peak audio level during recording
     int m_silenceDurationMs = 2000;
     qint64 m_silenceStartTime = 0;
-    int m_silenceBufferSize = 0;  // Buffer size when silence started
+    int m_silenceBufferSize = 0;         // Buffer size when silence started
     bool m_voiceDetected = false;
     bool m_thresholdCalculated = false;  // Whether dynamic threshold has been calculated
     QByteArray m_preBuffer;              // Rolling pre-buffer to keep ~500ms before voice
     static constexpr int PRE_BUFFER_MS = 500;  // Pre/post buffer duration in ms
+    
+    // VAD (Voice Activity Detection) parameters
+    // VOICE_LEVEL_RATIO: Multiplier for silence threshold to detect voice
+    // Higher values make voice detection less sensitive (require louder sounds)
+    static constexpr double VOICE_LEVEL_RATIO = 2.5;
+    
+    // SILENCE_LEVEL_RATIO: Multiplier for silence threshold to detect silence
+    // Higher values make silence detection trigger at higher audio levels
+    static constexpr double SILENCE_LEVEL_RATIO = 3.0;
+    
+    // RELATIVE_SILENCE_RATIO: Ratio of current level to peak level to detect relative silence
+    // Lower values make relative silence detection more sensitive
+    static constexpr double RELATIVE_SILENCE_RATIO = 0.3;
+    
+    // CALIBRATION_FRAMES: Number of initial audio frames used to calibrate noise floor
+    // More frames give better calibration but delay voice detection start
+    static constexpr int CALIBRATION_FRAMES = 10;
+    
+    // Calibration tracking variables
+    int m_calibrationCounter = 0;        // Counter for calibration frames
+    double m_calibrationSum = 0;         // Sum for calculating average noise floor
 };
 
 #endif // AUDIOAPI_H
