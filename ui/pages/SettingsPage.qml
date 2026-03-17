@@ -11,6 +11,12 @@ Page {
 
     readonly property var settingsApi: ApplicationWindow.window ? ApplicationWindow.window.settingsApi : null
 
+    // Helper function to parse float values with support for both "." and "," as decimal separators
+    function parseDoubleValue(text) {
+        // Replace comma with dot and parse as float
+        return parseFloat(text.replace(",", "."));
+    }
+
     Material.theme: ApplicationWindow.window ? ApplicationWindow.window.theme : Material.Light
 
     ScrollView {
@@ -284,7 +290,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.frameShift.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.frameShift = parseFloat(text)
+                                settingsApi.frameShift = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -296,7 +302,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.sampleRate.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.sampleRate = parseFloat(text)
+                                settingsApi.sampleRate = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -308,7 +314,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.minF0.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.minF0 = parseFloat(text)
+                                settingsApi.minF0 = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -320,7 +326,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.maxF0.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.maxF0 = parseFloat(text)
+                                settingsApi.maxF0 = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -332,7 +338,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.voicingThreshold.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.voicingThreshold = parseFloat(text)
+                                settingsApi.voicingThreshold = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -395,7 +401,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.pitchGaussianSmoothingSigma.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.pitchGaussianSmoothingSigma = parseFloat(text)
+                                settingsApi.pitchGaussianSmoothingSigma = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             visible: settingsApi ? settingsApi.pitchSmoothing === 3 : false // Show only for Gaussian (3)
@@ -409,7 +415,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.pitchSplineSmoothingPenalty.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.pitchSplineSmoothingPenalty = parseFloat(text)
+                                settingsApi.pitchSplineSmoothingPenalty = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             visible: settingsApi ? settingsApi.pitchSmoothing === 4 : false // Show only for Spline (4)
@@ -529,7 +535,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.amplitudeGaussianSmoothingSigma.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.amplitudeGaussianSmoothingSigma = parseFloat(text)
+                                settingsApi.amplitudeGaussianSmoothingSigma = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             visible: settingsApi ? settingsApi.amplitudeSmoothing === 3 : false // Show only for Gaussian (3)
@@ -707,7 +713,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpPitchCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpPitchCoef = parseFloat(text)
+                                settingsApi.dpPitchCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.dpUsePitch : false
@@ -731,7 +737,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpPitchDerivativeCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpPitchDerivativeCoef = parseFloat(text)
+                                settingsApi.dpPitchDerivativeCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.dpUsePitchDerivative : false
@@ -755,7 +761,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpPitchLogCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpPitchLogCoef = parseFloat(text)
+                                settingsApi.dpPitchLogCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.dpUsePitchLog : false
@@ -779,7 +785,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpAmplitudeCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpAmplitudeCoef = parseFloat(text)
+                                settingsApi.dpAmplitudeCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.dpUseAmplitude : false
@@ -803,7 +809,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpAmplitudeDerivativeCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpAmplitudeDerivativeCoef = parseFloat(text)
+                                settingsApi.dpAmplitudeDerivativeCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.dpUseAmplitudeDerivative : false
@@ -827,7 +833,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpSpectrumCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpSpectrumCoef = parseFloat(text)
+                                settingsApi.dpSpectrumCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.dpUseSpectrum : false
@@ -851,7 +857,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpCepstrumCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpCepstrumCoef = parseFloat(text)
+                                settingsApi.dpCepstrumCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.dpUseCepstrum : false
@@ -873,7 +879,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpMatchCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpMatchCoef = parseFloat(text)
+                                settingsApi.dpMatchCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -894,7 +900,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpInsertionCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpInsertionCoef = parseFloat(text)
+                                settingsApi.dpInsertionCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -915,7 +921,7 @@ Page {
                         TextField {
                             text: settingsApi ? settingsApi.dpDeletionCoef.toString() : ""
                             onEditingFinished: if (settingsApi)
-                                settingsApi.dpDeletionCoef = parseFloat(text)
+                                settingsApi.dpDeletionCoef = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
