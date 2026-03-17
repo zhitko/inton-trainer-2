@@ -462,16 +462,18 @@ Page {
             // Advanced Button
             Button {
                 id: advancedButton
-                Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 200
-                Layout.preferredHeight: 48
+                Layout.alignment: Qt.AlignRight
+                Layout.preferredWidth: 128
+                Layout.preferredHeight: 36
+                Layout.rightMargin: 12
+                Layout.bottomMargin: 8
                 flat: false
 
                 contentItem: Text {
                     text: qsTr("Advanced")
-                    font.pixelSize: 16
-                    font.weight: 600
-                    color: advancedButton.down ? Qt.darker(Theme.onPrimary(root.Material.theme), 1.1) : Theme.onPrimary(root.Material.theme)
+                    font.pixelSize: 13
+                    font.weight: 500
+                    color: advancedButton.down ? Qt.darker(Theme.onSecondaryContainer(root.Material.theme), 1.1) : Theme.onSecondaryContainer(root.Material.theme)
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
@@ -483,15 +485,15 @@ Page {
                 }
 
                 background: Rectangle {
-                    radius: 24
+                    radius: 18
                     gradient: Gradient {
                         GradientStop {
                             position: 0.0
-                            color: advancedButton.hovered ? Qt.lighter(Theme.primary(root.Material.theme), 1.1) : Theme.primary(root.Material.theme)
+                            color: advancedButton.hovered ? Qt.lighter(Theme.primaryContainer(root.Material.theme), 1.08) : Theme.primaryContainer(root.Material.theme)
                         }
                         GradientStop {
                             position: 1.0
-                            color: advancedButton.hovered ? Theme.primary(root.Material.theme) : Qt.darker(Theme.primary(root.Material.theme), 1.2)
+                            color: advancedButton.hovered ? Theme.primaryContainer(root.Material.theme) : Qt.darker(Theme.primaryContainer(root.Material.theme), 1.08)
                         }
                     }
 
