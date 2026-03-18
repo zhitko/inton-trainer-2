@@ -456,6 +456,61 @@ Page {
                         }
                     }
 
+                    Column {
+                        spacing: 10
+                        visible: window.settingsApi.showProcessedPitch
+                        width: parent.width
+
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Reference Processed Pitch (F0)")
+                        }
+
+                        WaveFormGraph {
+                            id: refPitchProcessedWaveFormGraph
+
+                            height: 200
+                            width: parent.width - 80
+                        }
+                    }
+
+                    Column {
+                        spacing: 10
+                        visible: window.settingsApi.showLogPitch
+                        width: parent.width
+
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Reference Log Pitch (LOG_F0)")
+                        }
+
+                        WaveFormGraph {
+                            id: refLogPitchWaveFormGraph
+
+                            height: 200
+                            width: parent.width - 80
+                        }
+                    }
+
+                    Text {
+                        color: Theme.onSurface(root.Material.theme)
+                        font.bold: true
+                        font.pixelSize: 16
+                        text: qsTr("Reference UMP")
+                    }
+
+                    WaveFormGraph {
+                        id: refUmpWaveFormGraph
+
+                        height: 200
+                        width: parent.width - 80
+                        lineWidth: 5
+                    }
+
                     Text {
                         color: Theme.onSurface(root.Material.theme)
                         font.bold: true
@@ -508,28 +563,7 @@ Page {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
                             font.pixelSize: 16
-                            text: qsTr("Processed Pitch (F0)")
-                        }
-
-                        Text {
-                            color: Theme.onSurface(root.Material.theme)
-                            font.bold: true
-                            font.pixelSize: 14
-                            text: qsTr("Reference")
-                        }
-
-                        WaveFormGraph {
-                            id: refPitchProcessedWaveFormGraph
-
-                            height: 200
-                            width: parent.width - 80
-                        }
-
-                        Text {
-                            color: Theme.onSurface(root.Material.theme)
-                            font.bold: true
-                            font.pixelSize: 14
-                            text: qsTr("User")
+                            text: qsTr("User Processed Pitch (F0)")
                         }
 
                         WaveFormGraph {
@@ -549,28 +583,7 @@ Page {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
                             font.pixelSize: 16
-                            text: qsTr("Log Pitch (LOG_F0)")
-                        }
-
-                        Text {
-                            color: Theme.onSurface(root.Material.theme)
-                            font.bold: true
-                            font.pixelSize: 14
-                            text: qsTr("Reference")
-                        }
-
-                        WaveFormGraph {
-                            id: refLogPitchWaveFormGraph
-
-                            height: 200
-                            width: parent.width - 80
-                        }
-
-                        Text {
-                            color: Theme.onSurface(root.Material.theme)
-                            font.bold: true
-                            font.pixelSize: 14
-                            text: qsTr("User")
+                            text: qsTr("User Log Pitch (LOG_F0)")
                         }
 
                         WaveFormGraph {
@@ -585,29 +598,7 @@ Page {
                         color: Theme.onSurface(root.Material.theme)
                         font.bold: true
                         font.pixelSize: 16
-                        text: qsTr("UMP")
-                    }
-
-                    Text {
-                        color: Theme.onSurface(root.Material.theme)
-                        font.bold: true
-                        font.pixelSize: 14
-                        text: qsTr("Reference")
-                    }
-
-                    WaveFormGraph {
-                        id: refUmpWaveFormGraph
-
-                        height: 200
-                        width: parent.width - 80
-                        lineWidth: 5
-                    }
-
-                    Text {
-                        color: Theme.onSurface(root.Material.theme)
-                        font.bold: true
-                        font.pixelSize: 14
-                        text: qsTr("User")
+                        text: qsTr("User UMP")
                     }
 
                     WaveFormGraph {
