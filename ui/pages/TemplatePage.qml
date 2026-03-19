@@ -267,125 +267,18 @@ Page {
     }
 
     Connections {
-        function onAlgorithmChanged() {
-            updateData();
-        }
+        target: window.settingsApi
 
-        function onAmplitudeGaussianSmoothingSigmaChanged() {
-            updateData();
-        }
-
-        function onAmplitudeSmoothingChanged() {
-            updateData();
-        }
-
-        function onAmplitudeSmoothingWindowSizeChanged() {
-            updateData();
-        }
-
-        function onAmplitudeShiftChanged() {
-            updateData();
-        }
-
-        function onAmplitudeWindowChanged() {
-            updateData();
-        }
-
-        function onCepstrNumOrderChanged() {
-            updateData();
-        }
-
-        function onFrameShiftChanged() {
-            updateData();
-        }
-
-        function onMaxF0Changed() {
-            updateData();
-        }
-
-        function onMinF0Changed() {
-            updateData();
-        }
-
-        function onPitchGaussianSmoothingSigmaChanged() {
-            updateData();
-        }
-
-        function onPitchInterpolationTypeChanged() {
-            updateData();
-        }
-
-        function onPitchNormalizationChanged() {
-            updateData();
-        }
-
-        function onPitchSmoothingChanged() {
-            updateData();
-        }
-
-        function onPitchSmoothingWindowSizeChanged() {
-            updateData();
-        }
-
-        function onPitchSplineSmoothingPenaltyChanged() {
-            updateData();
-        }
-
-        function onSampleRateChanged() {
-            updateData();
-        }
-
-        function onShowAmplitudeChanged() {
-            updateData();
-        }
-
-        function onShowAmplitudeDerivativeChanged() {
-            updateData();
-        }
-
-        function onShowCepstrumChanged() {
-            updateData();
-        }
-
-        function onShowF0Changed() {
-            updateData();
-        }
-
-        function onShowLogPitchChanged() {
-            updateData();
-        }
-
-        function onShowProcessedPitchChanged() {
-            updateData();
-        }
-
-        function onShowSpectrumChanged() {
-            updateData();
-        }
-
-        function onSpecColorSchemeChanged() {
-            updateColorScheme();
-        }
-
-        function onSpecF0RefinementChanged() {
-            updateData();
-        }
-
-        function onSpecFftLengthChanged() {
-            updateData();
-        }
-
-        function onSpecUseLogScaleChanged() {
+        function onSettingsChanged() {
+            Logger.debug("TemplatePage onSettingsChanged: refreshing graphs");
+            root.updateData();
+            root.updateColorScheme();
             refSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
             userSpectrumGraph.useLogScale = window.settingsApi.specUseLogScale;
         }
-
-        function onVoicingThresholdChanged() {
-            updateData();
-        }
-
-        target: settingsApi
     }
+
+
 
     Button {
         anchors.right: parent.right

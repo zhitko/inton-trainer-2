@@ -334,6 +334,7 @@ void SettingsApi::load()
     emit dpSpectrumCoefChanged();
     emit dpUseCepstrumChanged();
     emit dpCepstrumCoefChanged();
+    emit settingsChanged();
     LOG_DEBUG() << "Finish: load";
 }
 
@@ -360,6 +361,7 @@ void SettingsApi::save()
 {
     LOG_DEBUG() << "Start: save";
     Settings::saveSettings(m_settings);
+    emit settingsChanged();
     LOG_DEBUG() << "Finish: save";
 }
 

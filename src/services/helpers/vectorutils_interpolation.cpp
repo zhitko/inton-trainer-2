@@ -94,9 +94,15 @@ VectorUtils::interpolationSplineLinear(const std::vector<double>& data,
     SplineData sd = prepareSplineVectors(data);
 
     if (sd.xVec.empty())
-        return std::vector<double>(targetLength, 0.0);
+        return data.size() == static_cast<size_t>(targetLength) ? data : std::vector<double>(targetLength, 0.0);
     if (sd.xVec.size() == 1) {
-        return std::vector<double>(targetLength, 0.0);
+        // Only one voiced frame: preserve it at its position, zeros elsewhere
+        std::vector<double> result(targetLength, 0.0);
+        double step = static_cast<double>(data.size() - 1) / (targetLength - 1);
+        int idx = static_cast<int>(std::round(sd.firstNonZeroIdx / step));
+        if (idx >= 0 && idx < targetLength)
+            result[idx] = sd.yVec[0];
+        return result;
     }
 
     alglib::real_1d_array x, y;
@@ -146,9 +152,9 @@ VectorUtils::interpolationSplineCubic(const std::vector<double>& data,
     SplineData sd = prepareSplineVectors(data);
 
     if (sd.xVec.empty())
-        return std::vector<double>(targetLength, 0.0);
+        return data.size() == static_cast<size_t>(targetLength) ? data : std::vector<double>(targetLength, 0.0);
     if (sd.xVec.size() == 1)
-        return std::vector<double>(targetLength, 0.0);
+        return interpolationSplineLinear(data, targetLength);
 
     alglib::real_1d_array x, y;
     x.setcontent(sd.xVec.size(), sd.xVec.data());
@@ -197,9 +203,9 @@ VectorUtils::interpolationSplineAkima(const std::vector<double>& data,
     SplineData sd = prepareSplineVectors(data);
 
     if (sd.xVec.empty())
-        return std::vector<double>(targetLength, 0.0);
+        return data.size() == static_cast<size_t>(targetLength) ? data : std::vector<double>(targetLength, 0.0);
     if (sd.xVec.size() == 1)
-        return std::vector<double>(targetLength, 0.0);
+        return interpolationSplineLinear(data, targetLength);
 
     alglib::real_1d_array x, y;
     x.setcontent(sd.xVec.size(), sd.xVec.data());
@@ -248,9 +254,9 @@ VectorUtils::interpolationSplineMonotone(const std::vector<double>& data,
     SplineData sd = prepareSplineVectors(data);
 
     if (sd.xVec.empty())
-        return std::vector<double>(targetLength, 0.0);
+        return data.size() == static_cast<size_t>(targetLength) ? data : std::vector<double>(targetLength, 0.0);
     if (sd.xVec.size() == 1)
-        return std::vector<double>(targetLength, 0.0);
+        return interpolationSplineLinear(data, targetLength);
 
     alglib::real_1d_array x, y;
     x.setcontent(sd.xVec.size(), sd.xVec.data());

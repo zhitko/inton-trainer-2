@@ -72,6 +72,10 @@ Item {
                         if (y > dMax)
                             dMax = y;
                     }
+
+                    dMin = dMin - (dMax - dMin) * 0.01;
+                    dMax = dMax + (dMax - dMin) * 0.01;
+
                     perMinY.push(dMin);
                     perMaxY.push(dMax);
                 } else {
@@ -80,6 +84,9 @@ Item {
                     perMaxY.push(0);
                 }
             }
+            
+            minY = minY - (maxY - minY) * 0.01;
+            maxY = maxY + (maxY - minY) * 0.01;
 
             Logger.debug("MinX: " + minX);
             Logger.debug("MaxX: " + maxX);

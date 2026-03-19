@@ -58,6 +58,15 @@ Page {
         loadPreviousResults();
     }
 
+    Connections {
+        target: window.settingsApi
+
+        function onSettingsChanged() {
+            Logger.debug("TrainingPage onSettingsChanged: refreshing reference UMP");
+            root.updateReferenceUMP();
+        }
+    }
+
     function loadPreviousResults() {
         let results = statisticsApi.getResultsForFile(root.referenceFilePath);
         if (results && results.length > 0) {

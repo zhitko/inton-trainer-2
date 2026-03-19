@@ -26,6 +26,12 @@ VectorUtils::smoothMovingAverage(const std::vector<double>& data,
     int hw = windowSize / 2;
 
     for (int i = 0; i < n; ++i) {
+        // Keep original value for zero (unvoiced) frames
+        if (std::abs(data[i]) <= std::numeric_limits<double>::epsilon()) {
+            result.push_back(0.0);
+            continue;
+        }
+
         double sum = 0.0;
         int count = 0;
         // Symmetric window around i, clipped to bounds
@@ -33,14 +39,17 @@ VectorUtils::smoothMovingAverage(const std::vector<double>& data,
         int end = std::min(n - 1, i + hw);
 
         for (int j = start; j <= end; ++j) {
-            sum += data[j];
-            count++;
+            // Skip zero (unvoiced) values to avoid pulling average toward zero
+            if (std::abs(data[j]) > std::numeric_limits<double>::epsilon()) {
+                sum += data[j];
+                count++;
+            }
         }
 
         if (count > 0) {
             result.push_back(sum / count);
         } else {
-            result.push_back(0.0);
+            result.push_back(data[i]);
         }
     }
 
@@ -67,16 +76,25 @@ std::vector<double> VectorUtils::smoothMedian(const std::vector<double>& data,
     windowRef.reserve(windowSize);
 
     for (int i = 0; i < n; ++i) {
+        // Keep original value for zero (unvoiced) frames
+        if (std::abs(data[i]) <= std::numeric_limits<double>::epsilon()) {
+            result.push_back(0.0);
+            continue;
+        }
+
         windowRef.clear();
         int start = std::max(0, i - hw);
         int end = std::min(n - 1, i + hw);
 
         for (int j = start; j <= end; ++j) {
-            windowRef.push_back(data[j]);
+            // Skip zero (unvoiced) values to avoid pulling median toward zero
+            if (std::abs(data[j]) > std::numeric_limits<double>::epsilon()) {
+                windowRef.push_back(data[j]);
+            }
         }
 
         if (windowRef.empty()) {
-            result.push_back(0.0);
+            result.push_back(data[i]);
             continue;
         }
 

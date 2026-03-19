@@ -303,6 +303,7 @@ public:
     Q_INVOKABLE void clearUserStatistics();
 
 signals:
+    void settingsChanged();
     void amplitudeWindowChanged();
     void amplitudeShiftChanged();
     void amplitudeSmoothingChanged();
