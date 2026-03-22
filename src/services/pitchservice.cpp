@@ -123,3 +123,33 @@ std::vector<double> PitchService::getPitchDerivative(
     LOG_DEBUG() << "Finish: getPitchDerivative - result.size=" << derivative.size();
     return derivative;
 }
+
+std::vector<double> PitchService::keepCuePointSectors(
+    const std::vector<double>& pitch,
+    const std::vector<CuePointData>& cuePoints,
+    double frameShift,
+    double sampleRate)
+{
+    LOG_DEBUG() << "Start: keepCuePointSectors - pitch.size=" << pitch.size()
+                << ", cuePoints.size=" << cuePoints.size();
+
+    std::vector<double> result(pitch.size(), 0.0);
+
+    // frameShift is in samples (same convention as getPitch uses internally)
+    // Frame i covers sample range [i * frameShift, (i+1) * frameShift)
+    for (size_t i = 0; i < pitch.size(); ++i) {
+        uint32_t frameSample = static_cast<uint32_t>(std::round(
+            static_cast<double>(i) * frameShift));
+
+        for (const CuePointData& cue : cuePoints) {
+            if (frameSample >= cue.position
+                && frameSample < cue.position + cue.length) {
+                result[i] = pitch[i];
+                break;
+            }
+        }
+    }
+
+    LOG_DEBUG() << "Finish: keepCuePointSectors - result.size=" << result.size();
+    return result;
+}

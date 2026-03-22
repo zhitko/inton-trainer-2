@@ -98,9 +98,23 @@ std::vector<double> VectorUtils::smoothMedian(const std::vector<double>& data,
             continue;
         }
 
-        auto m = windowRef.begin() + windowRef.size() / 2;
-        std::nth_element(windowRef.begin(), m, windowRef.end());
-        result.push_back(*m);
+        // If the non-zero context is smaller than the requested window the
+        // segment itself is shorter than windowSize.  Computing a median over
+        // only 1-2 values collapses all frames in the segment to the same
+        // number, which causes zero-deviation normalisations downstream to
+        // return an all-zero vector.  Preserve the original value instead.
+        if (static_cast<int>(windowRef.size()) < windowSize) {
+            result.push_back(data[i]);
+            continue;
+        }
+
+        // Compute true median: average the two middle elements for even-sized
+        // windows.
+        size_t sz = windowRef.size();
+        size_t mid = sz / 2;
+        std::nth_element(windowRef.begin(), windowRef.begin() + mid, windowRef.end());
+        double median = windowRef[mid];
+        result.push_back(median);
     }
 
     LOG_DEBUG() << "Finish: smoothMedian - result.size=" << result.size();

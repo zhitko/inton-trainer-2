@@ -4,18 +4,25 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <sstream>
 
 UMPResult UMPService::getUMP(const std::string& interpolationType,
     const std::vector<double>& pitch,
     const std::vector<CuePointData>& cuePoints,
     int pLength, int nLength, int tLength,
-    int waveDataSize)
+    int waveDataSize,
+    const std::string& smoothingType,
+    int smoothingWindowSize,
+    double smoothingGaussianSigma,
+    double smoothingSplinePenalty)
 {
     LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size()
                 << ", cuePoints.size=" << cuePoints.size()
                 << ", pLength=" << pLength << ", nLength=" << nLength
-                << ", tLength=" << tLength << ", waveDataSize=" << waveDataSize;
+                << ", tLength=" << tLength << ", waveDataSize=" << waveDataSize
+                << ", smoothingType=" << smoothingType
+                << ", smoothingWindowSize=" << smoothingWindowSize;
 
     std::vector<double> result;
 
@@ -172,7 +179,57 @@ UMPResult UMPService::getUMP(const std::string& interpolationType,
         cuePointIndex++;
     }
 
-    std::vector<double> interpolatedResult = VectorUtils::interpolate(interpolationType, result, result.size());
+    // Find segments with 0 values and replace them with interpolated values to avoid having long flat lines
+    // in the UMP which can be problematic for visualization and comparison. We can use linear interpolation for this.
+    std::vector<double> interpolatedResult = result;
+    {
+        const int sz = static_cast<int>(interpolatedResult.size());
+        int i = 0;
+        while (i < sz) {
+            if (std::abs(interpolatedResult[i]) <= std::numeric_limits<double>::epsilon()) {
+                // Find the end of this zero run
+                int zeroStart = i;
+                while (i < sz && std::abs(interpolatedResult[i]) <= std::numeric_limits<double>::epsilon()) {
+                    ++i;
+                }
+                int zeroEnd = i; // exclusive
+
+                // Determine boundary values
+                double leftVal  = (zeroStart > 0) ? interpolatedResult[zeroStart - 1] : interpolatedResult[zeroEnd];
+                double rightVal = (zeroEnd   < sz) ? interpolatedResult[zeroEnd]       : interpolatedResult[zeroStart - 1];
+
+                // If both boundaries are zero (no non-zero data on either side)
+                // leave the run as zeros — nothing to interpolate from.
+                if (std::abs(leftVal) <= std::numeric_limits<double>::epsilon()
+                    && std::abs(rightVal) <= std::numeric_limits<double>::epsilon()) {
+                    continue;
+                }
+
+                // Linear interpolation across the zero run
+                int runLen = zeroEnd - zeroStart;
+                for (int j = 0; j < runLen; ++j) {
+                    double t = static_cast<double>(j + 1) / static_cast<double>(runLen + 1);
+                    interpolatedResult[zeroStart + j] = leftVal + t * (rightVal - leftVal);
+                }
+            } else {
+                ++i;
+            }
+        }
+    }
+
+    // Apply smoothing as the final step
+    if (smoothingType != "None" && !interpolatedResult.empty()) {
+        double param1 = static_cast<double>(smoothingWindowSize);
+        double param2 = 0.0;
+        if (smoothingType == "Gaussian") {
+            param2 = smoothingGaussianSigma;
+        } else if (smoothingType == "Spline") {
+            param1 = smoothingSplinePenalty;
+        }
+        interpolatedResult = VectorUtils::smooth(smoothingType, interpolatedResult, param1, param2);
+        LOG_DEBUG() << "Applied UMP smoothing: type=" << smoothingType
+                    << ", result.size=" << interpolatedResult.size();
+    }
 
     LOG_DEBUG() << "Finish: getUMP - result.size=" << result.size();
     UMPResult out;

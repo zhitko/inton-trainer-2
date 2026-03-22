@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "wavfileservice.h"
+
 /**
  * PitchService provides methods for extracting pitch information from audio data
  * using various algorithms. It allows for configuring parameters such as frame
@@ -93,6 +95,29 @@ public:
         double sampleRate, double minF0, double maxF0,
         double voicingThreshold,
         PitchOutputFormat outputFormat);
+
+    /**
+     * Filters a pitch contour vector so that only frames falling within the
+     * sample ranges defined by the given CuePointData sectors are retained;
+     * all other frames are set to 0.0.
+     *
+     * Each CuePointData entry defines a sector as the half-open interval
+     * [position, position + length) in samples. A pitch frame at index i
+     * corresponds to the sample at round(i * frameShift * sampleRate / 1000).
+     *
+     * @param pitch       - The pitch contour vector to filter.
+     * @param cuePoints   - A vector of CuePointData defining the sectors to
+     *                      keep.
+     * @param frameShift  - The frame shift in milliseconds used when extracting
+     *                      the pitch contour.
+     * @param sampleRate  - The sample rate of the original audio in Hz.
+     * @return A new pitch vector of the same length as @p pitch where frames
+     *         outside every CuePointData sector are replaced with 0.0.
+     */
+    std::vector<double> keepCuePointSectors(const std::vector<double>& pitch,
+        const std::vector<CuePointData>& cuePoints,
+        double frameShift,
+        double sampleRate);
 };
 
 #endif // PITCHSERVICE_H

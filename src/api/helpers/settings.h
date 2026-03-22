@@ -38,6 +38,8 @@ struct AppSettings {
     bool showLogPitch = true;
     // Show processed pitch contour in the UI (after smoothing and interpolation)
     bool showProcessedPitch = true;
+    // Use only N frames from cue points (for pitch extraction)
+    bool useOnlyN = true;
     // Algorithm options: "RAPT", "SWIPE", "REAPER", "DIO", "Harvest",
     // "NumAlgorithm"
     std::string algorithm = "RAPT";
@@ -98,6 +100,16 @@ struct AppSettings {
     int amplitudeSmoothingWindowSize = 16;
     // Sigma for Gaussian smoothing
     double amplitudeGaussianSmoothingSigma = 1.0;
+
+    // == UMP settings ==
+    // Smoothing type options: "None", "MovingAverage", "Median", "Gaussian", "Spline"
+    std::string umpSmoothing = "None";
+    // Smoothing window size for moving average, median, and Gaussian smoothing
+    int umpSmoothingWindowSize = 5;
+    // Sigma for Gaussian smoothing
+    double umpGaussianSmoothingSigma = 1.0;
+    // Penalty for spline smoothing
+    double umpSplineSmoothingPenalty = 1.0;
 
     // == DP settings ==
     bool showDtwAlignment = true;

@@ -71,7 +71,11 @@ public:
         const std::vector<double>& pitch,
         const std::vector<CuePointData>& cuePoints,
         int pLength, int nLength, int tLength,
-        int waveDataSize);
+        int waveDataSize,
+        const std::string& smoothingType = "None",
+        int smoothingWindowSize = 5,
+        double smoothingGaussianSigma = 1.0,
+        double smoothingSplinePenalty = 1.0);
 
     /**
      * @brief Compares two UMP portraits and calculates similarity metrics.

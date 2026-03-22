@@ -52,6 +52,17 @@ class SettingsApi : public QObject {
             WRITE setPitchSplineSmoothingPenalty NOTIFY
                 pitchSplineSmoothingPenaltyChanged)
 
+    Q_PROPERTY(UmpSmoothingType umpSmoothing READ umpSmoothing WRITE
+            setUmpSmoothing NOTIFY umpSmoothingChanged)
+    Q_PROPERTY(int umpSmoothingWindowSize READ umpSmoothingWindowSize WRITE
+            setUmpSmoothingWindowSize NOTIFY umpSmoothingWindowSizeChanged)
+    Q_PROPERTY(double umpGaussianSmoothingSigma READ umpGaussianSmoothingSigma
+            WRITE setUmpGaussianSmoothingSigma NOTIFY
+                umpGaussianSmoothingSigmaChanged)
+    Q_PROPERTY(double umpSplineSmoothingPenalty READ umpSplineSmoothingPenalty
+            WRITE setUmpSplineSmoothingPenalty NOTIFY
+                umpSplineSmoothingPenaltyChanged)
+
     Q_PROPERTY(int specFftLength READ specFftLength WRITE setSpecFftLength NOTIFY
             specFftLengthChanged)
     Q_PROPERTY(bool specF0Refinement READ specF0Refinement WRITE
@@ -88,6 +99,7 @@ class SettingsApi : public QObject {
             showLogPitchChanged)
     Q_PROPERTY(bool showProcessedPitch READ showProcessedPitch WRITE
             setShowProcessedPitch NOTIFY showProcessedPitchChanged)
+    Q_PROPERTY(bool useOnlyN READ useOnlyN WRITE setUseOnlyN NOTIFY useOnlyNChanged)
 
     Q_PROPERTY(int cepstrNumOrder READ cepstrNumOrder WRITE setCepstrNumOrder
             NOTIFY cepstrNumOrderChanged)
@@ -139,6 +151,15 @@ public:
         Median,
         Gaussian };
     Q_ENUM(AmplitudeSmoothingType)
+
+    enum class UmpSmoothingType {
+        None,
+        MovingAverage,
+        Median,
+        Gaussian,
+        Spline
+    };
+    Q_ENUM(UmpSmoothingType)
     explicit SettingsApi(QObject* parent = nullptr);
 
     QString language() const;
@@ -198,6 +219,15 @@ public:
     double pitchSplineSmoothingPenalty() const;
     void setPitchSplineSmoothingPenalty(double pitchSplineSmoothingPenalty);
 
+    UmpSmoothingType umpSmoothing() const;
+    void setUmpSmoothing(UmpSmoothingType umpSmoothing);
+    int umpSmoothingWindowSize() const;
+    void setUmpSmoothingWindowSize(int umpSmoothingWindowSize);
+    double umpGaussianSmoothingSigma() const;
+    void setUmpGaussianSmoothingSigma(double umpGaussianSmoothingSigma);
+    double umpSplineSmoothingPenalty() const;
+    void setUmpSplineSmoothingPenalty(double umpSplineSmoothingPenalty);
+
     int specFftLength() const;
     void setSpecFftLength(int specFftLength);
 
@@ -228,6 +258,7 @@ public:
     bool showF0() const;
     bool showLogPitch() const;
     bool showProcessedPitch() const;
+    bool useOnlyN() const;
 
     void setAmplitudeWindow(int amplitudeWindow);
     void setAmplitudeShift(int amplitudeShift);
@@ -240,6 +271,7 @@ public:
     void setShowF0(bool showF0);
     void setShowLogPitch(bool showLogPitch);
     void setShowProcessedPitch(bool showProcessedPitch);
+    void setUseOnlyN(bool useOnlyN);
 
     void setCepstrNumOrder(int cepstrNumOrder);
 
@@ -314,6 +346,7 @@ signals:
     void showF0Changed();
     void showLogPitchChanged();
     void showProcessedPitchChanged();
+    void useOnlyNChanged();
     void languageChanged();
     void languageTitleChanged();
     void themeChanged();
@@ -334,6 +367,11 @@ signals:
     void pitchGaussianSmoothingSigmaChanged();
 
     void pitchSplineSmoothingPenaltyChanged();
+
+    void umpSmoothingChanged();
+    void umpSmoothingWindowSizeChanged();
+    void umpGaussianSmoothingSigmaChanged();
+    void umpSplineSmoothingPenaltyChanged();
 
     void specFftLengthChanged();
     void specF0RefinementChanged();

@@ -93,6 +93,7 @@ public slots:
      * smoothing (default is 10.0).
      * @param normalized - A boolean flag indicating whether to normalize the
      * output pitch data (default is true).
+     * @param useOnlyN - A boolean flag indicating whether to keep only N frames
      * @return A QVariantList containing the extracted pitch contour based on
      * the specified parameters.
      */
@@ -104,7 +105,8 @@ public slots:
         const QString& pitchSmoothing = "None",
         int pitchSmoothingWindowSize = 5,
         double pitchGaussianSmoothingSigma = 2.0,
-        double pitchSplineSmoothingPenalty = 10.0, bool normalized = true);
+        double pitchSplineSmoothingPenalty = 10.0, bool normalized = true,
+        bool useOnlyN = false);
 
     /**
      * Generates an UMP (Unified Musical Pattern) from the given pitch and cue
@@ -127,6 +129,10 @@ public slots:
         const QVariantList& cuePoints, int pLength,
         int nLength, int tLength, int waveDataSize,
         const QString& pitchInterpolationType,
+        const QString& umpSmoothing = "None",
+        int umpSmoothingWindowSize = 5,
+        double umpGaussianSmoothingSigma = 1.0,
+        double umpSplineSmoothingPenalty = 1.0,
         bool normalized = true);
     /**
      * Extracts the spectrum from the given WaveFile object using the specified

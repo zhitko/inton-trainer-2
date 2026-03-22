@@ -488,7 +488,7 @@ QVariantList WavFileApi::getPitch(
     const QString& outputFormat, const QString& normalizationMode,
     const QString& pitchInterpolationType, const QString& pitchSmoothing,
     int pitchSmoothingWindowSize, double pitchGaussianSmoothingSigma,
-    double pitchSplineSmoothingPenalty, bool normalized)
+    double pitchSplineSmoothingPenalty, bool normalized, bool useOnlyN)
 {
     LOG_DEBUG() << "Start: getPitch - algorithm=" << algorithm
                 << ", frameShift=" << frameShift << ", sampleRate=" << sampleRate
@@ -501,7 +501,8 @@ QVariantList WavFileApi::getPitch(
                 << ", smoothingWindow=" << pitchSmoothingWindowSize
                 << ", sigma=" << pitchGaussianSmoothingSigma
                 << ", penalty=" << pitchSplineSmoothingPenalty
-                << ", normalized=" << normalized;
+                << ", normalized=" << normalized
+                << ", useOnlyN=" << useOnlyN;
     QVariantList pitchData;
 
     if (!waveFile) {
@@ -558,6 +559,20 @@ QVariantList WavFileApi::getPitch(
             pitch, pitch.size());
     }
 
+    // Keep only NUCLEUS frames based on cue points (before smoothing)
+    if (useOnlyN) {
+        std::vector<CuePointData> allCuePoints = WavFileService::readCuePoints(waveFile);
+        std::vector<CuePointData> nucleusCuePoints;
+        for (const CuePointData& cp : allCuePoints) {
+            if (cp.type == CuePointType::NUCLEUS) {
+                nucleusCuePoints.push_back(cp);
+            }
+        }
+        if (!nucleusCuePoints.empty()) {
+            pitch = pitchService.keepCuePointSectors(pitch, nucleusCuePoints, frameShift, sampleRate);
+        }
+    }
+
     // Apply smoothing
     if (!pitch.empty() && pitchSmoothing != "None") {
         std::string smoothType = pitchSmoothing.toStdString();
@@ -610,6 +625,10 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
     const QVariantList& cuePoints, int pLength,
     int nLength, int tLength, int waveDataSize,
     const QString& pitchInterpolationType,
+    const QString& umpSmoothing,
+    int umpSmoothingWindowSize,
+    double umpGaussianSmoothingSigma,
+    double umpSplineSmoothingPenalty,
     bool normalized)
 {
     LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size()
@@ -617,6 +636,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
                 << ", pLength=" << pLength << ", nLength=" << nLength
                 << ", tLength=" << tLength << ", waveDataSize=" << waveDataSize
                 << ", interpolation=" << pitchInterpolationType
+                << ", umpSmoothing=" << umpSmoothing
                 << ", normalized=" << normalized;
 
     QVariantMap result;
@@ -655,7 +675,9 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
     // Call UMPService
     LOG_DEBUG() << "  Calling UMPService::getUMP...";
     UMPResult umpResult = UMPService::getUMP(pitchInterpolationType.toStdString(), pitchVec,
-        cuePointsVec, pLength, nLength, tLength, waveDataSize);
+        cuePointsVec, pLength, nLength, tLength, waveDataSize,
+        umpSmoothing.toStdString(), umpSmoothingWindowSize,
+        umpGaussianSmoothingSigma, umpSplineSmoothingPenalty);
     LOG_DEBUG() << "  UMP result size:" << umpResult.ump.size();
 
     // Convert result back to QVariantList (as QPointF for graph)

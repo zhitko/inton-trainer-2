@@ -314,6 +314,10 @@ void SettingsApi::load()
     emit showLogPitchChanged();
 
     emit pitchSplineSmoothingPenaltyChanged();
+    emit umpSmoothingChanged();
+    emit umpSmoothingWindowSizeChanged();
+    emit umpGaussianSmoothingSigmaChanged();
+    emit umpSplineSmoothingPenaltyChanged();
     emit specFftLengthChanged();
     emit specF0RefinementChanged();
     emit specUseLogScaleChanged();
@@ -697,6 +701,14 @@ bool SettingsApi::showProcessedPitch() const
     return result;
 }
 
+bool SettingsApi::useOnlyN() const
+{
+    LOG_DEBUG() << "Start: useOnlyN";
+    bool result = m_settings.useOnlyN;
+    LOG_DEBUG() << "Finish: useOnlyN - result=" << result;
+    return result;
+}
+
 void SettingsApi::setAmplitudeWindow(int amplitudeWindow)
 {
     LOG_DEBUG() << "Start: setAmplitudeWindow - amplitudeWindow="
@@ -777,6 +789,17 @@ void SettingsApi::setShowProcessedPitch(bool showProcessedPitch)
     LOG_DEBUG() << "Finish: setShowProcessedPitch";
 }
 
+void SettingsApi::setUseOnlyN(bool useOnlyN)
+{
+    LOG_DEBUG() << "Start: setUseOnlyN - useOnlyN=" << useOnlyN;
+    if (m_settings.useOnlyN != useOnlyN) {
+        m_settings.useOnlyN = useOnlyN;
+        save();
+        emit useOnlyNChanged();
+    }
+    LOG_DEBUG() << "Finish: setUseOnlyN";
+}
+
 void SettingsApi::setPitchGaussianSmoothingSigma(
     double pitchGaussianSmoothingSigma)
 {
@@ -811,6 +834,103 @@ void SettingsApi::setPitchSplineSmoothingPenalty(
         emit pitchSplineSmoothingPenaltyChanged();
     }
     LOG_DEBUG() << "Finish: setPitchSplineSmoothingPenalty";
+}
+
+SettingsApi::UmpSmoothingType SettingsApi::umpSmoothing() const
+{
+    LOG_DEBUG() << "Start: umpSmoothing";
+    UmpSmoothingType result = UmpSmoothingType::None;
+    std::string type = m_settings.umpSmoothing;
+    if (type == "MovingAverage")
+        result = UmpSmoothingType::MovingAverage;
+    else if (type == "Median")
+        result = UmpSmoothingType::Median;
+    else if (type == "Gaussian")
+        result = UmpSmoothingType::Gaussian;
+    else if (type == "Spline")
+        result = UmpSmoothingType::Spline;
+    LOG_DEBUG() << "Finish: umpSmoothing - result=" << static_cast<int>(result);
+    return result;
+}
+
+void SettingsApi::setUmpSmoothing(UmpSmoothingType umpSmoothing)
+{
+    LOG_DEBUG() << "Start: setUmpSmoothing - umpSmoothing="
+                << static_cast<int>(umpSmoothing);
+    std::string type;
+    switch (umpSmoothing) {
+    case UmpSmoothingType::MovingAverage: type = "MovingAverage"; break;
+    case UmpSmoothingType::Median:        type = "Median";        break;
+    case UmpSmoothingType::Gaussian:      type = "Gaussian";      break;
+    case UmpSmoothingType::Spline:        type = "Spline";        break;
+    default:                              type = "None";          break;
+    }
+    if (m_settings.umpSmoothing != type) {
+        m_settings.umpSmoothing = type;
+        save();
+        emit umpSmoothingChanged();
+    }
+    LOG_DEBUG() << "Finish: setUmpSmoothing";
+}
+
+int SettingsApi::umpSmoothingWindowSize() const
+{
+    LOG_DEBUG() << "Start: umpSmoothingWindowSize";
+    int result = m_settings.umpSmoothingWindowSize;
+    LOG_DEBUG() << "Finish: umpSmoothingWindowSize - result=" << result;
+    return result;
+}
+
+void SettingsApi::setUmpSmoothingWindowSize(int umpSmoothingWindowSize)
+{
+    LOG_DEBUG() << "Start: setUmpSmoothingWindowSize - umpSmoothingWindowSize="
+                << umpSmoothingWindowSize;
+    if (m_settings.umpSmoothingWindowSize != umpSmoothingWindowSize) {
+        m_settings.umpSmoothingWindowSize = umpSmoothingWindowSize;
+        save();
+        emit umpSmoothingWindowSizeChanged();
+    }
+    LOG_DEBUG() << "Finish: setUmpSmoothingWindowSize";
+}
+
+double SettingsApi::umpGaussianSmoothingSigma() const
+{
+    LOG_DEBUG() << "Start: umpGaussianSmoothingSigma";
+    double result = m_settings.umpGaussianSmoothingSigma;
+    LOG_DEBUG() << "Finish: umpGaussianSmoothingSigma - result=" << result;
+    return result;
+}
+
+void SettingsApi::setUmpGaussianSmoothingSigma(double umpGaussianSmoothingSigma)
+{
+    LOG_DEBUG() << "Start: setUmpGaussianSmoothingSigma - umpGaussianSmoothingSigma="
+                << umpGaussianSmoothingSigma;
+    if (m_settings.umpGaussianSmoothingSigma != umpGaussianSmoothingSigma) {
+        m_settings.umpGaussianSmoothingSigma = umpGaussianSmoothingSigma;
+        save();
+        emit umpGaussianSmoothingSigmaChanged();
+    }
+    LOG_DEBUG() << "Finish: setUmpGaussianSmoothingSigma";
+}
+
+double SettingsApi::umpSplineSmoothingPenalty() const
+{
+    LOG_DEBUG() << "Start: umpSplineSmoothingPenalty";
+    double result = m_settings.umpSplineSmoothingPenalty;
+    LOG_DEBUG() << "Finish: umpSplineSmoothingPenalty - result=" << result;
+    return result;
+}
+
+void SettingsApi::setUmpSplineSmoothingPenalty(double umpSplineSmoothingPenalty)
+{
+    LOG_DEBUG() << "Start: setUmpSplineSmoothingPenalty - umpSplineSmoothingPenalty="
+                << umpSplineSmoothingPenalty;
+    if (m_settings.umpSplineSmoothingPenalty != umpSplineSmoothingPenalty) {
+        m_settings.umpSplineSmoothingPenalty = umpSplineSmoothingPenalty;
+        save();
+        emit umpSplineSmoothingPenaltyChanged();
+    }
+    LOG_DEBUG() << "Finish: setUmpSplineSmoothingPenalty";
 }
 
 int SettingsApi::specFftLength() const

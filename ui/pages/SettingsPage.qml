@@ -272,6 +272,16 @@ Page {
                         }
 
                         Label {
+                            text: qsTr("Use Only N")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.useOnlyN : true
+                            onToggled: if (settingsApi)
+                                settingsApi.useOnlyN = checked
+                        }
+
+                        Label {
                             text: qsTr("Algorithm")
                             color: Theme.onSurface(Material.theme)
                         }
@@ -419,6 +429,93 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             visible: settingsApi ? settingsApi.pitchSmoothing === 4 : false // Show only for Spline (4)
+                        }
+                    }
+                }
+            }
+
+            Frame {
+                Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
+                Layout.bottomMargin: 20
+
+                background: Rectangle {
+                    color: Theme.surfaceContainerLow(Material.theme)
+                    radius: 16
+                }
+
+                ColumnLayout {
+                    width: parent.width
+                    spacing: 10
+
+                    Label {
+                        text: qsTr("UMP")
+                        font.bold: true
+                        font.pixelSize: 20
+                        color: Theme.primary(Material.theme)
+                        Layout.fillWidth: true
+                    }
+
+                    GridLayout {
+                        columns: 2
+                        columnSpacing: 20
+                        rowSpacing: 10
+                        Layout.fillWidth: true
+
+                        Label {
+                            text: qsTr("Smoothing")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        ComboBox {
+                            model: ["None", "MovingAverage", "Median", "Gaussian", "Spline"]
+                            currentIndex: settingsApi ? settingsApi.umpSmoothing : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.umpSmoothing = currentIndex
+                            Layout.fillWidth: true
+                        }
+
+                        Label {
+                            text: qsTr("Smoothing Window Size")
+                            color: Theme.onSurface(Material.theme)
+                            visible: settingsApi ? settingsApi.umpSmoothing !== 0 && settingsApi.umpSmoothing !== 4 : false
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.umpSmoothingWindowSize.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.umpSmoothingWindowSize = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            visible: settingsApi ? settingsApi.umpSmoothing !== 0 && settingsApi.umpSmoothing !== 4 : false
+                        }
+
+                        Label {
+                            text: qsTr("Gaussian Sigma")
+                            color: Theme.onSurface(Material.theme)
+                            visible: settingsApi ? settingsApi.umpSmoothing === 3 : false
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.umpGaussianSmoothingSigma.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.umpGaussianSmoothingSigma = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: settingsApi ? settingsApi.umpSmoothing === 3 : false
+                        }
+
+                        Label {
+                            text: qsTr("Spline Penalty")
+                            color: Theme.onSurface(Material.theme)
+                            visible: settingsApi ? settingsApi.umpSmoothing === 4 : false
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.umpSplineSmoothingPenalty.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.umpSplineSmoothingPenalty = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: settingsApi ? settingsApi.umpSmoothing === 4 : false
                         }
                     }
                 }

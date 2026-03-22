@@ -61,6 +61,13 @@ Settings::loadSettings()
     settings.pitchSplineSmoothingPenalty = qsettings.value("pitchSplineSmoothingPenalty", 10.0).toDouble();
     qsettings.endGroup();
 
+    qsettings.beginGroup("UMP");
+    settings.umpSmoothing = qsettings.value("umpSmoothing", "None").toString().toStdString();
+    settings.umpSmoothingWindowSize = qsettings.value("umpSmoothingWindowSize", 5).toInt();
+    settings.umpGaussianSmoothingSigma = qsettings.value("umpGaussianSmoothingSigma", 1.0).toDouble();
+    settings.umpSplineSmoothingPenalty = qsettings.value("umpSplineSmoothingPenalty", 1.0).toDouble();
+    qsettings.endGroup();
+
     // Amplitude settings
     qsettings.beginGroup("Amplitude");
     settings.amplitudeWindow = qsettings.value("window", 1024).toInt();
@@ -73,6 +80,7 @@ Settings::loadSettings()
     settings.showF0 = qsettings.value("showF0", true).toBool();
     settings.showLogPitch = qsettings.value("showLogPitch", true).toBool();
     settings.showProcessedPitch = qsettings.value("showProcessedPitch", true).toBool();
+    settings.useOnlyN = qsettings.value("useOnlyN", true).toBool();
     qsettings.endGroup();
 
     qsettings.beginGroup("Spectrum");
@@ -151,6 +159,14 @@ void Settings::saveSettings(const AppSettings& settings)
         settings.pitchSplineSmoothingPenalty);
     qsettings.endGroup();
 
+    qsettings.beginGroup("UMP");
+    qsettings.setValue("umpSmoothing",
+        QString::fromStdString(settings.umpSmoothing));
+    qsettings.setValue("umpSmoothingWindowSize", settings.umpSmoothingWindowSize);
+    qsettings.setValue("umpGaussianSmoothingSigma", settings.umpGaussianSmoothingSigma);
+    qsettings.setValue("umpSplineSmoothingPenalty", settings.umpSplineSmoothingPenalty);
+    qsettings.endGroup();
+
     // Amplitude settings
     qsettings.beginGroup("Amplitude");
     qsettings.setValue("window", settings.amplitudeWindow);
@@ -167,6 +183,7 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("showF0", settings.showF0);
     qsettings.setValue("showLogPitch", settings.showLogPitch);
     qsettings.setValue("showProcessedPitch", settings.showProcessedPitch);
+    qsettings.setValue("useOnlyN", settings.useOnlyN);
     qsettings.endGroup();
 
     qsettings.beginGroup("Spectrum");
