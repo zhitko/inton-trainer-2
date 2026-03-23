@@ -143,12 +143,42 @@ Page {
         userPitchWaveFormGraph.waveData = [pitchOriginalData];
 
         Logger.debug("Extracting pitch data with algorithm: " + window.settingsApi.algorithm);
-        let pitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "PITCH", window.settingsApi.pitchNormalization, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], window.settingsApi.pitchSmoothingWindowSize, window.settingsApi.pitchGaussianSmoothingSigma, window.settingsApi.pitchSplineSmoothingPenalty);
+        let pitchData = wavFileApi.getPitch(
+            userWavFileHandle, 
+            window.settingsApi.algorithm, 
+            window.settingsApi.frameShift, 
+            window.settingsApi.sampleRate, 
+            window.settingsApi.minF0, 
+            window.settingsApi.maxF0, 
+            window.settingsApi.voicingThreshold, 
+            "PITCH", 
+            window.settingsApi.pitchNormalization, 
+            ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], 
+            ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], 
+            window.settingsApi.pitchSmoothingWindowSize, 
+            window.settingsApi.pitchGaussianSmoothingSigma, 
+            window.settingsApi.pitchSplineSmoothingPenalty
+        );
         Logger.debug("Pitch data length: " + pitchData.length);
         userPitchProcessedWaveFormGraph.waveData = [pitchData];
 
         Logger.debug("Extracting log pitch data with algorithm: " + window.settingsApi.algorithm);
-        logPitchData = wavFileApi.getPitch(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0", "LOG_F0", "None", "None", 0, 0, 0);
+        logPitchData = wavFileApi.getPitch(
+            userWavFileHandle, 
+            window.settingsApi.algorithm, 
+            window.settingsApi.frameShift, 
+            window.settingsApi.sampleRate, 
+            window.settingsApi.minF0, 
+            window.settingsApi.maxF0, 
+            window.settingsApi.voicingThreshold, 
+            "LOG_F0", 
+            "None", 
+            "None", 
+            "None", 
+            0, 
+            0, 
+            0
+        );
         Logger.debug("Log pitch data length: " + logPitchData.length);
         userLogPitchWaveFormGraph.waveData = [logPitchData];
 

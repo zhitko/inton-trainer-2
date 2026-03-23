@@ -172,9 +172,7 @@ Page {
             ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], 
             window.settingsApi.pitchSmoothingWindowSize, 
             window.settingsApi.pitchGaussianSmoothingSigma, 
-            window.settingsApi.pitchSplineSmoothingPenalty, 
-            false, 
-            false
+            window.settingsApi.pitchSplineSmoothingPenalty
         );
         Logger.debug("Pitch data frames: " + pitchData.length);
         let logPitchData = wavFileApi.getPitch(
@@ -188,11 +186,10 @@ Page {
             "LOG_F0", 
             "None", 
             "None", 
+            "None", 
             0, 
             0, 
-            0, 
-            false, 
-            false
+            0
         );
         Logger.debug("Log pitch data frames: " + logPitchData.length);
 
