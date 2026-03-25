@@ -62,6 +62,7 @@ Settings::loadSettings()
     qsettings.endGroup();
 
     qsettings.beginGroup("UMP");
+    settings.showUMP = qsettings.value("showUMP", true).toBool();
     settings.umpSmoothing = qsettings.value("umpSmoothing", "None").toString().toStdString();
     settings.umpSmoothingWindowSize = qsettings.value("umpSmoothingWindowSize", 5).toInt();
     settings.umpGaussianSmoothingSigma = qsettings.value("umpGaussianSmoothingSigma", 1.0).toDouble();
@@ -160,6 +161,7 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.endGroup();
 
     qsettings.beginGroup("UMP");
+    qsettings.setValue("showUMP", settings.showUMP);
     qsettings.setValue("umpSmoothing",
         QString::fromStdString(settings.umpSmoothing));
     qsettings.setValue("umpSmoothingWindowSize", settings.umpSmoothingWindowSize);

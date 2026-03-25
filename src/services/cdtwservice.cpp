@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "helpers/logger.h"
+#include "helpers/vectorutils.h"
 
 CDTWService::CDTWService(
     std::vector<std::vector<std::vector<double>>> templateData,
@@ -58,15 +59,10 @@ CDTWService::scaleStream(const std::vector<std::vector<double>>& stream,
         return stream;
     }
 
-    std::vector<std::vector<double>> transformed(targetLength);
-    double scalingFactor = static_cast<double>(stream.size()) / targetLength;
-    for (size_t i = 0; i < targetLength; ++i) {
-        size_t inputIndex = static_cast<size_t>(i * scalingFactor);
-        if (inputIndex < stream.size()) {
-            transformed[i] = stream[inputIndex];
-        } else {
-            transformed[i] = stream.back();
-        }
+    std::vector<std::vector<double>> transformed;
+    transformed.reserve(stream.size());
+    for (const auto& frame : stream) {
+        transformed.push_back(VectorUtils::linearInterpolation(frame, static_cast<int>(targetLength)));
     }
     return transformed;
 }
@@ -99,30 +95,31 @@ double CDTWService::calculateDistance(const std::vector<double>& vec1,
         return 0.0;
     }
 
-    // Get the maximum dimension to normalize
     size_t maxDim = std::max(vec1.size(), vec2.size());
-
-    double distance = 0.0;
     size_t minDim = std::min(vec1.size(), vec2.size());
 
-    // Calculate distance for common dimensions
+    // Accumulate in long double to reduce risk of intermediate overflow
+    // when vectors are large or contain large values
+    long double distance = 0.0L;
+
+    // Calculate squared distance for common dimensions
     for (size_t i = 0; i < minDim; ++i) {
-        double diff = vec1[i] - vec2[i];
+        long double diff = static_cast<long double>(vec1[i]) - static_cast<long double>(vec2[i]);
         distance += diff * diff;
     }
 
     // Add penalty for mismatched dimensions (if any)
     for (size_t i = minDim; i < maxDim; ++i) {
-        double val = (i < vec1.size()) ? vec1[i] : vec2[i];
+        long double val = static_cast<long double>((i < vec1.size()) ? vec1[i] : vec2[i]);
         distance += val * val;
     }
 
-    // Apply normalization coefficient based on dimension
-    // Normalize by maximum dimension to make distances comparable
+    // Normalize by sqrt(maxDim) so distance is independent of vector length
+    // and stays in a bounded range regardless of dimensionality
     double normalizationCoeff = 1.0 / std::sqrt(static_cast<double>(maxDim));
-    distance = std::sqrt(distance) * normalizationCoeff;
+    double result = static_cast<double>(std::sqrt(distance)) * normalizationCoeff;
 
-    return distance;
+    return result;
 }
 
 void CDTWService::compute()

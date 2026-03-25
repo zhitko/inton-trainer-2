@@ -318,6 +318,7 @@ void SettingsApi::load()
     emit umpSmoothingWindowSizeChanged();
     emit umpGaussianSmoothingSigmaChanged();
     emit umpSplineSmoothingPenaltyChanged();
+    emit showUMPChanged();
     emit specFftLengthChanged();
     emit specF0RefinementChanged();
     emit specUseLogScaleChanged();
@@ -931,6 +932,25 @@ void SettingsApi::setUmpSplineSmoothingPenalty(double umpSplineSmoothingPenalty)
         emit umpSplineSmoothingPenaltyChanged();
     }
     LOG_DEBUG() << "Finish: setUmpSplineSmoothingPenalty";
+}
+
+bool SettingsApi::showUMP() const
+{
+    LOG_DEBUG() << "Start: showUMP";
+    bool result = m_settings.showUMP;
+    LOG_DEBUG() << "Finish: showUMP - result=" << result;
+    return result;
+}
+
+void SettingsApi::setShowUMP(bool showUMP)
+{
+    LOG_DEBUG() << "Start: setShowUMP - showUMP=" << showUMP;
+    if (m_settings.showUMP != showUMP) {
+        m_settings.showUMP = showUMP;
+        save();
+        emit showUMPChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowUMP";
 }
 
 int SettingsApi::specFftLength() const

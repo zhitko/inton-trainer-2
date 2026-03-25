@@ -10,7 +10,7 @@
 
 std::vector<double>
 VectorUtils::smoothMovingAverage(const std::vector<double>& data,
-    int windowSize)
+    int windowSize, bool skipZeros)
 {
     LOG_DEBUG() << "Start: smoothMovingAverage - data.size=" << data.size()
                 << ", windowSize=" << windowSize;
@@ -27,7 +27,7 @@ VectorUtils::smoothMovingAverage(const std::vector<double>& data,
 
     for (int i = 0; i < n; ++i) {
         // Keep original value for zero (unvoiced) frames
-        if (std::abs(data[i]) <= std::numeric_limits<double>::epsilon()) {
+        if (skipZeros && std::abs(data[i]) <= std::numeric_limits<double>::epsilon()) {
             result.push_back(0.0);
             continue;
         }
@@ -40,7 +40,7 @@ VectorUtils::smoothMovingAverage(const std::vector<double>& data,
 
         for (int j = start; j <= end; ++j) {
             // Skip zero (unvoiced) values to avoid pulling average toward zero
-            if (std::abs(data[j]) > std::numeric_limits<double>::epsilon()) {
+            if (!skipZeros || std::abs(data[j]) > std::numeric_limits<double>::epsilon()) {
                 sum += data[j];
                 count++;
             }
@@ -58,7 +58,7 @@ VectorUtils::smoothMovingAverage(const std::vector<double>& data,
 }
 
 std::vector<double> VectorUtils::smoothMedian(const std::vector<double>& data,
-    int windowSize)
+    int windowSize, bool skipZeros)
 {
     LOG_DEBUG() << "Start: smoothMedian - data.size=" << data.size()
                 << ", windowSize=" << windowSize;
@@ -77,7 +77,7 @@ std::vector<double> VectorUtils::smoothMedian(const std::vector<double>& data,
 
     for (int i = 0; i < n; ++i) {
         // Keep original value for zero (unvoiced) frames
-        if (std::abs(data[i]) <= std::numeric_limits<double>::epsilon()) {
+        if (skipZeros && std::abs(data[i]) <= std::numeric_limits<double>::epsilon()) {
             result.push_back(0.0);
             continue;
         }
@@ -88,7 +88,7 @@ std::vector<double> VectorUtils::smoothMedian(const std::vector<double>& data,
 
         for (int j = start; j <= end; ++j) {
             // Skip zero (unvoiced) values to avoid pulling median toward zero
-            if (std::abs(data[j]) > std::numeric_limits<double>::epsilon()) {
+            if (!skipZeros || std::abs(data[j]) > std::numeric_limits<double>::epsilon()) {
                 windowRef.push_back(data[j]);
             }
         }
@@ -122,10 +122,11 @@ std::vector<double> VectorUtils::smoothMedian(const std::vector<double>& data,
 }
 
 std::vector<double> VectorUtils::smoothGaussian(const std::vector<double>& data,
-    int windowSize, double sigma)
+    int windowSize, double sigma, bool skipZeros)
 {
     LOG_DEBUG() << "Start: smoothGaussian - data.size=" << data.size()
-                << ", windowSize=" << windowSize << ", sigma=" << sigma;
+                << ", windowSize=" << windowSize << ", sigma=" << sigma
+                << ", skipZeros=" << skipZeros;
 
     if (data.empty())
         return {};
@@ -155,6 +156,12 @@ std::vector<double> VectorUtils::smoothGaussian(const std::vector<double>& data,
     result.reserve(n);
 
     for (int i = 0; i < n; ++i) {
+        // Keep original value for zero (unvoiced) frames
+        if (skipZeros && std::abs(data[i]) <= std::numeric_limits<double>::epsilon()) {
+            result.push_back(0.0);
+            continue;
+        }
+
         double sum = 0.0;
         double sumWeights = 0.0;
 
@@ -164,8 +171,11 @@ std::vector<double> VectorUtils::smoothGaussian(const std::vector<double>& data,
             // To handle edges properly with normalized kernel, we only sum weights of
             // valid neighbors and re-normalize.
             if (idx >= 0 && idx < n) {
-                sum += data[idx] * kernel[k];
-                sumWeights += kernel[k];
+                // Skip zero (unvoiced) values to avoid pulling average toward zero
+                if (!skipZeros || std::abs(data[idx]) > std::numeric_limits<double>::epsilon()) {
+                    sum += data[idx] * kernel[k];
+                    sumWeights += kernel[k];
+                }
             }
         }
 

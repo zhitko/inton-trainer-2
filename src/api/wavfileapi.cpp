@@ -560,7 +560,7 @@ QVariantList WavFileApi::getPitch(
     }
 
     // Keep only NUCLEUS frames based on cue points (before smoothing)
-    if (useOnlyN) {
+    if (useOnlyN && format != PitchOutputFormat::LOG_F0) {
         std::vector<CuePointData> allCuePoints = WavFileService::readCuePoints(waveFile);
         std::vector<CuePointData> nucleusCuePoints;
         for (const CuePointData& cp : allCuePoints) {
@@ -587,6 +587,18 @@ QVariantList WavFileApi::getPitch(
         }
 
         pitch = VectorUtils::smooth(smoothType, pitch, param1, param2);
+    }
+
+    // For LOG_F0, apply smoothing to reduce octave errors and then convert to binary voiced/unvoiced
+    if (!pitch.empty() && format == PitchOutputFormat::LOG_F0) {
+        LOG_DEBUG() << "Applying smoothing to LOG_F0 pitch data";
+        pitch = VectorUtils::smoothMedian(pitch, 32, false);
+        pitch = VectorUtils::smoothMovingAverage(pitch, 64, false);
+        // After smoothing, convert to 0 or 1 scale
+        for (double& val : pitch) {
+            // val = (val > std::numeric_limits<double>::epsilon()) ? 1.0 : 0.0;
+            val = (val > 0.4) ? 1.0 : 0.0;
+        }
     }
 
     // Normalize pitch data using VectorUtils based on mode

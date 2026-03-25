@@ -129,7 +129,18 @@ Page {
         referenceAmplitudeData = wavFileApi.getAmplitude(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
         referenceAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(referenceWavFileHandle, window.settingsApi.amplitudeWindow, window.settingsApi.amplitudeShift, ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], window.settingsApi.amplitudeSmoothingWindowSize, window.settingsApi.amplitudeGaussianSmoothingSigma);
 
-        root.referenceUMP = wavFileApi.getUMP(referencePitchData, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing], window.settingsApi.umpSmoothingWindowSize, window.settingsApi.umpGaussianSmoothingSigma, window.settingsApi.umpSplineSmoothingPenalty, false);
+        root.referenceUMP = wavFileApi.getUMP(
+            referencePitchData, 
+            referenceCuePoints, 
+            50, 100, 50, 
+            referenceWaveData.length, 
+            ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], 
+            ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing], 
+            window.settingsApi.umpSmoothingWindowSize, 
+            window.settingsApi.umpGaussianSmoothingSigma, 
+            window.settingsApi.umpSplineSmoothingPenalty, 
+            false
+        );
 
         umpGraph.waveData = root.referenceUMP.ump;
         umpGraph.cuePoints = root.referenceUMP.cuePoints;
@@ -218,7 +229,18 @@ Page {
         Logger.debug("DP result pitch length: " + scaledPitch.length);
 
         Logger.debug("Calculating UMP...");
-        root.userUMP = wavFileApi.getUMP(scaledPitch, referenceCuePoints, 50, 100, 50, referenceWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing], window.settingsApi.umpSmoothingWindowSize, window.settingsApi.umpGaussianSmoothingSigma, window.settingsApi.umpSplineSmoothingPenalty, false);
+        root.userUMP = wavFileApi.getUMP(
+            scaledPitch, 
+            referenceCuePoints, 
+            50, 100, 50, 
+            referenceWaveData.length, 
+            ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], 
+            ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing], 
+            window.settingsApi.umpSmoothingWindowSize, 
+            window.settingsApi.umpGaussianSmoothingSigma, 
+            window.settingsApi.umpSplineSmoothingPenalty, 
+            false
+        );
         Logger.debug("UMP calculated with " + root.userUMP.cuePoints.length + " cue points");
 
         umpGraph.waveData = [root.referenceUMP.ump, root.userUMP.ump];

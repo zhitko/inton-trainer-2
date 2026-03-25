@@ -102,6 +102,8 @@ struct AppSettings {
     double amplitudeGaussianSmoothingSigma = 1.0;
 
     // == UMP settings ==
+    // Show UMP graph in the UI
+    bool showUMP = true;
     // Smoothing type options: "None", "MovingAverage", "Median", "Gaussian", "Spline"
     std::string umpSmoothing = "None";
     // Smoothing window size for moving average, median, and Gaussian smoothing

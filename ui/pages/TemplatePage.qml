@@ -99,7 +99,17 @@ Page {
 
         // Calculate UMP
         Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(refPitchData, loadedCuePoints, 50, 100, 50, refWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing], window.settingsApi.umpSmoothingWindowSize, window.settingsApi.umpGaussianSmoothingSigma, window.settingsApi.umpSplineSmoothingPenalty);
+        let umpResult = wavFileApi.getUMP(
+            refPitchData, 
+            loadedCuePoints, 
+            50, 100, 50, 
+            refWaveData.length, 
+            ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], 
+            ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing], 
+            window.settingsApi.umpSmoothingWindowSize, 
+            window.settingsApi.umpGaussianSmoothingSigma, 
+            window.settingsApi.umpSplineSmoothingPenalty
+        );
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
         refUmpWaveFormGraph.waveData = umpResult.ump;
         refUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
@@ -222,7 +232,17 @@ Page {
         Logger.debug("DP minFinalCost: " + root.dpMinFinalCost + ", signalStreamDistances length: " + root.dpSignalStreamDistances.length);
 
         Logger.debug("Calculating UMP...");
-        let umpResult = wavFileApi.getUMP(scaledPitch, loadedCuePoints, 50, 100, 50, refWaveData.length, ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing], window.settingsApi.umpSmoothingWindowSize, window.settingsApi.umpGaussianSmoothingSigma, window.settingsApi.umpSplineSmoothingPenalty);
+        let umpResult = wavFileApi.getUMP(
+            scaledPitch, 
+            loadedCuePoints, 
+            50, 100, 50, 
+            refWaveData.length, 
+            ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], 
+            ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing], 
+            window.settingsApi.umpSmoothingWindowSize, 
+            window.settingsApi.umpGaussianSmoothingSigma, 
+            window.settingsApi.umpSplineSmoothingPenalty
+        );
         Logger.debug("UMP calculated with " + umpResult.cuePoints.length + " cue points");
 
         userUmpWaveFormGraph.waveData = umpResult.ump;
@@ -419,19 +439,25 @@ Page {
                         }
                     }
 
-                    Text {
-                        color: Theme.onSurface(root.Material.theme)
-                        font.bold: true
-                        font.pixelSize: 16
-                        text: qsTr("Reference UMP")
-                    }
+                    Column {
+                        spacing: 10
+                        visible: window.settingsApi.showUMP
+                        width: parent.width
 
-                    WaveFormGraph {
-                        id: refUmpWaveFormGraph
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("Reference UMP")
+                        }
 
-                        height: 200
-                        width: parent.width - 80
-                        lineWidth: 5
+                        WaveFormGraph {
+                            id: refUmpWaveFormGraph
+
+                            height: 200
+                            width: parent.width - 80
+                            lineWidth: 5
+                        }
                     }
 
                     Text {
@@ -517,19 +543,25 @@ Page {
                         }
                     }
 
-                    Text {
-                        color: Theme.onSurface(root.Material.theme)
-                        font.bold: true
-                        font.pixelSize: 16
-                        text: qsTr("User UMP")
-                    }
+                    Column {
+                        spacing: 10
+                        visible: window.settingsApi.showUMP
+                        width: parent.width
 
-                    WaveFormGraph {
-                        id: userUmpWaveFormGraph
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("User UMP")
+                        }
 
-                        height: 200
-                        width: parent.width - 80
-                        lineWidth: 5
+                        WaveFormGraph {
+                            id: userUmpWaveFormGraph
+
+                            height: 200
+                            width: parent.width - 80
+                            lineWidth: 5
+                        }
                     }
 
                     // Amplitude graphs
@@ -743,7 +775,7 @@ Page {
 
         SettingsPage {
             Layout.fillHeight: true
-            Layout.preferredWidth: 430
+            Layout.preferredWidth: 450
             visible: root.showSettings
 
             background: Rectangle {

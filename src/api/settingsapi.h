@@ -52,6 +52,7 @@ class SettingsApi : public QObject {
             WRITE setPitchSplineSmoothingPenalty NOTIFY
                 pitchSplineSmoothingPenaltyChanged)
 
+    Q_PROPERTY(bool showUMP READ showUMP WRITE setShowUMP NOTIFY showUMPChanged)
     Q_PROPERTY(UmpSmoothingType umpSmoothing READ umpSmoothing WRITE
             setUmpSmoothing NOTIFY umpSmoothingChanged)
     Q_PROPERTY(int umpSmoothingWindowSize READ umpSmoothingWindowSize WRITE
@@ -228,6 +229,9 @@ public:
     double umpSplineSmoothingPenalty() const;
     void setUmpSplineSmoothingPenalty(double umpSplineSmoothingPenalty);
 
+    bool showUMP() const;
+    void setShowUMP(bool showUMP);
+
     int specFftLength() const;
     void setSpecFftLength(int specFftLength);
 
@@ -372,6 +376,7 @@ signals:
     void umpSmoothingWindowSizeChanged();
     void umpGaussianSmoothingSigmaChanged();
     void umpSplineSmoothingPenaltyChanged();
+    void showUMPChanged();
 
     void specFftLengthChanged();
     void specF0RefinementChanged();

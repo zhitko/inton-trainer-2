@@ -145,7 +145,7 @@ public:
      * @return Smoothed vector.
      */
     static std::vector<double>
-    smoothMovingAverage(const std::vector<double>& data, int windowSize);
+    smoothMovingAverage(const std::vector<double>& data, int windowSize, bool skipZeros = true);
 
     /**
      * @brief Smooths data using a Median filter.
@@ -154,17 +154,19 @@ public:
      * @return Smoothed vector.
      */
     static std::vector<double> smoothMedian(const std::vector<double>& data,
-        int windowSize);
+        int windowSize, bool skipZeros = true);
 
     /**
      * @brief Smooths data using a Gaussian filter.
      * @param data Input vector.
      * @param windowSize Size of the smoothing window (must be odd).
      * @param sigma Standard deviation of the Gaussian kernel.
+     * @param skipZeros If true, zero values are kept as-is and excluded from
+     * neighbor weighting (treats them as unvoiced frames).
      * @return Smoothed vector.
      */
     static std::vector<double> smoothGaussian(const std::vector<double>& data,
-        int windowSize, double sigma);
+        int windowSize, double sigma, bool skipZeros = true);
 
     /**
      * @brief Smooths data using Alglib's Penalized Spline.

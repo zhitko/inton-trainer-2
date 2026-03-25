@@ -464,6 +464,16 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
+                            text: qsTr("Show UMP")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.showUMP : true
+                            onToggled: if (settingsApi)
+                                settingsApi.showUMP = checked
+                        }
+
+                        Label {
                             text: qsTr("Smoothing")
                             color: Theme.onSurface(Material.theme)
                         }
