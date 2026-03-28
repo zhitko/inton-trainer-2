@@ -30,18 +30,21 @@ AmplitudeService::getAmplitude(const std::vector<double>& inputWaveData,
     }
 
     const size_t total = inputWaveData.size();
-    for (size_t pos = 0; pos + static_cast<size_t>(window) <= total;
-         pos += shift) {
-        double sumSq = 0.0;
-        for (int i = 0; i < window; ++i) {
-            double s = inputWaveData[pos + i];
-            sumSq += s * s;
+    int halfWindow = window / 2;
+
+    for (size_t pos = 0; pos < total; pos += shift) {
+        double sum = 0.0;
+        int start = static_cast<int>(pos) - halfWindow;
+        int end = start + window;
+
+        for (int i = start; i < end; ++i) {
+            if (i >= 0 && i < static_cast<int>(total)) {
+                sum += std::abs(inputWaveData[i]);
+            }
         }
-        double rms = std::sqrt(sumSq / window);
-        result.push_back(rms);
+        result.push_back(sum / window);
     }
 
-    // normalize amplitude to [0,1]
     result = VectorUtils::normalizeFromTo(0.0, 1.0, result);
 
     LOG_DEBUG() << "Finish: getAmplitude - result.size=" << result.size();
