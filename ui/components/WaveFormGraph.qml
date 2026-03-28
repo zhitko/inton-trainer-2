@@ -28,13 +28,24 @@ Item {
                 return;
             }
 
-            // Normalize data to array of arrays
-            var datasets = [];
-            if (Array.isArray(root.waveData)) {
-                datasets = root.waveData;
-            } else {
-                datasets = [root.waveData];
+            // Normalize data to array of arrays.
+            // QVariantList from C++ arrives as an object with numeric keys and a
+            // 'length' property, but Array.isArray() returns false for it, so we
+            // convert explicitly. Each individual dataset may also be a QVariantList.
+            function toJSArray(val) {
+                if (!val)
+                    return [];
+                if (Array.isArray(val))
+                    return val;
+                if (typeof val === "object" && val.length !== undefined) {
+                    if (val[0].x !== undefined)
+                       return [val];
+                    return Array.from(val);
+                }
+                return [val];
             }
+
+            var datasets = toJSArray(root.waveData);
 
             if (datasets.length === 0 || datasets[0].length < 2) {
                 return;
@@ -88,10 +99,10 @@ Item {
             minY = minY - (maxY - minY) * 0.01;
             maxY = maxY + (maxY - minY) * 0.01;
 
-            Logger.debug("MinX: " + minX);
-            Logger.debug("MaxX: " + maxX);
-            Logger.debug("MinY: " + minY);
-            Logger.debug("MaxY: " + maxY);
+            // Logger.debug("MinX: " + minX);
+            // Logger.debug("MaxX: " + maxX);
+            // Logger.debug("MinY: " + minY);
+            // Logger.debug("MaxY: " + maxY);
 
             // Add some padding
             var rangeY = maxY - minY;
@@ -261,16 +272,15 @@ Item {
                 var color = null;
                 if (datasets[i] && datasets[i].color) {
                     color = datasets[i].color;
-                } else if (root.datasetColors && root.datasetColors.length > i) {
-                    color = root.datasetColors[i];
-                } else if (i < graphicsPalette.length) {
-                    color = graphicsPalette[i];
+                } else if (root.datasetColors && root.datasetColors.length > 0) {
+                    color = root.datasetColors[i % root.datasetColors.length];
                 } else {
-                    var hue = (i * 360 / datasets.length) % 360;
-                    color = "hsl(" + hue + ", 60%, 50%)";
+                    color = graphicsPalette[i % graphicsPalette.length];
                 }
                 colors.push(color);
             }
+
+            console.log("Drawing datasets with colors:", colors);
 
             ctx.save();
             ctx.beginPath();

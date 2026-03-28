@@ -90,6 +90,8 @@ public:
      * and is populated by compute().
      */
     std::vector<double> getSignalStreamDistances() const { return signalStreamDistances; }
+    std::vector<std::vector<std::vector<double>>> getTemplateData() const { return templateData; }
+    std::vector<std::vector<std::vector<double>>> getSignalData() const { return signalData; }
 
 private:
     /**

@@ -36,7 +36,9 @@ void CDTWService::normalizeData()
         size_t targetLength = templateData[0].size();
         for (size_t k = 1; k < templateData.size(); ++k) {
             if (templateData[k].size() != targetLength) {
+                size_t originalLength = templateData[k].size();
                 templateData[k] = scaleStream(templateData[k], targetLength);
+                LOG_DEBUG() << "Scaled stream template " << k << " from " << originalLength << " to " << targetLength << " frames";
             }
         }
     }
@@ -45,7 +47,9 @@ void CDTWService::normalizeData()
         size_t targetLength = signalData[0].size();
         for (size_t k = 1; k < signalData.size(); ++k) {
             if (signalData[k].size() != targetLength) {
+                size_t originalLength = signalData[k].size();
                 signalData[k] = scaleStream(signalData[k], targetLength);
+                LOG_DEBUG() << "Scaled stream signal " << k << " from " << originalLength << " to " << targetLength << " frames";
             }
         }
     }
@@ -59,12 +63,25 @@ CDTWService::scaleStream(const std::vector<std::vector<double>>& stream,
         return stream;
     }
 
-    std::vector<std::vector<double>> transformed;
-    transformed.reserve(stream.size());
-    for (const auto& frame : stream) {
-        transformed.push_back(VectorUtils::linearInterpolation(frame, static_cast<int>(targetLength)));
+    size_t dim = stream[0].size(); // number of values per frame
+    size_t srcLength = stream.size();
+
+    // For each dimension, extract values across all source frames, resample
+    // along the frame axis to targetLength, then reconstruct frame-major output.
+    std::vector<std::vector<double>> result(targetLength, std::vector<double>(dim, 0.0));
+
+    for (size_t d = 0; d < dim; ++d) {
+        std::vector<double> column(srcLength);
+        for (size_t i = 0; i < srcLength; ++i) {
+            column[i] = (d < stream[i].size()) ? stream[i][d] : 0.0;
+        }
+        std::vector<double> resampled = VectorUtils::linearInterpolation(column, static_cast<int>(targetLength));
+        for (size_t i = 0; i < targetLength; ++i) {
+            result[i][d] = resampled[i];
+        }
     }
-    return transformed;
+
+    return result;
 }
 
 double CDTWService::calculateDistance(int templateIndex, int signalIndex)

@@ -127,6 +127,19 @@ public:
     interpolationSplineMonotone(const std::vector<double>& data,
         int targetLength);
 
+    /*
+     * @brief Interpolates missing frames (zeros) in the input vector.
+     * @param type Interpolation type ("Linear", "Hermite", etc.).
+     * @param data Input vector.
+     * @param skipStartEmptyFrames If true, skips interpolation for leading zeros.
+     * @param skipEndEmptyFrames If true, skips interpolation for trailing zeros.
+     * @return Vector with interpolated values.
+     */
+    static std::vector<double> interpolateMissingFrames(const std::string& type,
+        const std::vector<double>& data,
+        bool skipStartEmptyFrames = false,
+        bool skipEndEmptyFrames = false);
+
     /**
      * @brief Dispatches interpolation based on type string.
      * @param type Interpolation type ("Linear", "Hermite", etc.).
@@ -186,11 +199,15 @@ public:
      * @param param1 Primary parameter (windowSize or penalty).
      * @param param2 Secondary parameter (polynomialOrder or sigma), if
      * applicable.
+     * @param skipZeros If true, zero values are treated as unvoiced frames and
+     * excluded from smoothing calculations (e.g., not included in moving average
+     * windows and not considered when calculating medians). This helps preserve
+     * the integrity of unvoiced frames while still smoothing voiced frames.
      * @return Smoothed vector.
      */
     static std::vector<double> smooth(const std::string& type,
         const std::vector<double>& data,
-        double param1, double param2 = 0.0);
+        double param1, double param2 = 0.0, bool skipZeros = true);
 
     /**
      * @brief Calculates the Pearson correlation coefficient between two vectors.

@@ -313,3 +313,66 @@ std::vector<double> VectorUtils::interpolate(const std::string& type,
     // Default fallback
     return interpolationSplineLinear(data, targetLength);
 }
+
+
+std::vector<double> VectorUtils::interpolateMissingFrames(
+    const std::string& type,
+    const std::vector<double>& data,
+    bool skipStartEmptyFrames,
+    bool skipEndEmptyFrames)
+{
+    if (data.empty())
+        return {};
+
+    const size_t N = data.size();
+
+    // Determine the inclusive range [startIdx, endIdx] to interpolate within.
+    size_t startIdx = 0;
+    size_t endIdx = N - 1;
+
+    if (skipStartEmptyFrames) {
+        while (startIdx < N && data[startIdx] == 0.0)
+            ++startIdx;
+    }
+
+    if (skipEndEmptyFrames) {
+        while (endIdx > startIdx && data[endIdx] == 0.0)
+            --endIdx;
+    }
+
+    // Build result as a copy of the input; we will fill in the zero gaps below.
+    std::vector<double> result(data.begin(), data.end());
+
+    // If there are no non-zero frames in the active range, nothing to interpolate.
+    if (startIdx >= endIdx)
+        return result;
+
+    // Collect positions and values of non-zero (voiced) frames within [startIdx, endIdx].
+    std::vector<size_t> positions;
+    std::vector<double> values;
+    for (size_t i = startIdx; i <= endIdx; ++i) {
+        if (data[i] != 0.0) {
+            positions.push_back(i);
+            values.push_back(data[i]);
+        }
+    }
+
+    // Nothing to interpolate from if there are fewer than 2 anchor points.
+    if (positions.size() < 2)
+        return result;
+
+    // Resample the non-zero values to the full active-range length using the
+    // requested interpolation type, then map each interpolated frame back to
+    // its original index via the anchor positions.
+    size_t activeLength = endIdx - startIdx + 1;
+    std::vector<double> interpolatedFull = interpolate(type, values, static_cast<int>(activeLength));
+
+    // Fill zero frames inside [startIdx, endIdx] with interpolated values.
+    for (size_t i = startIdx; i <= endIdx; ++i) {
+        if (result[i] == 0.0) {
+            result[i] = interpolatedFull[i - startIdx];
+        }
+    }
+
+    return result;
+}

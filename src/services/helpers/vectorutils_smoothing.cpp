@@ -288,12 +288,12 @@ std::vector<double> VectorUtils::smoothSpline(const std::vector<double>& data,
 
 std::vector<double> VectorUtils::smooth(const std::string& type,
     const std::vector<double>& data,
-    double param1, double param2)
+    double param1, double param2, bool skipZeros)
 {
     if (type == "MovingAverage")
-        return smoothMovingAverage(data, static_cast<int>(param1));
+        return smoothMovingAverage(data, static_cast<int>(param1), skipZeros);
     if (type == "Median")
-        return smoothMedian(data, static_cast<int>(param1));
+        return smoothMedian(data, static_cast<int>(param1), skipZeros);
     if (type == "Gaussian")
         return smoothGaussian(data, static_cast<int>(param1),
             param2 > 0 ? param2 : 1.0);
@@ -302,5 +302,5 @@ std::vector<double> VectorUtils::smooth(const std::string& type,
         return smoothSpline(data, param1);
 
     // Default or unknown
-    return smoothMovingAverage(data, static_cast<int>(param1));
+    return smoothMovingAverage(data, static_cast<int>(param1), skipZeros);
 }

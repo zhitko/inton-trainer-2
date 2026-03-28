@@ -112,7 +112,7 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
 
     QVariantMap result;
 
-    if (patternAmplitude.isEmpty() || signalAmplitude.isEmpty() || pitchToTransform.isEmpty()) {
+    if (pitchToTransform.isEmpty()) {
         LOG_WARNING() << "Input data is empty in getDP";
         return result;
     }
@@ -241,6 +241,28 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
         streamDistancesList.append(QPointF(i, streamDistances[i]));
     }
     result["signalStreamDistances"] = streamDistancesList;
+
+    auto toWaveFormDataList = [](const std::vector<std::vector<std::vector<double>>>& data) {
+        QVariantList streams;
+        for (const auto& stream : data) {
+            QVariantList points;
+            points.reserve(static_cast<int>(stream.size()));
+            for (size_t i = 0; i < stream.size(); ++i) {
+                double val = stream[i].empty() ? 0.0 : stream[i][0];
+                points.append(QVariant::fromValue(QPointF(static_cast<double>(i), val)));
+            }
+            LOG_DEBUG() << "stream size=" << stream.size() << ", points size=" << points.size();
+            streams.append(QVariant(points));
+        }
+        return streams;
+    };
+    const auto& tmplData = cdtwService.getTemplateData();
+    const auto& sigData = cdtwService.getSignalData();
+    result["templateData"] = toWaveFormDataList(tmplData);
+    result["signalData"] = toWaveFormDataList(sigData);
+    LOG_DEBUG() << "templateData streams=" << tmplData.size()
+                << ", signalData streams=" << sigData.size()
+                << (tmplData.empty() ? "" : (", templateData[0] frames=" + std::to_string(tmplData[0].size())));
 
     LOG_DEBUG() << "Finish: getDP - pitch size=" << pathDataList.size()
                 << ", cuePoints size=" << modifiedCuePoints.size()
@@ -418,7 +440,7 @@ QVariantList WavFileApi::getAmplitude(WaveFile* waveFile, int window, int shift,
             param2 = amplitudeGaussianSmoothingSigma;
         }
 
-        amps = VectorUtils::smooth(smoothType, amps, param1, param2);
+        amps = VectorUtils::smooth(smoothType, amps, param1, param2, false);
     }
 
     if (normalized) {
@@ -468,7 +490,7 @@ QVariantList WavFileApi::getAmplitudeDerivative(
             param2 = amplitudeGaussianSmoothingSigma;
         }
 
-        deriv = VectorUtils::smooth(smoothType, deriv, param1, param2);
+        deriv = VectorUtils::smooth(smoothType, deriv, param1, param2, false);
     }
 
     if (normalized) {
@@ -554,11 +576,6 @@ QVariantList WavFileApi::getPitch(
     std::vector<double> pitch = pitchService.getPitch(samples, algo, frameShift, sampleRate, minF0, maxF0,
         voicingThreshold, format);
 
-    if (!pitch.empty()) {
-        pitch = VectorUtils::interpolate(pitchInterpolationType.toStdString(),
-            pitch, pitch.size());
-    }
-
     // Keep only NUCLEUS frames based on cue points (before smoothing)
     if (useOnlyN && format != PitchOutputFormat::LOG_F0) {
         std::vector<CuePointData> allCuePoints = WavFileService::readCuePoints(waveFile);
@@ -571,6 +588,13 @@ QVariantList WavFileApi::getPitch(
         if (!nucleusCuePoints.empty()) {
             pitch = pitchService.keepCuePointSectors(pitch, nucleusCuePoints, frameShift, sampleRate);
         }
+    }
+
+    // Apply interpolation for empty frames
+    // but skip begin and end empty frames to avoid extrapolation artifacts
+    if (!pitch.empty() && pitchInterpolationType != "None") {
+        // pitch = VectorUtils::interpolate(pitchInterpolationType.toStdString(), pitch, pitch.size());
+        pitch = VectorUtils::interpolateMissingFrames(pitchInterpolationType.toStdString(), pitch, true, true);
     }
 
     // Apply smoothing
@@ -595,10 +619,10 @@ QVariantList WavFileApi::getPitch(
         pitch = VectorUtils::smoothMedian(pitch, 32, false);
         pitch = VectorUtils::smoothMovingAverage(pitch, 64, false);
         // After smoothing, convert to 0 or 1 scale
-        for (double& val : pitch) {
-            // val = (val > std::numeric_limits<double>::epsilon()) ? 1.0 : 0.0;
-            val = (val > 0.4) ? 1.0 : 0.0;
-        }
+        // for (double& val : pitch) {
+        //     val = (val > std::numeric_limits<double>::epsilon()) ? 1.0 : 0.0;
+        //     // val = (val > 0.1) ? 1.0 : 0.0;
+        // }
     }
 
     // Normalize pitch data using VectorUtils based on mode
