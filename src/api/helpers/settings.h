@@ -121,6 +121,14 @@ struct AppSettings {
     double dpPitchDerivativeCoef = 1.0;
     bool dpUsePitchLog = true;
     double dpPitchLogCoef = 1.0;
+    bool dpUsePitchLogAsMask = true;
+
+    // == Pitch Log processing settings ==
+    int pitchLogSmoothingWindowSize = 32;
+    int pitchLogSmoothingMovingAverageSize = 64;
+    bool transformPitchLogToBinary = false;
+    double transformPitchLogThreshold = 0.1;
+
     bool dpUseAmplitude = true;
     double dpAmplitudeCoef = 1.0;
     bool dpUseAmplitudeDerivative = true;

@@ -101,6 +101,11 @@ Settings::loadSettings()
     settings.dpPitchDerivativeCoef = qsettings.value("dpPitchDerivativeCoef", 1.0).toDouble();
     settings.dpUsePitchLog = qsettings.value("dpUsePitchLog", true).toBool();
     settings.dpPitchLogCoef = qsettings.value("dpPitchLogCoef", 1.0).toDouble();
+    settings.dpUsePitchLogAsMask = qsettings.value("dpUsePitchLogAsMask", true).toBool();
+    settings.pitchLogSmoothingWindowSize = qsettings.value("pitchLogSmoothingWindowSize", 32).toInt();
+    settings.pitchLogSmoothingMovingAverageSize = qsettings.value("pitchLogSmoothingMovingAverageSize", 64).toInt();
+    settings.transformPitchLogToBinary = qsettings.value("transformPitchLogToBinary", false).toBool();
+    settings.transformPitchLogThreshold = qsettings.value("transformPitchLogThreshold", 0.1).toDouble();
     settings.dpUseAmplitude = qsettings.value("dpUseAmplitude", true).toBool();
     settings.dpAmplitudeCoef = qsettings.value("dpAmplitudeCoef", 1.0).toDouble();
     settings.dpUseAmplitudeDerivative = qsettings.value("dpUseAmplitudeDerivative", true).toBool();
@@ -206,6 +211,11 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("dpPitchDerivativeCoef", settings.dpPitchDerivativeCoef);
     qsettings.setValue("dpUsePitchLog", settings.dpUsePitchLog);
     qsettings.setValue("dpPitchLogCoef", settings.dpPitchLogCoef);
+    qsettings.setValue("dpUsePitchLogAsMask", settings.dpUsePitchLogAsMask);
+    qsettings.setValue("pitchLogSmoothingWindowSize", settings.pitchLogSmoothingWindowSize);
+    qsettings.setValue("pitchLogSmoothingMovingAverageSize", settings.pitchLogSmoothingMovingAverageSize);
+    qsettings.setValue("transformPitchLogToBinary", settings.transformPitchLogToBinary);
+    qsettings.setValue("transformPitchLogThreshold", settings.transformPitchLogThreshold);
     qsettings.setValue("dpUseAmplitude", settings.dpUseAmplitude);
     qsettings.setValue("dpAmplitudeCoef", settings.dpAmplitudeCoef);
     qsettings.setValue("dpUseAmplitudeDerivative", settings.dpUseAmplitudeDerivative);

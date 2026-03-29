@@ -450,6 +450,88 @@ Page {
                     spacing: 10
 
                     Label {
+                        text: qsTr("Pitch Log")
+                        font.bold: true
+                        font.pixelSize: 20
+                        color: Theme.primary(Material.theme)
+                        Layout.fillWidth: true
+                    }
+
+                    GridLayout {
+                        columns: 2
+                        columnSpacing: 20
+                        rowSpacing: 10
+                        Layout.fillWidth: true
+
+                        Label {
+                            text: qsTr("Smoothing Window Size")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.pitchLogSmoothingWindowSize.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.pitchLogSmoothingWindowSize = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                        }
+
+                        Label {
+                            text: qsTr("Moving Average Size")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.pitchLogSmoothingMovingAverageSize.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.pitchLogSmoothingMovingAverageSize = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                        }
+
+                        Label {
+                            text: qsTr("Transform to Binary")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.transformPitchLogToBinary : false
+                            onToggled: if (settingsApi)
+                                settingsApi.transformPitchLogToBinary = checked
+                        }
+
+                        Label {
+                            text: qsTr("Binary Threshold")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.transformPitchLogToBinary : false
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.transformPitchLogThreshold.toString() : ""
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.transformPitchLogThreshold = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: settingsApi ? settingsApi.transformPitchLogToBinary : false
+                        }
+                    }
+                }
+            }
+
+            Frame {
+                Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
+                Layout.bottomMargin: 20
+
+                background: Rectangle {
+                    color: Theme.surfaceContainerLow(Material.theme)
+                    radius: 16
+                }
+
+                ColumnLayout {
+                    width: parent.width
+                    spacing: 10
+
+                    Label {
                         text: qsTr("UMP")
                         font.bold: true
                         font.pixelSize: 20
@@ -799,6 +881,20 @@ Page {
                             checked: settingsApi ? settingsApi.showDtwAlignment : true
                             onToggled: if (settingsApi)
                                 settingsApi.showDtwAlignment = checked
+                            Layout.columnSpan: 3
+                        }
+
+                        // Pitch Log as Mask
+                        Label {
+                            text: qsTr("Use Pitch Log as Mask")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.dpUsePitchLog : false
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.dpUsePitchLogAsMask : false
+                            onToggled: if (settingsApi)
+                                settingsApi.dpUsePitchLogAsMask = checked
+                            enabled: settingsApi ? settingsApi.dpUsePitchLog : false
                             Layout.columnSpan: 3
                         }
 

@@ -331,6 +331,11 @@ void SettingsApi::load()
     emit dpPitchDerivativeCoefChanged();
     emit dpUsePitchLogChanged();
     emit dpPitchLogCoefChanged();
+    emit dpUsePitchLogAsMaskChanged();
+    emit pitchLogSmoothingWindowSizeChanged();
+    emit pitchLogSmoothingMovingAverageSizeChanged();
+    emit transformPitchLogToBinaryChanged();
+    emit transformPitchLogThresholdChanged();
     emit dpUseAmplitudeChanged();
     emit dpAmplitudeCoefChanged();
     emit dpUseAmplitudeDerivativeChanged();
@@ -1159,6 +1164,51 @@ void SettingsApi::setDpPitchLogCoef(double val)
         m_settings.dpPitchLogCoef = val;
         save();
         emit dpPitchLogCoefChanged();
+    }
+}
+bool SettingsApi::dpUsePitchLogAsMask() const { return m_settings.dpUsePitchLogAsMask; }
+void SettingsApi::setDpUsePitchLogAsMask(bool val)
+{
+    if (m_settings.dpUsePitchLogAsMask != val) {
+        m_settings.dpUsePitchLogAsMask = val;
+        save();
+        emit dpUsePitchLogAsMaskChanged();
+    }
+}
+int SettingsApi::pitchLogSmoothingWindowSize() const { return m_settings.pitchLogSmoothingWindowSize; }
+void SettingsApi::setPitchLogSmoothingWindowSize(int val)
+{
+    if (m_settings.pitchLogSmoothingWindowSize != val) {
+        m_settings.pitchLogSmoothingWindowSize = val;
+        save();
+        emit pitchLogSmoothingWindowSizeChanged();
+    }
+}
+int SettingsApi::pitchLogSmoothingMovingAverageSize() const { return m_settings.pitchLogSmoothingMovingAverageSize; }
+void SettingsApi::setPitchLogSmoothingMovingAverageSize(int val)
+{
+    if (m_settings.pitchLogSmoothingMovingAverageSize != val) {
+        m_settings.pitchLogSmoothingMovingAverageSize = val;
+        save();
+        emit pitchLogSmoothingMovingAverageSizeChanged();
+    }
+}
+bool SettingsApi::transformPitchLogToBinary() const { return m_settings.transformPitchLogToBinary; }
+void SettingsApi::setTransformPitchLogToBinary(bool val)
+{
+    if (m_settings.transformPitchLogToBinary != val) {
+        m_settings.transformPitchLogToBinary = val;
+        save();
+        emit transformPitchLogToBinaryChanged();
+    }
+}
+double SettingsApi::transformPitchLogThreshold() const { return m_settings.transformPitchLogThreshold; }
+void SettingsApi::setTransformPitchLogThreshold(double val)
+{
+    if (qAbs(m_settings.transformPitchLogThreshold - val) > 0.0001) {
+        m_settings.transformPitchLogThreshold = val;
+        save();
+        emit transformPitchLogThresholdChanged();
     }
 }
 bool SettingsApi::dpUseAmplitude() const { return m_settings.dpUseAmplitude; }

@@ -153,7 +153,7 @@ Page {
         refPitchProcessedWaveFormGraph.waveData = [referencePitchData];
 
         // Log pitch — only needed when dpUsePitchLog is active.
-        if (settingsApi.dpUsePitchLog || settingsApi.showLogPitch) {
+        // if (settingsApi.dpUsePitchLog || settingsApi.showLogPitch) {
             Logger.debug("Extracting reference log pitch");
             referenceLogPitchData = wavFileApi.getPitch(
                 referenceWavFileHandle,
@@ -168,9 +168,9 @@ Page {
             );
             Logger.debug("Log pitch length: " + referenceLogPitchData.length);
             refLogPitchWaveFormGraph.waveData = [referenceLogPitchData];
-        } else {
-            referenceLogPitchData = [];
-        }
+        // } else {
+            // referenceLogPitchData = [];
+        // }
 
         // Pitch derivative — only needed when dpUsePitchDerivative is active.
         if (settingsApi.dpUsePitchDerivative || settingsApi.showPitchDerivative) {
@@ -336,7 +336,7 @@ Page {
         Logger.debug("User processed pitch length: " + userPitchData.length);
         userPitchProcessedWaveFormGraph.waveData = [userPitchData];
 
-        if (settingsApi.dpUsePitchLog || settingsApi.showLogPitch) {
+        // if (settingsApi.dpUsePitchLog || settingsApi.showLogPitch) {
             Logger.debug("Extracting user log pitch");
             userLogPitchData = wavFileApi.getPitch(
                 userWavFileHandle,
@@ -350,9 +350,9 @@ Page {
             );
             Logger.debug("User log pitch length: " + userLogPitchData.length);
             userLogPitchWaveFormGraph.waveData = [userLogPitchData];
-        } else {
-            userLogPitchData = [];
-        }
+        // } else {
+            // userLogPitchData = [];
+        // }
 
         // ── Spectrum ── only when getDP will consume it ─────────────────────────
         let userSpecData = [];

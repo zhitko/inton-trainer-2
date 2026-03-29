@@ -14,7 +14,9 @@ CDTWService::CDTWService(
     std::vector<double> streamWeights,
     double matchCoef,
     double insertionCoef,
-    double deletionCoef)
+    double deletionCoef,
+    std::vector<double> templateMask,
+    std::vector<double> signalMask)
     : templateData(templateData)
     , signalData(signalData)
     , streamWeights(streamWeights)
@@ -24,6 +26,8 @@ CDTWService::CDTWService(
     , bestStartIndex(-1)
     , bestEndIndex(-1)
     , minFinalCost(std::numeric_limits<double>::infinity())
+    , templateMask(templateMask)
+    , signalMask(signalMask)
 {
     normalizeData();
 }
@@ -34,25 +38,64 @@ void CDTWService::normalizeData()
 {
     if (!templateData.empty()) {
         size_t targetLength = templateData[0].size();
+
+        if (!templateMask.empty()) {
+            templateMask = VectorUtils::linearInterpolation(templateMask, static_cast<int>(targetLength));
+        }
+
         for (size_t k = 1; k < templateData.size(); ++k) {
             if (templateData[k].size() != targetLength) {
                 size_t originalLength = templateData[k].size();
                 templateData[k] = scaleStream(templateData[k], targetLength);
                 LOG_DEBUG() << "Scaled stream template " << k << " from " << originalLength << " to " << targetLength << " frames";
             }
+
+            if (!templateMask.empty()) {
+                templateData[k] = applyMask(templateData[k], templateMask);
+            }
         }
     }
 
     if (!signalData.empty()) {
         size_t targetLength = signalData[0].size();
+
+        if (!signalMask.empty()) {
+            signalMask = VectorUtils::linearInterpolation(signalMask, static_cast<int>(targetLength));
+        }
+
         for (size_t k = 1; k < signalData.size(); ++k) {
             if (signalData[k].size() != targetLength) {
                 size_t originalLength = signalData[k].size();
                 signalData[k] = scaleStream(signalData[k], targetLength);
                 LOG_DEBUG() << "Scaled stream signal " << k << " from " << originalLength << " to " << targetLength << " frames";
             }
+
+            if (!signalMask.empty()) {
+                signalData[k] = applyMask(signalData[k], signalMask);
+            }
         }
     }
+}
+
+std::vector<std::vector<double>> CDTWService::applyMask(const std::vector<std::vector<double>>& stream,
+    const std::vector<double>& mask)
+{
+    if (stream.empty() || mask.empty()) {
+        return stream;
+    }
+
+    size_t numFrames = stream.size();
+    size_t dim = stream[0].size();
+
+    std::vector<std::vector<double>> maskedStream(numFrames, std::vector<double>(dim, 0.0));
+    for (size_t i = 0; i < numFrames; ++i) {
+        double maskValue = (i < mask.size()) ? mask[i] : 1.0;
+        for (size_t d = 0; d < dim; ++d) {
+            maskedStream[i][d] = stream[i][d] * maskValue;
+        }
+    }
+
+    return maskedStream;
 }
 
 std::vector<std::vector<double>>

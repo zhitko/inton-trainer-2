@@ -30,7 +30,9 @@ public:
         std::vector<double> streamWeights = {},
         double matchCoef = 1.0,
         double insertionCoef = 1.0,
-        double deletionCoef = 1.0);
+        double deletionCoef = 1.0,
+        std::vector<double> templateMask = {},
+        std::vector<double> signalMask = {});
     ~CDTWService();
 
     /**
@@ -122,6 +124,20 @@ private:
     std::vector<std::vector<double>>
     scaleStream(const std::vector<std::vector<double>>& stream,
         size_t targetLength);
+    
+    /**
+     * Applies a mask to the input stream, multiplying each frame by the corresponding mask value.
+     * This method is used to focus the alignment on specific regions of the feature streams.
+     *
+     * @param stream - A 2D vector representing the feature stream to be masked,
+     * where the dimensions are organized as [frame][value].
+     * @param mask - A vector of double values representing the mask, where each element
+     * corresponds to a frame in the stream.
+     * @return A 2D vector containing the masked feature stream, where each frame has been multiplied 
+     * by the corresponding mask value.
+     */
+    std::vector<std::vector<double>> applyMask(const std::vector<std::vector<double>>& stream,
+        const std::vector<double>& mask);
 
     // Template and signal data
     std::vector<std::vector<std::vector<double>>> templateData;
@@ -138,6 +154,9 @@ private:
     double minFinalCost;
     std::vector<int> optimalPath;
     std::vector<double> signalStreamDistances;
+
+    std::vector<double> templateMask;
+    std::vector<double> signalMask;
 
 protected:
     /**

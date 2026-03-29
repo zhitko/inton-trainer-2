@@ -129,6 +129,18 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
         return res;
     };
 
+    auto parsePitchLog = [](const QVariantList& list) {
+        std::vector<double> res;
+        res.reserve(list.size());
+        for (const auto& val : list) {
+            if (val.canConvert<QPointF>())
+                res.push_back(val.toPointF().y());
+            else
+                res.push_back(val.toDouble());
+        }
+        return res;
+    };
+
     auto parse2D = [](const QVariantList& list) {
         std::vector<std::vector<double>> res;
         res.reserve(list.size());
@@ -149,15 +161,15 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
     std::vector<std::vector<std::vector<double>>> signalData;
     std::vector<double> weights;
 
-    if (settings.dpUsePitch && !patternPitch.isEmpty()) {
-        patternData.push_back(parse1D(patternPitch));
-        signalData.push_back(parse1D(signalPitch));
-        weights.push_back(settings.dpPitchCoef);
-    }
     if (settings.dpUsePitchLog && !patternPitchLog.isEmpty()) {
         patternData.push_back(parse1D(patternPitchLog));
         signalData.push_back(parse1D(signalPitchLog));
         weights.push_back(settings.dpPitchLogCoef);
+    }
+    if (settings.dpUsePitch && !patternPitch.isEmpty()) {
+        patternData.push_back(parse1D(patternPitch));
+        signalData.push_back(parse1D(signalPitch));
+        weights.push_back(settings.dpPitchCoef);
     }
     if (settings.dpUsePitchDerivative && !patternPitchDerivative.isEmpty()) {
         patternData.push_back(parse1D(patternPitchDerivative));
@@ -208,8 +220,16 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
         cuePointsVec.push_back(cp);
     }
 
-    CDTWService cdtwService(patternData, signalData, weights,
-        settings.dpMatchCoef, settings.dpInsertionCoef, settings.dpDeletionCoef);
+    CDTWService cdtwService(
+        patternData,
+        signalData,
+        weights,
+        settings.dpMatchCoef,
+        settings.dpInsertionCoef,
+        settings.dpDeletionCoef,
+        settings.dpUsePitchLogAsMask ? parsePitchLog(patternPitchLog) : std::vector<double>(),
+        settings.dpUsePitchLogAsMask ? parsePitchLog(signalPitchLog) : std::vector<double>()
+    );
     cdtwService.compute();
 
     std::vector<double> pitchTransformed = cdtwService.applyPathToVector(pitchVec, patternPitch.size());
@@ -614,15 +634,17 @@ QVariantList WavFileApi::getPitch(
     }
 
     // For LOG_F0, apply smoothing to reduce octave errors and then convert to binary voiced/unvoiced
+    AppSettings settings = Settings::loadSettings();
     if (!pitch.empty() && format == PitchOutputFormat::LOG_F0) {
         LOG_DEBUG() << "Applying smoothing to LOG_F0 pitch data";
-        pitch = VectorUtils::smoothMedian(pitch, 32, false);
-        pitch = VectorUtils::smoothMovingAverage(pitch, 64, false);
+        pitch = VectorUtils::smoothMedian(pitch, settings.pitchLogSmoothingWindowSize, false);
+        pitch = VectorUtils::smoothMovingAverage(pitch, settings.pitchLogSmoothingMovingAverageSize, false);
         // After smoothing, convert to 0 or 1 scale
-        // for (double& val : pitch) {
-        //     val = (val > std::numeric_limits<double>::epsilon()) ? 1.0 : 0.0;
-        //     // val = (val > 0.1) ? 1.0 : 0.0;
-        // }
+        if (settings.transformPitchLogToBinary) {
+            for (double& val : pitch) {
+                val = (val > settings.transformPitchLogThreshold) ? 1.0 : 0.0;
+            }
+        }
     }
 
     // Normalize pitch data using VectorUtils based on mode

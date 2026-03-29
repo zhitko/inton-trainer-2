@@ -112,6 +112,11 @@ class SettingsApi : public QObject {
     Q_PROPERTY(double dpPitchDerivativeCoef READ dpPitchDerivativeCoef WRITE setDpPitchDerivativeCoef NOTIFY dpPitchDerivativeCoefChanged)
     Q_PROPERTY(bool dpUsePitchLog READ dpUsePitchLog WRITE setDpUsePitchLog NOTIFY dpUsePitchLogChanged)
     Q_PROPERTY(double dpPitchLogCoef READ dpPitchLogCoef WRITE setDpPitchLogCoef NOTIFY dpPitchLogCoefChanged)
+    Q_PROPERTY(bool dpUsePitchLogAsMask READ dpUsePitchLogAsMask WRITE setDpUsePitchLogAsMask NOTIFY dpUsePitchLogAsMaskChanged)
+    Q_PROPERTY(int pitchLogSmoothingWindowSize READ pitchLogSmoothingWindowSize WRITE setPitchLogSmoothingWindowSize NOTIFY pitchLogSmoothingWindowSizeChanged)
+    Q_PROPERTY(int pitchLogSmoothingMovingAverageSize READ pitchLogSmoothingMovingAverageSize WRITE setPitchLogSmoothingMovingAverageSize NOTIFY pitchLogSmoothingMovingAverageSizeChanged)
+    Q_PROPERTY(bool transformPitchLogToBinary READ transformPitchLogToBinary WRITE setTransformPitchLogToBinary NOTIFY transformPitchLogToBinaryChanged)
+    Q_PROPERTY(double transformPitchLogThreshold READ transformPitchLogThreshold WRITE setTransformPitchLogThreshold NOTIFY transformPitchLogThresholdChanged)
     Q_PROPERTY(bool dpUseAmplitude READ dpUseAmplitude WRITE setDpUseAmplitude NOTIFY dpUseAmplitudeChanged)
     Q_PROPERTY(double dpAmplitudeCoef READ dpAmplitudeCoef WRITE setDpAmplitudeCoef NOTIFY dpAmplitudeCoefChanged)
     Q_PROPERTY(bool dpUseAmplitudeDerivative READ dpUseAmplitudeDerivative WRITE setDpUseAmplitudeDerivative NOTIFY dpUseAmplitudeDerivativeChanged)
@@ -294,6 +299,16 @@ public:
     void setDpUsePitchLog(bool dpUsePitchLog);
     double dpPitchLogCoef() const;
     void setDpPitchLogCoef(double dpPitchLogCoef);
+    bool dpUsePitchLogAsMask() const;
+    void setDpUsePitchLogAsMask(bool dpUsePitchLogAsMask);
+    int pitchLogSmoothingWindowSize() const;
+    void setPitchLogSmoothingWindowSize(int pitchLogSmoothingWindowSize);
+    int pitchLogSmoothingMovingAverageSize() const;
+    void setPitchLogSmoothingMovingAverageSize(int pitchLogSmoothingMovingAverageSize);
+    bool transformPitchLogToBinary() const;
+    void setTransformPitchLogToBinary(bool transformPitchLogToBinary);
+    double transformPitchLogThreshold() const;
+    void setTransformPitchLogThreshold(double transformPitchLogThreshold);
     bool dpUseAmplitude() const;
     void setDpUseAmplitude(bool dpUseAmplitude);
     double dpAmplitudeCoef() const;
@@ -393,6 +408,11 @@ signals:
     void dpPitchDerivativeCoefChanged();
     void dpUsePitchLogChanged();
     void dpPitchLogCoefChanged();
+    void dpUsePitchLogAsMaskChanged();
+    void pitchLogSmoothingWindowSizeChanged();
+    void pitchLogSmoothingMovingAverageSizeChanged();
+    void transformPitchLogToBinaryChanged();
+    void transformPitchLogThresholdChanged();
     void dpUseAmplitudeChanged();
     void dpAmplitudeCoefChanged();
     void dpUseAmplitudeDerivativeChanged();
