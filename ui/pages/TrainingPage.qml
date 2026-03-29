@@ -118,49 +118,69 @@ Page {
         );
         Logger.debug("Reference pitch frames: " + referencePitchData.length);
 
-        referenceLogPitchData = wavFileApi.getPitch(
-            referenceWavFileHandle,
-            window.settingsApi.algorithm,
-            window.settingsApi.frameShift,
-            window.settingsApi.sampleRate,
-            window.settingsApi.minF0,
-            window.settingsApi.maxF0,
-            window.settingsApi.voicingThreshold,
-            "LOG_F0", "None", "None", 0, 0, 0,
-            window.settingsApi.useOnlyN
-        );
-        Logger.debug("Reference log pitch frames: " + referenceLogPitchData.length);
+        // Log pitch — only when dpUsePitchLog or dpUsePitchLogAsMask is active
+        if (settingsApi.dpUsePitchLog || settingsApi.dpUsePitchLogAsMask) {
+            Logger.debug("Extracting reference log pitch");
+            referenceLogPitchData = wavFileApi.getPitch(
+                referenceWavFileHandle,
+                window.settingsApi.algorithm,
+                window.settingsApi.frameShift,
+                window.settingsApi.sampleRate,
+                window.settingsApi.minF0,
+                window.settingsApi.maxF0,
+                window.settingsApi.voicingThreshold,
+                "LOG_F0", "None", "None", 0, 0, 0,
+                window.settingsApi.useOnlyN
+            );
+            Logger.debug("Reference log pitch frames: " + referenceLogPitchData.length);
+        } else {
+            referenceLogPitchData = [];
+        }
 
-        Logger.debug("Extracting pitch derivative");
-        referencePitchDerivData = wavFileApi.getPitchDerivative(
-            referenceWavFileHandle,
-            window.settingsApi.algorithm,
-            window.settingsApi.frameShift,
-            window.settingsApi.sampleRate,
-            window.settingsApi.minF0,
-            window.settingsApi.maxF0,
-            window.settingsApi.voicingThreshold,
-            "LOG_F0"
-        );
-        Logger.debug("Reference pitch derivative frames: " + referencePitchDerivData.length);
+        // Pitch derivative — only when dpUsePitchDerivative is active
+        if (settingsApi.dpUsePitchDerivative) {
+            Logger.debug("Extracting reference pitch derivative");
+            referencePitchDerivData = wavFileApi.getPitchDerivative(
+                referenceWavFileHandle,
+                window.settingsApi.algorithm,
+                window.settingsApi.frameShift,
+                window.settingsApi.sampleRate,
+                window.settingsApi.minF0,
+                window.settingsApi.maxF0,
+                window.settingsApi.voicingThreshold,
+                "LOG_F0"
+            );
+            Logger.debug("Reference pitch derivative frames: " + referencePitchDerivData.length);
+        } else {
+            referencePitchDerivData = [];
+        }
 
-        // ── Amplitude ────────────────────────────────────────────────────
-        referenceAmplitudeData = wavFileApi.getAmplitude(
-            referenceWavFileHandle,
-            window.settingsApi.amplitudeWindow,
-            window.settingsApi.amplitudeShift,
-            amplitudeSmoothingName,
-            window.settingsApi.amplitudeSmoothingWindowSize,
-            window.settingsApi.amplitudeGaussianSmoothingSigma
-        );
-        referenceAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(
-            referenceWavFileHandle,
-            window.settingsApi.amplitudeWindow,
-            window.settingsApi.amplitudeShift,
-            amplitudeSmoothingName,
-            window.settingsApi.amplitudeSmoothingWindowSize,
-            window.settingsApi.amplitudeGaussianSmoothingSigma
-        );
+        // ── Amplitude ── only when dpUseAmplitude / dpUseAmplitudeDerivative is active
+        if (settingsApi.dpUseAmplitude) {
+            referenceAmplitudeData = wavFileApi.getAmplitude(
+                referenceWavFileHandle,
+                window.settingsApi.amplitudeWindow,
+                window.settingsApi.amplitudeShift,
+                amplitudeSmoothingName,
+                window.settingsApi.amplitudeSmoothingWindowSize,
+                window.settingsApi.amplitudeGaussianSmoothingSigma
+            );
+        } else {
+            referenceAmplitudeData = [];
+        }
+
+        if (settingsApi.dpUseAmplitudeDerivative) {
+            referenceAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(
+                referenceWavFileHandle,
+                window.settingsApi.amplitudeWindow,
+                window.settingsApi.amplitudeShift,
+                amplitudeSmoothingName,
+                window.settingsApi.amplitudeSmoothingWindowSize,
+                window.settingsApi.amplitudeGaussianSmoothingSigma
+            );
+        } else {
+            referenceAmplitudeDerivData = [];
+        }
 
         // ── UMP ───────────────────────────────────────────────────────────
         root.referenceUMP = wavFileApi.getUMP(
@@ -178,35 +198,43 @@ Page {
         umpGraph.waveData  = root.referenceUMP.ump;
         umpGraph.cuePoints = root.referenceUMP.cuePoints;
 
-        // ── Spectrum / Cepstrum ─────────────────────────────────────────────
-        Logger.debug("Extracting cepstrum (order: " + window.settingsApi.cepstrNumOrder + ")");
-        referenceCepstrData = wavFileApi.getCepstr(
-            referenceWavFileHandle,
-            window.settingsApi.specFftLength,
-            window.settingsApi.frameShift,
-            window.settingsApi.sampleRate,
-            window.settingsApi.cepstrNumOrder,
-            window.settingsApi.algorithm,
-            window.settingsApi.minF0,
-            window.settingsApi.maxF0,
-            window.settingsApi.voicingThreshold,
-            window.settingsApi.specF0Refinement
-        );
-        Logger.debug("Cepstrum frames: " + referenceCepstrData.length);
+        // ── Spectrum / Cepstrum ── only when dpUseSpectrum / dpUseCepstrum is active
+        if (settingsApi.dpUseCepstrum) {
+            Logger.debug("Extracting cepstrum (order: " + window.settingsApi.cepstrNumOrder + ")");
+            referenceCepstrData = wavFileApi.getCepstr(
+                referenceWavFileHandle,
+                window.settingsApi.specFftLength,
+                window.settingsApi.frameShift,
+                window.settingsApi.sampleRate,
+                window.settingsApi.cepstrNumOrder,
+                window.settingsApi.algorithm,
+                window.settingsApi.minF0,
+                window.settingsApi.maxF0,
+                window.settingsApi.voicingThreshold,
+                window.settingsApi.specF0Refinement
+            );
+            Logger.debug("Cepstrum frames: " + referenceCepstrData.length);
+        } else {
+            referenceCepstrData = [];
+        }
 
-        Logger.debug("Extracting spectrum (FFT: " + window.settingsApi.specFftLength + ")");
-        referenceSpecData = wavFileApi.getSpec(
-            referenceWavFileHandle,
-            window.settingsApi.specFftLength,
-            window.settingsApi.frameShift,
-            window.settingsApi.sampleRate,
-            window.settingsApi.algorithm,
-            window.settingsApi.minF0,
-            window.settingsApi.maxF0,
-            window.settingsApi.voicingThreshold,
-            window.settingsApi.specF0Refinement
-        );
-        Logger.debug("Reference spectrum frames: " + referenceSpecData.length);
+        if (settingsApi.dpUseSpectrum) {
+            Logger.debug("Extracting spectrum (FFT: " + window.settingsApi.specFftLength + ")");
+            referenceSpecData = wavFileApi.getSpec(
+                referenceWavFileHandle,
+                window.settingsApi.specFftLength,
+                window.settingsApi.frameShift,
+                window.settingsApi.sampleRate,
+                window.settingsApi.algorithm,
+                window.settingsApi.minF0,
+                window.settingsApi.maxF0,
+                window.settingsApi.voicingThreshold,
+                window.settingsApi.specF0Refinement
+            );
+            Logger.debug("Reference spectrum frames: " + referenceSpecData.length);
+        } else {
+            referenceSpecData = [];
+        }
     }
 
     function updateUserUMP(fileFullPath, isMicrophoneRecording) {
@@ -217,83 +245,122 @@ Page {
         let userCuePoints = wavFileApi.getCuePoints(userWavFileHandle);
         let userWaveData = wavFileApi.getWaveData(userWavFileHandle);
 
+        // ── Pitch ───────────────────────────────────────────────────────────
         let userPitchData = wavFileApi.getPitch(
-            userWavFileHandle, 
-            window.settingsApi.algorithm, 
-            window.settingsApi.frameShift, 
-            window.settingsApi.sampleRate, 
-            window.settingsApi.minF0, 
-            window.settingsApi.maxF0, 
-            window.settingsApi.voicingThreshold, 
-            "PITCH", 
-            window.settingsApi.pitchNormalization, 
-            ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], 
-            ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing], 
-            window.settingsApi.pitchSmoothingWindowSize, 
-            window.settingsApi.pitchGaussianSmoothingSigma, 
+            userWavFileHandle,
+            window.settingsApi.algorithm,
+            window.settingsApi.frameShift,
+            window.settingsApi.sampleRate,
+            window.settingsApi.minF0,
+            window.settingsApi.maxF0,
+            window.settingsApi.voicingThreshold,
+            "PITCH",
+            window.settingsApi.pitchNormalization,
+            pitchInterpolationName,
+            pitchSmoothingName,
+            window.settingsApi.pitchSmoothingWindowSize,
+            window.settingsApi.pitchGaussianSmoothingSigma,
             window.settingsApi.pitchSplineSmoothingPenalty
         );
         Logger.debug("Pitch data frames: " + userPitchData.length);
-        let userLogPitchData = wavFileApi.getPitch(
-            userWavFileHandle, 
-            window.settingsApi.algorithm, 
-            window.settingsApi.frameShift, 
-            window.settingsApi.sampleRate, 
-            window.settingsApi.minF0, 
-            window.settingsApi.maxF0, 
-            window.settingsApi.voicingThreshold, 
-            "LOG_F0", 
-            "None", 
-            "None", 
-            "None", 
-            0, 
-            0, 
-            0
-        );
-        Logger.debug("Log pitch data frames: " + userLogPitchData.length);
 
-        let userAmplitudeData = wavFileApi.getAmplitude(
-            userWavFileHandle, 
-            window.settingsApi.amplitudeWindow, 
-            window.settingsApi.amplitudeShift, 
-            ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], 
-            window.settingsApi.amplitudeSmoothingWindowSize, 
-            window.settingsApi.amplitudeGaussianSmoothingSigma
-        );
-        let userAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(
-            userWavFileHandle, 
-            window.settingsApi.amplitudeWindow, 
-            window.settingsApi.amplitudeShift, 
-            ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing], 
-            window.settingsApi.amplitudeSmoothingWindowSize, 
-            window.settingsApi.amplitudeGaussianSmoothingSigma
-        );
+        // Log pitch — only when dpUsePitchLog or dpUsePitchLogAsMask is active
+        let userLogPitchData = [];
+        if (settingsApi.dpUsePitchLog || settingsApi.dpUsePitchLogAsMask) {
+            Logger.debug("Extracting user log pitch");
+            userLogPitchData = wavFileApi.getPitch(
+                userWavFileHandle,
+                window.settingsApi.algorithm,
+                window.settingsApi.frameShift,
+                window.settingsApi.sampleRate,
+                window.settingsApi.minF0,
+                window.settingsApi.maxF0,
+                window.settingsApi.voicingThreshold,
+                "LOG_F0", "None", "None", "None", 0, 0, 0
+            );
+            Logger.debug("Log pitch data frames: " + userLogPitchData.length);
+        }
 
-        // Extract cepstrum data for user
-        Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
-        let userCepstrData = wavFileApi.getCepstr(
-            userWavFileHandle, 
-            window.settingsApi.specFftLength, 
-            window.settingsApi.frameShift, 
-            window.settingsApi.sampleRate, 
-            window.settingsApi.cepstrNumOrder, 
-            window.settingsApi.algorithm, 
-            window.settingsApi.minF0, 
-            window.settingsApi.maxF0, 
-            window.settingsApi.voicingThreshold, 
-            window.settingsApi.specF0Refinement
-        );
-        Logger.debug("Cepstrum data frames: " + userCepstrData.length);
+        // ── Amplitude ── only when dpUseAmplitude / dpUseAmplitudeDerivative is active
+        let userAmplitudeData = [];
+        if (settingsApi.dpUseAmplitude) {
+            Logger.debug("Extracting user amplitude");
+            userAmplitudeData = wavFileApi.getAmplitude(
+                userWavFileHandle,
+                window.settingsApi.amplitudeWindow,
+                window.settingsApi.amplitudeShift,
+                amplitudeSmoothingName,
+                window.settingsApi.amplitudeSmoothingWindowSize,
+                window.settingsApi.amplitudeGaussianSmoothingSigma
+            );
+        }
 
-        // Extract spectrum data for user
-        Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
-        let userSpecData = wavFileApi.getSpec(userWavFileHandle, window.settingsApi.specFftLength, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.algorithm, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, window.settingsApi.specF0Refinement);
-        Logger.debug("User spectrum data frames: " + userSpecData.length);
+        let userAmplitudeDerivData = [];
+        if (settingsApi.dpUseAmplitudeDerivative) {
+            Logger.debug("Extracting user amplitude derivative");
+            userAmplitudeDerivData = wavFileApi.getAmplitudeDerivative(
+                userWavFileHandle,
+                window.settingsApi.amplitudeWindow,
+                window.settingsApi.amplitudeShift,
+                amplitudeSmoothingName,
+                window.settingsApi.amplitudeSmoothingWindowSize,
+                window.settingsApi.amplitudeGaussianSmoothingSigma
+            );
+        }
 
-        // Extract pitch derivative data for user
-        Logger.debug("Extracting pitch derivative data for user");
-        let userPitchDerivData = wavFileApi.getPitchDerivative(userWavFileHandle, window.settingsApi.algorithm, window.settingsApi.frameShift, window.settingsApi.sampleRate, window.settingsApi.minF0, window.settingsApi.maxF0, window.settingsApi.voicingThreshold, "LOG_F0");
-        Logger.debug("User pitch derivative data frames: " + userPitchDerivData.length);
+        // ── Cepstrum ── only when dpUseCepstrum is active
+        let userCepstrData = [];
+        if (settingsApi.dpUseCepstrum) {
+            Logger.debug("Extracting cepstrum with order: " + window.settingsApi.cepstrNumOrder);
+            userCepstrData = wavFileApi.getCepstr(
+                userWavFileHandle,
+                window.settingsApi.specFftLength,
+                window.settingsApi.frameShift,
+                window.settingsApi.sampleRate,
+                window.settingsApi.cepstrNumOrder,
+                window.settingsApi.algorithm,
+                window.settingsApi.minF0,
+                window.settingsApi.maxF0,
+                window.settingsApi.voicingThreshold,
+                window.settingsApi.specF0Refinement
+            );
+            Logger.debug("Cepstrum data frames: " + userCepstrData.length);
+        }
+
+        // ── Spectrum ── only when dpUseSpectrum is active
+        let userSpecData = [];
+        if (settingsApi.dpUseSpectrum) {
+            Logger.debug("Extracting spectrum with FFT length: " + window.settingsApi.specFftLength);
+            userSpecData = wavFileApi.getSpec(
+                userWavFileHandle,
+                window.settingsApi.specFftLength,
+                window.settingsApi.frameShift,
+                window.settingsApi.sampleRate,
+                window.settingsApi.algorithm,
+                window.settingsApi.minF0,
+                window.settingsApi.maxF0,
+                window.settingsApi.voicingThreshold,
+                window.settingsApi.specF0Refinement
+            );
+            Logger.debug("User spectrum data frames: " + userSpecData.length);
+        }
+
+        // ── Pitch derivative ── only when dpUsePitchDerivative is active
+        let userPitchDerivData = [];
+        if (settingsApi.dpUsePitchDerivative) {
+            Logger.debug("Extracting pitch derivative data for user");
+            userPitchDerivData = wavFileApi.getPitchDerivative(
+                userWavFileHandle,
+                window.settingsApi.algorithm,
+                window.settingsApi.frameShift,
+                window.settingsApi.sampleRate,
+                window.settingsApi.minF0,
+                window.settingsApi.maxF0,
+                window.settingsApi.voicingThreshold,
+                "LOG_F0"
+            );
+            Logger.debug("User pitch derivative data frames: " + userPitchDerivData.length);
+        }
 
         // Generate UMP from DP result
         // Scale loadedCuePoints to match user pitch data length
@@ -332,8 +399,8 @@ Page {
             referenceCuePoints, 
             50, 100, 50, 
             referenceWaveData.length, 
-            ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType], 
-            ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing], 
+            pitchInterpolationName, 
+            umpSmoothingName, 
             window.settingsApi.umpSmoothingWindowSize, 
             window.settingsApi.umpGaussianSmoothingSigma, 
             window.settingsApi.umpSplineSmoothingPenalty, 

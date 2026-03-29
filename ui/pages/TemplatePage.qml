@@ -152,8 +152,9 @@ Page {
         Logger.debug("Processed pitch length: " + referencePitchData.length);
         refPitchProcessedWaveFormGraph.waveData = [referencePitchData];
 
-        // Log pitch — only needed when dpUsePitchLog is active.
-        // if (settingsApi.dpUsePitchLog || settingsApi.showLogPitch) {
+        // Log pitch — only needed when dpUsePitchLog / showLogPitch / dpUsePitchLogAsMask is active. 
+        // Also needed for UMP when showUMP is active, since UMP is based on log pitch.
+        if (settingsApi.dpUsePitchLog || settingsApi.showLogPitch || settingsApi.dpUsePitchLogAsMask) {
             Logger.debug("Extracting reference log pitch");
             referenceLogPitchData = wavFileApi.getPitch(
                 referenceWavFileHandle,
@@ -168,9 +169,9 @@ Page {
             );
             Logger.debug("Log pitch length: " + referenceLogPitchData.length);
             refLogPitchWaveFormGraph.waveData = [referenceLogPitchData];
-        // } else {
-            // referenceLogPitchData = [];
-        // }
+        } else {
+            referenceLogPitchData = [];
+        }
 
         // Pitch derivative — only needed when dpUsePitchDerivative is active.
         if (settingsApi.dpUsePitchDerivative || settingsApi.showPitchDerivative) {
