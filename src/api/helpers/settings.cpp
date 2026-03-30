@@ -91,6 +91,7 @@ Settings::loadSettings()
     settings.specColorScheme = qsettings.value("specColorScheme", "Viridis").toString().toStdString();
     settings.showSpectrum = qsettings.value("showSpectrum", false).toBool();
     settings.showCepstrum = qsettings.value("showCepstrum", false).toBool();
+    settings.cepstrNumOrder = qsettings.value("cepstrNumOrder", 25).toInt();
     qsettings.endGroup();
 
     qsettings.beginGroup("DP");
@@ -201,6 +202,7 @@ void Settings::saveSettings(const AppSettings& settings)
         QString::fromStdString(settings.specColorScheme));
     qsettings.setValue("showSpectrum", settings.showSpectrum);
     qsettings.setValue("showCepstrum", settings.showCepstrum);
+    qsettings.setValue("cepstrNumOrder", settings.cepstrNumOrder);
     qsettings.endGroup();
 
     qsettings.beginGroup("DP");
