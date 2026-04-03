@@ -302,67 +302,65 @@ Page {
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
                         }
-                        RowLayout {
+
+                        TextField {
+                            id: vadThresholdField
+                            text: settingsApi ? settingsApi.vadThreshold.toFixed(1) : "50000.0"
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.vadThreshold = parseDoubleValue(text)
                             Layout.fillWidth: true
-                            spacing: 8
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhFormattedNumbersOnly
+                            validator: DoubleValidator {
+                                bottom: 0.0
+                                top: 1000000.0
+                                decimals: 1
+                            }
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
 
-                            TextField {
-                                id: vadThresholdField
-                                text: settingsApi ? settingsApi.vadThreshold.toFixed(1) : "50000.0"
-                                onEditingFinished: if (settingsApi)
-                                    settingsApi.vadThreshold = parseDoubleValue(text)
-                                Layout.fillWidth: true
-                                selectByMouse: true
-                                inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                validator: DoubleValidator {
-                                    bottom: 0.0
-                                    top: 1000000.0
-                                    decimals: 1
-                                }
-
-                                Connections {
-                                    target: settingsApi
-                                    function onVadThresholdChanged() {
-                                        if (!vadThresholdField.activeFocus)
-                                            vadThresholdField.text = settingsApi.vadThreshold.toFixed(1);
-                                    }
+                            Connections {
+                                target: settingsApi
+                                function onVadThresholdChanged() {
+                                    if (!vadThresholdField.activeFocus)
+                                        vadThresholdField.text = settingsApi.vadThreshold.toFixed(1);
                                 }
                             }
+                        }
 
-                            Button {
-                                id: calibrateBtn
-                                text: qsTr("Calibrate")
-                                enabled: settingsApi ? settingsApi.autoStopRecording : false
-                                
-                                ToolTip.visible: hovered
-                                ToolTip.text: qsTr("Measure background noise for 2 seconds to set optimal threshold")
-                                
-                                onClicked: vadCalibrationDialog.open()
+                        Button {
+                            id: calibrateBtn
+                            text: qsTr("Calibrate")
+                            Layout.columnSpan: 2
+                            Layout.fillWidth: true
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Measure background noise for 2 seconds to set optimal threshold")
+                            
+                            onClicked: vadCalibrationDialog.open()
 
-                                background: Rectangle {
-                                    radius: 8
-                                    gradient: Gradient {
-                                        GradientStop {
-                                            position: 0.0
-                                            color: calibrateBtn.hovered ? Qt.lighter(Theme.primary(Material.theme), 1.1) : Theme.primary(Material.theme)
-                                        }
-                                        GradientStop {
-                                            position: 1.0
-                                            color: calibrateBtn.hovered ? Theme.primary(Material.theme) : Qt.darker(Theme.primary(Material.theme), 1.15)
-                                        }
+                            background: Rectangle {
+                                radius: 8
+                                gradient: Gradient {
+                                    GradientStop {
+                                        position: 0.0
+                                        color: calibrateBtn.hovered ? Qt.lighter(Theme.primary(Material.theme), 1.1) : Theme.primary(Material.theme)
                                     }
-                                    opacity: calibrateBtn.enabled ? 1.0 : 0.4
+                                    GradientStop {
+                                        position: 1.0
+                                        color: calibrateBtn.hovered ? Theme.primary(Material.theme) : Qt.darker(Theme.primary(Material.theme), 1.15)
+                                    }
                                 }
+                                opacity: calibrateBtn.enabled ? 1.0 : 0.4
+                            }
 
-                                contentItem: Text {
-                                    text: calibrateBtn.text
-                                    color: Theme.onPrimary(Material.theme)
-                                    font.pixelSize: 13
-                                    font.weight: 600
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                }
+                            contentItem: Text {
+                                text: calibrateBtn.text
+                                color: Theme.onPrimary(Material.theme)
+                                font.pixelSize: 13
+                                font.weight: 600
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
                             }
                         }
 
