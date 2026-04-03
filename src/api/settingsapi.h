@@ -22,8 +22,12 @@ class SettingsApi : public QObject {
     Q_PROPERTY(QString theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QString primaryColor READ primaryColor WRITE setPrimaryColor NOTIFY primaryColorChanged)
     Q_PROPERTY(bool showNavigationMenu READ showNavigationMenu WRITE setShowNavigationMenu NOTIFY showNavigationMenuChanged)
+    Q_PROPERTY(bool showVadA READ showVadA WRITE setShowVadA NOTIFY showVadAChanged)
+    Q_PROPERTY(bool showVadU READ showVadU WRITE setShowVadU NOTIFY showVadUChanged)
+    Q_PROPERTY(bool showVadV READ showVadV WRITE setShowVadV NOTIFY showVadVChanged)
     Q_PROPERTY(bool autoStopRecording READ autoStopRecording WRITE setAutoStopRecording NOTIFY autoStopRecordingChanged)
     Q_PROPERTY(int autoStopSilenceDuration READ autoStopSilenceDuration WRITE setAutoStopSilenceDuration NOTIFY autoStopSilenceDurationChanged)
+    Q_PROPERTY(double vadThreshold READ vadThreshold WRITE setVadThreshold NOTIFY vadThresholdChanged)
     Q_PROPERTY(QString algorithm READ algorithm WRITE setAlgorithm NOTIFY
             algorithmChanged)
     Q_PROPERTY(double frameShift READ frameShift WRITE setFrameShift NOTIFY
@@ -183,11 +187,21 @@ public:
     bool showNavigationMenu() const;
     void setShowNavigationMenu(bool showNavigationMenu);
 
+    bool showVadA() const;
+    void setShowVadA(bool show);
+    bool showVadU() const;
+    void setShowVadU(bool show);
+    bool showVadV() const;
+    void setShowVadV(bool show);
+
     bool autoStopRecording() const;
     void setAutoStopRecording(bool autoStopRecording);
 
     int autoStopSilenceDuration() const;
     void setAutoStopSilenceDuration(int autoStopSilenceDuration);
+
+    double vadThreshold() const;
+    void setVadThreshold(double vadThreshold);
 
     QString algorithm() const;
     void setAlgorithm(const QString& algorithm);
@@ -371,8 +385,12 @@ signals:
     void themeChanged();
     void primaryColorChanged();
     void showNavigationMenuChanged();
+    void showVadAChanged();
+    void showVadUChanged();
+    void showVadVChanged();
     void autoStopRecordingChanged();
     void autoStopSilenceDurationChanged();
+    void vadThresholdChanged();
     void algorithmChanged();
     void frameShiftChanged();
     void sampleRateChanged();

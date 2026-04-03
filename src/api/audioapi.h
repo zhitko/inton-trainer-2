@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <QMediaPlayer>
+#include <vector>
 
 class WavFileService;
 struct WaveFile;
@@ -35,6 +36,7 @@ class AudioApi : public QObject {
     Q_PROPERTY(bool isRecording READ isRecording NOTIFY isRecordingChanged)
     Q_PROPERTY(qreal audioLevel READ audioLevel NOTIFY isAudioLevelChanged)
     Q_PROPERTY(bool isPlaying READ isPlaying NOTIFY isPlayingChanged)
+    Q_PROPERTY(bool isVoiceDetected READ isVoiceDetected NOTIFY isVoiceDetectedChanged)
 
 public:
     explicit AudioApi(QObject* parent = nullptr);
@@ -61,6 +63,13 @@ public:
      */
     bool isPlaying() const;
 
+    /**
+     * Returns whether the Voice Activity Detection (VAD) has detected speech.
+     *
+     * @return true if speech is currently detected in the recording.
+     */
+    bool isVoiceDetected() const;
+
 public slots:
     /**
      * Starts recording audio from the microphone. If durationSeconds is greater
@@ -77,6 +86,14 @@ public slots:
      * this method has no effect.
      */
     Q_INVOKABLE void stopRecording();
+
+    /**
+     * Internal VAD curves for visualization.
+     * Returns data from the last recording.
+     */
+    Q_INVOKABLE QVariantList getVadA() const;
+    Q_INVOKABLE QVariantList getVadU() const;
+    Q_INVOKABLE QVariantList getVadV() const;
     /**
      * Saves the recorded audio to a WAV file. If fileName is provided, it will be
      * used as the name of the saved file. If fileName is empty, a default name
@@ -100,6 +117,13 @@ public slots:
      */
     Q_INVOKABLE void stopPlayback();
 
+    /**
+     * Records 2 seconds of silence and calculates the VAD threshold (Pe)
+     * based on the background noise level. Emits calibrationFinished(threshold)
+     * when done.
+     */
+    Q_INVOKABLE void calibrateVad();
+
 signals:
     /**
      * Signal emitted when the recording state changes (started or stopped).
@@ -114,6 +138,15 @@ signals:
      * Signal emitted when the playback state changes (started or stopped).
      */
     void isPlayingChanged();
+    /**
+     * Signal emitted when voice activity detection state changes.
+     */
+    void isVoiceDetectedChanged();
+    /**
+     * Emitted when VAD calibration completes. The parameter is the computed
+     * threshold value that should be saved in settings.
+     */
+    void calibrationFinished(double threshold);
 
 private:
     /**
@@ -126,49 +159,50 @@ private:
      */
     void setAudioLevel(qreal level = 0.0);
 
-     QAudioDevice m_audioDevice;
-     std::unique_ptr<QAudioSource> m_audioSource;
-     QAudioFormat m_format;
-     QByteArray m_buffer;
-     bool m_isRecording = false;
-     qreal m_audioLevel = 0.0;
-     std::unique_ptr<WavFileService> m_wavFileService;
-     QMediaPlayer* m_player = nullptr;
-     QAudioOutput* m_audioOutput = nullptr;
-     bool m_isPlaying = false;
+    // Base buffer elements
+    QAudioDevice m_audioDevice;
+    std::unique_ptr<QAudioSource> m_audioSource;
+    QAudioFormat m_format;
+    QByteArray m_buffer;
+    qint64 m_bufferOffsetBytes = 0; // Tracks bytes removed from m_buffer
+    bool m_isRecording = false;
+    qreal m_audioLevel = 0.0;
+    std::unique_ptr<WavFileService> m_wavFileService;
+    QMediaPlayer* m_player = nullptr;
+    QAudioOutput* m_audioOutput = nullptr;
+    bool m_isPlaying = false;
 
     bool m_autoStopEnabled = false;
-    double m_silenceThreshold = 0;
-    double m_noiseFloor = 0;             // Baseline noise level
-    double m_peakLevel = 0;              // Peak audio level during recording
     int m_silenceDurationMs = 2000;
-    qint64 m_silenceStartTime = 0;
-    int m_silenceBufferSize = 0;         // Buffer size when silence started
     bool m_voiceDetected = false;
-    bool m_thresholdCalculated = false;  // Whether dynamic threshold has been calculated
-    QByteArray m_preBuffer;              // Rolling pre-buffer to keep ~500ms before voice
-    static constexpr int PRE_BUFFER_MS = 500;  // Pre/post buffer duration in ms
-    
-    // VAD (Voice Activity Detection) parameters
-    // VOICE_LEVEL_RATIO: Multiplier for silence threshold to detect voice
-    // Higher values make voice detection less sensitive (require louder sounds)
-    static constexpr double VOICE_LEVEL_RATIO = 2.5;
-    
-    // SILENCE_LEVEL_RATIO: Multiplier for silence threshold to detect silence
-    // Higher values make silence detection trigger at higher audio levels
-    static constexpr double SILENCE_LEVEL_RATIO = 3.0;
-    
-    // RELATIVE_SILENCE_RATIO: Ratio of current level to peak level to detect relative silence
-    // Lower values make relative silence detection more sensitive
-    static constexpr double RELATIVE_SILENCE_RATIO = 0.3;
-    
-    // CALIBRATION_FRAMES: Number of initial audio frames used to calibrate noise floor
-    // More frames give better calibration but delay voice detection start
-    static constexpr int CALIBRATION_FRAMES = 10;
-    
-    // Calibration tracking variables
-    int m_calibrationCounter = 0;        // Counter for calibration frames
-    double m_calibrationSum = 0;         // Sum for calculating average noise floor
+    static constexpr int PRE_BUFFER_MS = 250; // Pre/post buffer duration in ms
+
+    // New VAD logic properties
+    static constexpr int K_FRAMES = 16;
+    static constexpr int CALIBRATION_FRAMES = 50; // Increased for reliable percentile
+
+    std::vector<qint16> m_sampleBuf;
+    std::vector<double> m_A;
+    std::vector<double> m_U;
+    std::vector<double> m_H;
+    std::vector<double> m_V;
+
+    std::vector<double> m_savedA;
+    std::vector<double> m_savedU;
+    std::vector<double> m_savedV;
+
+    int m_valid_U = 0;
+    int m_valid_V = 0;
+    int m_calibrationCounter = 0;
+    std::vector<double> m_calibrationFrames; // Individual V(n) frames during calibration
+    double m_Pe = 0.0;
+
+    int m_firstSpeechFrame = -1;
+    int m_lastSpeechFrame = -1;
+    int m_silenceFramesCount = 0;
+
+    void processVadFrame(int frameIndex, double V_n);
+    static double percentileValue(std::vector<double> values, double percentile);
 };
 
 #endif // AUDIOAPI_H

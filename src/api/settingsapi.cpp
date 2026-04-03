@@ -109,6 +109,63 @@ void SettingsApi::setShowNavigationMenu(bool showNavigationMenu)
     LOG_DEBUG() << "Finish: setShowNavigationMenu";
 }
 
+bool SettingsApi::showVadA() const
+{
+    LOG_DEBUG() << "Start: showVadA";
+    bool result = m_settings.showVadA;
+    LOG_DEBUG() << "Finish: showVadA - result=" << result;
+    return result;
+}
+
+void SettingsApi::setShowVadA(bool show)
+{
+    LOG_DEBUG() << "Start: setShowVadA - show=" << show;
+    if (m_settings.showVadA != show) {
+        m_settings.showVadA = show;
+        save();
+        emit showVadAChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowVadA";
+}
+
+bool SettingsApi::showVadU() const
+{
+    LOG_DEBUG() << "Start: showVadU";
+    bool result = m_settings.showVadU;
+    LOG_DEBUG() << "Finish: showVadU - result=" << result;
+    return result;
+}
+
+void SettingsApi::setShowVadU(bool show)
+{
+    LOG_DEBUG() << "Start: setShowVadU - show=" << show;
+    if (m_settings.showVadU != show) {
+        m_settings.showVadU = show;
+        save();
+        emit showVadUChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowVadU";
+}
+
+bool SettingsApi::showVadV() const
+{
+    LOG_DEBUG() << "Start: showVadV";
+    bool result = m_settings.showVadV;
+    LOG_DEBUG() << "Finish: showVadV - result=" << result;
+    return result;
+}
+
+void SettingsApi::setShowVadV(bool show)
+{
+    LOG_DEBUG() << "Start: setShowVadV - show=" << show;
+    if (m_settings.showVadV != show) {
+        m_settings.showVadV = show;
+        save();
+        emit showVadVChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowVadV";
+}
+
 bool SettingsApi::autoStopRecording() const
 {
     LOG_DEBUG() << "Start: autoStopRecording";
@@ -145,6 +202,25 @@ void SettingsApi::setAutoStopSilenceDuration(int autoStopSilenceDuration)
         emit autoStopSilenceDurationChanged();
     }
     LOG_DEBUG() << "Finish: setAutoStopSilenceDuration";
+}
+
+double SettingsApi::vadThreshold() const
+{
+    LOG_DEBUG() << "Start: vadThreshold";
+    double result = m_settings.vadThreshold;
+    LOG_DEBUG() << "Finish: vadThreshold - result=" << result;
+    return result;
+}
+
+void SettingsApi::setVadThreshold(double vadThreshold)
+{
+    LOG_DEBUG() << "Start: setVadThreshold - vadThreshold=" << vadThreshold;
+    if (qAbs(m_settings.vadThreshold - vadThreshold) > 0.001) {
+        m_settings.vadThreshold = vadThreshold;
+        save();
+        emit vadThresholdChanged();
+    }
+    LOG_DEBUG() << "Finish: setVadThreshold";
 }
 
 QString SettingsApi::algorithm() const
@@ -292,6 +368,9 @@ void SettingsApi::load()
     emit themeChanged();
     emit primaryColorChanged();
     emit showNavigationMenuChanged();
+    emit autoStopRecordingChanged();
+    emit autoStopSilenceDurationChanged();
+    emit vadThresholdChanged();
     emit algorithmChanged();
     emit frameShiftChanged();
     emit sampleRateChanged();

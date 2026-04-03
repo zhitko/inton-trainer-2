@@ -9,6 +9,7 @@ import by.intontrainer.wavfile 1.0
 import by.intontrainer.file 1.0
 import by.intontrainer.analysis 1.0
 import by.intontrainer.statistics 1.0
+import by.intontrainer.audio 1.0
 
 import "../components"
 import "../utils"
@@ -62,9 +63,91 @@ Page {
         id: statisticsApi
     }
 
+    AudioApi {
+        id: trainingAudioApi
+    }
+
+    property bool _isExiting: false
+
+    onVisibleChanged: {
+        if (visible) {
+            _isExiting = false;
+            // Guard against uninitialized window.settingsApi during destruction/initialization
+            if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording) {
+                trainingAudioApi.startRecording();
+            }
+        } else {
+            _isExiting = true;
+            if (trainingAudioApi.isRecording) {
+                trainingAudioApi.stopRecording();
+            }
+        }
+    }
+
+    Component.onDestruction: {
+        _isExiting = true;
+        if (trainingAudioApi.isRecording) {
+            trainingAudioApi.stopRecording();
+        }
+    }
+
+    Connections {
+        target: trainingAudioApi
+        onIsRecordingChanged: {
+            if (!trainingAudioApi.isRecording && !root._isExiting && window.settingsApi && window.settingsApi.autoStopRecording) {
+                let tempFilePath = trainingAudioApi.saveWavFile();
+                if (tempFilePath !== "") {
+                    let userWavHandle = wavFileApi.openWavFile(tempFilePath);
+                    let userWaveData = wavFileApi.getWaveData(userWavHandle);
+                    
+                    if (root.referenceWaveData && userWaveData && userWaveData.length >= root.referenceWaveData.length * 0.8) {
+                        Logger.info("Recording successful, length is sufficient.");
+                        updateUserUMP(tempFilePath, true);
+                    } else {
+                        Logger.info("Recording too short, discarding. Required: " + (root.referenceWaveData ? root.referenceWaveData.length * 0.8 : 0) + ", got: " + (userWaveData ? userWaveData.length : 0));
+                        // Let the UI know or just wait in silence
+                    }
+                }
+                // Restart recording after a small delay if playback isn't active
+                if (!isAnyPlaybackActive && window.settingsApi && window.settingsApi.autoStopRecording) {
+                    restartRecordingTimer.start();
+                }
+            }
+        }
+    }
+
+    Timer {
+        id: restartRecordingTimer
+        interval: 100
+        repeat: false
+        onTriggered: {
+            if (root.visible && !root._isExiting) {
+                trainingAudioApi.startRecording();
+            }
+        }
+    }
+
+    property bool isAnyPlaybackActive: playReferenceBtn.isPlaying || playUserBtn.isPlaying
+
+    onIsAnyPlaybackActiveChanged: {
+        if (isAnyPlaybackActive && trainingAudioApi.isRecording) {
+            _isExiting = true; // Set to true so we don't save the aborted recording
+            trainingAudioApi.stopRecording();
+            _isExiting = false; // reset immediately
+        } else if (!isAnyPlaybackActive && !trainingAudioApi.isRecording) {
+            // Un-pause recording when playback finishes
+            restartRecordingTimer.start();
+        }
+    }
+
     Component.onCompleted: {
         updateReferenceUMP();
         loadPreviousResults();
+        
+        if (visible && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording) {
+            _isExiting = false;
+            trainingAudioApi.startRecording();
+        }
     }
 
     Connections {
@@ -624,18 +707,77 @@ Page {
                 spacing: 32
 
                 PlayRoundButton {
+                    id: playReferenceBtn
                     filePath: root.referenceFilePath
                     text: qsTr("Play\nReference")
                 }
 
+                ColumnLayout {
+                    Layout.alignment: Qt.AlignVCenter
+                    spacing: 8
+                    Layout.preferredWidth: 220
+                    visible: window.settingsApi ? window.settingsApi.autoStopRecording : false
+
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: 8
+
+                        Rectangle {
+                            width: 14
+                            height: 14
+                            radius: 7
+                            // Change color based on playback or recording
+                            color: isAnyPlaybackActive ? Theme.primary(root.Material.theme) : Theme.error(root.Material.theme)
+                            visible: trainingAudioApi.isRecording || isAnyPlaybackActive
+
+                            SequentialAnimation on opacity {
+                                running: trainingAudioApi.isRecording || isAnyPlaybackActive
+                                loops: Animation.Infinite
+                                NumberAnimation { from: 1.0; to: 0.2; duration: 800; easing.type: Easing.InOutQuad }
+                                NumberAnimation { from: 0.2; to: 1.0; duration: 800; easing.type: Easing.InOutQuad }
+                            }
+                        }
+
+                        Text {
+                            text: isAnyPlaybackActive ? qsTr("Playing...") : (trainingAudioApi.isRecording ? (trainingAudioApi.isVoiceDetected ? qsTr("Recording...") : qsTr("Listening...")) : qsTr("Processing..."))
+                            font.pixelSize: 18
+                            font.weight: 600
+                            color: isAnyPlaybackActive ? Theme.primary(root.Material.theme) : (trainingAudioApi.isRecording ? Theme.error(root.Material.theme) : Theme.onSurface(root.Material.theme))
+                        }
+                    }
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: isAnyPlaybackActive ? qsTr("Listen carefully") : qsTr("Repeat the phrase into the mic")
+                        font.pixelSize: 14
+                        color: Theme.onSurface(root.Material.theme)
+                        opacity: 0.6
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
+                    }
+                }
+
                 RecordRoundButton {
-                    filePath: root.userFilePath
-                    onRecordingFinished: updateUserUMP(filePath, true)
+                    id: manualRecordBtn
+                    Layout.alignment: Qt.AlignVCenter
+                    visible: window.settingsApi ? !window.settingsApi.autoStopRecording : false
+                    onRecordingFinished: function(filePath) {
+                        if (filePath !== "") {
+                            root.updateUserUMP(filePath, true);
+                        }
+                    }
                 }
 
                 PlayRoundButton {
+                    id: playUserBtn
                     filePath: root.userFilePath
                     text: qsTr("Play\nMe")
+                    opacity: root.userFilePath !== "" ? 1.0 : 0.0
+                    enabled: root.userFilePath !== ""
+                    
+                    Behavior on opacity {
+                        NumberAnimation { duration: 250 }
+                    }
                 }
             }
 
@@ -782,7 +924,10 @@ Page {
                 onClicked: {
                     stackView.push("TemplatePage.qml", {
                         referenceFilePath: root.referenceFilePath,
-                        userFilePath: root.userFilePath
+                        userFilePath: root.userFilePath,
+                        userVadA: trainingAudioApi.getVadA(),
+                        userVadU: trainingAudioApi.getVadU(),
+                        userVadV: trainingAudioApi.getVadV()
                     });
                 }
             }

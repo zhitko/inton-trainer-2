@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
+import by.intontrainer.audio 1.0
 import by.intontrainer.settings 1.0
 import "../utils"
 
@@ -15,6 +16,62 @@ Page {
     function parseDoubleValue(text) {
         // Replace comma with dot and parse as float
         return parseFloat(text.replace(",", "."));
+    }
+
+    // AudioApi used only for VAD calibration
+    AudioApi {
+        id: calibrationAudioApi
+        onCalibrationFinished: function(threshold) {
+            if (settingsApi) {
+                settingsApi.vadThreshold = threshold;
+            }
+            vadCalibrationDialog.close();
+        }
+    }
+
+    // Calibration dialog
+    Dialog {
+        id: vadCalibrationDialog
+        title: qsTr("VAD Calibration")
+        modal: true
+        anchors.centerIn: parent
+        width: 380
+        closePolicy: Popup.NoAutoClose
+
+        contentItem: ColumnLayout {
+            spacing: 16
+            Label {
+                text: qsTr("Please stay quiet for 2 seconds so the background noise level can be measured.")
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                font.pixelSize: 15
+            }
+            // Animated dots to show progress
+            Row {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 8
+                Repeater {
+                    model: 3
+                    Rectangle {
+                        width: 14
+                        height: 14
+                        radius: 7
+                        color: Theme.primary(Material.theme)
+                        SequentialAnimation on opacity {
+                            running: vadCalibrationDialog.visible
+                            loops: Animation.Infinite
+                            NumberAnimation { from: 0.2; to: 1.0; duration: 400 }
+                            NumberAnimation { from: 1.0; to: 0.2; duration: 400 }
+                            PauseAnimation { duration: index * 200 }
+                        }
+                    }
+                }
+            }
+        }
+
+        onOpened: {
+            calibrationAudioApi.calibrateVad();
+        }
     }
 
     Material.theme: ApplicationWindow.window ? ApplicationWindow.window.theme : Material.Light
@@ -169,6 +226,51 @@ Page {
                             onToggled: if (settingsApi)
                                 settingsApi.showNavigationMenu = checked
                         }
+                    }
+
+                    Button {
+                        text: qsTr("Delete user data")
+                        Layout.fillWidth: true
+                        Material.foreground: Theme.onError(Material.theme)
+
+                        background: Rectangle {
+                            color: Theme.error(Material.theme)
+                            radius: 4
+                        }
+
+                        onClicked: {
+                            confirmationDialog.open();
+                        }
+                    }
+                }
+            }
+
+            Frame {
+                Layout.fillWidth: true
+                Layout.margins: 20
+
+                background: Rectangle {
+                    color: Theme.surfaceContainerLow(Material.theme)
+                    radius: 16
+                }
+
+                ColumnLayout {
+                    width: parent.width
+                    spacing: 10
+
+                    Label {
+                        text: qsTr("Automated Recording (VAD)")
+                        font.bold: true
+                        font.pixelSize: 20
+                        color: Theme.primary(Material.theme)
+                        Layout.fillWidth: true
+                    }
+
+                    GridLayout {
+                        columns: 2
+                        columnSpacing: 20
+                        rowSpacing: 10
+                        Layout.fillWidth: true
 
                         Label {
                             text: qsTr("Auto Stop Recording")
@@ -185,6 +287,7 @@ Page {
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
+                            id: silenceDurationField
                             text: settingsApi ? settingsApi.autoStopSilenceDuration.toString() : "2000"
                             onEditingFinished: if (settingsApi)
                                 settingsApi.autoStopSilenceDuration = parseInt(text)
@@ -193,20 +296,104 @@ Page {
                             inputMethodHints: Qt.ImhDigitsOnly
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
                         }
-                    }
 
-                    Button {
-                        text: qsTr("Delete user data")
-                        Layout.fillWidth: true
-                        Material.foreground: Theme.onError(Material.theme)
+                        Label {
+                            text: qsTr("VAD Threshold (Pe)")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 8
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
 
-                        background: Rectangle {
-                            color: Theme.error(Material.theme)
-                            radius: 4
+                            TextField {
+                                id: vadThresholdField
+                                text: settingsApi ? settingsApi.vadThreshold.toFixed(1) : "50000.0"
+                                onEditingFinished: if (settingsApi)
+                                    settingsApi.vadThreshold = parseDoubleValue(text)
+                                Layout.fillWidth: true
+                                selectByMouse: true
+                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                validator: DoubleValidator {
+                                    bottom: 0.0
+                                    top: 1000000.0
+                                    decimals: 1
+                                }
+
+                                Connections {
+                                    target: settingsApi
+                                    function onVadThresholdChanged() {
+                                        if (!vadThresholdField.activeFocus)
+                                            vadThresholdField.text = settingsApi.vadThreshold.toFixed(1);
+                                    }
+                                }
+                            }
+
+                            Button {
+                                id: calibrateBtn
+                                text: qsTr("Calibrate")
+                                enabled: settingsApi ? settingsApi.autoStopRecording : false
+                                
+                                ToolTip.visible: hovered
+                                ToolTip.text: qsTr("Measure background noise for 2 seconds to set optimal threshold")
+                                
+                                onClicked: vadCalibrationDialog.open()
+
+                                background: Rectangle {
+                                    radius: 8
+                                    gradient: Gradient {
+                                        GradientStop {
+                                            position: 0.0
+                                            color: calibrateBtn.hovered ? Qt.lighter(Theme.primary(Material.theme), 1.1) : Theme.primary(Material.theme)
+                                        }
+                                        GradientStop {
+                                            position: 1.0
+                                            color: calibrateBtn.hovered ? Theme.primary(Material.theme) : Qt.darker(Theme.primary(Material.theme), 1.15)
+                                        }
+                                    }
+                                    opacity: calibrateBtn.enabled ? 1.0 : 0.4
+                                }
+
+                                contentItem: Text {
+                                    text: calibrateBtn.text
+                                    color: Theme.onPrimary(Material.theme)
+                                    font.pixelSize: 13
+                                    font.weight: 600
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
                         }
 
-                        onClicked: {
-                            confirmationDialog.open();
+                        Label {
+                            text: qsTr("Show A(n)")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.showVadA : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showVadA = checked
+                        }
+
+                        Label {
+                            text: qsTr("Show U(n)")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.showVadU : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showVadU = checked
+                        }
+
+                        Label {
+                            text: qsTr("Show V(n)")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.showVadV : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showVadV = checked
                         }
                     }
                 }

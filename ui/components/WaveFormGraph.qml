@@ -1,8 +1,9 @@
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material 6.8
 import "../utils"
 
-Item {
+Column {
     id: root
     width: 300
     height: 150
@@ -15,9 +16,13 @@ Item {
     property double lineWidth: 2.5
     property bool showCueLabels: true
 
+    property bool showLegend: false
+    property var datasetLabels: []
+
     Canvas {
         id: canvas
-        anchors.fill: parent
+        width: parent.width
+        height: root.showLegend ? parent.height - 30 : parent.height
 
         onPaint: {
             var ctx = getContext("2d");
@@ -280,6 +285,7 @@ Item {
                 colors.push(color);
             }
 
+            console.log("Drawing " + datasets.length + " datasets. First dataset points: " + (datasets.length > 0 ? datasets[0].length : 0));
             console.log("Drawing datasets with colors:", colors);
 
             ctx.save();
@@ -332,5 +338,37 @@ Item {
 
     onCueNLabelsChanged: {
         canvas.requestPaint();
+    }
+
+    RowLayout {
+        id: legendRow
+        anchors.horizontalCenter: parent.horizontalCenter
+        height: 30
+        visible: root.showLegend && root.datasetLabels.length > 0
+        spacing: 20
+
+        Repeater {
+            model: root.datasetLabels.length
+            Row {
+                spacing: 5
+                Rectangle {
+                    width: 12
+                    height: 12
+                    radius: 2
+                    color: {
+                        if (root.datasetColors && root.datasetColors.length > index)
+                            return root.datasetColors[index];
+                        return Theme.chartPalette(Material.theme)[index % Theme.chartPalette(Material.theme).length];
+                    }
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    text: root.datasetLabels[index]
+                    color: Theme.onSurface(Material.theme)
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 12
+                }
+            }
+        }
     }
 }

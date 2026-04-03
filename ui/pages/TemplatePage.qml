@@ -7,6 +7,7 @@ import "../components"
 import "../utils"
 
 import by.intontrainer.wavfile 1.0
+import by.intontrainer.audio 1.0
 
 Page {
     id: root
@@ -46,6 +47,11 @@ Page {
     property var    dpSignalStreamDistances: []
     property var    dpTemplateData:        []
     property var    dpSignalData:          []
+
+    // ── VAD data ────────────────────────────────────────────────────────────
+    property var userVadA: []
+    property var userVadU: []
+    property var userVadV: []
 
     function updateColorScheme() {
         let scheme = window.settingsApi.specColorScheme;
@@ -475,6 +481,7 @@ Page {
             userUmpWaveFormGraph.waveData  = umpResult.ump;
             userUmpWaveFormGraph.cuePoints = umpResult.cuePoints;
         }
+
 
         // ── Waveform cue point overlays ────────────────────────────────────────
             let scaledCuePoints = dpResult.cuePoints.map(cp => ({
@@ -956,6 +963,43 @@ Page {
                         }
                     }
 
+                    // VAD Analysis section
+                    Column {
+                        spacing: 10
+                        width: parent.width
+                        visible: window.settingsApi.showVadA || window.settingsApi.showVadU || window.settingsApi.showVadV
+
+                        Text {
+                            color: Theme.onSurface(root.Material.theme)
+                            font.bold: true
+                            font.pixelSize: 16
+                            text: qsTr("VAD Analysis")
+                        }
+
+                        WaveFormGraph {
+                            id: userVadGraph
+                            onWaveDataChanged: console.log("userVadGraph waveData changed, datasets:", waveData.length)
+                            height: 250
+                            width: parent.width - 80
+                            waveData: {
+                                let datasets = [];
+                                if (window.settingsApi.showVadA && root.userVadA.length > 0) datasets.push(root.userVadA);
+                                if (window.settingsApi.showVadU && root.userVadU.length > 0) datasets.push(root.userVadU);
+                                if (window.settingsApi.showVadV && root.userVadV.length > 0) datasets.push(root.userVadV);
+                                return datasets;
+                            }
+                            showLegend: window.settingsApi.showVadA || window.settingsApi.showVadU || window.settingsApi.showVadV
+                            datasetLabels: {
+                                let labels = [];
+                                if (window.settingsApi.showVadA) labels.push("A(n)");
+                                if (window.settingsApi.showVadU) labels.push("U(n)");
+                                if (window.settingsApi.showVadV) labels.push("V(n)");
+                                return labels;
+                            }
+                            datasetColors: Theme.chartPalette(root.Material.theme).slice(0, datasetLabels.length)
+                        }
+                    }
+
                     // DTW Alignment section
                     Column {
                         spacing: 10
@@ -1004,9 +1048,21 @@ Page {
 
                         WaveFormGraph {
                             id: templateGraph
-
                             height: 200
                             width: parent.width - 80
+                            showLegend: true
+                            datasetLabels: {
+                                let labels = [];
+                                if (window.settingsApi.dpUsePitchLog) labels.push("Log Pitch");
+                                if (window.settingsApi.dpUsePitch) labels.push("Pitch");
+                                if (window.settingsApi.dpUsePitchDerivative) labels.push("Pitch Deriv");
+                                if (window.settingsApi.dpUseSpectrum) labels.push("Spectrum");
+                                if (window.settingsApi.dpUseCepstrum) labels.push("Cepstrum");
+                                if (window.settingsApi.dpUseAmplitude) labels.push("Amplitude");
+                                if (window.settingsApi.dpUseAmplitudeDerivative) labels.push("Amp Deriv");
+                                return labels;
+                            }
+                            datasetColors: Theme.chartPalette(root.Material.theme).slice(0, datasetLabels.length)
                         }
                     }
 
@@ -1024,9 +1080,21 @@ Page {
 
                         WaveFormGraph {
                             id: signalGraph
-
                             height: 200
                             width: parent.width - 80
+                            showLegend: true
+                            datasetLabels: {
+                                let labels = [];
+                                if (window.settingsApi.dpUsePitchLog) labels.push("Log Pitch");
+                                if (window.settingsApi.dpUsePitch) labels.push("Pitch");
+                                if (window.settingsApi.dpUsePitchDerivative) labels.push("Pitch Deriv");
+                                if (window.settingsApi.dpUseSpectrum) labels.push("Spectrum");
+                                if (window.settingsApi.dpUseCepstrum) labels.push("Cepstrum");
+                                if (window.settingsApi.dpUseAmplitude) labels.push("Amplitude");
+                                if (window.settingsApi.dpUseAmplitudeDerivative) labels.push("Amp Deriv");
+                                return labels;
+                            }
+                            datasetColors: Theme.chartPalette(root.Material.theme).slice(0, datasetLabels.length)
                         }
                     }
                 }
