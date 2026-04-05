@@ -202,6 +202,14 @@ private:
     int m_silenceFramesCount = 0;
 
     void processVadFrame(int frameIndex, double V_n);
+    /**
+     * Helper function to process audio samples and calculate VAD metrics.
+     * Updates m_A, m_U, m_H, m_V vectors incrementally.
+     * @param samples - raw audio samples (int16)
+     * @param numSamples - number of samples
+     * @return vector of newly calculated V values
+     */
+    std::vector<double> calculateVadMetrics(const qint16* samples, qint64 numSamples);
     static double percentileValue(std::vector<double> values, double percentile);
 };
 

@@ -45,6 +45,59 @@ AudioApi::AudioApi(QObject* parent)
         });
 }
 
+std::vector<double> AudioApi::calculateVadMetrics(const qint16* samples, qint64 numSamples)
+{
+    std::vector<double> newVValues;
+    
+    // Add samples to buffer
+    for (qint64 i = 0; i < numSamples; ++i) {
+        m_sampleBuf.push_back(samples[i]);
+    }
+
+    // Calculate A (Amplitude) from 128-sample frames with 64-sample hop
+    while (static_cast<int>(m_sampleBuf.size()) >= 128) {
+        long long sumAmp = 0;
+        for (int i = 0; i < 128; ++i) {
+            sumAmp += std::abs(static_cast<int>(m_sampleBuf[i]));
+        }
+        m_A.push_back(static_cast<double>(sumAmp) / 128.0);
+        m_sampleBuf.erase(m_sampleBuf.begin(), m_sampleBuf.begin() + 64);
+    }
+
+    // Ensure vectors are large enough
+    if (m_U.size() < m_A.size()) m_U.resize(m_A.size(), 0.0);
+    if (m_H.size() < m_A.size()) m_H.resize(m_A.size(), 0.0);
+    if (m_V.size() < m_A.size()) m_V.resize(m_A.size(), 0.0);
+
+    // Calculate U(n) and H(n) incrementally
+    for (; m_valid_U + K_FRAMES - 1 < static_cast<int>(m_A.size()); ++m_valid_U) {
+        int i = m_valid_U;
+        if (i - K_FRAMES + 1 < 0) continue;
+
+        double sum_A = 0.0;
+        for (int j = i - K_FRAMES + 1; j < i + K_FRAMES; ++j) {
+            sum_A += m_A[j];
+        }
+        m_U[i] = sum_A / (2 * K_FRAMES - 1);
+        m_H[i] = std::abs(m_A[i] - m_U[i]);
+    }
+
+    // Calculate V(n) incrementally
+    for (; m_valid_V + K_FRAMES - 1 < m_valid_U; ++m_valid_V) {
+        int i = m_valid_V;
+        if (i - K_FRAMES + 1 < 0) continue;
+
+        double sum_H = 0.0;
+        for (int j = i - K_FRAMES + 1; j < i + K_FRAMES; ++j) {
+            sum_H += m_H[j];
+        }
+        m_V[i] = sum_H / (2 * K_FRAMES - 1);
+        newVValues.push_back(m_V[i]);
+    }
+
+    return newVValues;
+}
+
 bool AudioApi::isRecording() const
 {
     LOG_DEBUG() << "Start: isRecording";
@@ -182,59 +235,21 @@ void AudioApi::startRecording(int durationSeconds)
             const auto samples = reinterpret_cast<const qint16*>(data.constData());
             for (qint64 i = 0; i < numSamples; ++i) {
                 sumValue += std::abs(static_cast<int>(samples[i]));
-                m_sampleBuf.push_back(samples[i]);
+            }
+            // Calculate VAD metrics using helper function
+            std::vector<double> newVValues = calculateVadMetrics(samples, numSamples);
+            
+            // Process new V values for auto-stop if enabled
+            if (m_autoStopEnabled) {
+                int firstFrameIdx = m_valid_V - static_cast<int>(newVValues.size());
+                for (size_t i = 0; i < newVValues.size(); ++i) {
+                    processVadFrame(firstFrameIdx + i, newVValues[i]);
+                }
             }
         }
         double avgValue = (numSamples > 0) ? (double)sumValue / numSamples : 0.0;
         double level = avgValue / 4000.0;
         setAudioLevel(level > 1.0 ? 1.0 : level);
-
-        // Process VAD frames
-        while (m_sampleBuf.size() >= 128) {
-            long long sumAmp = 0;
-            for (int i = 0; i < 128; ++i) {
-                sumAmp += std::abs(static_cast<int>(m_sampleBuf[i]));
-            }
-            double A_n = static_cast<double>(sumAmp) / 128.0;
-            m_A.push_back(A_n);
-            
-            // Remove 64 samples for hop size
-            m_sampleBuf.erase(m_sampleBuf.begin(), m_sampleBuf.begin() + 64);
-        }
-
-        // Ensure vectors are large enough
-        if (m_U.size() < m_A.size()) m_U.resize(m_A.size(), 0.0);
-        if (m_H.size() < m_A.size()) m_H.resize(m_A.size(), 0.0);
-        if (m_V.size() < m_A.size()) m_V.resize(m_A.size(), 0.0);
-        
-        // Calculate U(n) and H(n) incrementally
-        for (; m_valid_U + K_FRAMES - 1 < static_cast<int>(m_A.size()); ++m_valid_U) {
-            int i = m_valid_U;
-            if (i - K_FRAMES + 1 < 0) continue;
-            
-            double sum_A = 0.0;
-            for (int j = i - K_FRAMES + 1; j < i + K_FRAMES; ++j) {
-                sum_A += m_A[j];
-            }
-            m_U[i] = sum_A;
-            m_H[i] = std::abs(m_A[i] - m_U[i]);
-        }
-
-        // Calculate V(n) incrementally
-        for (; m_valid_V + K_FRAMES - 1 < m_valid_U; ++m_valid_V) {
-            int i = m_valid_V;
-            if (i - K_FRAMES + 1 < 0) continue;
-            
-            double sum_H = 0.0;
-            for (int j = i - K_FRAMES + 1; j < i + K_FRAMES; ++j) {
-                sum_H += m_H[j];
-            }
-            m_V[i] = sum_H;
-            
-            if (m_autoStopEnabled) {
-                processVadFrame(i, m_V[i]);
-            }
-        }
 
         if (durationSeconds > 0) {
             const int maxBufferSize = m_format.sampleRate() * m_format.bytesPerSample() * durationSeconds;
@@ -308,22 +323,39 @@ void AudioApi::calibrateVad()
         return;
     }
 
-    // Temp VAD accumulation state
-    std::vector<qint16> sampleBuf;
-    std::vector<double> A;
-    std::vector<double> H;
-    std::vector<double> U;
+    // Save current VAD state
+    auto savedSampleBuf = m_sampleBuf;
+    auto savedA = m_A;
+    auto savedU = m_U;
+    auto savedH = m_H;
+    auto savedV = m_V;
+    int savedValidU = m_valid_U;
+    int savedValidV = m_valid_V;
+
+    // Clear VAD state for calibration
+    m_sampleBuf.clear();
+    m_A.clear();
+    m_U.clear();
+    m_H.clear();
+    m_V.clear();
+    m_valid_U = 0;
+    m_valid_V = 0;
+
     std::vector<double> allV;
     
-    int processed_A_idx = 0;
-    int processed_U_idx = 0;
-    int processed_V_idx = 0;
-
     QAudioFormat fmt = m_format;
     auto source = std::unique_ptr<QAudioSource>(new QAudioSource(m_audioDevice, fmt, this));
     QIODevice* io = source->start();
     if (!io) {
         LOG_DEBUG() << "Finish: calibrateVad - Failed to open audio device";
+        // Restore state
+        m_sampleBuf = savedSampleBuf;
+        m_A = savedA;
+        m_U = savedU;
+        m_H = savedH;
+        m_V = savedV;
+        m_valid_U = savedValidU;
+        m_valid_V = savedValidV;
         emit calibrationFinished(50000.0);
         return;
     }
@@ -336,50 +368,15 @@ void AudioApi::calibrateVad()
     QEventLoop loop;
     connect(&stopTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
-    connect(io, &QIODevice::readyRead, this, [&]() {
+    connect(io, &QIODevice::readyRead, this, [this, io, &allV, fmt]() {
         QByteArray data = io->readAll();
         qint64 numSamples = data.size() / fmt.bytesPerSample();
         if (numSamples > 0) {
             const auto samples = reinterpret_cast<const qint16*>(data.constData());
-            for (qint64 i = 0; i < numSamples; ++i)
-                sampleBuf.push_back(samples[i]);
-        }
-        
-        // 1. Calculate A (Amplitude)
-        while (static_cast<int>(sampleBuf.size()) >= 128) {
-            long long sumAmp = 0;
-            for (int i = 0; i < 128; ++i)
-                sumAmp += std::abs(static_cast<int>(sampleBuf[i]));
-            A.push_back(static_cast<double>(sumAmp) / 128.0);
-            sampleBuf.erase(sampleBuf.begin(), sampleBuf.begin() + 64);
-        }
-        
-        // 2. Calculate U (Mean Amplitude) and H (Absolute difference)
-        for (; processed_A_idx + K_FRAMES - 1 < static_cast<int>(A.size()); ++processed_A_idx) {
-            int i = processed_A_idx;
-            if (i - K_FRAMES + 1 < 0) continue;
-            
-            double sum_A = 0.0;
-            for (int j = i - K_FRAMES + 1; j < i + K_FRAMES; ++j)
-                sum_A += A[j];
-            
-            if (U.size() <= static_cast<size_t>(i)) U.resize(i + 1);
-            if (H.size() <= static_cast<size_t>(i)) H.resize(i + 1);
-            
-            U[i] = sum_A;
-            H[i] = std::abs(A[i] - U[i]);
-        }
-        
-        // 3. Calculate V (Energy/Variation)
-        for (; processed_U_idx + K_FRAMES - 1 < static_cast<int>(U.size()); ++processed_U_idx) {
-            int i = processed_U_idx;
-            if (i - K_FRAMES + 1 < 0) continue;
-            
-            double sum_H = 0.0;
-            for (int j = i - K_FRAMES + 1; j < i + K_FRAMES; ++j)
-                sum_H += H[j];
-            
-            allV.push_back(sum_H);
+            // Use helper function to calculate VAD metrics
+            std::vector<double> newVValues = calculateVadMetrics(samples, numSamples);
+            // Collect all V values for threshold calculation
+            allV.insert(allV.end(), newVValues.begin(), newVValues.end());
         }
     });
 
@@ -387,6 +384,15 @@ void AudioApi::calibrateVad()
     loop.exec();
 
     source->stop();
+
+    // Restore original state
+    m_sampleBuf = savedSampleBuf;
+    m_A = savedA;
+    m_U = savedU;
+    m_H = savedH;
+    m_V = savedV;
+    m_valid_U = savedValidU;
+    m_valid_V = savedValidV;
 
     // Use 95th percentile × 3 as threshold — robust against noise spikes
     double threshold = allV.empty() ? 50000.0 : percentileValue(allV, 0.95) * 3.0;
@@ -440,11 +446,6 @@ void AudioApi::stopRecording()
 
     emit isRecordingChanged();
 
-    if (m_voiceDetected) {
-        m_voiceDetected = false;
-        emit isVoiceDetectedChanged();
-    }
-
     m_savedA = m_A;
     m_savedU = m_U;
     m_savedV = m_V;
@@ -476,6 +477,11 @@ void AudioApi::stopRecording()
                 }
             }
         }
+    }
+
+    if (m_voiceDetected) {
+        m_voiceDetected = false;
+        emit isVoiceDetectedChanged();
     }
 
     LOG_DEBUG() << "Finish: stopRecording - Recording stopped";

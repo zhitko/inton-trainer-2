@@ -997,6 +997,7 @@ Page {
                                 return labels;
                             }
                             datasetColors: Theme.chartPalette(root.Material.theme).slice(0, datasetLabels.length)
+                            thresholdValue: window.settingsApi ? window.settingsApi.vadThreshold : null
                         }
                     }
 

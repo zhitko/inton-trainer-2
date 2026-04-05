@@ -87,4 +87,6 @@ CMakeLists.txt.user*
 /build*/
 application.log
 .cache/
-stories
+stories/
+build_appimage/
+data/

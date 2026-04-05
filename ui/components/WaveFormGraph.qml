@@ -18,6 +18,8 @@ Column {
 
     property bool showLegend: false
     property var datasetLabels: []
+    property var thresholdValue: null
+    property color thresholdColor: Theme.error(Material.theme)
 
     Canvas {
         id: canvas
@@ -100,6 +102,9 @@ Column {
                     perMaxY.push(0);
                 }
             }
+
+            var realMinY = minY;
+            var realMaxY = maxY;
             
             minY = minY - (maxY - minY) * 0.01;
             maxY = maxY + (maxY - minY) * 0.01;
@@ -178,8 +183,8 @@ Column {
             ctx.font = "10px sans-serif";
             ctx.textAlign = "right";
             ctx.textBaseline = "middle";
-            ctx.fillText(maxY.toFixed(2), leftMargin - 8, topPadding);
-            ctx.fillText(minY.toFixed(2), leftMargin - 8, canvas.height - bottomPadding);
+            ctx.fillText(realMaxY.toFixed(2), leftMargin - 8, topPadding);
+            ctx.fillText(realMinY.toFixed(2), leftMargin - 8, canvas.height - bottomPadding);
 
             // Draw cue points
             ctx.lineWidth = 1;
@@ -215,7 +220,9 @@ Column {
                 // Draw label
                 ctx.fillStyle = Theme.onSurfaceVariant(Material.theme);
                 ctx.textAlign = "right";
-                ctx.fillText("0", leftMargin - 8, y0);
+                // Draw "0" label only if it's not overlapping with min/max labels
+                if (Math.abs(y0 - topPadding) > 12 && Math.abs(y0 - (canvas.height - bottomPadding)) > 12)
+                    ctx.fillText("0", leftMargin - 8, y0);
             }
 
             var nIdx = 0;
@@ -312,6 +319,28 @@ Column {
                 ctx.lineJoin = "round";
                 ctx.stroke();
             }
+
+            // Draw threshold line OUTSIDE clipping region
+            if (root.thresholdValue !== null && typeof root.thresholdValue === "number") {
+                // Calculate Y position
+                var scaledThresholdY = (root.thresholdValue - minY) / rangeY * graphHeight;
+                var thresholdY = graphHeight + topPadding - scaledThresholdY;
+                
+                // Ensure Y is within visible bounds
+                if (thresholdY < topPadding) thresholdY = topPadding;
+                if (thresholdY > graphHeight + topPadding) thresholdY = graphHeight + topPadding;
+
+                console.log("Drawing threshold line at Y:", thresholdY, "Canvas bounds: top=", topPadding, "bottom=", graphHeight + topPadding, "leftMargin=", leftMargin, "graphWidth=", graphWidth);
+                
+                // Draw threshold line
+                ctx.strokeStyle = root.thresholdColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(leftMargin, thresholdY);
+                ctx.lineTo(leftMargin + graphWidth, thresholdY);
+                ctx.stroke();
+                console.log("Threshold line drawn");
+            }
             ctx.restore();
         }
     }
@@ -329,6 +358,14 @@ Column {
     }
 
     onDatasetColorsChanged: {
+        canvas.requestPaint();
+    }
+
+    onThresholdValueChanged: {
+        canvas.requestPaint();
+    }
+
+    onThresholdColorChanged: {
         canvas.requestPaint();
     }
 
