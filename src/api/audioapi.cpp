@@ -31,6 +31,8 @@ AudioApi::AudioApi(QObject* parent)
     m_wavFileService = std::unique_ptr<WavFileService>(new WavFileService(
         QCoreApplication::applicationDirPath().toStdString()));
 
+    m_vadService = std::unique_ptr<VADEnergyService>(new VADEnergyService(this));
+
     m_player = new QMediaPlayer(this);
     m_audioOutput = new QAudioOutput(this);
     m_player->setAudioOutput(m_audioOutput);
@@ -43,59 +45,6 @@ AudioApi::AudioApi(QObject* parent)
                 emit isPlayingChanged();
             }
         });
-}
-
-std::vector<double> AudioApi::calculateVadMetrics(const qint16* samples, qint64 numSamples)
-{
-    std::vector<double> newVValues;
-    
-    // Add samples to buffer
-    for (qint64 i = 0; i < numSamples; ++i) {
-        m_sampleBuf.push_back(samples[i]);
-    }
-
-    // Calculate A (Amplitude) from 128-sample frames with 64-sample hop
-    while (static_cast<int>(m_sampleBuf.size()) >= 128) {
-        long long sumAmp = 0;
-        for (int i = 0; i < 128; ++i) {
-            sumAmp += std::abs(static_cast<int>(m_sampleBuf[i]));
-        }
-        m_A.push_back(static_cast<double>(sumAmp) / 128.0);
-        m_sampleBuf.erase(m_sampleBuf.begin(), m_sampleBuf.begin() + 64);
-    }
-
-    // Ensure vectors are large enough
-    if (m_U.size() < m_A.size()) m_U.resize(m_A.size(), 0.0);
-    if (m_H.size() < m_A.size()) m_H.resize(m_A.size(), 0.0);
-    if (m_V.size() < m_A.size()) m_V.resize(m_A.size(), 0.0);
-
-    // Calculate U(n) and H(n) incrementally
-    for (; m_valid_U + K_FRAMES - 1 < static_cast<int>(m_A.size()); ++m_valid_U) {
-        int i = m_valid_U;
-        if (i - K_FRAMES + 1 < 0) continue;
-
-        double sum_A = 0.0;
-        for (int j = i - K_FRAMES + 1; j < i + K_FRAMES; ++j) {
-            sum_A += m_A[j];
-        }
-        m_U[i] = sum_A / (2 * K_FRAMES - 1);
-        m_H[i] = std::abs(m_A[i] - m_U[i]);
-    }
-
-    // Calculate V(n) incrementally
-    for (; m_valid_V + K_FRAMES - 1 < m_valid_U; ++m_valid_V) {
-        int i = m_valid_V;
-        if (i - K_FRAMES + 1 < 0) continue;
-
-        double sum_H = 0.0;
-        for (int j = i - K_FRAMES + 1; j < i + K_FRAMES; ++j) {
-            sum_H += m_H[j];
-        }
-        m_V[i] = sum_H / (2 * K_FRAMES - 1);
-        newVValues.push_back(m_V[i]);
-    }
-
-    return newVValues;
 }
 
 bool AudioApi::isRecording() const
@@ -128,24 +77,27 @@ qreal AudioApi::audioLevel() const
 QVariantList AudioApi::getVadA() const
 {
     QVariantList list;
-    for (int i = 0; i < static_cast<int>(m_savedA.size()); ++i)
-        list.append(QPointF(i, m_savedA[i]));
+    const auto& savedA = m_vadService->getSavedA();
+    for (int i = 0; i < static_cast<int>(savedA.size()); ++i)
+        list.append(QPointF(i, savedA[i]));
     return list;
 }
 
 QVariantList AudioApi::getVadU() const
 {
     QVariantList list;
-    for (int i = 0; i < static_cast<int>(m_savedU.size()); ++i)
-        list.append(QPointF(i, m_savedU[i]));
+    const auto& savedU = m_vadService->getSavedU();
+    for (int i = 0; i < static_cast<int>(savedU.size()); ++i)
+        list.append(QPointF(i, savedU[i]));
     return list;
 }
 
 QVariantList AudioApi::getVadV() const
 {
     QVariantList list;
-    for (int i = 0; i < static_cast<int>(m_savedV.size()); ++i)
-        list.append(QPointF(i, m_savedV[i]));
+    const auto& savedV = m_vadService->getSavedV();
+    for (int i = 0; i < static_cast<int>(savedV.size()); ++i)
+        list.append(QPointF(i, savedV[i]));
     return list;
 }
 
@@ -195,27 +147,19 @@ void AudioApi::startRecording(int durationSeconds)
     m_firstSpeechFrame = -1;
     m_lastSpeechFrame = -1;
     m_silenceFramesCount = 0;
-    
-    m_valid_U = 0;
-    m_valid_V = 0;
-    m_calibrationCounter = 0;
-    m_calibrationFrames.clear();
-    // Use saved threshold from settings if available; otherwise will calibrate at runtime
-    m_Pe = settings.vadThreshold > 0 ? settings.vadThreshold : 0.0;
-    // If we have a preset threshold, skip the in-recording calibration phase
-    if (m_Pe > 0) {
-        m_calibrationCounter = CALIBRATION_FRAMES;
+
+    // Initialize VAD service
+    m_vadService->reset();
+    if (settings.vadThreshold > 0) {
+        m_vadService->setThreshold(settings.vadThreshold);
+    } else {
+        m_vadService->setThreshold(0.0);
     }
+
     if (m_voiceDetected) {
         m_voiceDetected = false;
         emit isVoiceDetectedChanged();
     }
-    
-    m_sampleBuf.clear();
-    m_A.clear();
-    m_U.clear();
-    m_H.clear();
-    m_V.clear();
 
     m_buffer.clear();
     m_bufferOffsetBytes = 0;
@@ -236,12 +180,13 @@ void AudioApi::startRecording(int durationSeconds)
             for (qint64 i = 0; i < numSamples; ++i) {
                 sumValue += std::abs(static_cast<int>(samples[i]));
             }
-            // Calculate VAD metrics using helper function
-            std::vector<double> newVValues = calculateVadMetrics(samples, numSamples);
+            // Calculate VAD metrics using service
+            std::vector<double> newVValues = m_vadService->processAudioSamples(samples, numSamples);
             
             // Process new V values for auto-stop if enabled
             if (m_autoStopEnabled) {
-                int firstFrameIdx = m_valid_V - static_cast<int>(newVValues.size());
+                int validV = m_vadService->getValidVIndex();
+                int firstFrameIdx = validV - static_cast<int>(newVValues.size());
                 for (size_t i = 0; i < newVValues.size(); ++i) {
                     processVadFrame(firstFrameIdx + i, newVValues[i]);
                 }
@@ -269,19 +214,13 @@ void AudioApi::startRecording(int durationSeconds)
 
 void AudioApi::processVadFrame(int frameIndex, double V_n)
 {
-    if (m_calibrationCounter < CALIBRATION_FRAMES) {
-        m_calibrationFrames.push_back(V_n);
-        m_calibrationCounter++;
-        if (m_calibrationCounter == CALIBRATION_FRAMES) {
-            // Use 95th percentile to ignore occasional noise spikes during calibration
-            m_Pe = percentileValue(m_calibrationFrames, 0.95) * 3.0;
-            LOG_DEBUG() << "AutoStop: Calibrated threshold Pe=" << m_Pe
-                        << " (95th percentile of" << CALIBRATION_FRAMES << "frames)";
-        }
-        return;
+    if (m_vadService->addCalibrationFrame(V_n)) {
+        // Calibration just completed
+        double threshold = m_vadService->getThreshold();
+        LOG_DEBUG() << "AutoStop: Calibrated threshold Pe=" << threshold;
     }
 
-    bool isSpeech = (V_n > m_Pe);
+    bool isSpeech = m_vadService->isSpeech(V_n);
 
     if (isSpeech) {
         if (!m_voiceDetected) {
@@ -304,17 +243,6 @@ void AudioApi::processVadFrame(int frameIndex, double V_n)
     }
 }
 
-double AudioApi::percentileValue(std::vector<double> values, double percentile)
-{
-    if (values.empty()) return 0.0;
-    // We need a sorted copy, and 'values' is already a copy since it's passed by value
-    std::sort(values.begin(), values.end());
-    int idx = static_cast<int>(std::ceil(percentile * values.size())) - 1;
-    if (idx < 0) idx = 0;
-    if (idx >= static_cast<int>(values.size())) idx = static_cast<int>(values.size()) - 1;
-    return values[idx];
-}
-
 void AudioApi::calibrateVad()
 {
     LOG_DEBUG() << "Start: calibrateVad";
@@ -323,39 +251,15 @@ void AudioApi::calibrateVad()
         return;
     }
 
-    // Save current VAD state
-    auto savedSampleBuf = m_sampleBuf;
-    auto savedA = m_A;
-    auto savedU = m_U;
-    auto savedH = m_H;
-    auto savedV = m_V;
-    int savedValidU = m_valid_U;
-    int savedValidV = m_valid_V;
+    // Create a temporary VAD service for calibration
+    auto calibrationService = std::make_unique<VADEnergyService>(nullptr);
+    calibrationService->prepareForCalibration();
 
-    // Clear VAD state for calibration
-    m_sampleBuf.clear();
-    m_A.clear();
-    m_U.clear();
-    m_H.clear();
-    m_V.clear();
-    m_valid_U = 0;
-    m_valid_V = 0;
-
-    std::vector<double> allV;
-    
     QAudioFormat fmt = m_format;
     auto source = std::unique_ptr<QAudioSource>(new QAudioSource(m_audioDevice, fmt, this));
     QIODevice* io = source->start();
     if (!io) {
         LOG_DEBUG() << "Finish: calibrateVad - Failed to open audio device";
-        // Restore state
-        m_sampleBuf = savedSampleBuf;
-        m_A = savedA;
-        m_U = savedU;
-        m_H = savedH;
-        m_V = savedV;
-        m_valid_U = savedValidU;
-        m_valid_V = savedValidV;
         emit calibrationFinished(50000.0);
         return;
     }
@@ -368,15 +272,13 @@ void AudioApi::calibrateVad()
     QEventLoop loop;
     connect(&stopTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
-    connect(io, &QIODevice::readyRead, this, [this, io, &allV, fmt]() {
+    connect(io, &QIODevice::readyRead, this, [this, io, calibrationService = calibrationService.get(), fmt]() {
         QByteArray data = io->readAll();
         qint64 numSamples = data.size() / fmt.bytesPerSample();
         if (numSamples > 0) {
             const auto samples = reinterpret_cast<const qint16*>(data.constData());
-            // Use helper function to calculate VAD metrics
-            std::vector<double> newVValues = calculateVadMetrics(samples, numSamples);
-            // Collect all V values for threshold calculation
-            allV.insert(allV.end(), newVValues.begin(), newVValues.end());
+            // Process audio samples through calibration service
+            calibrationService->processAudioSamples(samples, numSamples);
         }
     });
 
@@ -385,19 +287,12 @@ void AudioApi::calibrateVad()
 
     source->stop();
 
-    // Restore original state
-    m_sampleBuf = savedSampleBuf;
-    m_A = savedA;
-    m_U = savedU;
-    m_H = savedH;
-    m_V = savedV;
-    m_valid_U = savedValidU;
-    m_valid_V = savedValidV;
-
-    // Use 95th percentile × 3 as threshold — robust against noise spikes
-    double threshold = allV.empty() ? 50000.0 : percentileValue(allV, 0.95) * 3.0;
+    // Get all V values and calculate threshold
+    std::vector<double> vValues = calibrationService->getAndClearRecentVValues();
+    double threshold = VADEnergyService::calculateThresholdFromValues(vValues);
+    
     LOG_DEBUG() << "Calibration done: threshold=" << threshold
-                << " (95th percentile of" << allV.size() << "frames)";
+                << " (from" << vValues.size() << "frames)";
     emit calibrationFinished(threshold);
     LOG_DEBUG() << "Finish: calibrateVad";
 }
@@ -446,11 +341,10 @@ void AudioApi::stopRecording()
 
     emit isRecordingChanged();
 
-    m_savedA = m_A;
-    m_savedU = m_U;
-    m_savedV = m_V;
+    // Save current VAD metrics
+    m_vadService->updateSavedMetrics();
 
-    // Crop m_savedA, m_savedU, m_savedV to synchronize with m_buffer
+    // Crop saved metrics to synchronize with m_buffer
     if (m_autoStopEnabled && m_voiceDetected && m_firstSpeechFrame >= 0 && m_lastSpeechFrame >= 0) {
         int pre_samples = (PRE_BUFFER_MS * m_format.sampleRate()) / 1000;
         int post_samples = (PRE_BUFFER_MS * m_format.sampleRate()) / 1000;
@@ -460,23 +354,7 @@ void AudioApi::stopRecording()
         
         int end_frame = (m_lastSpeechFrame * 64 + 128 + post_samples) / 64;
         
-        if (start_frame < static_cast<int>(m_savedA.size())) {
-            int count = end_frame - start_frame;
-            if (start_frame + count > static_cast<int>(m_savedA.size()))
-                count = m_savedA.size() - start_frame;
-            
-            if (count > 0) {
-                m_savedA = std::vector<double>(m_savedA.begin() + start_frame, m_savedA.begin() + start_frame + count);
-                if (start_frame < static_cast<int>(m_savedU.size())) {
-                   int u_count = std::min<int>(count, m_savedU.size() - start_frame);
-                   m_savedU = std::vector<double>(m_savedU.begin() + start_frame, m_savedU.begin() + start_frame + u_count);
-                }
-                if (start_frame < static_cast<int>(m_savedV.size())) {
-                   int v_count = std::min<int>(count, m_savedV.size() - start_frame);
-                   m_savedV = std::vector<double>(m_savedV.begin() + start_frame, m_savedV.begin() + start_frame + v_count);
-                }
-            }
-        }
+        m_vadService->cropSavedMetrics(start_frame, end_frame);
     }
 
     if (m_voiceDetected) {

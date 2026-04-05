@@ -3,6 +3,7 @@
 
 #include "src/services/helpers/wavFile.h"
 #include "src/services/wavfileservice.h"
+#include "src/services/vadenergryservice.h"
 #include <QAudioFormat>
 #include <QAudioSource>
 #include <QMediaDevices>
@@ -13,6 +14,7 @@
 #include <vector>
 
 class WavFileService;
+class VADEnergyService;
 struct WaveFile;
 
 /*
@@ -177,40 +179,14 @@ private:
     bool m_voiceDetected = false;
     static constexpr int PRE_BUFFER_MS = 250; // Pre/post buffer duration in ms
 
-    // New VAD logic properties
-    static constexpr int K_FRAMES = 16;
-    static constexpr int CALIBRATION_FRAMES = 50; // Increased for reliable percentile
-
-    std::vector<qint16> m_sampleBuf;
-    std::vector<double> m_A;
-    std::vector<double> m_U;
-    std::vector<double> m_H;
-    std::vector<double> m_V;
-
-    std::vector<double> m_savedA;
-    std::vector<double> m_savedU;
-    std::vector<double> m_savedV;
-
-    int m_valid_U = 0;
-    int m_valid_V = 0;
-    int m_calibrationCounter = 0;
-    std::vector<double> m_calibrationFrames; // Individual V(n) frames during calibration
-    double m_Pe = 0.0;
+    // VAD service for energy-based voice activity detection
+    std::unique_ptr<VADEnergyService> m_vadService;
 
     int m_firstSpeechFrame = -1;
     int m_lastSpeechFrame = -1;
     int m_silenceFramesCount = 0;
 
     void processVadFrame(int frameIndex, double V_n);
-    /**
-     * Helper function to process audio samples and calculate VAD metrics.
-     * Updates m_A, m_U, m_H, m_V vectors incrementally.
-     * @param samples - raw audio samples (int16)
-     * @param numSamples - number of samples
-     * @return vector of newly calculated V values
-     */
-    std::vector<double> calculateVadMetrics(const qint16* samples, qint64 numSamples);
-    static double percentileValue(std::vector<double> values, double percentile);
 };
 
 #endif // AUDIOAPI_H
