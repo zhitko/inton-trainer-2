@@ -68,6 +68,7 @@ Page {
     }
 
     property bool _isExiting: false
+    property bool _wasRecordingBeforeDialog: false
 
     onVisibleChanged: {
         if (visible) {
@@ -835,6 +836,14 @@ Page {
                 }
 
                 onClicked: {
+                    // Stop recording before opening the dialog
+                    _wasRecordingBeforeDialog = trainingAudioApi.isRecording;
+                    if (_wasRecordingBeforeDialog) {
+                        console.log("Stopping recording before opening test file dialog");
+                        _isExiting = true; // Prevent automatic restart when stopping
+                        trainingAudioApi.stopRecording();
+                    }
+                    
                     var testFolderPath = fileApi.getApplicationDirPath() + "/data/test";
                     console.log("Opening test file dialog: " + testFolderPath);
                     if (!fileApi.directoryExists(testFolderPath)) {
@@ -856,6 +865,21 @@ Page {
                     var selectedPath = fileApi.getPathFromUrl(testFileDialog.selectedFile);
                     if (selectedPath) {
                         updateUserUMP(selectedPath, false);
+                    }
+                    // Resume recording if it was active before opening the dialog
+                    if (_wasRecordingBeforeDialog && window.settingsApi && window.settingsApi.autoStopRecording) {
+                        console.log("Resuming recording after opening test file dialog");
+                        _isExiting = false; // Allow recording to auto-restart
+                        trainingAudioApi.startRecording();
+                    }
+                }
+                onRejected: {
+                    console.log("testFileDialog rejected");
+                    // Resume recording if it was active before opening the dialog
+                    if (_wasRecordingBeforeDialog && window.settingsApi && window.settingsApi.autoStopRecording) {
+                        console.log("Resuming recording after opening test file dialog");
+                        _isExiting = false; // Allow recording to auto-restart
+                        trainingAudioApi.startRecording();
                     }
                 }
             }
