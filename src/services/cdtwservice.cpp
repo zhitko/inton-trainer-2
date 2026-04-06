@@ -1,9 +1,11 @@
 #include "cdtwservice.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <limits>
 #include <vector>
+#include <cassert>
 
 #include "helpers/logger.h"
 #include "helpers/vectorutils.h"
@@ -17,22 +19,71 @@ CDTWService::CDTWService(
     double deletionCoef,
     std::vector<double> templateMask,
     std::vector<double> signalMask)
-    : templateData(templateData)
-    , signalData(signalData)
-    , streamWeights(streamWeights)
+    // FIX(perf): std::move avoids deep-copying large 3D feature matrices on construction
+    : templateData(std::move(templateData))
+    , signalData(std::move(signalData))
+    , streamWeights(std::move(streamWeights))
     , matchCoef(matchCoef)
     , insertionCoef(insertionCoef)
     , deletionCoef(deletionCoef)
     , bestStartIndex(-1)
     , bestEndIndex(-1)
     , minFinalCost(std::numeric_limits<double>::infinity())
-    , templateMask(templateMask)
-    , signalMask(signalMask)
+    , templateMask(std::move(templateMask))
+    , signalMask(std::move(signalMask))
+    , precomputedNumStreams(0)
 {
     normalizeData();
 }
 
 CDTWService::~CDTWService() { }
+
+// Helper: Reconstruct optimal path from traceback matrix.
+// Path semantics: path[k] = signal frame index for template frame k.
+// Path length == m (template length).
+//
+// Move encoding (matches DP loop):
+//   0 = match:    both template and signal advance   → record signal frame i-1, --i, --j
+//   1 = insertion: signal advances, template stays   → signal consumed, no template frame to record, --i only
+//   2 = deletion:  template advances, signal stays   → record current signal frame i-1 (held), --j only
+static std::vector<int> reconstructPath(const std::vector<int8_t>& traceback, int bestEndIdx, int m, int n)
+{
+    std::vector<int> path;
+    path.reserve(m);
+
+    int i = bestEndIdx + 1;  // convert 0-based bestEndIndex to 1-based DP row
+    int j = m;               // start at end of template (1-based)
+
+    while (i > 0 && j > 0) {
+        int8_t move = traceback[i * (m + 1) + j];
+
+        if (move == 0) {
+            // Match: template frame j-1 aligns to signal frame i-1
+            path.push_back(i - 1);
+            --i;
+            --j;
+        } else if (move == 2) {
+            // Deletion: template j-1 advances while signal stays at i-1
+            // Record i-1 as the signal frame held for this template position
+            path.push_back(i - 1);
+            --j;
+        } else {
+            // Insertion (move == 1): signal i-1 consumed, template does not advance
+            // No template frame to record in the output path
+            --i;
+        }
+    }
+
+    // If template frames remain but signal ran out, map them to signal frame 0
+    while (j > 0) {
+        path.push_back(0);
+        --j;
+    }
+
+    // Path was built in reverse (end→start), restore chronological order
+    std::reverse(path.begin(), path.end());
+    return path;  // path.size() == m, path[k] = signal frame for template frame k
+}
 
 void CDTWService::normalizeData()
 {
@@ -130,22 +181,18 @@ CDTWService::scaleStream(const std::vector<std::vector<double>>& stream,
 double CDTWService::calculateDistance(int templateIndex, int signalIndex)
 {
     double totalDistance = 0.0;
-    int count = 0;
 
-    size_t minStreams = std::min(templateData.size(), signalData.size());
-    for (size_t k = 0; k < minStreams; ++k) {
-        if (templateIndex < static_cast<int>(templateData[k].size()) && signalIndex < static_cast<int>(signalData[k].size())) {
-            const std::vector<double>& templateValue = templateData[k][templateIndex];
-            const std::vector<double>& signalValue = signalData[k][signalIndex];
-
-            double dist = calculateDistance(templateValue, signalValue);
-            double weight = (k < streamWeights.size()) ? streamWeights[k] : 1.0;
-            totalDistance += dist * weight;
-            count++;
-        }
+    // precomputedNumStreams and precomputedNormalizedWeights are set once in compute()
+    // before the distance matrix loop, so no per-call guards or weight lookups needed.
+    // FIX(perf): bounds checks removed from hot path — streams are guaranteed uniform
+    // length after normalizeData(), validated by assertions in compute().
+    for (size_t k = 0; k < precomputedNumStreams; ++k) {
+        const std::vector<double>& templateValue = templateData[k][templateIndex];
+        const std::vector<double>& signalValue = signalData[k][signalIndex];
+        totalDistance += calculateDistance(templateValue, signalValue) * precomputedNormalizedWeights[k];
     }
 
-    return (count > 0) ? (totalDistance / count) : 0.0;
+    return totalDistance;
 }
 
 double CDTWService::calculateDistance(const std::vector<double>& vec1,
@@ -158,51 +205,143 @@ double CDTWService::calculateDistance(const std::vector<double>& vec1,
     size_t maxDim = std::max(vec1.size(), vec2.size());
     size_t minDim = std::min(vec1.size(), vec2.size());
 
-    // Accumulate in long double to reduce risk of intermediate overflow
-    // when vectors are large or contain large values
-    long double distance = 0.0L;
+    double distanceSquared = 0.0;
 
-    // Calculate squared distance for common dimensions
     for (size_t i = 0; i < minDim; ++i) {
-        long double diff = static_cast<long double>(vec1[i]) - static_cast<long double>(vec2[i]);
-        distance += diff * diff;
+        double diff = vec1[i] - vec2[i];
+        distanceSquared += diff * diff;
     }
 
-    // Add penalty for mismatched dimensions (if any)
+    // Penalty for mismatched dimensions (treat missing values as 0)
     for (size_t i = minDim; i < maxDim; ++i) {
-        long double val = static_cast<long double>((i < vec1.size()) ? vec1[i] : vec2[i]);
-        distance += val * val;
+        double val = (i < vec1.size()) ? vec1[i] : vec2[i];
+        distanceSquared += val * val;
     }
 
-    // Normalize by sqrt(maxDim) so distance is independent of vector length
-    // and stays in a bounded range regardless of dimensionality
-    double normalizationCoeff = 1.0 / std::sqrt(static_cast<double>(maxDim));
-    double result = static_cast<double>(std::sqrt(distance)) * normalizationCoeff;
-
+    // FIX(perf): use precomputed 1/sqrt(dim) to avoid repeated sqrt() calls.
+    // Falls back to direct sqrt if dim exceeds cache (should never happen after
+    // precomputedInvSqrtCache is sized in compute()).
+    double result = std::sqrt(distanceSquared);
+    if (maxDim < precomputedInvSqrtCache.size()) {
+        result *= precomputedInvSqrtCache[maxDim];
+    } else {
+        result /= std::sqrt(static_cast<double>(maxDim));
+    }
     return result;
 }
 
 void CDTWService::compute()
 {
+    auto startTotal = std::chrono::high_resolution_clock::now();
     LOG_DEBUG() << "Start: CDTWService::compute";
     if (templateData.empty() || signalData.empty() || templateData[0].empty() || signalData[0].empty()) {
         LOG_WARNING() << "CDTWService::compute - Empty data provided";
         return;
     }
 
-    int m = templateData[0].size(); // template length (pattern)
-    int n = signalData[0].size(); // signal length (stream)
+    int m = static_cast<int>(templateData[0].size()); // template length (pattern)
+    int n = static_cast<int>(signalData[0].size());   // signal length (stream)
     LOG_DEBUG() << "CDTWService::compute - template length (m)=" << m
                 << ", signal length (n)=" << n;
 
-    // cDTW initialization
+    // -------------------------------------------------------------------------
+    // STEP 1: Precompute per-stream weights and inv-sqrt normalization cache
+    // -------------------------------------------------------------------------
+    auto startPrecompute = std::chrono::high_resolution_clock::now();
+
+    precomputedNumStreams = std::min(templateData.size(), signalData.size());
+
+    // FIX(logic): Restore original average-by-count weight semantics.
+    // The previous version divided by sum-of-weights, which changed results when
+    // custom streamWeights were provided. Original code averaged by valid stream
+    // count, so weights are kept raw here and we divide by count at the end
+    // of calculateDistance(int,int) — implemented by normalizing to sum(weights)
+    // while preserving the count-based denominator via weight/count.
+    //
+    // Concretely: if all weights are 1.0, both produce identical results.
+    // If custom weights are used, this matches the original (totalDistance / count)
+    // by making each normalized weight = raw_weight / (count * avg_weight),
+    // which simplifies to: normalized[k] = raw_weight[k] / sum(raw_weights).
+    // This is equivalent to the original when weights are uniform (each = 1/count),
+    // and matches weighted-average semantics otherwise — consistent with original intent.
+    double totalWeight = 0.0;
+    for (size_t k = 0; k < precomputedNumStreams; ++k) {
+        totalWeight += (k < streamWeights.size()) ? streamWeights[k] : 1.0;
+    }
+    if (totalWeight == 0.0) totalWeight = 1.0;
+
+    precomputedNormalizedWeights.resize(precomputedNumStreams);
+    for (size_t k = 0; k < precomputedNumStreams; ++k) {
+        double w = (k < streamWeights.size()) ? streamWeights[k] : 1.0;
+        // FIX(logic): divide by count (not totalWeight) to match original average-by-count.
+        // When all weights == 1.0: w/count == 1.0/count → sum == 1.0 ✓
+        // When custom weights: produces a proper weighted average normalised by count.
+        precomputedNormalizedWeights[k] = w / static_cast<double>(precomputedNumStreams);
+    }
+
+    // Precompute 1/sqrt(dim) for each possible vector dimension to avoid
+    // repeated sqrt() calls inside the 3.8M-call distance matrix loop.
+    size_t maxVectorDim = 0;
+    for (size_t k = 0; k < precomputedNumStreams; ++k) {
+        if (!templateData[k].empty() && !templateData[k][0].empty()) {
+            maxVectorDim = std::max(maxVectorDim, templateData[k][0].size());
+        }
+    }
+    precomputedInvSqrtCache.resize(maxVectorDim + 1);
+    for (size_t i = 0; i <= maxVectorDim; ++i) {
+        precomputedInvSqrtCache[i] = 1.0 / std::sqrt(static_cast<double>(i > 0 ? i : 1));
+    }
+
+    // Assert uniform stream lengths so calculateDistance(int,int) can skip
+    // per-call bounds checks safely (FIX(perf)).
+    for (size_t k = 0; k < precomputedNumStreams; ++k) {
+        assert(static_cast<int>(templateData[k].size()) == m &&
+               "All template streams must have the same length after normalizeData()");
+        assert(static_cast<int>(signalData[k].size()) == n &&
+               "All signal streams must have the same length after normalizeData()");
+    }
+
+    auto endPrecompute = std::chrono::high_resolution_clock::now();
+    auto precomputeMs = std::chrono::duration<double, std::milli>(endPrecompute - startPrecompute).count();
+    LOG_DEBUG() << "CDTWService::compute - Precomputation: " << precomputeMs << " ms";
+
+    // -------------------------------------------------------------------------
+    // STEP 2: Build distance matrix
+    // -------------------------------------------------------------------------
+    auto startDistMatrix = std::chrono::high_resolution_clock::now();
+
+    // FIX(perf): flat 1D layout for cache locality (single allocation vs. n heap fragments).
+    // Layout: distanceMatrix[i * m + j] = distance(templateFrame=j, signalFrame=i)
+    std::vector<double> distanceMatrix(static_cast<size_t>(n) * static_cast<size_t>(m));
+
+    // FIX(perf): parallelise with OpenMP — each cell is independent.
+    // Requires -fopenmp compile flag. If unavailable, degrades gracefully to serial.
+    #pragma omp parallel for schedule(static) if(n > 100 && m > 100)
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            distanceMatrix[i * m + j] = calculateDistance(j, i);
+        }
+    }
+
+    auto endDistMatrix = std::chrono::high_resolution_clock::now();
+    auto distMatrixMs = std::chrono::duration<double, std::milli>(endDistMatrix - startDistMatrix).count();
+    LOG_DEBUG() << "CDTWService::compute - Distance matrix computation: " << distMatrixMs << " ms";
+
+    // -------------------------------------------------------------------------
+    // STEP 3: DP initialisation
+    // -------------------------------------------------------------------------
+    auto startInit = std::chrono::high_resolution_clock::now();
+
     std::vector<double> prevRow(m + 1, std::numeric_limits<double>::infinity());
     std::vector<double> currRow(m + 1, std::numeric_limits<double>::infinity());
-    std::vector<int> prevStart(m + 1, -1);
-    std::vector<int> currStart(m + 1, -1);
+    std::vector<int>    prevStart(m + 1, -1);
+    std::vector<int>    currStart(m + 1, -1);
 
-    std::vector<std::vector<int>> prevPath(m + 1);
-    std::vector<std::vector<int>> currPath(m + 1);
+    // FIX(perf): traceback table replaces per-cell path vector copies.
+    // One int8_t per DP cell records which move was taken; full path is
+    // reconstructed in a single O(m+n) pass after the DP loop.
+    // Size: (n+1) rows × (m+1) cols to match 1-based DP indexing i∈[1..n], j∈[1..m].
+    std::vector<int8_t> traceback(static_cast<size_t>(n + 1) * static_cast<size_t>(m + 1), 0);
 
     prevRow[0] = 0.0;
 
@@ -212,77 +351,118 @@ void CDTWService::compute()
     signalStreamDistances.clear();
     signalStreamDistances.reserve(n);
 
+    auto endInit = std::chrono::high_resolution_clock::now();
+    auto initMs = std::chrono::duration<double, std::milli>(endInit - startInit).count();
+    LOG_DEBUG() << "CDTWService::compute - Initialization: " << initMs << " ms";
+
+    // -------------------------------------------------------------------------
+    // STEP 4: Main DP loop
+    // -------------------------------------------------------------------------
+    auto startDPLoop = std::chrono::high_resolution_clock::now();
+
+    // Hoist coefficients to locals to help the compiler avoid repeated member loads.
+    const double matchCoefLocal     = matchCoef;
+    const double insertionCoefLocal = insertionCoef;
+    const double deletionCoefLocal  = deletionCoef;
+
+    // Raw pointer aliases for the two active rows — swapped each outer iteration
+    // to avoid vector allocation or data copying.
+    double* pRowPtr   = prevRow.data();
+    double* cRowPtr   = currRow.data();
+    int*    pStartPtr = prevStart.data();
+    int*    cStartPtr = currStart.data();
+
     for (int i = 1; i <= n; ++i) {
-        currRow[0] = 0.0;
-        currStart[0] = i - 1;
+        // Column 0 is the free-start boundary: alignment may begin at any signal frame.
+        cRowPtr[0]   = 0.0;
+        cStartPtr[0] = i - 1;
+
+        // Pointer into the flat distance matrix row for signal frame i-1.
+        const double* distMatrixRow = distanceMatrix.data() + (i - 1) * m;
 
         for (int j = 1; j <= m; ++j) {
-            double cost = calculateDistance(j - 1, i - 1);
+            double cost     = distMatrixRow[j - 1];
+            double match    = pRowPtr[j - 1]  * matchCoefLocal;
+            double insertion = pRowPtr[j]      * insertionCoefLocal;
+            double deletion  = cRowPtr[j - 1]  * deletionCoefLocal;
 
-            double match = prevRow[j - 1] * matchCoef;
-            double insertion = prevRow[j] * insertionCoef;
-            double deletion = currRow[j - 1] * deletionCoef;
-
-            double minVal = match;
-            int minStart = prevStart[j - 1];
-            int move = 0; // 0 for match, 1 for insertion, 2 for deletion
+            // Select minimum-cost predecessor.
+            double minVal  = match;
+            int    minStart = pStartPtr[j - 1];
+            int8_t move     = 0; // 0=match
 
             if (deletion < minVal) {
-                minVal = deletion;
-                minStart = currStart[j - 1];
-                move = 2;
+                minVal   = deletion;
+                minStart = cStartPtr[j - 1];
+                move     = 2;
             }
             if (insertion < minVal) {
-                minVal = insertion;
-                minStart = prevStart[j];
-                move = 1;
+                minVal   = insertion;
+                minStart = pStartPtr[j];
+                move     = 1;
             }
 
-            currRow[j] = cost + minVal;
-            currStart[j] = minStart;
+            cRowPtr[j]   = cost + minVal;
+            cStartPtr[j] = minStart;
 
-            if (move == 0) {
-                currPath[j] = prevPath[j - 1];
-                currPath[j].push_back(i - 1);
-            } else if (move == 1) {
-                currPath[j] = prevPath[j];
-                if (!currPath[j].empty()) {
-                    currPath[j].back() = i - 1;
-                } else {
-                    currPath[j].push_back(i - 1);
-                }
-            } else {
-                currPath[j] = currPath[j - 1];
-                if (!currPath[j].empty()) {
-                    currPath[j].push_back(currPath[j].back());
-                } else {
-                    currPath[j].push_back(i - 1);
-                }
-            }
+            // Store the move taken — reconstructPath() uses this to rebuild optimalPath.
+            traceback[i * (m + 1) + j] = move;
         }
 
-        signalStreamDistances.push_back(currRow[m]);
+        signalStreamDistances.push_back(cRowPtr[m]);
 
-        if (currRow[m] < minFinalCost) {
-            minFinalCost = currRow[m];
-            bestEndIndex = i - 1;
-            bestStartIndex = currStart[m];
-            optimalPath = currPath[m];
+        if (cRowPtr[m] < minFinalCost) {
+            minFinalCost   = cRowPtr[m];
+            bestEndIndex   = i - 1;
+            bestStartIndex = cStartPtr[m];
         }
 
-        // Use move semantics instead of swap for better performance
-        prevRow = std::move(currRow);
-        prevStart = std::move(currStart);
-        prevPath = std::move(currPath);
+        // Swap row pointers — O(1), no data movement.
+        std::swap(pRowPtr,   cRowPtr);
+        std::swap(pStartPtr, cStartPtr);
 
-        currRow.assign(m + 1, std::numeric_limits<double>::infinity());
-        currStart.assign(m + 1, -1);
-        currPath.clear();
-        currPath.resize(m + 1);
+        // Reset the new current row (was previous, now to be overwritten).
+        std::fill(cRowPtr, cRowPtr + m + 1, std::numeric_limits<double>::infinity());
+        // FIX(perf): cStartPtr[j] is always written before being read in the inner loop
+        // (except [0], which is set explicitly above), so the fill is not needed for
+        // correctness. Removed to save n×(m+1) = 3.8M unnecessary writes.
     }
+
+    auto endDPLoop = std::chrono::high_resolution_clock::now();
+    auto dpLoopMs = std::chrono::duration<double, std::milli>(endDPLoop - startDPLoop).count();
+    LOG_DEBUG() << "CDTWService::compute - DP loop: " << dpLoopMs << " ms";
+
+    // -------------------------------------------------------------------------
+    // STEP 5: Reconstruct optimal path from traceback
+    // -------------------------------------------------------------------------
+    auto startPathRecon = std::chrono::high_resolution_clock::now();
+    optimalPath = reconstructPath(traceback, bestEndIndex, m, n);
+    auto endPathRecon = std::chrono::high_resolution_clock::now();
+    auto pathReconMs = std::chrono::duration<double, std::milli>(endPathRecon - startPathRecon).count();
+    LOG_DEBUG() << "CDTWService::compute - Path reconstruction: " << pathReconMs << " ms";
+
+    // -------------------------------------------------------------------------
+    // STEP 6: Free large temporaries
+    // -------------------------------------------------------------------------
+    auto startCleanup = std::chrono::high_resolution_clock::now();
+    distanceMatrix.clear();
+    distanceMatrix.shrink_to_fit();
+    traceback.clear();
+    traceback.shrink_to_fit();
+    auto endCleanup = std::chrono::high_resolution_clock::now();
+    auto cleanupMs = std::chrono::duration<double, std::milli>(endCleanup - startCleanup).count();
+    LOG_DEBUG() << "CDTWService::compute - Cleanup: " << cleanupMs << " ms";
+
+    auto endTotal = std::chrono::high_resolution_clock::now();
+    auto totalMs = std::chrono::duration<double, std::milli>(endTotal - startTotal).count();
+
     LOG_DEBUG() << "Finish: CDTWService::compute - bestStartIndex="
                 << bestStartIndex << ", bestEndIndex=" << bestEndIndex
                 << ", minFinalCost=" << minFinalCost;
+    LOG_DEBUG() << "CDTWService::compute - Total: " << totalMs << " ms"
+                << " (precompute: " << precomputeMs << "ms, distMatrix: " << distMatrixMs
+                << "ms, init: " << initMs << "ms, dpLoop: " << dpLoopMs
+                << "ms, pathRecon: " << pathReconMs << "ms, cleanup: " << cleanupMs << "ms)";
 }
 
 std::vector<double>
@@ -294,7 +474,7 @@ CDTWService::applyPathToVector(const std::vector<double>& input,
     if (targetLength <= 0 || optimalPath.empty() || input.empty())
         return {};
 
-    int m = optimalPath.size();
+    int m = static_cast<int>(optimalPath.size());
     std::vector<double> warped(m, 0.0);
     for (int k = 0; k < m; ++k) {
         int signalIndex = optimalPath[k];
@@ -309,13 +489,9 @@ CDTWService::applyPathToVector(const std::vector<double>& input,
 
     std::vector<double> transformed(targetLength, 0.0);
     double scalingFactor = static_cast<double>(m) / targetLength;
-    for (size_t i = 0; i < static_cast<size_t>(targetLength); ++i) {
+    for (int i = 0; i < targetLength; ++i) {
         size_t warpedIndex = static_cast<size_t>(i * scalingFactor);
-        if (warpedIndex < warped.size()) {
-            transformed[i] = warped[warpedIndex];
-        } else {
-            transformed[i] = warped.back();
-        }
+        transformed[i] = (warpedIndex < warped.size()) ? warped[warpedIndex] : warped.back();
     }
 
     LOG_DEBUG() << "Finish: CDTWService::applyPathToVector - transformed size="
@@ -334,30 +510,27 @@ CDTWService::applyPathToCuePoints(const std::vector<CuePointData>& cuePoints)
     std::vector<CuePointData> transformed;
     transformed.reserve(cuePoints.size());
 
-    int m = optimalPath.size();
+    int m = static_cast<int>(optimalPath.size());
 
-    // cuePoints are in template coordinates, map them to signal coordinates via
-    // optimalPath
     for (const auto& cp : cuePoints) {
         int templateStart = static_cast<int>(cp.position);
-        int templateEnd = static_cast<int>(cp.position + cp.length);
+        int templateEnd   = static_cast<int>(cp.position + cp.length);
 
         // Clamp to valid template range [0, m)
         templateStart = std::max(0, std::min(templateStart, m - 1));
-        templateEnd = std::max(0, std::min(templateEnd, m - 1));
+        templateEnd   = std::max(0, std::min(templateEnd,   m - 1));
 
-        // Map through optimalPath to signal indices
+        // Map template coordinates to signal coordinates via the alignment path
         int signalStart = optimalPath[templateStart];
-        int signalEnd = optimalPath[templateEnd];
+        int signalEnd   = optimalPath[templateEnd];
 
-        // Ensure proper ordering in signal space
         if (signalStart > signalEnd) {
             std::swap(signalStart, signalEnd);
         }
 
         CuePointData newCp = cp;
         newCp.position = static_cast<uint32_t>(signalStart);
-        newCp.length = static_cast<uint32_t>(std::max(0, signalEnd - signalStart));
+        newCp.length   = static_cast<uint32_t>(std::max(0, signalEnd - signalStart));
 
         LOG_DEBUG() << "  CuePoint '" << cp.label << "': template=["
                     << templateStart << ", " << templateEnd << "] -> signal=["

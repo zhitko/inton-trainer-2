@@ -5,6 +5,7 @@ project(inton-trainer-2 VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS Quick Multimedia LinguistTools)
+find_package(OpenMP REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.8 I18N_TRANSLATED_LANGUAGES en ru)
 
@@ -151,7 +152,7 @@ set_target_properties(appinton-trainer-2 PROPERTIES
 )
 
 target_link_libraries(appinton-trainer-2
-    PRIVATE Qt6::Quick Qt6::Multimedia sptk
+    PRIVATE Qt6::Quick Qt6::Multimedia sptk OpenMP::OpenMP_CXX
 )
 
 include(GNUInstallDirs)

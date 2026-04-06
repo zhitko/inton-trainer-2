@@ -158,6 +158,11 @@ private:
     std::vector<double> templateMask;
     std::vector<double> signalMask;
 
+    // Precomputed values for distance calculations (set during compute())
+    size_t precomputedNumStreams;
+    std::vector<double> precomputedNormalizedWeights;
+    std::vector<double> precomputedInvSqrtCache;
+
 protected:
     /**
      * Calculates the distance between two frames of feature data at the specified
