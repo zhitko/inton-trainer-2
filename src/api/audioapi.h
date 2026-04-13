@@ -4,6 +4,7 @@
 #include "src/services/helpers/wavFile.h"
 #include "src/services/wavfileservice.h"
 #include "src/services/vadenergryservice.h"
+#include "src/services/vadautocorrelationservice.h"
 #include <QAudioFormat>
 #include <QAudioSource>
 #include <QMediaDevices>
@@ -39,6 +40,7 @@ class AudioApi : public QObject {
     Q_PROPERTY(qreal audioLevel READ audioLevel NOTIFY isAudioLevelChanged)
     Q_PROPERTY(bool isPlaying READ isPlaying NOTIFY isPlayingChanged)
     Q_PROPERTY(bool isVoiceDetected READ isVoiceDetected NOTIFY isVoiceDetectedChanged)
+    Q_PROPERTY(int vadMethod READ vadMethod WRITE setVadMethod NOTIFY vadMethodChanged)
 
 public:
     explicit AudioApi(QObject* parent = nullptr);
@@ -72,6 +74,12 @@ public:
      */
     bool isVoiceDetected() const;
 
+    /**
+     * VAD method selection (0: energy, 1: autocorrelation, 2: hybrid)
+     */
+    int vadMethod() const { return m_vadMethod; }
+    void setVadMethod(int method);
+
 public slots:
     /**
      * Starts recording audio from the microphone. If durationSeconds is greater
@@ -96,6 +104,9 @@ public slots:
     Q_INVOKABLE QVariantList getVadA() const;
     Q_INVOKABLE QVariantList getVadU() const;
     Q_INVOKABLE QVariantList getVadV() const;
+    Q_INVOKABLE QVariantList getVadCorr() const;
+    Q_INVOKABLE QVariantList getVadCorrU() const;
+    Q_INVOKABLE QVariantList getVadCorrV() const;
     /**
      * Saves the recorded audio to a WAV file. If fileName is provided, it will be
      * used as the name of the saved file. If fileName is empty, a default name
@@ -144,6 +155,7 @@ signals:
      * Signal emitted when voice activity detection state changes.
      */
     void isVoiceDetectedChanged();
+    void vadMethodChanged();
     /**
      * Emitted when VAD calibration completes. The parameter is the computed
      * threshold value that should be saved in settings.
@@ -179,14 +191,16 @@ private:
     bool m_voiceDetected = false;
     static constexpr int PRE_BUFFER_MS = 250; // Pre/post buffer duration in ms
 
-    // VAD service for energy-based voice activity detection
+    // VAD services
     std::unique_ptr<VADEnergyService> m_vadService;
+    std::unique_ptr<VADAutocorrelationService> m_vadAutocorrService;
+    int m_vadMethod = 0; // 0: energy, 1: autocorr, 2: hybrid (default AND)
 
     int m_firstSpeechFrame = -1;
     int m_lastSpeechFrame = -1;
     int m_silenceFramesCount = 0;
 
-    void processVadFrame(int frameIndex, double V_n);
+    void processVadFrame(int frameIndex, double V_n, double correlation);
 };
 
 #endif // AUDIOAPI_H

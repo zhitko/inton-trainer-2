@@ -30,12 +30,17 @@ struct AppSettings {
     bool autoStopRecording = true;
     // Duration of silence in ms before auto-stop triggers
     int autoStopSilenceDuration = 2000;
-    // VAD threshold for auto-stop
+    // VAD settings
+    int vadMethod = 0; // 0: energy, 1: autocorr, 2: hybrid
     double vadThreshold = 10000.0;
+    double autoCorrThreshold = 0.3;
+    double autoCorrMinF0 = 80.0;
+    double autoCorrMaxF0 = 300.0;
     // Show VAD internal curves in the UI
     bool showVadA = false;
     bool showVadU = false;
     bool showVadV = false;
+    bool showVadCorr = false;
 
     // == Pitch extraction settings ==
     // Show F0 contour in the UI

@@ -25,9 +25,14 @@ class SettingsApi : public QObject {
     Q_PROPERTY(bool showVadA READ showVadA WRITE setShowVadA NOTIFY showVadAChanged)
     Q_PROPERTY(bool showVadU READ showVadU WRITE setShowVadU NOTIFY showVadUChanged)
     Q_PROPERTY(bool showVadV READ showVadV WRITE setShowVadV NOTIFY showVadVChanged)
+    Q_PROPERTY(bool showVadCorr READ showVadCorr WRITE setShowVadCorr NOTIFY showVadCorrChanged)
     Q_PROPERTY(bool autoStopRecording READ autoStopRecording WRITE setAutoStopRecording NOTIFY autoStopRecordingChanged)
     Q_PROPERTY(int autoStopSilenceDuration READ autoStopSilenceDuration WRITE setAutoStopSilenceDuration NOTIFY autoStopSilenceDurationChanged)
+    Q_PROPERTY(int vadMethod READ vadMethod WRITE setVadMethod NOTIFY vadMethodChanged)
     Q_PROPERTY(double vadThreshold READ vadThreshold WRITE setVadThreshold NOTIFY vadThresholdChanged)
+    Q_PROPERTY(double autoCorrThreshold READ autoCorrThreshold WRITE setAutoCorrThreshold NOTIFY autoCorrThresholdChanged)
+    Q_PROPERTY(double autoCorrMinF0 READ autoCorrMinF0 WRITE setAutoCorrMinF0 NOTIFY autoCorrMinF0Changed)
+    Q_PROPERTY(double autoCorrMaxF0 READ autoCorrMaxF0 WRITE setAutoCorrMaxF0 NOTIFY autoCorrMaxF0Changed)
     Q_PROPERTY(QString algorithm READ algorithm WRITE setAlgorithm NOTIFY
             algorithmChanged)
     Q_PROPERTY(double frameShift READ frameShift WRITE setFrameShift NOTIFY
@@ -193,15 +198,29 @@ public:
     void setShowVadU(bool show);
     bool showVadV() const;
     void setShowVadV(bool show);
+    bool showVadCorr() const;
+    void setShowVadCorr(bool show);
 
     bool autoStopRecording() const;
     void setAutoStopRecording(bool autoStopRecording);
 
     int autoStopSilenceDuration() const;
     void setAutoStopSilenceDuration(int autoStopSilenceDuration);
+    
+    int vadMethod() const;
+    void setVadMethod(int method);
 
     double vadThreshold() const;
     void setVadThreshold(double vadThreshold);
+
+    double autoCorrThreshold() const;
+    void setAutoCorrThreshold(double threshold);
+
+    double autoCorrMinF0() const;
+    void setAutoCorrMinF0(double minF0);
+
+    double autoCorrMaxF0() const;
+    void setAutoCorrMaxF0(double maxF0);
 
     QString algorithm() const;
     void setAlgorithm(const QString& algorithm);
@@ -388,9 +407,14 @@ signals:
     void showVadAChanged();
     void showVadUChanged();
     void showVadVChanged();
+    void showVadCorrChanged();
     void autoStopRecordingChanged();
     void autoStopSilenceDurationChanged();
+    void vadMethodChanged();
     void vadThresholdChanged();
+    void autoCorrThresholdChanged();
+    void autoCorrMinF0Changed();
+    void autoCorrMaxF0Changed();
     void algorithmChanged();
     void frameShiftChanged();
     void sampleRateChanged();

@@ -32,6 +32,7 @@ AudioApi::AudioApi(QObject* parent)
         QCoreApplication::applicationDirPath().toStdString()));
 
     m_vadService = std::unique_ptr<VADEnergyService>(new VADEnergyService(this));
+    m_vadAutocorrService = std::unique_ptr<VADAutocorrelationService>(new VADAutocorrelationService(this));
 
     m_player = new QMediaPlayer(this);
     m_audioOutput = new QAudioOutput(this);
@@ -101,6 +102,41 @@ QVariantList AudioApi::getVadV() const
     return list;
 }
 
+QVariantList AudioApi::getVadCorr() const
+{
+    QVariantList list;
+    const auto& savedCorr = m_vadAutocorrService->getSavedCorrelations();
+    for (int i = 0; i < static_cast<int>(savedCorr.size()); ++i)
+        list.append(QPointF(i, savedCorr[i]));
+    return list;
+}
+
+QVariantList AudioApi::getVadCorrU() const
+{
+    QVariantList list;
+    const auto& savedU = m_vadAutocorrService->getSavedU();
+    for (int i = 0; i < static_cast<int>(savedU.size()); ++i)
+        list.append(QPointF(i, savedU[i]));
+    return list;
+}
+
+QVariantList AudioApi::getVadCorrV() const
+{
+    QVariantList list;
+    const auto& savedV = m_vadAutocorrService->getSavedV();
+    for (int i = 0; i < static_cast<int>(savedV.size()); ++i)
+        list.append(QPointF(i, savedV[i]));
+    return list;
+}
+
+void AudioApi::setVadMethod(int method)
+{
+    if (m_vadMethod == method)
+        return;
+    m_vadMethod = method;
+    emit vadMethodChanged();
+}
+
 void AudioApi::play(const QString& filePath)
 {
     LOG_DEBUG() << "Start: play - filePath=" << filePath;
@@ -143,6 +179,7 @@ void AudioApi::startRecording(int durationSeconds)
     AppSettings settings = Settings::loadSettings();
     m_autoStopEnabled = settings.autoStopRecording;
     m_silenceDurationMs = settings.autoStopSilenceDuration;
+    m_vadMethod = settings.vadMethod;
     
     m_firstSpeechFrame = -1;
     m_lastSpeechFrame = -1;
@@ -155,6 +192,25 @@ void AudioApi::startRecording(int durationSeconds)
     } else {
         m_vadService->setThreshold(0.0);
     }
+
+    m_vadAutocorrService->reset();
+    m_vadAutocorrService->setSampleRate(m_format.sampleRate());
+    m_vadAutocorrService->setPitchRange(settings.autoCorrMinF0, settings.autoCorrMaxF0);
+
+    if (settings.autoCorrThreshold > 0) {
+        // Set hysteresis thresholds with smaller gap to include post-silence
+        // Smaller gap allows staying in speech state longer, including silence at end
+        double high = settings.autoCorrThreshold;         // Use setting as HIGH threshold
+        double low = std::max(0.0, high - 0.1);          // LOW = HIGH - 0.1 for smaller gap
+        m_vadAutocorrService->setVoiceThresholdHigh(high);
+        m_vadAutocorrService->setVoiceThresholdLow(low);
+    } else {
+        // Use defaults: HIGH=0.45, LOW=0.35 (gap=0.1)
+        m_vadAutocorrService->setVoiceThresholdHigh(0.45);
+        m_vadAutocorrService->setVoiceThresholdLow(0.35);
+    }
+    // Less strict energy threshold - allows more speech through
+    m_vadAutocorrService->setEnergyThreshold(0.02);
 
     if (m_voiceDetected) {
         m_voiceDetected = false;
@@ -180,15 +236,20 @@ void AudioApi::startRecording(int durationSeconds)
             for (qint64 i = 0; i < numSamples; ++i) {
                 sumValue += std::abs(static_cast<int>(samples[i]));
             }
-            // Calculate VAD metrics using service
+            // Calculate VAD metrics using services
             std::vector<double> newVValues = m_vadService->processAudioSamples(samples, numSamples);
+            std::vector<double> newCorrValues = m_vadAutocorrService->processAudioSamples(samples, numSamples);
             
             // Process new V values for auto-stop if enabled
             if (m_autoStopEnabled) {
+                // They should produce same amount of frames as they use same FRAME_SIZE/HOP_SIZE
+                size_t numFrames = std::min(newVValues.size(), newCorrValues.size());
                 int validV = m_vadService->getValidVIndex();
                 int firstFrameIdx = validV - static_cast<int>(newVValues.size());
-                for (size_t i = 0; i < newVValues.size(); ++i) {
-                    processVadFrame(firstFrameIdx + i, newVValues[i]);
+                
+                for (size_t i = 0; i < numFrames; ++i) {
+                    // We might need to pass both values for hybrid mode
+                    processVadFrame(firstFrameIdx + i, newVValues[i], newCorrValues[i]);
                 }
             }
         }
@@ -212,7 +273,7 @@ void AudioApi::startRecording(int durationSeconds)
     LOG_DEBUG() << "Finish: startRecording - Recording started";
 }
 
-void AudioApi::processVadFrame(int frameIndex, double V_n)
+void AudioApi::processVadFrame(int frameIndex, double V_n, double correlation)
 {
     if (m_vadService->addCalibrationFrame(V_n)) {
         // Calibration just completed
@@ -220,14 +281,31 @@ void AudioApi::processVadFrame(int frameIndex, double V_n)
         LOG_DEBUG() << "AutoStop: Calibrated threshold Pe=" << threshold;
     }
 
-    bool isSpeech = m_vadService->isSpeech(V_n);
+    // Use hysteresis by passing current state to isSpeech
+    bool energySpeech = m_vadService->isSpeech(V_n, m_voiceDetected);
+    bool autocorrSpeech = m_vadAutocorrService->isSpeech(correlation, m_voiceDetected);
+
+    bool isSpeech = false;
+    if (m_vadMethod == 0) { // Energy
+        isSpeech = energySpeech;
+    } else if (m_vadMethod == 1) { // Autocorr (now with hysteresis!)
+        isSpeech = autocorrSpeech;
+    } else if (m_vadMethod == 2) { // Hybrid AND
+        isSpeech = energySpeech && autocorrSpeech;
+    } else if (m_vadMethod == 3) { // Hybrid OR
+        isSpeech = energySpeech || autocorrSpeech;
+    }
 
     if (isSpeech) {
         if (!m_voiceDetected) {
             m_voiceDetected = true;
             emit isVoiceDetectedChanged();
             m_firstSpeechFrame = frameIndex;
-            LOG_DEBUG() << "AutoStop: Voice detected at frame " << frameIndex << ", V=" << V_n;
+            LOG_DEBUG()
+                << "AutoStop: Voice detected at frame " << frameIndex
+                << " | V=" << QString::number(V_n, 'f', 2)
+                << " corr=" << QString::number(correlation, 'f', 3)
+                << " | autoStop=" << m_silenceDurationMs << "ms";
         }
         m_lastSpeechFrame = frameIndex;
         m_silenceFramesCount = 0;
@@ -236,8 +314,16 @@ void AudioApi::processVadFrame(int frameIndex, double V_n)
         // 1 frame corresponds to a 64-sample advance (8ms at 8kHz).
         int silenceDuration = (m_silenceFramesCount * 64 * 1000) / m_format.sampleRate();
         
+        // Log silence counter periodically (every 5 silence frames = 40ms)
+        if (m_silenceFramesCount % 5 == 0) {
+            LOG_DEBUG() << QString("AutoStop: Silence cumulated: %1ms / %2ms threshold")
+                            .arg(silenceDuration)
+                            .arg(m_silenceDurationMs);
+        }
+        
         if (silenceDuration >= m_silenceDurationMs) {
-            LOG_DEBUG() << "AutoStop: Silence limit reached. Stopping.";
+            LOG_DEBUG() << QString("AutoStop: Silence limit reached (%1ms). Stopping.")
+                            .arg(silenceDuration);
             stopRecording();
         }
     }
@@ -343,6 +429,7 @@ void AudioApi::stopRecording()
 
     // Save current VAD metrics
     m_vadService->updateSavedMetrics();
+    m_vadAutocorrService->updateSavedMetrics();
 
     // Crop saved metrics to synchronize with m_buffer
     if (m_autoStopEnabled && m_voiceDetected && m_firstSpeechFrame >= 0 && m_lastSpeechFrame >= 0) {
@@ -355,6 +442,7 @@ void AudioApi::stopRecording()
         int end_frame = (m_lastSpeechFrame * 64 + 128 + post_samples) / 64;
         
         m_vadService->cropSavedMetrics(start_frame, end_frame);
+        m_vadAutocorrService->cropSavedMetrics(start_frame, end_frame);
     }
 
     if (m_voiceDetected) {

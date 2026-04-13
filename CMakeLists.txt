@@ -33,6 +33,8 @@ qt_add_executable(appinton-trainer-2
     src/services/wavfileservice.cpp
     src/services/vadenergryservice.h
     src/services/vadenergryservice.cpp
+    src/services/vadautocorrelationservice.h
+    src/services/vadautocorrelationservice.cpp
     src/services/pitchservice.h
     src/services/pitchservice.cpp
     src/services/specservice.h

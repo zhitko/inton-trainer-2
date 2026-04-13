@@ -41,10 +41,15 @@ Settings::loadSettings()
     settings.showNavigationMenu = qsettings.value("showNavigationMenu", false).toBool();
     settings.autoStopRecording = qsettings.value("autoStopRecording", true).toBool();
     settings.autoStopSilenceDuration = qsettings.value("autoStopSilenceDuration", 2000).toInt();
+    settings.vadMethod = qsettings.value("vadMethod", 0).toInt();
     settings.vadThreshold = qsettings.value("vadThreshold", 10000.0).toDouble();
+    settings.autoCorrThreshold = qsettings.value("autoCorrThreshold", 0.3).toDouble();
+    settings.autoCorrMinF0 = qsettings.value("autoCorrMinF0", 80.0).toDouble();
+    settings.autoCorrMaxF0 = qsettings.value("autoCorrMaxF0", 200.0).toDouble();
     settings.showVadA = qsettings.value("showVadA", false).toBool();
     settings.showVadU = qsettings.value("showVadU", false).toBool();
     settings.showVadV = qsettings.value("showVadV", false).toBool();
+    settings.showVadCorr = qsettings.value("showVadCorr", false).toBool();
     qsettings.endGroup();
 
     qsettings.beginGroup("Pitch");
@@ -146,10 +151,15 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("showNavigationMenu", settings.showNavigationMenu);
     qsettings.setValue("autoStopRecording", settings.autoStopRecording);
     qsettings.setValue("autoStopSilenceDuration", settings.autoStopSilenceDuration);
+    qsettings.setValue("vadMethod", settings.vadMethod);
     qsettings.setValue("vadThreshold", settings.vadThreshold);
+    qsettings.setValue("autoCorrThreshold", settings.autoCorrThreshold);
+    qsettings.setValue("autoCorrMinF0", settings.autoCorrMinF0);
+    qsettings.setValue("autoCorrMaxF0", settings.autoCorrMaxF0);
     qsettings.setValue("showVadA", settings.showVadA);
     qsettings.setValue("showVadU", settings.showVadU);
     qsettings.setValue("showVadV", settings.showVadV);
+    qsettings.setValue("showVadCorr", settings.showVadCorr);
     qsettings.endGroup();
 
     qsettings.beginGroup("Pitch");

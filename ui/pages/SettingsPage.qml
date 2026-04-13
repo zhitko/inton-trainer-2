@@ -283,12 +283,26 @@ Page {
                         }
 
                         Label {
+                            text: qsTr("VAD Method")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                        }
+                        ComboBox {
+                            model: [qsTr("Energy"), qsTr("Autocorrelation"), qsTr("Hybrid AND"), qsTr("Hybrid OR")]
+                            currentIndex: settingsApi ? settingsApi.vadMethod : 0
+                            onActivated: if (settingsApi)
+                                settingsApi.vadMethod = currentIndex
+                            Layout.fillWidth: true
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                        }
+
+                        Label {
                             text: qsTr("Silence Duration (ms)")
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
                             id: silenceDurationField
-                            text: settingsApi ? settingsApi.autoStopSilenceDuration.toString() : "2000"
+                            text: settingsApi ? settingsApi.autoStopSilenceDuration.toString() : 2000
                             onEditingFinished: if (settingsApi)
                                 settingsApi.autoStopSilenceDuration = parseInt(text)
                             Layout.fillWidth: true
@@ -298,25 +312,21 @@ Page {
                         }
 
                         Label {
-                            text: qsTr("VAD Threshold (Pe)")
+                            text: qsTr("Energy Threshold (Pe)")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: settingsApi ? (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
                         }
 
                         TextField {
                             id: vadThresholdField
-                            text: settingsApi ? settingsApi.vadThreshold.toFixed(1) : "50000.0"
+                            text: settingsApi ? settingsApi.vadThreshold.toFixed(1) : 50000.0
                             onEditingFinished: if (settingsApi)
                                 settingsApi.vadThreshold = parseDoubleValue(text)
                             Layout.fillWidth: true
                             selectByMouse: true
-                            inputMethodHints: Qt.ImhFormattedNumbersOnly
-                            validator: DoubleValidator {
-                                bottom: 0.0
-                                top: 1000000.0
-                                decimals: 1
-                            }
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: settingsApi ? (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
 
                             Connections {
                                 target: settingsApi
@@ -338,6 +348,7 @@ Page {
                             ToolTip.text: qsTr("Measure background noise for 2 seconds to set optimal threshold")
                             
                             onClicked: vadCalibrationDialog.open()
+                            visible: settingsApi ? (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
 
                             background: Rectangle {
                                 radius: 8
@@ -361,6 +372,84 @@ Page {
                                 font.weight: 600
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+
+                        Label {
+                            text: qsTr("Autocorr. Threshold")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                        }
+
+                        TextField {
+                            id: autoCorrThresholdField
+                            text: settingsApi ? settingsApi.autoCorrThreshold.toFixed(2) : 0.30
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.autoCorrThreshold = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+
+                            Connections {
+                                target: settingsApi
+                                function onAutoCorrThresholdChanged() {
+                                    if (!autoCorrThresholdField.activeFocus)
+                                        autoCorrThresholdField.text = settingsApi.autoCorrThreshold.toFixed(2);
+                                }
+                            }
+                        }
+
+                        Label {
+                            text: qsTr("Autocorr Min F0 (Hz)")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                        }
+
+                        TextField {
+                            id: autoCorrMinF0Field
+                            text: settingsApi ? settingsApi.autoCorrMinF0.toFixed(0) : 80
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.autoCorrMinF0 = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+
+                            Connections {
+                                target: settingsApi
+                                function onAutoCorrMinF0Changed() {
+                                    if (!autoCorrMinF0Field.activeFocus)
+                                        autoCorrMinF0Field.text = settingsApi.autoCorrMinF0.toFixed(0);
+                                }
+                            }
+                        }
+
+                        Label {
+                            text: qsTr("Autocorr Max F0 (Hz)")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                        }
+
+                        TextField {
+                            id: autoCorrMaxF0Field
+                            text: settingsApi ? settingsApi.autoCorrMaxF0.toFixed(0) : 300
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.autoCorrMaxF0 = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+
+                            Connections {
+                                target: settingsApi
+                                function onAutoCorrMaxF0Changed() {
+                                    if (!autoCorrMaxF0Field.activeFocus)
+                                        autoCorrMaxF0Field.text = settingsApi.autoCorrMaxF0.toFixed(0);
+                                }
                             }
                         }
 
@@ -392,6 +481,16 @@ Page {
                             checked: settingsApi ? settingsApi.showVadV : false
                             onToggled: if (settingsApi)
                                 settingsApi.showVadV = checked
+                        }
+
+                        Label {
+                            text: qsTr("Show Corr.")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.showVadCorr : false
+                            onToggled: if (settingsApi)
+                                settingsApi.showVadCorr = checked
                         }
                     }
                 }
@@ -586,6 +685,7 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             visible: settingsApi ? settingsApi.pitchSmoothing !== 4 : false // Hide for Spline (4)
+                            inputMethodHints: Qt.ImhDigitsOnly
                         }
 
                         Label {

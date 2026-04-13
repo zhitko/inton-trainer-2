@@ -44,12 +44,33 @@ public:
     /**
      * Set the VAD threshold manually (e.g., from saved settings).
      */
-    void setThreshold(double threshold) { m_Pe = threshold; }
+    void setThreshold(double threshold) { 
+        m_Pe = threshold; 
+        m_voiceThresholdHigh = threshold;
+        m_voiceThresholdLow = threshold * 0.9;  // 10% gap for hysteresis
+    }
+
+    /**
+     * Set hysteresis thresholds manually.
+     */
+    void setVoiceThresholdHigh(double high) { m_voiceThresholdHigh = high; }
+    void setVoiceThresholdLow(double low) { m_voiceThresholdLow = low; }
 
     /**
      * Check if a V value indicates speech based on current threshold.
      */
     bool isSpeech(double V_n) const { return V_n > m_Pe; }
+
+    /**
+     * Check if a V value indicates speech with hysteresis.
+     */
+    bool isSpeech(double V_n, bool currentState) const {
+        if (currentState) {
+            return V_n > m_voiceThresholdLow;
+        } else {
+            return V_n > m_voiceThresholdHigh;
+        }
+    }
 
     /**
      * Get current valid V index (for frame tracking).
@@ -115,6 +136,8 @@ signals:
 
 private:
     // VAD algorithm constants
+    static constexpr int FRAME_SIZE = 128;
+    static constexpr int HOP_SIZE = 64;
     static constexpr int K_FRAMES = 16;
     static constexpr int CALIBRATION_FRAMES = 50;
 
@@ -138,6 +161,8 @@ private:
     int m_calibrationCounter = 0;
     std::vector<double> m_calibrationFrames;
     double m_Pe = 0.0;  // Threshold (percentile * 3)
+    double m_voiceThresholdHigh = 0.0;
+    double m_voiceThresholdLow = 0.0;
 };
 
 #endif // VADENERGRYSERVICE_H

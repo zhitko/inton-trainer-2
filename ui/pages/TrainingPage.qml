@@ -951,7 +951,10 @@ Page {
                         userFilePath: root.userFilePath,
                         userVadA: trainingAudioApi.getVadA(),
                         userVadU: trainingAudioApi.getVadU(),
-                        userVadV: trainingAudioApi.getVadV()
+                        userVadV: trainingAudioApi.getVadV(),
+                        userVadCorr: trainingAudioApi.getVadCorr(),
+                        userVadCorrU: trainingAudioApi.getVadCorrU(),
+                        userVadCorrV: trainingAudioApi.getVadCorrV()
                     });
                 }
             }

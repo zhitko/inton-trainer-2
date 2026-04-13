@@ -29,13 +29,13 @@ std::vector<double> VADEnergyService::processAudioSamples(const qint16* samples,
     }
 
     // Calculate A (Amplitude) from 128-sample frames with 64-sample hop
-    while (static_cast<int>(m_sampleBuf.size()) >= 128) {
+    while (static_cast<int>(m_sampleBuf.size()) >= FRAME_SIZE) {
         long long sumAmp = 0;
-        for (int i = 0; i < 128; ++i) {
+        for (int i = 0; i < FRAME_SIZE; ++i) {
             sumAmp += std::abs(static_cast<int>(m_sampleBuf[i]));
         }
-        m_A.push_back(static_cast<double>(sumAmp) / 128.0);
-        m_sampleBuf.erase(m_sampleBuf.begin(), m_sampleBuf.begin() + 64);
+        m_A.push_back(static_cast<double>(sumAmp) / FRAME_SIZE);
+        m_sampleBuf.erase(m_sampleBuf.begin(), m_sampleBuf.begin() + HOP_SIZE);
     }
 
     // Ensure vectors are large enough

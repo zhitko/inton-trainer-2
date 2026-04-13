@@ -166,6 +166,25 @@ void SettingsApi::setShowVadV(bool show)
     LOG_DEBUG() << "Finish: setShowVadV";
 }
 
+bool SettingsApi::showVadCorr() const
+{
+    LOG_DEBUG() << "Start: showVadCorr";
+    bool result = m_settings.showVadCorr;
+    LOG_DEBUG() << "Finish: showVadCorr - result=" << result;
+    return result;
+}
+
+void SettingsApi::setShowVadCorr(bool show)
+{
+    LOG_DEBUG() << "Start: setShowVadCorr - show=" << show;
+    if (m_settings.showVadCorr != show) {
+        m_settings.showVadCorr = show;
+        save();
+        emit showVadCorrChanged();
+    }
+    LOG_DEBUG() << "Finish: setShowVadCorr";
+}
+
 bool SettingsApi::autoStopRecording() const
 {
     LOG_DEBUG() << "Start: autoStopRecording";
@@ -204,6 +223,25 @@ void SettingsApi::setAutoStopSilenceDuration(int autoStopSilenceDuration)
     LOG_DEBUG() << "Finish: setAutoStopSilenceDuration";
 }
 
+int SettingsApi::vadMethod() const
+{
+    LOG_DEBUG() << "Start: vadMethod";
+    int result = m_settings.vadMethod;
+    LOG_DEBUG() << "Finish: vadMethod - result=" << result;
+    return result;
+}
+
+void SettingsApi::setVadMethod(int method)
+{
+    LOG_DEBUG() << "Start: setVadMethod - method=" << method;
+    if (m_settings.vadMethod != method) {
+        m_settings.vadMethod = method;
+        save();
+        emit vadMethodChanged();
+    }
+    LOG_DEBUG() << "Finish: setVadMethod";
+}
+
 double SettingsApi::vadThreshold() const
 {
     LOG_DEBUG() << "Start: vadThreshold";
@@ -215,12 +253,69 @@ double SettingsApi::vadThreshold() const
 void SettingsApi::setVadThreshold(double vadThreshold)
 {
     LOG_DEBUG() << "Start: setVadThreshold - vadThreshold=" << vadThreshold;
-    if (qAbs(m_settings.vadThreshold - vadThreshold) > 0.001) {
+    if (qAbs(m_settings.vadThreshold - vadThreshold) >= 0.001) {
         m_settings.vadThreshold = vadThreshold;
         save();
         emit vadThresholdChanged();
     }
     LOG_DEBUG() << "Finish: setVadThreshold";
+}
+
+double SettingsApi::autoCorrThreshold() const
+{
+    LOG_DEBUG() << "Start: autoCorrThreshold";
+    double result = m_settings.autoCorrThreshold;
+    LOG_DEBUG() << "Finish: autoCorrThreshold - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAutoCorrThreshold(double threshold)
+{
+    LOG_DEBUG() << "Start: setAutoCorrThreshold - threshold=" << threshold;
+    if (qAbs(m_settings.autoCorrThreshold - threshold) >= 0.001) {
+        m_settings.autoCorrThreshold = threshold;
+        save();
+        emit autoCorrThresholdChanged();
+    }
+    LOG_DEBUG() << "Finish: setAutoCorrThreshold";
+}
+
+double SettingsApi::autoCorrMinF0() const
+{
+    LOG_DEBUG() << "Start: autoCorrMinF0";
+    double result = m_settings.autoCorrMinF0;
+    LOG_DEBUG() << "Finish: autoCorrMinF0 - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAutoCorrMinF0(double minF0)
+{
+    LOG_DEBUG() << "Start: setAutoCorrMinF0 - minF0=" << minF0;
+    if (qAbs(m_settings.autoCorrMinF0 - minF0) >= 0.0001) {
+        m_settings.autoCorrMinF0 = minF0;
+        save();
+        emit autoCorrMinF0Changed();
+    }
+    LOG_DEBUG() << "Finish: setAutoCorrMinF0";
+}
+
+double SettingsApi::autoCorrMaxF0() const
+{
+    LOG_DEBUG() << "Start: autoCorrMaxF0";
+    double result = m_settings.autoCorrMaxF0;
+    LOG_DEBUG() << "Finish: autoCorrMaxF0 - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAutoCorrMaxF0(double maxF0)
+{
+    LOG_DEBUG() << "Start: setAutoCorrMaxF0 - maxF0=" << maxF0;
+    if (qAbs(m_settings.autoCorrMaxF0 - maxF0) >= 0.0001) {
+        m_settings.autoCorrMaxF0 = maxF0;
+        save();
+        emit autoCorrMaxF0Changed();
+    }
+    LOG_DEBUG() << "Finish: setAutoCorrMaxF0";
 }
 
 QString SettingsApi::algorithm() const
@@ -253,7 +348,7 @@ double SettingsApi::frameShift() const
 void SettingsApi::setFrameShift(double frameShift)
 {
     LOG_DEBUG() << "Start: setFrameShift - frameShift=" << frameShift;
-    if (qAbs(m_settings.frameShift - frameShift) > 0.0001) {
+    if (qAbs(m_settings.frameShift - frameShift) >= 0.0001) {
         m_settings.frameShift = frameShift;
         save();
         emit frameShiftChanged();
@@ -272,7 +367,7 @@ double SettingsApi::sampleRate() const
 void SettingsApi::setSampleRate(double sampleRate)
 {
     LOG_DEBUG() << "Start: setSampleRate - sampleRate=" << sampleRate;
-    if (qAbs(m_settings.sampleRate - sampleRate) > 0.0001) {
+    if (qAbs(m_settings.sampleRate - sampleRate) >= 0.0001) {
         m_settings.sampleRate = sampleRate;
         save();
         emit sampleRateChanged();
@@ -291,7 +386,7 @@ double SettingsApi::minF0() const
 void SettingsApi::setMinF0(double minF0)
 {
     LOG_DEBUG() << "Start: setMinF0 - minF0=" << minF0;
-    if (qAbs(m_settings.minF0 - minF0) > 0.0001) {
+    if (qAbs(m_settings.minF0 - minF0) >= 0.0001) {
         m_settings.minF0 = minF0;
         save();
         emit minF0Changed();
@@ -310,7 +405,7 @@ double SettingsApi::maxF0() const
 void SettingsApi::setMaxF0(double maxF0)
 {
     LOG_DEBUG() << "Start: setMaxF0 - maxF0=" << maxF0;
-    if (qAbs(m_settings.maxF0 - maxF0) > 0.0001) {
+    if (qAbs(m_settings.maxF0 - maxF0) >= 0.0001) {
         m_settings.maxF0 = maxF0;
         save();
         emit maxF0Changed();
@@ -330,7 +425,7 @@ void SettingsApi::setVoicingThreshold(double voicingThreshold)
 {
     LOG_DEBUG() << "Start: setVoicingThreshold - voicingThreshold="
                 << voicingThreshold;
-    if (qAbs(m_settings.voicingThreshold - voicingThreshold) > 0.0001) {
+    if (qAbs(m_settings.voicingThreshold - voicingThreshold) >= 0.0001) {
         m_settings.voicingThreshold = voicingThreshold;
         save();
         emit voicingThresholdChanged();
@@ -370,7 +465,13 @@ void SettingsApi::load()
     emit showNavigationMenuChanged();
     emit autoStopRecordingChanged();
     emit autoStopSilenceDurationChanged();
+    emit vadMethodChanged();
     emit vadThresholdChanged();
+    emit autoCorrThresholdChanged();
+    emit showVadAChanged();
+    emit showVadUChanged();
+    emit showVadVChanged();
+    emit showVadCorrChanged();
     emit algorithmChanged();
     emit frameShiftChanged();
     emit sampleRateChanged();
