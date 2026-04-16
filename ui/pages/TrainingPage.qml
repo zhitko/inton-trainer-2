@@ -75,7 +75,7 @@ Page {
             _isExiting = false;
             // Guard against uninitialized window.settingsApi during destruction/initialization
             if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording) {
-                trainingAudioApi.startRecording();
+                trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
             }
         } else {
             _isExiting = true;
@@ -123,7 +123,7 @@ Page {
         repeat: false
         onTriggered: {
             if (root.visible && !root._isExiting) {
-                trainingAudioApi.startRecording();
+                trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
             }
         }
     }
@@ -147,7 +147,7 @@ Page {
         
         if (visible && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording) {
             _isExiting = false;
-            trainingAudioApi.startRecording();
+            trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
         }
     }
 

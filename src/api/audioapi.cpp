@@ -168,7 +168,7 @@ void AudioApi::setAudioLevel(qreal level)
     emit isAudioLevelChanged();
 }
 
-void AudioApi::startRecording(int durationSeconds)
+void AudioApi::startRecording(int durationSeconds, int minimumRecordLength)
 {
     LOG_DEBUG() << "Start: startRecording - durationSeconds=" << durationSeconds;
     if (m_isRecording) {
@@ -184,6 +184,7 @@ void AudioApi::startRecording(int durationSeconds)
     m_firstSpeechFrame = -1;
     m_lastSpeechFrame = -1;
     m_silenceFramesCount = 0;
+    m_minimumRecordLength = minimumRecordLength;
 
     // Initialize VAD service
     m_vadService->reset();
@@ -324,7 +325,7 @@ void AudioApi::processVadFrame(int frameIndex, double V_n, double correlation)
         if (silenceDuration >= m_silenceDurationMs) {
             LOG_DEBUG() << QString("AutoStop: Silence limit reached (%1ms). Stopping.")
                             .arg(silenceDuration);
-            stopRecording();
+            stopRecording(true);
         }
     }
 }
@@ -383,12 +384,40 @@ void AudioApi::calibrateVad()
     LOG_DEBUG() << "Finish: calibrateVad";
 }
 
-void AudioApi::stopRecording()
+void AudioApi::stopRecording(bool isAutoStop)
 {
     LOG_DEBUG() << "Start: stopRecording";
     if (!m_isRecording) {
         LOG_DEBUG() << "Finish: stopRecording - Not recording";
         return;
+    }
+
+    if (m_minimumRecordLength > 0) {
+        int currentSamples = m_buffer.size() / m_format.bytesPerSample();
+        int effectiveLength = currentSamples;
+        
+        // If auto-stop is enabled and voice was detected, use speech length instead of total buffer
+        // to account for recorded silence at the end
+        if (m_autoStopEnabled && m_voiceDetected && m_firstSpeechFrame >= 0 && m_lastSpeechFrame >= 0) {
+            int speechSamples = (m_lastSpeechFrame - m_firstSpeechFrame + 1) * 64; // approximate speech length
+            effectiveLength = speechSamples;
+        }
+        
+        if (effectiveLength < m_minimumRecordLength) {
+            if (isAutoStop) {
+                // Reset VAD status to initial - it was high level noise, not voice
+                m_voiceDetected = false;
+                emit isVoiceDetectedChanged();
+                m_firstSpeechFrame = -1;
+                m_lastSpeechFrame = -1;
+                m_silenceFramesCount = 0;
+                LOG_DEBUG() << "Auto-stop: Recording too short (" << effectiveLength << " < " << m_minimumRecordLength << "), resetting VAD and continuing";
+                return;
+            } else {
+                LOG_DEBUG() << "Manual stop: Recording too short (" << effectiveLength << " < " << m_minimumRecordLength << "), skipping stop";
+                return;
+            }
+        }
     }
 
     if (m_audioSource) {

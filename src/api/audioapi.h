@@ -89,13 +89,18 @@ public slots:
      *
      * @param durationSeconds - The duration in seconds for automatic stop, or -1
      *                         for manual stop.
+     * @param minimumRecordLength - Minimum number of samples required for recording.
+     *                             If > 0 and recording is shorter, auto-stop resets VAD,
+     *                             manual stop is ignored. Default -1 (no minimum).
      */
-    Q_INVOKABLE void startRecording(int durationSeconds = -1);
+    Q_INVOKABLE void startRecording(int durationSeconds = -1, int minimumRecordLength = -1);
     /**
      * Stops the ongoing audio recording process. If recording is not in progress,
      * this method has no effect.
+     *
+     * @param isAutoStop - True if called from auto-stop logic, false for manual stop.
      */
-    Q_INVOKABLE void stopRecording();
+    Q_INVOKABLE void stopRecording(bool isAutoStop = false);
 
     /**
      * Internal VAD curves for visualization.
@@ -199,6 +204,7 @@ private:
     int m_firstSpeechFrame = -1;
     int m_lastSpeechFrame = -1;
     int m_silenceFramesCount = 0;
+    int m_minimumRecordLength = -1;
 
     void processVadFrame(int frameIndex, double V_n, double correlation);
 };
