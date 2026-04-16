@@ -101,12 +101,11 @@ Page {
                     let userWavHandle = wavFileApi.openWavFile(tempFilePath);
                     let userWaveData = wavFileApi.getWaveData(userWavHandle);
                     
-                    if (root.referenceWaveData && userWaveData && userWaveData.length >= root.referenceWaveData.length * 0.8) {
-                        Logger.info("Recording successful, length is sufficient.");
+                    if (userWaveData) {
+                        Logger.info("Recording successful, backend minimum length enforced.");
                         updateUserUMP(tempFilePath, true);
                     } else {
-                        Logger.info("Recording too short, discarding. Required: " + (root.referenceWaveData ? root.referenceWaveData.length * 0.8 : 0) + ", got: " + (userWaveData ? userWaveData.length : 0));
-                        // Let the UI know or just wait in silence
+                        Logger.info("Recording save failed or no wave data available.");
                     }
                 }
                 // Restart recording after a small delay if playback isn't active
@@ -870,7 +869,7 @@ Page {
                     if (_wasRecordingBeforeDialog && window.settingsApi && window.settingsApi.autoStopRecording) {
                         console.log("Resuming recording after opening test file dialog");
                         _isExiting = false; // Allow recording to auto-restart
-                        trainingAudioApi.startRecording();
+                        trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
                     }
                 }
                 onRejected: {
@@ -879,7 +878,7 @@ Page {
                     if (_wasRecordingBeforeDialog && window.settingsApi && window.settingsApi.autoStopRecording) {
                         console.log("Resuming recording after opening test file dialog");
                         _isExiting = false; // Allow recording to auto-restart
-                        trainingAudioApi.startRecording();
+                        trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
                     }
                 }
             }
