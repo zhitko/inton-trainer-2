@@ -153,6 +153,8 @@ struct AppSettings {
     double dpMatchCoef = 1.0;
     double dpInsertionCoef = 1.0;
     double dpDeletionCoef = 1.0;
+    // When true, DTW is constrained to fixed start/end (full template vs full signal).
+    bool dpUseFixedStartEndDP = false;
 };
 
 /*

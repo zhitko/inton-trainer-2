@@ -1169,6 +1169,19 @@ Page {
                             Layout.columnSpan: 3
                         }
 
+                        // Fixed start/end DTW (morph aligned sequences)
+                        Label {
+                            text: qsTr("Fixed start/end DP (morph)")
+                            color: Theme.onSurface(Material.theme)
+                            Layout.columnSpan: 1
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.dpUseFixedStartEndDP : false
+                            onToggled: if (settingsApi)
+                                settingsApi.dpUseFixedStartEndDP = checked
+                            Layout.columnSpan: 3
+                        }
+
                         // Pitch Log as Mask
                         Label {
                             text: qsTr("Use Pitch Log as Mask")

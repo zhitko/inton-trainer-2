@@ -18,7 +18,8 @@ CDTWService::CDTWService(
     double insertionCoef,
     double deletionCoef,
     std::vector<double> templateMask,
-    std::vector<double> signalMask)
+    std::vector<double> signalMask,
+    bool useFixedStartEndDP)
     // FIX(perf): std::move avoids deep-copying large 3D feature matrices on construction
     : templateData(std::move(templateData))
     , signalData(std::move(signalData))
@@ -26,6 +27,7 @@ CDTWService::CDTWService(
     , matchCoef(matchCoef)
     , insertionCoef(insertionCoef)
     , deletionCoef(deletionCoef)
+    , useFixedStartEndDP(useFixedStartEndDP)
     , bestStartIndex(-1)
     , bestEndIndex(-1)
     , minFinalCost(std::numeric_limits<double>::infinity())
@@ -372,10 +374,19 @@ void CDTWService::compute()
     int*    pStartPtr = prevStart.data();
     int*    cStartPtr = currStart.data();
 
+    const double infCost = std::numeric_limits<double>::infinity();
+
     for (int i = 1; i <= n; ++i) {
-        // Column 0 is the free-start boundary: alignment may begin at any signal frame.
-        cRowPtr[0]   = 0.0;
-        cStartPtr[0] = i - 1;
+        if (useFixedStartEndDP) {
+            // Fixed start: cannot match zero template frames to a positive signal prefix
+            // at finite cost (path must begin at template 0 ↔ signal 0).
+            cRowPtr[0]   = infCost;
+            cStartPtr[0] = -1;
+        } else {
+            // Free-start boundary: alignment may begin at any signal frame.
+            cRowPtr[0]   = 0.0;
+            cStartPtr[0] = i - 1;
+        }
 
         // Pointer into the flat distance matrix row for signal frame i-1.
         const double* distMatrixRow = distanceMatrix.data() + (i - 1) * m;
@@ -411,9 +422,16 @@ void CDTWService::compute()
 
         signalStreamDistances.push_back(cRowPtr[m]);
 
-        if (cRowPtr[m] < minFinalCost) {
+        if (!useFixedStartEndDP) {
+            if (cRowPtr[m] < minFinalCost) {
+                minFinalCost   = cRowPtr[m];
+                bestEndIndex   = i - 1;
+                bestStartIndex = cStartPtr[m];
+            }
+        } else if (i == n) {
+            // Fixed end: optimal path must use the full signal (last row only).
             minFinalCost   = cRowPtr[m];
-            bestEndIndex   = i - 1;
+            bestEndIndex   = n - 1;
             bestStartIndex = cStartPtr[m];
         }
 

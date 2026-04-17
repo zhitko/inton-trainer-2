@@ -10,6 +10,10 @@
  * allows for applying this path to transform vectors (e.g., pitch contours) and
  * cue points. The service is designed to handle multi-dimensional feature streams
  * and provides methods for normalizing and scaling data as needed.
+ *
+ * With useFixedStartEndDP, alignment is constrained to start at the first template
+ * and signal frames and end at the last frames (standard endpoint DTW / morphing).
+ * Otherwise, a free start along the signal and free end are used (sliding-window style).
  */
 class CDTWService {
 public:
@@ -32,7 +36,8 @@ public:
         double insertionCoef = 1.0,
         double deletionCoef = 1.0,
         std::vector<double> templateMask = {},
-        std::vector<double> signalMask = {});
+        std::vector<double> signalMask = {},
+        bool useFixedStartEndDP = false);
     ~CDTWService();
 
     /**
@@ -148,6 +153,7 @@ private:
     double matchCoef;
     double insertionCoef;
     double deletionCoef;
+    bool useFixedStartEndDP;
 
     int bestStartIndex;
     int bestEndIndex;

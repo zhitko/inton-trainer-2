@@ -1490,6 +1490,15 @@ void SettingsApi::setDpDeletionCoef(double val)
         emit dpDeletionCoefChanged();
     }
 }
+bool SettingsApi::dpUseFixedStartEndDP() const { return m_settings.dpUseFixedStartEndDP; }
+void SettingsApi::setDpUseFixedStartEndDP(bool val)
+{
+    if (m_settings.dpUseFixedStartEndDP != val) {
+        m_settings.dpUseFixedStartEndDP = val;
+        save();
+        emit dpUseFixedStartEndDPChanged();
+    }
+}
 
 void SettingsApi::updateTranslator()
 {

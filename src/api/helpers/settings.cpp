@@ -127,6 +127,7 @@ Settings::loadSettings()
     settings.dpMatchCoef = qsettings.value("dpMatchCoef", 1.0).toDouble();
     settings.dpInsertionCoef = qsettings.value("dpInsertionCoef", 1.0).toDouble();
     settings.dpDeletionCoef = qsettings.value("dpDeletionCoef", 1.0).toDouble();
+    settings.dpUseFixedStartEndDP = qsettings.value("dpUseFixedStartEndDP", false).toBool();
     qsettings.endGroup();
 
     return settings;
@@ -247,6 +248,7 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("dpMatchCoef", settings.dpMatchCoef);
     qsettings.setValue("dpInsertionCoef", settings.dpInsertionCoef);
     qsettings.setValue("dpDeletionCoef", settings.dpDeletionCoef);
+    qsettings.setValue("dpUseFixedStartEndDP", settings.dpUseFixedStartEndDP);
     qsettings.endGroup();
 
     qsettings.sync();

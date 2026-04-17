@@ -137,6 +137,7 @@ class SettingsApi : public QObject {
     Q_PROPERTY(double dpMatchCoef READ dpMatchCoef WRITE setDpMatchCoef NOTIFY dpMatchCoefChanged)
     Q_PROPERTY(double dpInsertionCoef READ dpInsertionCoef WRITE setDpInsertionCoef NOTIFY dpInsertionCoefChanged)
     Q_PROPERTY(double dpDeletionCoef READ dpDeletionCoef WRITE setDpDeletionCoef NOTIFY dpDeletionCoefChanged)
+    Q_PROPERTY(bool dpUseFixedStartEndDP READ dpUseFixedStartEndDP WRITE setDpUseFixedStartEndDP NOTIFY dpUseFixedStartEndDPChanged)
 
 public:
     enum class SpecColorScheme { Viridis,
@@ -364,6 +365,8 @@ public:
     void setDpInsertionCoef(double dpInsertionCoef);
     double dpDeletionCoef() const;
     void setDpDeletionCoef(double dpDeletionCoef);
+    bool dpUseFixedStartEndDP() const;
+    void setDpUseFixedStartEndDP(bool dpUseFixedStartEndDP);
 
     /**
      * Loads the settings from a file and updates the internal state of the
@@ -466,6 +469,7 @@ signals:
     void dpMatchCoefChanged();
     void dpInsertionCoefChanged();
     void dpDeletionCoefChanged();
+    void dpUseFixedStartEndDPChanged();
 
 private:
     AppSettings m_settings;

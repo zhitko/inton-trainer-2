@@ -228,7 +228,8 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
         settings.dpInsertionCoef,
         settings.dpDeletionCoef,
         settings.dpUsePitchLogAsMask ? parsePitchLog(patternPitchLog) : std::vector<double>(),
-        settings.dpUsePitchLogAsMask ? parsePitchLog(signalPitchLog) : std::vector<double>()
+        settings.dpUsePitchLogAsMask ? parsePitchLog(signalPitchLog) : std::vector<double>(),
+        settings.dpUseFixedStartEndDP
     );
     cdtwService.compute();
 
