@@ -11,7 +11,7 @@
     <message>
         <location filename="../ui/pages/CategoriesPage.qml" line="92"/>
         <source>No categories found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -19,12 +19,12 @@
     <message>
         <location filename="../ui/components/ConfirmDialog.qml" line="9"/>
         <source>Yes</source>
-        <translation type="unfinished">Yes</translation>
+        <translation>Yes</translation>
     </message>
     <message>
         <location filename="../ui/components/ConfirmDialog.qml" line="10"/>
         <source>No</source>
-        <translation type="unfinished">No</translation>
+        <translation>No</translation>
     </message>
 </context>
 <context>
@@ -32,7 +32,7 @@
     <message>
         <location filename="../ui/components/EmptyState.qml" line="8"/>
         <source>No items found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -182,27 +182,27 @@
     <message>
         <location filename="../ui/components/RecordItem.qml" line="134"/>
         <source>Mastered</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/components/RecordItem.qml" line="135"/>
         <source>Excellent</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/components/RecordItem.qml" line="136"/>
         <source>Good</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/components/RecordItem.qml" line="137"/>
         <source>Needs work</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/components/RecordItem.qml" line="138"/>
         <source>Poor</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -236,32 +236,32 @@
     <message>
         <location filename="../ui/pages/RecordsPage.qml" line="120"/>
         <source>Delete All Records</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/RecordsPage.qml" line="121"/>
         <source>Are you sure you want to delete all records?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/RecordsPage.qml" line="122"/>
         <source>Yes</source>
-        <translation type="unfinished">Yes</translation>
+        <translation>Yes</translation>
     </message>
     <message>
         <location filename="../ui/pages/RecordsPage.qml" line="123"/>
         <source>No</source>
-        <translation type="unfinished">No</translation>
+        <translation>No</translation>
     </message>
     <message>
         <location filename="../ui/pages/RecordsPage.qml" line="152"/>
         <source>Delete All</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/RecordsPage.qml" line="220"/>
         <source>No records found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -282,12 +282,12 @@
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="35"/>
         <source>VAD Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="44"/>
         <source>Please stay quiet for 2 seconds so the background noise level can be measured.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="101"/>
@@ -367,17 +367,17 @@
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="276"/>
         <source>Auto Stop Recording</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="300"/>
         <source>Silence Duration (ms)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="342"/>
         <source>Calibrate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="232"/>
@@ -388,77 +388,77 @@
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="262"/>
         <source>Automated Recording (VAD)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="286"/>
         <source>VAD Method</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="291"/>
         <source>Energy</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="291"/>
         <source>Autocorrelation</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="291"/>
         <source>Hybrid AND</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="291"/>
         <source>Hybrid OR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="315"/>
         <source>Energy Threshold (Pe)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="348"/>
         <source>Measure background noise for 2 seconds to set optimal threshold</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="379"/>
         <source>Autocorr. Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="405"/>
         <source>Autocorr Min F0 (Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="431"/>
         <source>Autocorr Max F0 (Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="457"/>
         <source>Show A(n)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="467"/>
         <source>Show U(n)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="477"/>
         <source>Show V(n)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="487"/>
         <source>Show Corr.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="515"/>
@@ -483,7 +483,7 @@
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="559"/>
         <source>Use Only N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="569"/>
@@ -554,32 +554,32 @@
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="738"/>
         <source>Pitch Log</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="765"/>
         <source>Moving Average Size</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="778"/>
         <source>Transform to Binary</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="788"/>
         <source>Binary Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="820"/>
         <source>UMP</source>
-        <translation type="unfinished">UMP</translation>
+        <translation>UMP</translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="834"/>
         <source>Show UMP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="918"/>
@@ -605,6 +605,25 @@
         <location filename="../ui/pages/SettingsPage.qml" line="965"/>
         <source>Shift</source>
         <translation>Shift</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="1174"/>
+        <source>Fixed start/end</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="1210"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1234"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1258"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1282"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1306"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1330"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1354"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1377"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1398"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1419"/>
+        <source>Coeff.</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="844"/>
@@ -660,36 +679,17 @@
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1161"/>
         <source>Show DTW Distances</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1174"/>
-        <source>Fixed start/end DP (morph)</source>
-        <translation>Fixed start/end DP (morph)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1187"/>
         <source>Use Pitch Log as Mask</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1201"/>
         <source>Use Pitch</source>
         <translation>Use Pitch</translation>
-    </message>
-    <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1210"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1234"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1258"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1282"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1306"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1330"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1354"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1377"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1398"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1419"/>
-        <source>Coefficient</source>
-        <translation>Coefficient</translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1225"/>
@@ -724,17 +724,17 @@
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1369"/>
         <source>Match Coefficient</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1390"/>
         <source>Insertion Coefficient</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1411"/>
         <source>Deletion Coefficient</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1444"/>
@@ -785,10 +785,6 @@ Check analysis settings (e.g. increase FFT length).</translation>
         <translation>Show Settings</translation>
     </message>
     <message>
-        <source>Waveforms</source>
-        <translation type="vanished">Waveforms</translation>
-    </message>
-    <message>
         <location filename="../ui/pages/TemplatePage.qml" line="821"/>
         <location filename="../ui/pages/TemplatePage.qml" line="862"/>
         <location filename="../ui/pages/TemplatePage.qml" line="903"/>
@@ -825,105 +821,89 @@ Check analysis settings (e.g. increase FFT length).</translation>
         <translation>Amplitude Derivative</translation>
     </message>
     <message>
-        <source>Pitch (F0)</source>
-        <translation type="vanished">Pitch (F0)</translation>
-    </message>
-    <message>
-        <source>Log Pitch (LOG_F0)</source>
-        <translation type="vanished">Log Pitch (LOG_F0)</translation>
-    </message>
-    <message>
-        <source>Processed Pitch (F0)</source>
-        <translation type="vanished">Processed Pitch (F0)</translation>
-    </message>
-    <message>
         <location filename="../ui/pages/TemplatePage.qml" line="600"/>
         <source>Reference waveform</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="628"/>
         <source>Reference Pitch (F0)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="704"/>
         <source>User waveform</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="648"/>
         <source>Reference Processed Pitch (F0)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="668"/>
         <source>Reference Log Pitch (LOG_F0)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="688"/>
         <source>Reference UMP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="732"/>
         <source>User Pitch (F0)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="752"/>
         <source>User Processed Pitch (F0)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="772"/>
         <source>User Log Pitch (LOG_F0)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="792"/>
         <source>User UMP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="979"/>
         <source>VAD Correlation</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="1017"/>
         <source>VAD Energy</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="1055"/>
         <source>DTW Distances</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="1061"/>
         <source>Best alignment cost: </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="1068"/>
         <source>Signal Distances</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="1088"/>
         <source>Template Data</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="1120"/>
         <source>Signal Data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>UMP</source>
-        <translation type="vanished">UMP</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -936,7 +916,7 @@ Check analysis settings (e.g. increase FFT length).</translation>
     <message>
         <location filename="../ui/pages/TemplatesPage.qml" line="87"/>
         <source>No templates found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -956,32 +936,32 @@ Reference</translation>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="742"/>
         <source>Playing...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="742"/>
         <source>Listening...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="742"/>
         <source>Processing...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="742"/>
         <source>Recording...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="751"/>
         <source>Listen carefully</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="751"/>
         <source>Repeat the phrase into the mic</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="774"/>

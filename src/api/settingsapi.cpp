@@ -1,6 +1,7 @@
 #include "settingsapi.h"
 #include "helpers/logger.h"
 #include "helpers/statistics.h"
+#include <algorithm>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
@@ -221,6 +222,26 @@ void SettingsApi::setAutoStopSilenceDuration(int autoStopSilenceDuration)
         emit autoStopSilenceDurationChanged();
     }
     LOG_DEBUG() << "Finish: setAutoStopSilenceDuration";
+}
+
+double SettingsApi::minimumRecordLengthPercent() const
+{
+    LOG_DEBUG() << "Start: minimumRecordLengthPercent";
+    double result = m_settings.minimumRecordLengthPercent;
+    LOG_DEBUG() << "Finish: minimumRecordLengthPercent - result=" << result;
+    return result;
+}
+
+void SettingsApi::setMinimumRecordLengthPercent(double minimumRecordLengthPercent)
+{
+    LOG_DEBUG() << "Start: setMinimumRecordLengthPercent - minimumRecordLengthPercent=" << minimumRecordLengthPercent;
+    double clamped = std::clamp(minimumRecordLengthPercent, 0.0, 1.0);
+    if (qAbs(m_settings.minimumRecordLengthPercent - clamped) >= 0.0001) {
+        m_settings.minimumRecordLengthPercent = clamped;
+        save();
+        emit minimumRecordLengthPercentChanged();
+    }
+    LOG_DEBUG() << "Finish: setMinimumRecordLengthPercent";
 }
 
 int SettingsApi::vadMethod() const

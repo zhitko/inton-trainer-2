@@ -366,10 +366,6 @@
         <translation>Длительность тишины (мс)</translation>
     </message>
     <message>
-        <source>VAD Threshold (Pe)</source>
-        <translation type="vanished">Порог VAD (Pe)</translation>
-    </message>
-    <message>
         <location filename="../ui/pages/SettingsPage.qml" line="457"/>
         <source>Show A(n)</source>
         <translation>Показать А(n)</translation>
@@ -612,6 +608,25 @@
         <translation>Сдвиг</translation>
     </message>
     <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="1174"/>
+        <source>Fixed start/end</source>
+        <translation>Фиксированное начало и конец</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="1210"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1234"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1258"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1282"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1306"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1330"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1354"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1377"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1398"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1419"/>
+        <source>Coeff.</source>
+        <translation>Коэфф.</translation>
+    </message>
+    <message>
         <location filename="../ui/pages/SettingsPage.qml" line="844"/>
         <location filename="../ui/pages/SettingsPage.qml" line="978"/>
         <source>Smoothing</source>
@@ -668,11 +683,6 @@
         <translation>Показать расстояния ДП</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1174"/>
-        <source>Fixed start/end DP (morph)</source>
-        <translation>Фиксированное начало и конец ДП (морфинг)</translation>
-    </message>
-    <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1187"/>
         <source>Use Pitch Log as Mask</source>
         <translation>Использовать логарифм тона как маску</translation>
@@ -681,20 +691,6 @@
         <location filename="../ui/pages/SettingsPage.qml" line="1201"/>
         <source>Use Pitch</source>
         <translation>Использовать тон</translation>
-    </message>
-    <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1210"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1234"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1258"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1282"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1306"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1330"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1354"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1377"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1398"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1419"/>
-        <source>Coefficient</source>
-        <translation>Коэффициент</translation>
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="1225"/>
@@ -790,10 +786,6 @@ Check analysis settings (e.g. increase FFT length).</source>
         <translation>Показать</translation>
     </message>
     <message>
-        <source>Waveforms</source>
-        <translation type="vanished">Волновые формы</translation>
-    </message>
-    <message>
         <location filename="../ui/pages/TemplatePage.qml" line="821"/>
         <location filename="../ui/pages/TemplatePage.qml" line="862"/>
         <location filename="../ui/pages/TemplatePage.qml" line="903"/>
@@ -828,10 +820,6 @@ Check analysis settings (e.g. increase FFT length).</source>
         <location filename="../ui/pages/TemplatePage.qml" line="855"/>
         <source>Amplitude Derivative</source>
         <translation>Производная амплитуды</translation>
-    </message>
-    <message>
-        <source>Pitch (F0)</source>
-        <translation type="vanished">Тон (F0)</translation>
     </message>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="648"/>
@@ -1001,14 +989,6 @@ Me</source>
         <location filename="../ui/pages/TrainingPage.qml" line="897"/>
         <source>Advanced</source>
         <translation>Дополнительно</translation>
-    </message>
-    <message>
-        <source>VAD Analysis</source>
-        <translation type="vanished">Анализ VAD</translation>
-    </message>
-    <message>
-        <source>User VAD Curves</source>
-        <translation type="vanished">Кривые VAD пользователя</translation>
     </message>
 </context>
 </TS>

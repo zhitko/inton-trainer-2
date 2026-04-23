@@ -75,7 +75,11 @@ Page {
             _isExiting = false;
             // Guard against uninitialized window.settingsApi during destruction/initialization
             if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording) {
-                trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
+                let minimumLength = -1;
+                if (root.referenceWaveData && window.settingsApi) {
+                    minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
+                }
+                trainingAudioApi.startRecording(-1, minimumLength);
             }
         } else {
             _isExiting = true;
@@ -122,7 +126,11 @@ Page {
         repeat: false
         onTriggered: {
             if (root.visible && !root._isExiting) {
-                trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
+                let minimumLength = -1;
+                if (root.referenceWaveData && window.settingsApi) {
+                    minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
+                }
+                trainingAudioApi.startRecording(-1, minimumLength);
             }
         }
     }
@@ -146,7 +154,11 @@ Page {
         
         if (visible && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording) {
             _isExiting = false;
-            trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
+            let minimumLength = -1;
+            if (root.referenceWaveData && window.settingsApi) {
+                minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
+            }
+            trainingAudioApi.startRecording(-1, minimumLength);
         }
     }
 
@@ -869,7 +881,11 @@ Page {
                     if (_wasRecordingBeforeDialog && window.settingsApi && window.settingsApi.autoStopRecording) {
                         console.log("Resuming recording after opening test file dialog");
                         _isExiting = false; // Allow recording to auto-restart
-                        trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
+                        let minimumLength = -1;
+                        if (root.referenceWaveData && window.settingsApi) {
+                            minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
+                        }
+                        trainingAudioApi.startRecording(-1, minimumLength);
                     }
                 }
                 onRejected: {
@@ -878,7 +894,11 @@ Page {
                     if (_wasRecordingBeforeDialog && window.settingsApi && window.settingsApi.autoStopRecording) {
                         console.log("Resuming recording after opening test file dialog");
                         _isExiting = false; // Allow recording to auto-restart
-                        trainingAudioApi.startRecording(-1, root.referenceWaveData ? root.referenceWaveData.length : -1);
+                        let minimumLength = -1;
+                        if (root.referenceWaveData && window.settingsApi) {
+                            minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
+                        }
+                        trainingAudioApi.startRecording(-1, minimumLength);
                     }
                 }
             }

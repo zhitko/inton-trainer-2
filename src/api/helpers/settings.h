@@ -36,6 +36,9 @@ struct AppSettings {
     double autoCorrThreshold = 0.3;
     double autoCorrMinF0 = 80.0;
     double autoCorrMaxF0 = 300.0;
+    // Minimum record length as a fraction of the original reference length.
+    // 1.0 means allow the full original length, 0.8 means allow 80%.
+    double minimumRecordLengthPercent = 1.0;
     // Show VAD internal curves in the UI
     bool showVadA = false;
     bool showVadU = false;

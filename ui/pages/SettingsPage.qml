@@ -312,6 +312,22 @@ Page {
                         }
 
                         Label {
+                            text: qsTr("Minimum Record Length (%)")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                        }
+                        TextField {
+                            id: minimumRecordLengthField
+                            text: settingsApi ? (settingsApi.minimumRecordLengthPercent * 100).toFixed(0) : 100
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.minimumRecordLengthPercent = parseDoubleValue(text) / 100.0
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                        }
+
+                        Label {
                             text: qsTr("Energy Threshold (Pe)")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
@@ -1171,7 +1187,7 @@ Page {
 
                         // Fixed start/end DTW (morph aligned sequences)
                         Label {
-                            text: qsTr("Fixed start/end DP (morph)")
+                            text: qsTr("Fixed start/end")
                             color: Theme.onSurface(Material.theme)
                             Layout.columnSpan: 1
                         }
@@ -1207,7 +1223,7 @@ Page {
                                 settingsApi.dpUsePitch = checked
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.dpUsePitch : false
                         }
@@ -1231,7 +1247,7 @@ Page {
                                 settingsApi.dpUsePitchDerivative = checked
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.dpUsePitchDerivative : false
                         }
@@ -1255,7 +1271,7 @@ Page {
                                 settingsApi.dpUsePitchLog = checked
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.dpUsePitchLog : false
                         }
@@ -1279,7 +1295,7 @@ Page {
                                 settingsApi.dpUseAmplitude = checked
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.dpUseAmplitude : false
                         }
@@ -1303,7 +1319,7 @@ Page {
                                 settingsApi.dpUseAmplitudeDerivative = checked
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.dpUseAmplitudeDerivative : false
                         }
@@ -1327,7 +1343,7 @@ Page {
                                 settingsApi.dpUseSpectrum = checked
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.dpUseSpectrum : false
                         }
@@ -1351,7 +1367,7 @@ Page {
                                 settingsApi.dpUseCepstrum = checked
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.dpUseCepstrum : false
                         }
@@ -1374,7 +1390,7 @@ Page {
                             enabled: false
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
@@ -1395,7 +1411,7 @@ Page {
                             enabled: false
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
@@ -1416,7 +1432,7 @@ Page {
                             enabled: false
                         }
                         Label {
-                            text: qsTr("Coefficient")
+                            text: qsTr("Coeff.")
                             color: Theme.onSurface(Material.theme)
                         }
                         TextField {
