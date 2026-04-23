@@ -223,7 +223,9 @@ Page {
                 umpSmoothingName,
                 window.settingsApi.umpSmoothingWindowSize,
                 window.settingsApi.umpGaussianSmoothingSigma,
-                window.settingsApi.umpSplineSmoothingPenalty
+                window.settingsApi.umpSplineSmoothingPenalty,
+                true,
+                false
             );
             Logger.debug("UMP cue points: " + refUmpResult.cuePoints.length);
             refUmpWaveFormGraph.waveData  = refUmpResult.ump;
@@ -478,7 +480,9 @@ Page {
                 umpSmoothingName,
                 window.settingsApi.umpSmoothingWindowSize,
                 window.settingsApi.umpGaussianSmoothingSigma,
-                window.settingsApi.umpSplineSmoothingPenalty
+                window.settingsApi.umpSplineSmoothingPenalty,
+                true,
+                window.settingsApi.useOnlyN
             );
             Logger.debug("User UMP cue points: " + umpResult.cuePoints.length);
             userUmpWaveFormGraph.waveData  = umpResult.ump;

@@ -133,7 +133,7 @@ public slots:
         int umpSmoothingWindowSize = 5,
         double umpGaussianSmoothingSigma = 1.0,
         double umpSplineSmoothingPenalty = 1.0,
-        bool normalized = true);
+        bool normalized = true, bool useOnlyN = false);
     /**
      * Extracts the spectrum from the given WaveFile object using the specified
      * parameters and returns it as a QVariantList. The method allows for

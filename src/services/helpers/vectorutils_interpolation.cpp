@@ -361,16 +361,41 @@ std::vector<double> VectorUtils::interpolateMissingFrames(
     if (positions.size() < 2)
         return result;
 
-    // Resample the non-zero values to the full active-range length using the
-    // requested interpolation type, then map each interpolated frame back to
-    // its original index via the anchor positions.
-    size_t activeLength = endIdx - startIdx + 1;
-    std::vector<double> interpolatedFull = interpolate(type, values, static_cast<int>(activeLength));
+    // Build a spline directly on the actual (position, value) pairs so that
+    // the x-spacing between anchors is correctly reflected in the curve.
+    // Using the real frame index as x fixes the previous bug where sparse
+    // values were resampled uniformly, causing tails from neighbouring parts
+    // to bleed into unrelated gaps.
+    std::vector<double> xVec(positions.size());
+    for (size_t k = 0; k < positions.size(); ++k)
+        xVec[k] = static_cast<double>(positions[k]);
 
-    // Fill zero frames inside [startIdx, endIdx] with interpolated values.
+    alglib::real_1d_array ax, ay;
+    ax.setcontent(static_cast<alglib::ae_int_t>(xVec.size()), xVec.data());
+    ay.setcontent(static_cast<alglib::ae_int_t>(values.size()), values.data());
+
+    alglib::spline1dinterpolant spline;
+    try {
+        if (type == "Cubic") {
+            alglib::spline1dbuildcubic(ax, ay, spline);
+        } else if (type == "Akima") {
+            alglib::spline1dbuildakima(ax, ay, spline);
+        } else if (type == "Monotone") {
+            alglib::spline1dbuildmonotone(ax, ay, spline);
+        } else {
+            // "Linear" and any unknown type
+            alglib::spline1dbuildlinear(ax, ay, spline);
+        }
+    } catch (...) {
+        LOG_CRITICAL() << "Alglib error in interpolateMissingFrames (type=" << type.c_str() << ")";
+        return result;
+    }
+
+    // Evaluate the spline at every zero frame's true index so that the gap
+    // is filled proportionally to its position between its anchor neighbours.
     for (size_t i = startIdx; i <= endIdx; ++i) {
         if (result[i] == 0.0) {
-            result[i] = interpolatedFull[i - startIdx];
+            result[i] = alglib::spline1dcalc(spline, static_cast<double>(i));
         }
     }
 

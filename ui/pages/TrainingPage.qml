@@ -288,6 +288,7 @@ Page {
             window.settingsApi.umpSmoothingWindowSize,
             window.settingsApi.umpGaussianSmoothingSigma,
             window.settingsApi.umpSplineSmoothingPenalty,
+            false,
             false
         );
         umpGraph.waveData  = root.referenceUMP.ump;
@@ -499,7 +500,8 @@ Page {
             window.settingsApi.umpSmoothingWindowSize, 
             window.settingsApi.umpGaussianSmoothingSigma, 
             window.settingsApi.umpSplineSmoothingPenalty, 
-            false
+            false,
+            window.settingsApi.useOnlyN
         );
         Logger.debug("UMP calculated with " + root.userUMP.cuePoints.length + " cue points");
 

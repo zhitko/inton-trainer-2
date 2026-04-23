@@ -229,8 +229,7 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
         settings.dpDeletionCoef,
         settings.dpUsePitchLogAsMask ? parsePitchLog(patternPitchLog) : std::vector<double>(),
         settings.dpUsePitchLogAsMask ? parsePitchLog(signalPitchLog) : std::vector<double>(),
-        settings.dpUseFixedStartEndDP
-    );
+        settings.dpUseFixedStartEndDP);
     cdtwService.compute();
 
     std::vector<double> pitchTransformed = cdtwService.applyPathToVector(pitchVec, patternPitch.size());
@@ -614,7 +613,6 @@ QVariantList WavFileApi::getPitch(
     // Apply interpolation for empty frames
     // but skip begin and end empty frames to avoid extrapolation artifacts
     if (!pitch.empty() && pitchInterpolationType != "None") {
-        // pitch = VectorUtils::interpolate(pitchInterpolationType.toStdString(), pitch, pitch.size());
         pitch = VectorUtils::interpolateMissingFrames(pitchInterpolationType.toStdString(), pitch, true, true);
     }
 
@@ -688,7 +686,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
     int umpSmoothingWindowSize,
     double umpGaussianSmoothingSigma,
     double umpSplineSmoothingPenalty,
-    bool normalized)
+    bool normalized, bool useOnlyN)
 {
     LOG_DEBUG() << "Start: getUMP - pitch.size=" << pitch.size()
                 << ", cuePoints.size=" << cuePoints.size()
@@ -696,7 +694,8 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
                 << ", tLength=" << tLength << ", waveDataSize=" << waveDataSize
                 << ", interpolation=" << pitchInterpolationType
                 << ", umpSmoothing=" << umpSmoothing
-                << ", normalized=" << normalized;
+                << ", normalized=" << normalized
+                << ", useOnlyN=" << useOnlyN;
 
     QVariantMap result;
 
@@ -744,16 +743,72 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
     if (normalized) {
         umpVec = VectorUtils::normalizeFromTo(0.0, 1.0, umpVec);
     }
-    QVariantList umpData;
-    for (size_t i = 0; i < umpVec.size(); ++i) {
-        umpData.append(QPointF(i, umpVec[i]));
-    }
-    result["ump"] = umpData;
-    LOG_DEBUG() << "  UMP data points created:" << umpData.size();
 
-    // Create modified cue points from processedCuePoints returned by UMPService
     QVariantList modifiedCuePoints;
     QVariantList scaledCuePoints;
+
+    if (useOnlyN) {
+        // Replace PRE_NUCLEUS and POST_NUCLEUS segments with zeros and keep NUCLEUS frames.
+        std::vector<double> filteredUmp(umpVec.size(), 0.0);
+        int currentPos = 0;
+        double firstNucleusValue = -1.0;
+        double lastNucleusValue = -1.0;
+        for (size_t i = 0; i < umpResult.processedCuePoints.size(); ++i) {
+            const CuePointData& cp = umpResult.processedCuePoints[i];
+            int length = nLength;
+            if (cp.type == CuePointType::PRE_NUCLEUS) {
+                length = pLength;
+            } else if (cp.type == CuePointType::POST_NUCLEUS) {
+                length = tLength;
+            }
+
+            if (cp.type == CuePointType::NUCLEUS) {
+                for (int j = 0; j < length; ++j) {
+                    filteredUmp[currentPos + j] = umpVec[currentPos + j];
+                }
+                if (firstNucleusValue == -1.0) {
+                    firstNucleusValue = umpVec[currentPos];
+                }
+                lastNucleusValue = umpVec[currentPos + length - 1];
+            }
+
+            currentPos += length;
+        }
+        // First and last frames may be non-nucleus, so set them to the nearest nucleus value to avoid long zero segments at the start/end
+        if (firstNucleusValue != -1.0) {
+            for (size_t i = 0; i < filteredUmp.size(); ++i) {
+                if (filteredUmp[i] != 0.0) {
+                    break;
+                }
+                filteredUmp[i] = firstNucleusValue;
+            }
+            for (int i = static_cast<int>(filteredUmp.size()) - 1; i >= 0; --i) {
+                if (filteredUmp[i] != 0.0) {
+                    break;
+                }
+                filteredUmp[i] = lastNucleusValue;
+            }
+        }
+        // Apply interpolation for empty frames after zeroing non-nucleus segments.
+        if (!filteredUmp.empty()) {
+            filteredUmp = VectorUtils::interpolateMissingFrames(pitchInterpolationType.toStdString(), filteredUmp, true, true);
+        }
+        // Normalize the filtered UMP vector if required.
+        if (normalized) {
+            filteredUmp = VectorUtils::normalizeFromTo(0.0, 1.0, filteredUmp);
+        }
+        // Smooth the filtered UMP vector if required.
+        if (!filteredUmp.empty() && umpSmoothing != "None") {
+            std::string smoothType = umpSmoothing.toStdString();
+            double param1 = static_cast<double>(umpSmoothingWindowSize);
+            double param2 = 0.0;
+            filteredUmp = VectorUtils::smooth(smoothType, filteredUmp, param1, param2, false);
+        }
+        // Replace the original UMP vector with the filtered one.
+        umpVec = filteredUmp;
+    }
+
+    // Create modified cue points from processedCuePoints returned by UMPService
     int position = 0;
     for (size_t i = 0; i < umpResult.processedCuePoints.size(); ++i) {
         const CuePointData& cp = umpResult.processedCuePoints[i];
@@ -786,6 +841,14 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
                     << "position=" << scaledCpMap["position"].toUInt()
                     << "length=" << scaledCpMap["length"].toUInt();
     }
+
+    QVariantList umpData;
+    for (size_t i = 0; i < umpVec.size(); ++i) {
+        umpData.append(QPointF(i, umpVec[i]));
+    }
+    result["ump"] = umpData;
+    LOG_DEBUG() << "  UMP data points created:" << umpData.size();
+
     result["cuePoints"] = modifiedCuePoints;
 
     result["waveCuePoints"] = scaledCuePoints;
