@@ -824,6 +824,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
         cpMap["label"] = QString::fromStdString(cp.label);
         cpMap["position"] = static_cast<uint>(position);
         cpMap["length"] = static_cast<uint>(length);
+        cpMap["type"] = static_cast<int>(cp.type);
         modifiedCuePoints.append(cpMap);
         position += length;
         LOG_DEBUG() << "  Modified cue point" << cpMap["id"].toUInt() << ":"

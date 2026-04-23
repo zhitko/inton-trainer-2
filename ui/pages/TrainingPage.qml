@@ -509,7 +509,15 @@ Page {
         umpGraph.cuePoints = root.userUMP.cuePoints;
 
         // Compare UMPs using AnalysisApi to get similarity
-        var cmp = analysisApi.compareUMP(root.referenceUMP.ump, root.userUMP.ump, window.settingsApi.minF0, window.settingsApi.maxF0);
+        var cmp = analysisApi.compareUMP(
+            root.referenceUMP.ump,
+            root.userUMP.ump,
+            root.referenceUMP.cuePoints,
+            root.userUMP.cuePoints,
+            window.settingsApi.minF0,
+            window.settingsApi.maxF0,
+            window.settingsApi.useOnlyN
+        );
         var newShapeSimilarity = cmp.shapeSimilarity || 0;
 
         if (root.shapeSimilarity > 0) {

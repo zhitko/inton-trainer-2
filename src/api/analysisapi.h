@@ -31,13 +31,21 @@ public slots:
      * @param referenceUmp - The reference UMP contour as a QVariantList.
      * @param userUmp - The user UMP contour as a QVariantList.
      * @param fullMin - The minimum value in the full range of UMP values.
-     * @param fullMax - The maximum value in the full range of UMP values.
+      * @param fullMax - The maximum value in the full range of UMP values.
+     * @param referenceCuePoints - Optional processed cue point metadata for the
+     *        reference UMP contour.
+     * @param userCuePoints - Optional processed cue point metadata for the user
+     *        UMP contour.
+     * @param useOnlyN - If true, compare only frames inside NUCLEUS segments.
      * @return A QVariantMap containing analysis results such as similarity scores
      *         or error metrics.
      */
     Q_INVOKABLE QVariantMap compareUMP(const QVariantList& referenceUmp,
         const QVariantList& userUmp,
-        double fullMin, double fullMax);
+        const QVariantList& referenceCuePoints,
+        const QVariantList& userCuePoints,
+        double fullMin, double fullMax,
+        bool useOnlyN = false);
 };
 
 #endif // ANALYSISAPI_H
