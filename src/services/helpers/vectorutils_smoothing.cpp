@@ -98,16 +98,6 @@ std::vector<double> VectorUtils::smoothMedian(const std::vector<double>& data,
             continue;
         }
 
-        // If the non-zero context is smaller than the requested window the
-        // segment itself is shorter than windowSize.  Computing a median over
-        // only 1-2 values collapses all frames in the segment to the same
-        // number, which causes zero-deviation normalisations downstream to
-        // return an all-zero vector.  Preserve the original value instead.
-        if (static_cast<int>(windowRef.size()) < windowSize) {
-            result.push_back(data[i]);
-            continue;
-        }
-
         // Compute true median: average the two middle elements for even-sized
         // windows.
         size_t sz = windowRef.size();

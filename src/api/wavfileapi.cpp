@@ -802,7 +802,7 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
             std::string smoothType = umpSmoothing.toStdString();
             double param1 = static_cast<double>(umpSmoothingWindowSize);
             double param2 = 0.0;
-            filteredUmp = VectorUtils::smooth(smoothType, filteredUmp, param1, param2, false);
+            filteredUmp = VectorUtils::smooth(smoothType, filteredUmp, param1, param2, true);
         }
         // Replace the original UMP vector with the filtered one.
         umpVec = filteredUmp;

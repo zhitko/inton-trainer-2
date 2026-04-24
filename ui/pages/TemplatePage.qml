@@ -13,46 +13,46 @@ Page {
     id: root
 
     // Shorthand computed accessors for repeated index→string lookups
-    readonly property string pitchInterpolationName: window.settingsApi ? ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType] : "None"
-    readonly property string pitchSmoothingName:     window.settingsApi ? ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing]    : "None"
-    readonly property string amplitudeSmoothingName:  window.settingsApi ? ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing]           : "None"
-    readonly property string umpSmoothingName:        window.settingsApi ? ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing]       : "None"
+    property string pitchInterpolationName: window.settingsApi ? ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType] : "None"
+    property string pitchSmoothingName:     window.settingsApi ? ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing]    : "None"
+    property string amplitudeSmoothingName: window.settingsApi ? ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing]           : "None"
+    property string umpSmoothingName:       window.settingsApi ? ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing]       : "None"
 
     // ── Page state ──────────────────────────────────────────────────────────
-    property bool   showSettings:    false
+    property bool   showSettings:      false
     property string referenceFilePath: ""
-    property string userFilePath:    ""
+    property string userFilePath:      ""
 
     // ── WAV file handles ────────────────────────────────────────────────────
     property var referenceWavFileHandle: null
     property var userWavFileHandle:      null
 
     // ── Reference audio data ────────────────────────────────────────────────
-    property var referenceCuePoints:       []
-    property var referenceWaveData:        []
-    property var referenceAmplitudeData:   []
+    property var referenceCuePoints:          []
+    property var referenceWaveData:           []
+    property var referenceAmplitudeData:      []
     property var referenceAmplitudeDerivData: []
-    property var referencePitchData:       []
-    property var referenceLogPitchData:    []
-    property var referencePitchDerivData:  []
-    property var referenceSpecData:        []
-    property var referenceCepstrData:      []
+    property var referencePitchData:          []
+    property var referenceLogPitchData:       []
+    property var referencePitchDerivData:     []
+    property var referenceSpecData:           []
+    property var referenceCepstrData:         []
 
     // ── User audio data ─────────────────────────────────────────────────────
-    property var userWaveData:       []
-    property var userLogPitchData:   []
+    property var userWaveData:     []
+    property var userLogPitchData: []
 
     // ── DP / alignment results ──────────────────────────────────────────────
-    property double dpMinFinalCost:        0.0
+    property double dpMinFinalCost:          0.0
     property var    dpSignalStreamDistances: []
-    property var    dpTemplateData:        []
-    property var    dpSignalData:          []
+    property var    dpTemplateData:          []
+    property var    dpSignalData:            []
 
     // ── VAD data ────────────────────────────────────────────────────────────
-    property var userVadA: []
-    property var userVadU: []
-    property var userVadV: []
-    property var userVadCorr: []
+    property var userVadA:     []
+    property var userVadU:     []
+    property var userVadV:     []
+    property var userVadCorr:  []
     property var userVadCorrU: []
     property var userVadCorrV: []
 
@@ -76,6 +76,11 @@ Page {
     }
 
     function updateData() {
+        pitchInterpolationName = window.settingsApi ? ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType] : "None";
+        pitchSmoothingName = window.settingsApi ? ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing] : "None";
+        amplitudeSmoothingName = window.settingsApi ? ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing] : "None";
+        umpSmoothingName = window.settingsApi ? ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing] : "None";
+
         updateRefData();
         updateUserData();
     }
@@ -161,7 +166,7 @@ Page {
         Logger.debug("Processed pitch length: " + referencePitchData.length);
         refPitchProcessedWaveFormGraph.waveData = [referencePitchData];
 
-        // Log pitch — only needed when dpUsePitchLog / showLogPitch / dpUsePitchLogAsMask is active. 
+        // Log pitch — only needed when dpUsePitchLog / showLogPitch / dpUsePitchLogAsMask is active.
         // Also needed for UMP when showUMP is active, since UMP is based on log pitch.
         if (settingsApi.dpUsePitchLog || settingsApi.showLogPitch || settingsApi.dpUsePitchLogAsMask) {
             Logger.debug("Extracting reference log pitch");
@@ -348,8 +353,7 @@ Page {
         Logger.debug("User processed pitch length: " + userPitchData.length);
         userPitchProcessedWaveFormGraph.waveData = [userPitchData];
 
-        // if (settingsApi.dpUsePitchLog || settingsApi.showLogPitch) {
-            Logger.debug("Extracting user log pitch");
+        Logger.debug("Extracting user log pitch");
             userLogPitchData = wavFileApi.getPitch(
                 userWavFileHandle,
                 window.settingsApi.algorithm,
@@ -360,11 +364,8 @@ Page {
                 window.settingsApi.voicingThreshold,
                 "LOG_F0", "None", "None", "None", 0, 0, 0
             );
-            Logger.debug("User log pitch length: " + userLogPitchData.length);
-            userLogPitchWaveFormGraph.waveData = [userLogPitchData];
-        // } else {
-            // userLogPitchData = [];
-        // }
+        Logger.debug("User log pitch length: " + userLogPitchData.length);
+        userLogPitchWaveFormGraph.waveData = [userLogPitchData];
 
         // ── Spectrum ── only when getDP will consume it ─────────────────────────
         let userSpecData = [];
@@ -491,23 +492,23 @@ Page {
 
 
         // ── Waveform cue point overlays ────────────────────────────────────────
-            let scaledCuePoints = dpResult.cuePoints.map(cp => ({
-            position: Math.round(cp.position * userWaveData.length   / userLogPitchData.length),
-                label:    cp.label,
-            length:   Math.round(cp.length   * userWaveData.length   / userLogPitchData.length)
-            }));
-            userWaveFormGraph.cuePoints = scaledCuePoints;
+        let scaledCuePoints = dpResult.cuePoints.map(cp => ({
+            position: Math.round(cp.position * userWaveData.length / userLogPitchData.length),
+            label: cp.label,
+            length: Math.round(cp.length * userWaveData.length / userLogPitchData.length)
+        }));
+        userWaveFormGraph.cuePoints = scaledCuePoints;
 
         if (settingsApi.showProcessedPitch || settingsApi.showF0) {
-                let processedScaledCuePoints = dpResult.cuePoints.map(cp => ({
+            let processedScaledCuePoints = dpResult.cuePoints.map(cp => ({
                 position: Math.round(cp.position * userPitchData.length / userLogPitchData.length),
-                    label:    cp.label,
-                length:   Math.round(cp.length   * userPitchData.length / userLogPitchData.length)
-                }));
-                if (settingsApi.showF0)
-                    userPitchWaveFormGraph.cuePoints = processedScaledCuePoints;
-                if (settingsApi.showProcessedPitch)
-                    userPitchProcessedWaveFormGraph.cuePoints = processedScaledCuePoints;
+                label: cp.label,
+                length: Math.round(cp.length * userPitchData.length / userLogPitchData.length)
+            }));
+            if (settingsApi.showF0)
+                userPitchWaveFormGraph.cuePoints = processedScaledCuePoints;
+            if (settingsApi.showProcessedPitch)
+                userPitchProcessedWaveFormGraph.cuePoints = processedScaledCuePoints;
         }
     }
 
@@ -569,8 +570,6 @@ Page {
         }
     }
 
-
-
     Button {
         anchors.right: parent.right
         anchors.top: parent.top
@@ -606,14 +605,12 @@ Page {
 
                     WaveFormGraph {
                         id: refWaveFormGraph
-
                         height: 300
                         width: parent.width - 80
                     }
 
                     PlayButton {
                         id: refPlayButton
-
                         file: referenceFilePath
                         height: 32
                         showLabel: true
@@ -634,7 +631,6 @@ Page {
 
                         WaveFormGraph {
                             id: refPitchWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -654,7 +650,6 @@ Page {
 
                         WaveFormGraph {
                             id: refPitchProcessedWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -674,7 +669,6 @@ Page {
 
                         WaveFormGraph {
                             id: refLogPitchWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -694,7 +688,6 @@ Page {
 
                         WaveFormGraph {
                             id: refUmpWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                             lineWidth: 5
@@ -710,14 +703,12 @@ Page {
 
                     WaveFormGraph {
                         id: userWaveFormGraph
-
                         height: 300
                         width: parent.width - 80
                     }
 
                     PlayButton {
                         id: userPlayButton
-
                         file: userFilePath
                         height: 32
                         showLabel: true
@@ -738,7 +729,6 @@ Page {
 
                         WaveFormGraph {
                             id: userPitchWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -758,7 +748,6 @@ Page {
 
                         WaveFormGraph {
                             id: userPitchProcessedWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -778,7 +767,6 @@ Page {
 
                         WaveFormGraph {
                             id: userLogPitchWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -798,7 +786,6 @@ Page {
 
                         WaveFormGraph {
                             id: userUmpWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                             lineWidth: 5
@@ -827,7 +814,6 @@ Page {
 
                         WaveFormGraph {
                             id: refAmplitudeWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -841,7 +827,6 @@ Page {
 
                         WaveFormGraph {
                             id: userAmplitudeWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -868,7 +853,6 @@ Page {
 
                         WaveFormGraph {
                             id: refAmplitudeDerivWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -882,7 +866,6 @@ Page {
 
                         WaveFormGraph {
                             id: userAmplitudeDerivWaveFormGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -909,7 +892,6 @@ Page {
 
                         Spectrogram2DGraph {
                             id: refSpectrumGraph
-
                             height: 400
                             width: parent.width
                         }
@@ -923,7 +905,6 @@ Page {
 
                         Spectrogram2DGraph {
                             id: userSpectrumGraph
-
                             height: 400
                             width: parent.width
                         }
@@ -950,7 +931,6 @@ Page {
 
                         Spectrogram2DGraph {
                             id: refCepstrogramGraph
-
                             height: 400
                             width: parent.width
                         }
@@ -964,7 +944,6 @@ Page {
 
                         Spectrogram2DGraph {
                             id: userCepstrogramGraph
-
                             height: 400
                             width: parent.width
                         }
@@ -985,22 +964,27 @@ Page {
 
                         WaveFormGraph {
                             id: userVadCorrGraph
-
                             height: 200
                             width: parent.width - 80
                             waveData: {
                                 let datasets = [];
-                                if (window.settingsApi.showVadCorr && root.userVadCorr.length > 0) datasets.push(root.userVadCorr);
-                                if (window.settingsApi.showVadCorr && root.userVadCorrU.length > 0) datasets.push(root.userVadCorrU);
-                                if (window.settingsApi.showVadCorr && root.userVadCorrV.length > 0) datasets.push(root.userVadCorrV);
+                                if (window.settingsApi.showVadCorr && root.userVadCorr.length > 0)
+                                    datasets.push(root.userVadCorr);
+                                if (window.settingsApi.showVadCorr && root.userVadCorrU.length > 0)
+                                    datasets.push(root.userVadCorrU);
+                                if (window.settingsApi.showVadCorr && root.userVadCorrV.length > 0)
+                                    datasets.push(root.userVadCorrV);
                                 return datasets;
                             }
                             showLegend: window.settingsApi.showVadCorr && (root.userVadCorr.length > 0 || root.userVadCorrU.length > 0 || root.userVadCorrV.length > 0)
                             datasetLabels: {
                                 let labels = [];
-                                if (root.userVadCorr.length > 0) labels.push("R(n)");
-                                if (root.userVadCorrU.length > 0) labels.push("U(n)");
-                                if (root.userVadCorrV.length > 0) labels.push("V(n)");
+                                if (root.userVadCorr.length > 0)
+                                    labels.push("R(n)");
+                                if (root.userVadCorrU.length > 0)
+                                    labels.push("U(n)");
+                                if (root.userVadCorrV.length > 0)
+                                    labels.push("V(n)");
                                 return labels;
                             }
                             datasetColors: Theme.chartPalette(root.Material.theme).slice(0, datasetLabels.length)
@@ -1028,17 +1012,23 @@ Page {
                             width: parent.width - 80
                             waveData: {
                                 let datasets = [];
-                                if (window.settingsApi.showVadA && root.userVadA.length > 0) datasets.push(root.userVadA);
-                                if (window.settingsApi.showVadU && root.userVadU.length > 0) datasets.push(root.userVadU);
-                                if (window.settingsApi.showVadV && root.userVadV.length > 0) datasets.push(root.userVadV);
+                                if (window.settingsApi.showVadA && root.userVadA.length > 0)
+                                    datasets.push(root.userVadA);
+                                if (window.settingsApi.showVadU && root.userVadU.length > 0)
+                                    datasets.push(root.userVadU);
+                                if (window.settingsApi.showVadV && root.userVadV.length > 0)
+                                    datasets.push(root.userVadV);
                                 return datasets;
                             }
                             showLegend: window.settingsApi.showVadA || window.settingsApi.showVadU || window.settingsApi.showVadV
                             datasetLabels: {
                                 let labels = [];
-                                if (window.settingsApi.showVadA) labels.push("A(n)");
-                                if (window.settingsApi.showVadU) labels.push("U(n)");
-                                if (window.settingsApi.showVadV) labels.push("V(n)");
+                                if (window.settingsApi.showVadA)
+                                    labels.push("A(n)");
+                                if (window.settingsApi.showVadU)
+                                    labels.push("U(n)");
+                                if (window.settingsApi.showVadV)
+                                    labels.push("V(n)");
                                 return labels;
                             }
                             datasetColors: Theme.chartPalette(root.Material.theme).slice(0, datasetLabels.length)
@@ -1074,7 +1064,6 @@ Page {
 
                         WaveFormGraph {
                             id: dtwSignalStreamGraph
-
                             height: 200
                             width: parent.width - 80
                         }
@@ -1099,13 +1088,20 @@ Page {
                             showLegend: true
                             datasetLabels: {
                                 let labels = [];
-                                if (window.settingsApi.dpUsePitchLog) labels.push("Log Pitch");
-                                if (window.settingsApi.dpUsePitch) labels.push("Pitch");
-                                if (window.settingsApi.dpUsePitchDerivative) labels.push("Pitch Deriv");
-                                if (window.settingsApi.dpUseSpectrum) labels.push("Spectrum");
-                                if (window.settingsApi.dpUseCepstrum) labels.push("Cepstrum");
-                                if (window.settingsApi.dpUseAmplitude) labels.push("Amplitude");
-                                if (window.settingsApi.dpUseAmplitudeDerivative) labels.push("Amp Deriv");
+                                if (window.settingsApi.dpUsePitchLog)
+                                    labels.push("Log Pitch");
+                                if (window.settingsApi.dpUsePitch)
+                                    labels.push("Pitch");
+                                if (window.settingsApi.dpUsePitchDerivative)
+                                    labels.push("Pitch Deriv");
+                                if (window.settingsApi.dpUseSpectrum)
+                                    labels.push("Spectrum");
+                                if (window.settingsApi.dpUseCepstrum)
+                                    labels.push("Cepstrum");
+                                if (window.settingsApi.dpUseAmplitude)
+                                    labels.push("Amplitude");
+                                if (window.settingsApi.dpUseAmplitudeDerivative)
+                                    labels.push("Amp Deriv");
                                 return labels;
                             }
                             datasetColors: Theme.chartPalette(root.Material.theme).slice(0, datasetLabels.length)
@@ -1131,13 +1127,20 @@ Page {
                             showLegend: true
                             datasetLabels: {
                                 let labels = [];
-                                if (window.settingsApi.dpUsePitchLog) labels.push("Log Pitch");
-                                if (window.settingsApi.dpUsePitch) labels.push("Pitch");
-                                if (window.settingsApi.dpUsePitchDerivative) labels.push("Pitch Deriv");
-                                if (window.settingsApi.dpUseSpectrum) labels.push("Spectrum");
-                                if (window.settingsApi.dpUseCepstrum) labels.push("Cepstrum");
-                                if (window.settingsApi.dpUseAmplitude) labels.push("Amplitude");
-                                if (window.settingsApi.dpUseAmplitudeDerivative) labels.push("Amp Deriv");
+                                if (window.settingsApi.dpUsePitchLog)
+                                    labels.push("Log Pitch");
+                                if (window.settingsApi.dpUsePitch)
+                                    labels.push("Pitch");
+                                if (window.settingsApi.dpUsePitchDerivative)
+                                    labels.push("Pitch Deriv");
+                                if (window.settingsApi.dpUseSpectrum)
+                                    labels.push("Spectrum");
+                                if (window.settingsApi.dpUseCepstrum)
+                                    labels.push("Cepstrum");
+                                if (window.settingsApi.dpUseAmplitude)
+                                    labels.push("Amplitude");
+                                if (window.settingsApi.dpUseAmplitudeDerivative)
+                                    labels.push("Amp Deriv");
                                 return labels;
                             }
                             datasetColors: Theme.chartPalette(root.Material.theme).slice(0, datasetLabels.length)
