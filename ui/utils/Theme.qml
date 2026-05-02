@@ -29,6 +29,7 @@ Item {
         readonly property color colorOnError: "#FFFFFF"
         readonly property color errorContainer: "#FFDAD6"
         readonly property color colorOnErrorContainer: "#93000A"
+        readonly property color success: '#1f6d21'
         readonly property color background: "#F9F9FF"
         readonly property color colorOnBackground: "#191C20"
         readonly property color surface: "#F9F9FF"
@@ -82,6 +83,7 @@ Item {
         readonly property color colorOnError: "#690005"
         readonly property color errorContainer: "#93000A"
         readonly property color colorOnErrorContainer: "#FFDAD6"
+        readonly property color success: "#81c784"
         readonly property color background: "#111318"
         readonly property color colorOnBackground: "#E2E2E9"
         readonly property color surface: "#111318"
@@ -428,6 +430,9 @@ Item {
     }
     function onErrorContainer(theme) {
         return getColor("onErrorContainer", theme);
+    }
+    function success(theme) {
+        return theme === Material.Dark ? darkTheme.success : lightTheme.success;
     }
 
     function background(theme) {

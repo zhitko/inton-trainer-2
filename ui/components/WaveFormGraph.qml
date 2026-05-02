@@ -232,16 +232,16 @@ Column {
                 var width = scaleX(cue.position + cue.length) - x;
 
                 if (cue.label.toUpperCase().startsWith("P")) {
-                    ctx.fillStyle = Qt.alpha(Theme.harmonize("#FFC107", Material.theme), 0.5);
+                    ctx.fillStyle = Qt.alpha(Theme.harmonize('#ffffff', Material.theme), 0.5);
                     ctx.strokeStyle = Theme.outline(Material.theme);
                 } else if (cue.label.toUpperCase().startsWith("N")) {
                     ctx.fillStyle = Qt.alpha(Theme.harmonize("#4CAF50", Material.theme), 0.5);
                     ctx.strokeStyle = Theme.outline(Material.theme);
                 } else if (cue.label.toUpperCase().startsWith("T")) {
-                    ctx.fillStyle = Qt.alpha(Theme.harmonize("#FF9800", Material.theme), 0.5);
+                    ctx.fillStyle = Qt.alpha(Theme.harmonize('#ffffff', Material.theme), 0.5);
                     ctx.strokeStyle = Theme.outline(Material.theme);
                 } else {
-                    ctx.fillStyle = Qt.alpha(Theme.harmonize("#FFFFFF", Material.theme), 0.1);
+                    ctx.fillStyle = Qt.alpha(Theme.harmonize("#ffffff", Material.theme), 0.1);
                     ctx.strokeStyle = Theme.outline(Material.theme);
                 }
 

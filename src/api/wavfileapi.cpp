@@ -629,7 +629,7 @@ QVariantList WavFileApi::getPitch(
             param1 = pitchSplineSmoothingPenalty; // Penalty (rho)
         }
 
-        pitch = VectorUtils::smooth(smoothType, pitch, param1, param2);
+        pitch = VectorUtils::smooth(smoothType, pitch, param1, param2, true);
     }
 
     // For LOG_F0, apply smoothing to reduce octave errors and then convert to binary voiced/unvoiced
@@ -789,20 +789,17 @@ QVariantMap WavFileApi::getUMP(const QVariantList& pitch,
                 filteredUmp[i] = lastNucleusValue;
             }
         }
-        // Apply interpolation for empty frames after zeroing non-nucleus segments.
-        if (!filteredUmp.empty()) {
-            filteredUmp = VectorUtils::interpolateMissingFrames(pitchInterpolationType.toStdString(), filteredUmp, true, true);
-        }
         // Normalize the filtered UMP vector if required.
         if (normalized) {
             filteredUmp = VectorUtils::normalizeFromTo(0.0, 1.0, filteredUmp);
         }
-        // Smooth the filtered UMP vector if required.
-        if (!filteredUmp.empty() && umpSmoothing != "None") {
-            std::string smoothType = umpSmoothing.toStdString();
-            double param1 = static_cast<double>(umpSmoothingWindowSize);
-            double param2 = 0.0;
-            filteredUmp = VectorUtils::smooth(smoothType, filteredUmp, param1, param2, true);
+        // Apply interpolation for empty frames after zeroing non-nucleus segments.
+        if (!filteredUmp.empty()) {
+            filteredUmp = VectorUtils::interpolateMissingFrames(pitchInterpolationType.toStdString(), filteredUmp, true, true);
+        }
+        // Smooth the filtered UMP vector.
+        if (!filteredUmp.empty()) {
+            filteredUmp = VectorUtils::smooth("MovingAverage", filteredUmp, 32, 0, false);
         }
         // Replace the original UMP vector with the filtered one.
         umpVec = filteredUmp;

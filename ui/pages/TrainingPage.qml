@@ -69,12 +69,13 @@ Page {
 
     property bool _isExiting: false
     property bool _wasRecordingBeforeDialog: false
+    property bool _isVadPaused: false
 
     onVisibleChanged: {
         if (visible) {
             _isExiting = false;
             // Guard against uninitialized window.settingsApi during destruction/initialization
-            if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording) {
+            if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
                 let minimumLength = -1;
                 if (root.referenceWaveData && window.settingsApi) {
                     minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
@@ -99,7 +100,7 @@ Page {
     Connections {
         target: trainingAudioApi
         onIsRecordingChanged: {
-            if (!trainingAudioApi.isRecording && !root._isExiting && window.settingsApi && window.settingsApi.autoStopRecording) {
+            if (!trainingAudioApi.isRecording && !root._isExiting && !root._isVadPaused && window.settingsApi && window.settingsApi.autoStopRecording) {
                 let tempFilePath = trainingAudioApi.saveWavFile();
                 if (tempFilePath !== "") {
                     let userWavHandle = wavFileApi.openWavFile(tempFilePath);
@@ -125,7 +126,7 @@ Page {
         interval: 100
         repeat: false
         onTriggered: {
-            if (root.visible && !root._isExiting) {
+            if (root.visible && !root._isExiting && !root._isVadPaused) {
                 let minimumLength = -1;
                 if (root.referenceWaveData && window.settingsApi) {
                     minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
@@ -142,7 +143,7 @@ Page {
             _isExiting = true; // Set to true so we don't save the aborted recording
             trainingAudioApi.stopRecording();
             _isExiting = false; // reset immediately
-        } else if (!isAnyPlaybackActive && !trainingAudioApi.isRecording) {
+        } else if (!isAnyPlaybackActive && !trainingAudioApi.isRecording && !root._isVadPaused) {
             // Un-pause recording when playback finishes
             restartRecordingTimer.start();
         }
@@ -152,7 +153,7 @@ Page {
         updateReferenceUMP();
         loadPreviousResults();
         
-        if (visible && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording) {
+        if (visible && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
             _isExiting = false;
             let minimumLength = -1;
             if (root.referenceWaveData && window.settingsApi) {
@@ -749,7 +750,7 @@ Page {
                             height: 14
                             radius: 7
                             // Change color based on playback or recording
-                            color: isAnyPlaybackActive ? Theme.primary(root.Material.theme) : Theme.error(root.Material.theme)
+                            color: trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : Theme.error(root.Material.theme))
                             visible: trainingAudioApi.isRecording || isAnyPlaybackActive
 
                             SequentialAnimation on opacity {
@@ -761,16 +762,16 @@ Page {
                         }
 
                         Text {
-                            text: isAnyPlaybackActive ? qsTr("Playing...") : (trainingAudioApi.isRecording ? (trainingAudioApi.isVoiceDetected ? qsTr("Recording...") : qsTr("Listening...")) : qsTr("Processing..."))
+                            text: root._isVadPaused ? qsTr("Paused") : (isAnyPlaybackActive ? qsTr("Playing...") : (trainingAudioApi.isRecording ? (trainingAudioApi.isVoiceDetected ? qsTr("Recording...") : qsTr("Listening...")) : qsTr("Processing...")))
                             font.pixelSize: 18
                             font.weight: 600
-                            color: isAnyPlaybackActive ? Theme.primary(root.Material.theme) : (trainingAudioApi.isRecording ? Theme.error(root.Material.theme) : Theme.onSurface(root.Material.theme))
+                            color: root._isVadPaused ? Theme.error(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : (trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : Theme.error(root.Material.theme)))
                         }
                     }
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        text: isAnyPlaybackActive ? qsTr("Listen carefully") : qsTr("Repeat the phrase into the mic")
+                        text: root._isVadPaused ? qsTr("Press Resume to continue recording.") : (isAnyPlaybackActive ? qsTr("Listen carefully") : qsTr("Repeat the phrase into the mic"))
                         font.pixelSize: 14
                         color: Theme.onSurface(root.Material.theme)
                         opacity: 0.6
@@ -799,6 +800,81 @@ Page {
                     
                     Behavior on opacity {
                         NumberAnimation { duration: 250 }
+                    }
+                }
+            }
+
+            // Pause/Resume VAD Button
+            Button {
+                id: pauseVadButton
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 48
+                flat: false
+                visible: window.settingsApi ? window.settingsApi.autoStopRecording : false
+
+                contentItem: Text {
+                    text: root._isVadPaused ? qsTr("Resume") : qsTr("Pause")
+                    font.pixelSize: 16
+                    font.weight: 600
+                    color: pauseVadButton.down ? Qt.darker(Theme.onSecondaryContainer(root.Material.theme), 1.1) : Theme.onSecondaryContainer(root.Material.theme)
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    Behavior on text {
+                        enabled: false
+                    }
+                }
+
+                background: Rectangle {
+                    radius: 24
+                    gradient: Gradient {
+                        GradientStop {
+                            position: 0.0
+                            color: pauseVadButton.hovered ? Qt.lighter(Theme.primaryContainer(root.Material.theme), 1.08) : Theme.primaryContainer(root.Material.theme)
+                        }
+                        GradientStop {
+                            position: 1.0
+                            color: pauseVadButton.hovered ? Theme.primaryContainer(root.Material.theme) : Qt.darker(Theme.primaryContainer(root.Material.theme), 1.08)
+                        }
+                    }
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 200
+                        }
+                    }
+
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        shadowEnabled: true
+                        shadowColor: Qt.rgba(0, 0, 0, 0.2)
+                        blur: pauseVadButton.hovered ? 0.3 : 0.2
+                        shadowVerticalOffset: pauseVadButton.hovered ? 6 : 4
+                    }
+
+                    scale: pauseVadButton.pressed ? 0.95 : (pauseVadButton.hovered ? 1.02 : 1.0)
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: 100
+                            easing.type: Easing.OutBack
+                        }
+                    }
+                }
+
+                onClicked: {
+                    if (root._isVadPaused) {
+                        // Resume VAD
+                        root._isVadPaused = false;
+                        let minimumLength = -1;
+                        if (root.referenceWaveData && window.settingsApi) {
+                            minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
+                        }
+                        trainingAudioApi.startRecording(-1, minimumLength);
+                    } else {
+                        // Pause VAD
+                        root._isVadPaused = true;
+                        trainingAudioApi.stopRecording();
                     }
                 }
             }
@@ -887,8 +963,8 @@ Page {
                     if (selectedPath) {
                         updateUserUMP(selectedPath, false);
                     }
-                    // Resume recording if it was active before opening the dialog
-                    if (_wasRecordingBeforeDialog && window.settingsApi && window.settingsApi.autoStopRecording) {
+                    // Resume recording if it was active before opening the dialog and VAD is not paused
+                    if (_wasRecordingBeforeDialog && !root._isVadPaused && window.settingsApi && window.settingsApi.autoStopRecording) {
                         console.log("Resuming recording after opening test file dialog");
                         _isExiting = false; // Allow recording to auto-restart
                         let minimumLength = -1;
@@ -900,8 +976,8 @@ Page {
                 }
                 onRejected: {
                     console.log("testFileDialog rejected");
-                    // Resume recording if it was active before opening the dialog
-                    if (_wasRecordingBeforeDialog && window.settingsApi && window.settingsApi.autoStopRecording) {
+                    // Resume recording if it was active before opening the dialog and VAD is not paused
+                    if (_wasRecordingBeforeDialog && !root._isVadPaused && window.settingsApi && window.settingsApi.autoStopRecording) {
                         console.log("Resuming recording after opening test file dialog");
                         _isExiting = false; // Allow recording to auto-restart
                         let minimumLength = -1;
