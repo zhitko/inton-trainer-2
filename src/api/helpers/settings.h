@@ -28,6 +28,8 @@ struct AppSettings {
     bool showNavigationMenu = false;
     // Auto stop recording when silence is detected
     bool autoStopRecording = true;
+    // Run VAD calibration before starting a new recording session
+    bool autoCalibrate = true;
     // Duration of silence in ms before auto-stop triggers
     int autoStopSilenceDuration = 2000;
     // VAD settings

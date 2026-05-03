@@ -205,6 +205,25 @@ void SettingsApi::setAutoStopRecording(bool autoStopRecording)
     LOG_DEBUG() << "Finish: setAutoStopRecording";
 }
 
+bool SettingsApi::autoCalibrate() const
+{
+    LOG_DEBUG() << "Start: autoCalibrate";
+    bool result = m_settings.autoCalibrate;
+    LOG_DEBUG() << "Finish: autoCalibrate - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAutoCalibrate(bool autoCalibrate)
+{
+    LOG_DEBUG() << "Start: setAutoCalibrate - autoCalibrate=" << autoCalibrate;
+    if (m_settings.autoCalibrate != autoCalibrate) {
+        m_settings.autoCalibrate = autoCalibrate;
+        save();
+        emit autoCalibrateChanged();
+    }
+    LOG_DEBUG() << "Finish: setAutoCalibrate";
+}
+
 int SettingsApi::autoStopSilenceDuration() const
 {
     LOG_DEBUG() << "Start: autoStopSilenceDuration";
@@ -485,6 +504,7 @@ void SettingsApi::load()
     emit primaryColorChanged();
     emit showNavigationMenuChanged();
     emit autoStopRecordingChanged();
+    emit autoCalibrateChanged();
     emit autoStopSilenceDurationChanged();
     emit vadMethodChanged();
     emit vadThresholdChanged();

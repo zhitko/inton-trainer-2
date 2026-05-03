@@ -40,6 +40,7 @@ Settings::loadSettings()
     settings.primaryColor = qsettings.value("primaryColor", "blue").toString().toStdString();
     settings.showNavigationMenu = qsettings.value("showNavigationMenu", false).toBool();
     settings.autoStopRecording = qsettings.value("autoStopRecording", true).toBool();
+    settings.autoCalibrate = qsettings.value("autoCalibrate", true).toBool();
     settings.autoStopSilenceDuration = qsettings.value("autoStopSilenceDuration", 2000).toInt();
     settings.vadMethod = qsettings.value("vadMethod", 0).toInt();
     settings.vadThreshold = qsettings.value("vadThreshold", 10000.0).toDouble();
@@ -152,6 +153,7 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("primaryColor", QString::fromStdString(settings.primaryColor));
     qsettings.setValue("showNavigationMenu", settings.showNavigationMenu);
     qsettings.setValue("autoStopRecording", settings.autoStopRecording);
+    qsettings.setValue("autoCalibrate", settings.autoCalibrate);
     qsettings.setValue("autoStopSilenceDuration", settings.autoStopSilenceDuration);
     qsettings.setValue("vadMethod", settings.vadMethod);
     qsettings.setValue("vadThreshold", settings.vadThreshold);

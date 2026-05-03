@@ -27,6 +27,7 @@ class SettingsApi : public QObject {
     Q_PROPERTY(bool showVadV READ showVadV WRITE setShowVadV NOTIFY showVadVChanged)
     Q_PROPERTY(bool showVadCorr READ showVadCorr WRITE setShowVadCorr NOTIFY showVadCorrChanged)
     Q_PROPERTY(bool autoStopRecording READ autoStopRecording WRITE setAutoStopRecording NOTIFY autoStopRecordingChanged)
+    Q_PROPERTY(bool autoCalibrate READ autoCalibrate WRITE setAutoCalibrate NOTIFY autoCalibrateChanged)
     Q_PROPERTY(int autoStopSilenceDuration READ autoStopSilenceDuration WRITE setAutoStopSilenceDuration NOTIFY autoStopSilenceDurationChanged)
     Q_PROPERTY(double minimumRecordLengthPercent READ minimumRecordLengthPercent WRITE setMinimumRecordLengthPercent NOTIFY minimumRecordLengthPercentChanged)
     Q_PROPERTY(int vadMethod READ vadMethod WRITE setVadMethod NOTIFY vadMethodChanged)
@@ -205,6 +206,9 @@ public:
 
     bool autoStopRecording() const;
     void setAutoStopRecording(bool autoStopRecording);
+
+    bool autoCalibrate() const;
+    void setAutoCalibrate(bool autoCalibrate);
 
     int autoStopSilenceDuration() const;
     void setAutoStopSilenceDuration(int autoStopSilenceDuration);
@@ -416,6 +420,7 @@ signals:
     void showVadVChanged();
     void showVadCorrChanged();
     void autoStopRecordingChanged();
+    void autoCalibrateChanged();
     void autoStopSilenceDurationChanged();
     void minimumRecordLengthPercentChanged();
     void vadMethodChanged();

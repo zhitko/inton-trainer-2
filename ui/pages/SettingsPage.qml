@@ -2,9 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
-import by.intontrainer.audio 1.0
 import by.intontrainer.settings 1.0
 import "../utils"
+import "../components"
 
 Page {
     id: root
@@ -18,59 +18,13 @@ Page {
         return parseFloat(text.replace(",", "."));
     }
 
-    // AudioApi used only for VAD calibration
-    AudioApi {
-        id: calibrationAudioApi
-        onCalibrationFinished: function(threshold) {
+    // VAD Calibration dialog (extracted component)
+    VadCalibrationDialog {
+        id: vadCalibrationDialog
+        onCalibrationDone: function(threshold) {
             if (settingsApi) {
                 settingsApi.vadThreshold = threshold;
             }
-            vadCalibrationDialog.close();
-        }
-    }
-
-    // Calibration dialog
-    Dialog {
-        id: vadCalibrationDialog
-        title: qsTr("VAD Calibration")
-        modal: true
-        anchors.centerIn: parent
-        width: 380
-        closePolicy: Popup.NoAutoClose
-
-        contentItem: ColumnLayout {
-            spacing: 16
-            Label {
-                text: qsTr("Please stay quiet for 2 seconds so the background noise level can be measured.")
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-                font.pixelSize: 15
-            }
-            // Animated dots to show progress
-            Row {
-                Layout.alignment: Qt.AlignHCenter
-                spacing: 8
-                Repeater {
-                    model: 3
-                    Rectangle {
-                        width: 14
-                        height: 14
-                        radius: 7
-                        color: Theme.primary(Material.theme)
-                        SequentialAnimation on opacity {
-                            running: vadCalibrationDialog.visible
-                            loops: Animation.Infinite
-                            NumberAnimation { from: 0.2; to: 1.0; duration: 400 }
-                            NumberAnimation { from: 1.0; to: 0.2; duration: 400 }
-                            PauseAnimation { duration: index * 200 }
-                        }
-                    }
-                }
-            }
-        }
-
-        onOpened: {
-            calibrationAudioApi.calibrateVad();
         }
     }
 
@@ -282,6 +236,17 @@ Page {
                                 settingsApi.autoStopRecording = checked
                         }
 
+                        Label {
+                            text: qsTr("Autocalibrate before recording")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.autoCalibrate : true
+                            onToggled: if (settingsApi)
+                                settingsApi.autoCalibrate = checked
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                        }
                         Label {
                             text: qsTr("VAD Method")
                             color: Theme.onSurface(Material.theme)

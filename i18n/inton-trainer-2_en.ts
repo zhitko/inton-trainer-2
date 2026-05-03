@@ -126,40 +126,45 @@
     <message>
         <location filename="../ui/Main.qml" line="16"/>
         <location filename="../ui/Main.qml" line="118"/>
-        <location filename="../ui/Main.qml" line="311"/>
+        <location filename="../ui/Main.qml" line="364"/>
         <source>Inton Trainer</source>
         <translation>Inton Trainer</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="200"/>
-        <location filename="../ui/Main.qml" line="323"/>
-        <location filename="../ui/Main.qml" line="373"/>
+        <location filename="../ui/Main.qml" line="185"/>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/Main.qml" line="253"/>
+        <location filename="../ui/Main.qml" line="376"/>
+        <location filename="../ui/Main.qml" line="426"/>
         <source>Home</source>
         <translation>Home</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="335"/>
+        <location filename="../ui/Main.qml" line="388"/>
         <source>My Records</source>
         <translation>My Records</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="231"/>
-        <location filename="../ui/Main.qml" line="239"/>
-        <location filename="../ui/Main.qml" line="244"/>
-        <location filename="../ui/Main.qml" line="247"/>
-        <location filename="../ui/Main.qml" line="248"/>
-        <location filename="../ui/Main.qml" line="255"/>
-        <location filename="../ui/Main.qml" line="341"/>
+        <location filename="../ui/Main.qml" line="284"/>
+        <location filename="../ui/Main.qml" line="292"/>
+        <location filename="../ui/Main.qml" line="297"/>
+        <location filename="../ui/Main.qml" line="300"/>
+        <location filename="../ui/Main.qml" line="301"/>
+        <location filename="../ui/Main.qml" line="308"/>
+        <location filename="../ui/Main.qml" line="394"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="329"/>
+        <location filename="../ui/Main.qml" line="382"/>
         <source>Patterns</source>
         <translation>Patterns</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="409"/>
+        <location filename="../ui/Main.qml" line="462"/>
         <source>Dark Mode</source>
         <translation>Dark Mode</translation>
     </message>
@@ -280,476 +285,476 @@
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="35"/>
-        <source>VAD Calibration</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="44"/>
-        <source>Please stay quiet for 2 seconds so the background noise level can be measured.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="101"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="55"/>
         <source>General</source>
         <translation>General</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="115"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="69"/>
         <source>Language</source>
         <translation>Language</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="127"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="81"/>
         <source>Language Title</source>
         <translation>Language Title</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="139"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="93"/>
         <source>Theme</source>
         <translation>Theme</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="147"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="101"/>
         <source>Light</source>
         <translation>Light</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="151"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="105"/>
         <source>Dark</source>
         <translation>Dark</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="155"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="109"/>
         <source>System</source>
         <translation>System</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="174"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="128"/>
         <source>Primary Color</source>
         <translation>Primary Color</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="182"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="136"/>
         <source>Blue</source>
         <translation>Blue</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="186"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="140"/>
         <source>Green</source>
         <translation>Green</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="190"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="144"/>
         <source>Purple</source>
         <translation>Purple</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="194"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="148"/>
         <source>Orange</source>
         <translation>Orange</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="198"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="152"/>
         <source>Red</source>
         <translation>Red</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="202"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="156"/>
         <source>Stainless Steel</source>
         <translation>Stainless Steel</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="221"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="175"/>
         <source>Show Navigation Menu</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="276"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="230"/>
         <source>Auto Stop Recording</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="300"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="265"/>
         <source>Silence Duration (ms)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="342"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="323"/>
         <source>Calibrate</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="232"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1436"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="186"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1417"/>
         <source>Delete user data</source>
         <translation>Delete user data</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="262"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="216"/>
         <source>Automated Recording (VAD)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="286"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="240"/>
+        <source>Autocalibrate before recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="251"/>
         <source>VAD Method</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="291"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="256"/>
         <source>Energy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="291"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="256"/>
         <source>Autocorrelation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="291"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="256"/>
         <source>Hybrid AND</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="291"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="256"/>
         <source>Hybrid OR</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="315"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="280"/>
+        <source>Minimum Record Length (%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/SettingsPage.qml" line="296"/>
         <source>Energy Threshold (Pe)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="348"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="329"/>
         <source>Measure background noise for 2 seconds to set optimal threshold</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="379"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="360"/>
         <source>Autocorr. Threshold</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="405"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="386"/>
         <source>Autocorr Min F0 (Hz)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="431"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="412"/>
         <source>Autocorr Max F0 (Hz)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="457"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="438"/>
         <source>Show A(n)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="467"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="448"/>
         <source>Show U(n)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="477"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="458"/>
         <source>Show V(n)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="487"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="468"/>
         <source>Show Corr.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="515"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="496"/>
         <source>Pitch</source>
         <translation>Pitch</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="529"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="510"/>
         <source>Show F0</source>
         <translation>Show F0</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="539"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="520"/>
         <source>Show Processed Pitch (F0)</source>
         <translation>Show Processed Pitch (F0)</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="549"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="530"/>
         <source>Show Log Pitch (LOG_F0)</source>
         <translation>Show Log Pitch (LOG_F0)</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="559"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="540"/>
         <source>Use Only N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="569"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="550"/>
         <source>Algorithm</source>
         <translation>Algorithm</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="581"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="562"/>
         <source>Frame Shift (ms)</source>
         <translation>Frame Shift (ms)</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="593"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="574"/>
         <source>Sample Rate (Hz)</source>
         <translation>Sample Rate (Hz)</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="605"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="586"/>
         <source>Min F0 (Hz)</source>
         <translation>Min F0 (Hz)</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="617"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="598"/>
         <source>Max F0 (Hz)</source>
         <translation>Max F0 (Hz)</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="629"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="610"/>
         <source>Voicing Threshold</source>
         <translation>Voicing Threshold</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="641"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="622"/>
         <source>Pitch Normalization</source>
         <translation>Pitch Normalization</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="653"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="634"/>
         <source>Pitch Interpolation</source>
         <translation>Pitch Interpolation</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="665"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="646"/>
         <source>Pitch Smoothing</source>
         <translation>Pitch Smoothing</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="677"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="752"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="856"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="990"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="658"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="733"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="837"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="971"/>
         <source>Smoothing Window Size</source>
         <translation>Smoothing Window Size</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="692"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="871"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1005"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="673"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="852"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="986"/>
         <source>Gaussian Sigma</source>
         <translation>Gaussian Sigma</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="706"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="885"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="687"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="866"/>
         <source>Spline Penalty</source>
         <translation>Spline Penalty</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="738"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="719"/>
         <source>Pitch Log</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="765"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="746"/>
         <source>Moving Average Size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="778"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="759"/>
         <source>Transform to Binary</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="788"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="769"/>
         <source>Binary Threshold</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="820"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="801"/>
         <source>UMP</source>
         <translation>UMP</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="834"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="815"/>
         <source>Show UMP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="918"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="899"/>
         <source>Amplitude</source>
         <translation>Amplitude</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="932"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="913"/>
         <source>Show Amplitude</source>
         <translation>Show Amplitude</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="942"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="923"/>
         <source>Show Amplitude Derivative</source>
         <translation>Show Amplitude Derivative</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="952"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="933"/>
         <source>Window</source>
         <translation>Window</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="965"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="946"/>
         <source>Shift</source>
         <translation>Shift</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1174"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1155"/>
         <source>Fixed start/end</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1210"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1234"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1258"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1282"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1306"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1330"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1354"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1377"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1398"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="1419"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1191"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1215"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1239"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1263"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1287"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1311"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1335"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1358"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1379"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1400"/>
         <source>Coeff.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="844"/>
-        <location filename="../ui/pages/SettingsPage.qml" line="978"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="825"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="959"/>
         <source>Smoothing</source>
         <translation>Smoothing</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1037"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1018"/>
         <source>Spectrum</source>
         <translation>Spectrum</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1051"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1032"/>
         <source>Show Spectrum</source>
         <translation>Show Spectrum</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1061"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1042"/>
         <source>Show Cepstrum</source>
         <translation>Show Cepstrum</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1071"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1052"/>
         <source>FFT Length</source>
         <translation>FFT Length</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1083"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1064"/>
         <source>F0 Refinement</source>
         <translation>F0 Refinement</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1093"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1074"/>
         <source>Use Log Scale</source>
         <translation>Use Log Scale</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1103"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1084"/>
         <source>Color Scheme</source>
         <translation>Color Scheme</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1115"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1096"/>
         <source>Cepstrum Order</source>
         <translation>Cepstrum Order</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1146"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1127"/>
         <source>DP Calculation</source>
         <translation>DP Calculation</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1161"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1142"/>
         <source>Show DTW Distances</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1187"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1168"/>
         <source>Use Pitch Log as Mask</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1201"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1182"/>
         <source>Use Pitch</source>
         <translation>Use Pitch</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1225"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1206"/>
         <source>Use Pitch Derivative</source>
         <translation>Use Pitch Derivative</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1249"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1230"/>
         <source>Use Pitch Log</source>
         <translation>Use Pitch Log</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1273"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1254"/>
         <source>Use Amplitude</source>
         <translation>Use Amplitude</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1297"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1278"/>
         <source>Use Amp Derivative</source>
         <translation>Use Amp Derivative</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1321"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1302"/>
         <source>Use Spectrum</source>
         <translation>Use Spectrum</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1345"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1326"/>
         <source>Use Cepstrum</source>
         <translation>Use Cepstrum</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1369"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1350"/>
         <source>Match Coefficient</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1390"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1371"/>
         <source>Insertion Coefficient</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1411"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1392"/>
         <source>Deletion Coefficient</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1444"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1425"/>
         <source>This action will permanently delete all user statistics and user records.
 This cannot be undone. Are you sure?</source>
         <translation>This action will permanently delete all user statistics and user records.
 This cannot be undone. Are you sure?</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1456"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1437"/>
         <source>Yes</source>
         <translation>Yes</translation>
     </message>
     <message>
-        <location filename="../ui/pages/SettingsPage.qml" line="1461"/>
+        <location filename="../ui/pages/SettingsPage.qml" line="1442"/>
         <source>No</source>
         <translation>No</translation>
     </message>
@@ -775,63 +780,63 @@ Check analysis settings (e.g. increase FFT length).</translation>
 <context>
     <name>TemplatePage</name>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="573"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="576"/>
         <source>Hide Settings</source>
         <translation>Hide Settings</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="573"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="576"/>
         <source>Show Settings</source>
         <translation>Show Settings</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="821"/>
-        <location filename="../ui/pages/TemplatePage.qml" line="862"/>
-        <location filename="../ui/pages/TemplatePage.qml" line="903"/>
-        <location filename="../ui/pages/TemplatePage.qml" line="944"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="812"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="851"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="890"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="929"/>
         <source>Reference</source>
         <translation>Reference</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="835"/>
-        <location filename="../ui/pages/TemplatePage.qml" line="876"/>
-        <location filename="../ui/pages/TemplatePage.qml" line="917"/>
-        <location filename="../ui/pages/TemplatePage.qml" line="958"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="825"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="864"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="903"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="942"/>
         <source>User</source>
         <translation>User</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="896"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="883"/>
         <source>Spectrum</source>
         <translation>Spectrum</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="937"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="922"/>
         <source>Cepstrum</source>
         <translation>Cepstrum</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="814"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="805"/>
         <source>Amplitude</source>
         <translation>Amplitude</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="855"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="844"/>
         <source>Amplitude Derivative</source>
         <translation>Amplitude Derivative</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="600"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="603"/>
         <source>Reference waveform</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="628"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="629"/>
         <source>Reference Pitch (F0)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="704"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="701"/>
         <source>User waveform</source>
         <translation></translation>
     </message>
@@ -841,62 +846,62 @@ Check analysis settings (e.g. increase FFT length).</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="668"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="667"/>
         <source>Reference Log Pitch (LOG_F0)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="688"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="686"/>
         <source>Reference UMP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="732"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="727"/>
         <source>User Pitch (F0)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="752"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="746"/>
         <source>User Processed Pitch (F0)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="772"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="765"/>
         <source>User Log Pitch (LOG_F0)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="792"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="784"/>
         <source>User UMP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="979"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="962"/>
         <source>VAD Correlation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="1017"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="1005"/>
         <source>VAD Energy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="1055"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="1049"/>
         <source>DTW Distances</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="1061"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="1055"/>
         <source>Best alignment cost: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="1068"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="1062"/>
         <source>Signal Distances</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TemplatePage.qml" line="1088"/>
+        <location filename="../ui/pages/TemplatePage.qml" line="1081"/>
         <source>Template Data</source>
         <translation></translation>
     </message>
@@ -922,68 +927,101 @@ Check analysis settings (e.g. increase FFT length).</translation>
 <context>
     <name>TrainingPage</name>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="558"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="605"/>
         <source>Shape Similarity</source>
         <translation>Shape Similarity</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="712"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="759"/>
         <source>Play
 Reference</source>
         <translation>Play
 Reference</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="742"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
         <source>Playing...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="742"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
         <source>Listening...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="742"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
         <source>Processing...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="742"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
         <source>Recording...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="751"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
+        <source>Paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TrainingPage.qml" line="798"/>
         <source>Listen carefully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="751"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="798"/>
         <source>Repeat the phrase into the mic</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="774"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="798"/>
+        <source>Press Resume to continue recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TrainingPage.qml" line="821"/>
         <source>Play
 Me</source>
         <translation>Play
 Me</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="793"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="841"/>
+        <source>Resume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TrainingPage.qml" line="841"/>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TrainingPage.qml" line="911"/>
         <source>Open Test File</source>
         <translation>Open Test File</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="860"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="978"/>
         <source>Open test file</source>
         <translation>Open test file</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="897"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="1023"/>
         <source>Advanced</source>
         <translation>Advanced</translation>
+    </message>
+</context>
+<context>
+    <name>VadCalibrationDialog</name>
+    <message>
+        <location filename="../ui/components/VadCalibrationDialog.qml" line="23"/>
+        <source>VAD Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/components/VadCalibrationDialog.qml" line="41"/>
+        <source>Please stay quiet for 2 seconds so the background noise level can be measured.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

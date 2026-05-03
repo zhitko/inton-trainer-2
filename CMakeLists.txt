@@ -129,6 +129,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/components/ListSectionHeader.qml
         ui/components/EmptyState.qml
         ui/components/ConfirmDialog.qml
+        ui/components/VadCalibrationDialog.qml
         ui/components/SearchBar.qml
         ui/components/Chip.qml
         ${qml_singletons}

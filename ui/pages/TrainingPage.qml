@@ -67,20 +67,48 @@ Page {
         id: trainingAudioApi
     }
 
+    // VAD calibration dialog — runs before recording starts (initial + resume)
+    VadCalibrationDialog {
+        id: trainingVadCalibrationDialog
+        onCalibrationDone: function(threshold) {
+            if (window.settingsApi) {
+                window.settingsApi.vadThreshold = threshold;
+            }
+            // Start the actual recording after calibration finishes
+            let minimumLength = -1;
+            if (root.referenceWaveData && window.settingsApi) {
+                minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
+            }
+            trainingAudioApi.startRecording(-1, minimumLength);
+        }
+    }
+
     property bool _isExiting: false
     property bool _wasRecordingBeforeDialog: false
     property bool _isVadPaused: false
+
+    // Starts recording, with VAD calibration first when VAD auto-stop is active
+    // and the "Autocalibrate before recording" setting is enabled.
+    // Use calibrate=true for the very first start and manual resume;
+    // use calibrate=false for automatic restarts after each utterance.
+    function startRecordingWithCalibration(calibrate) {
+        if (calibrate && window.settingsApi && window.settingsApi.autoStopRecording && window.settingsApi.autoCalibrate) {
+            trainingVadCalibrationDialog.open();
+        } else {
+            let minimumLength = -1;
+            if (root.referenceWaveData && window.settingsApi) {
+                minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
+            }
+            trainingAudioApi.startRecording(-1, minimumLength);
+        }
+    }
 
     onVisibleChanged: {
         if (visible) {
             _isExiting = false;
             // Guard against uninitialized window.settingsApi during destruction/initialization
             if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
-                let minimumLength = -1;
-                if (root.referenceWaveData && window.settingsApi) {
-                    minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
-                }
-                trainingAudioApi.startRecording(-1, minimumLength);
+                startRecordingWithCalibration(true);
             }
         } else {
             _isExiting = true;
@@ -155,11 +183,7 @@ Page {
         
         if (visible && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
             _isExiting = false;
-            let minimumLength = -1;
-            if (root.referenceWaveData && window.settingsApi) {
-                minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
-            }
-            trainingAudioApi.startRecording(-1, minimumLength);
+            startRecordingWithCalibration(true);
         }
     }
 
@@ -864,13 +888,9 @@ Page {
 
                 onClicked: {
                     if (root._isVadPaused) {
-                        // Resume VAD
+                        // Resume VAD — calibrate first
                         root._isVadPaused = false;
-                        let minimumLength = -1;
-                        if (root.referenceWaveData && window.settingsApi) {
-                            minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
-                        }
-                        trainingAudioApi.startRecording(-1, minimumLength);
+                        startRecordingWithCalibration(true);
                     } else {
                         // Pause VAD
                         root._isVadPaused = true;
