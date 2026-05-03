@@ -17,6 +17,8 @@ import "../utils"
 Page {
     id: root
 
+    readonly property bool isTrainingPage: true
+
     // ── Page state ──────────────────────────────────────────────────────────
     property string referenceFilePath: ""
     property string userFilePath:      ""
@@ -208,6 +210,22 @@ Page {
                 root.shapeSimilarity = results[results.length - 1];
             }
         }
+    }
+
+    function openAdvancedTemplatePage() {
+        let sv = StackView.view;
+        if (!sv)
+            return;
+        sv.push("TemplatePage.qml", {
+            referenceFilePath: root.referenceFilePath,
+            userFilePath: root.userFilePath,
+            userVadA: trainingAudioApi.getVadA(),
+            userVadU: trainingAudioApi.getVadU(),
+            userVadV: trainingAudioApi.getVadV(),
+            userVadCorr: trainingAudioApi.getVadCorr(),
+            userVadCorrU: trainingAudioApi.getVadCorrU(),
+            userVadCorrV: trainingAudioApi.getVadCorrV()
+        });
     }
 
     function updateReferenceUMP() {
@@ -1006,81 +1024,6 @@ Page {
                         }
                         trainingAudioApi.startRecording(-1, minimumLength);
                     }
-                }
-            }
-
-            // Advanced Button
-            Button {
-                id: advancedButton
-                Layout.alignment: Qt.AlignRight
-                Layout.preferredWidth: 128
-                Layout.preferredHeight: 36
-                Layout.rightMargin: 12
-                Layout.bottomMargin: 8
-                flat: false
-
-                contentItem: Text {
-                    text: qsTr("Advanced")
-                    font.pixelSize: 13
-                    font.weight: 500
-                    color: advancedButton.down ? Qt.darker(Theme.onSecondaryContainer(root.Material.theme), 1.1) : Theme.onSecondaryContainer(root.Material.theme)
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 100
-                        }
-                    }
-                }
-
-                background: Rectangle {
-                    radius: 18
-                    gradient: Gradient {
-                        GradientStop {
-                            position: 0.0
-                            color: advancedButton.hovered ? Qt.lighter(Theme.primaryContainer(root.Material.theme), 1.08) : Theme.primaryContainer(root.Material.theme)
-                        }
-                        GradientStop {
-                            position: 1.0
-                            color: advancedButton.hovered ? Theme.primaryContainer(root.Material.theme) : Qt.darker(Theme.primaryContainer(root.Material.theme), 1.08)
-                        }
-                    }
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 200
-                        }
-                    }
-
-                    layer.enabled: true
-                    layer.effect: MultiEffect {
-                        shadowEnabled: true
-                        shadowColor: Qt.rgba(0, 0, 0, 0.2)
-                        blur: advancedButton.hovered ? 0.3 : 0.2
-                        shadowVerticalOffset: advancedButton.hovered ? 6 : 4
-                    }
-
-                    scale: advancedButton.pressed ? 0.95 : (advancedButton.hovered ? 1.02 : 1.0)
-                    Behavior on scale {
-                        NumberAnimation {
-                            duration: 100
-                            easing.type: Easing.OutBack
-                        }
-                    }
-                }
-
-                onClicked: {
-                    stackView.push("TemplatePage.qml", {
-                        referenceFilePath: root.referenceFilePath,
-                        userFilePath: root.userFilePath,
-                        userVadA: trainingAudioApi.getVadA(),
-                        userVadU: trainingAudioApi.getVadU(),
-                        userVadV: trainingAudioApi.getVadV(),
-                        userVadCorr: trainingAudioApi.getVadCorr(),
-                        userVadCorrU: trainingAudioApi.getVadCorrU(),
-                        userVadCorrV: trainingAudioApi.getVadCorrV()
-                    });
                 }
             }
         }

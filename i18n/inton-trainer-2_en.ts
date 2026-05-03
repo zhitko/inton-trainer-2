@@ -126,7 +126,7 @@
     <message>
         <location filename="../ui/Main.qml" line="16"/>
         <location filename="../ui/Main.qml" line="118"/>
-        <location filename="../ui/Main.qml" line="364"/>
+        <location filename="../ui/Main.qml" line="414"/>
         <source>Inton Trainer</source>
         <translation>Inton Trainer</translation>
     </message>
@@ -136,35 +136,40 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="253"/>
-        <location filename="../ui/Main.qml" line="376"/>
+        <location filename="../ui/Main.qml" line="255"/>
         <location filename="../ui/Main.qml" line="426"/>
+        <location filename="../ui/Main.qml" line="476"/>
         <source>Home</source>
         <translation>Home</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="388"/>
+        <location filename="../ui/Main.qml" line="301"/>
+        <source>Advanced</source>
+        <translation>Advanced</translation>
+    </message>
+    <message>
+        <location filename="../ui/Main.qml" line="438"/>
         <source>My Records</source>
         <translation>My Records</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="284"/>
-        <location filename="../ui/Main.qml" line="292"/>
-        <location filename="../ui/Main.qml" line="297"/>
-        <location filename="../ui/Main.qml" line="300"/>
-        <location filename="../ui/Main.qml" line="301"/>
-        <location filename="../ui/Main.qml" line="308"/>
-        <location filename="../ui/Main.qml" line="394"/>
+        <location filename="../ui/Main.qml" line="334"/>
+        <location filename="../ui/Main.qml" line="342"/>
+        <location filename="../ui/Main.qml" line="347"/>
+        <location filename="../ui/Main.qml" line="350"/>
+        <location filename="../ui/Main.qml" line="351"/>
+        <location filename="../ui/Main.qml" line="358"/>
+        <location filename="../ui/Main.qml" line="444"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="382"/>
+        <location filename="../ui/Main.qml" line="432"/>
         <source>Patterns</source>
         <translation>Patterns</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="462"/>
+        <location filename="../ui/Main.qml" line="512"/>
         <source>Dark Mode</source>
         <translation>Dark Mode</translation>
     </message>
@@ -927,88 +932,87 @@ Check analysis settings (e.g. increase FFT length).</translation>
 <context>
     <name>TrainingPage</name>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="605"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="623"/>
         <source>Shape Similarity</source>
         <translation>Shape Similarity</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="759"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="777"/>
         <source>Play
 Reference</source>
         <translation>Play
 Reference</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="807"/>
         <source>Playing...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="807"/>
         <source>Listening...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="807"/>
         <source>Processing...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="807"/>
         <source>Recording...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="789"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="807"/>
         <source>Paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="798"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="816"/>
         <source>Listen carefully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="798"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="816"/>
         <source>Repeat the phrase into the mic</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="798"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="816"/>
         <source>Press Resume to continue recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="821"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="839"/>
         <source>Play
 Me</source>
         <translation>Play
 Me</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="841"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="859"/>
         <source>Resume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="841"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="859"/>
         <source>Pause</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="911"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="929"/>
         <source>Open Test File</source>
         <translation>Open Test File</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="978"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="996"/>
         <source>Open test file</source>
         <translation>Open test file</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="1023"/>
         <source>Advanced</source>
-        <translation>Advanced</translation>
+        <translation type="vanished">Advanced</translation>
     </message>
 </context>
 <context>

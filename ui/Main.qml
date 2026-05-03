@@ -24,6 +24,8 @@ ApplicationWindow {
 
     property alias settingsApi: settingsApi
 
+    readonly property bool trainingPageActive: stackView.currentItem && stackView.currentItem.isTrainingPage === true
+
     function getTheme() {
         return settingsApi.theme === "dark" ? Material.Dark : (settingsApi.theme === "light" ? Material.Light : Material.System);
     }
@@ -225,7 +227,7 @@ ApplicationWindow {
 
                 // Home Tab
                 Item {
-                    width: parent.width / 2
+                    width: parent.width / (window.trainingPageActive ? 3 : 2)
                     height: parent.height
 
                     Column {
@@ -267,9 +269,57 @@ ApplicationWindow {
                     }
                 }
 
+                // Advanced (training only) — opens template analysis from TrainingPage
+                Item {
+                    width: window.trainingPageActive ? parent.width / 3 : 0
+                    height: parent.height
+                    visible: window.trainingPageActive
+                    clip: true
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 4
+
+                        Rectangle {
+                            width: 64
+                            height: 32
+                            radius: 16
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: Theme.primaryContainer(Material.theme)
+
+                            Text {
+                                anchors.centerIn: parent
+                                font.family: Icons.familySolid
+                                font.weight: Icons.fontSolid.weight
+                                font.pixelSize: 20
+                                text: Icons.faSliders
+                                color: Theme.onPrimaryContainer(Material.theme)
+                            }
+                        }
+
+                        Text {
+                            text: qsTr("Advanced")
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.pixelSize: 12
+                            font.weight: Font.Medium
+                            color: Theme.onSurface(Material.theme)
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            let page = stackView.currentItem;
+                            if (page && page.openAdvancedTemplatePage) {
+                                page.openAdvancedTemplatePage();
+                            }
+                        }
+                    }
+                }
+
                 // Settings Tab
                 Item {
-                    width: parent.width / 2
+                    width: parent.width / (window.trainingPageActive ? 3 : 2)
                     height: parent.height
 
                     Column {
@@ -440,6 +490,47 @@ ApplicationWindow {
                             stackView.push(modelData.page);
                             drawer.close();
                         }
+                    }
+                }
+
+                ItemDelegate {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 56
+                    visible: !settingsApi.showNavigationMenu && window.trainingPageActive
+
+                    contentItem: RowLayout {
+                        spacing: 12
+                        Text {
+                            font.family: Icons.familySolid
+                            font.weight: Icons.fontSolid.weight
+                            text: Icons.faSliders
+                            font.pixelSize: 18
+                            font.bold: true
+                            color: parent.parent.highlighted ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
+                            Layout.leftMargin: 4
+                        }
+                        Label {
+                            text: qsTr("Advanced")
+                            font.pixelSize: 14
+                            font.weight: parent.parent.highlighted ? Font.Bold : Font.Normal
+                            color: parent.parent.highlighted ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
+                            Layout.fillWidth: true
+                        }
+                    }
+
+                    highlighted: false
+
+                    background: Rectangle {
+                        radius: 28
+                        color: parent.highlighted ? Theme.secondaryContainer(Material.theme) : (parent.hovered ? Theme.surfaceContainerLow(Material.theme) : "transparent")
+                    }
+
+                    onClicked: {
+                        let page = stackView.currentItem;
+                        if (page && page.openAdvancedTemplatePage) {
+                            page.openAdvancedTemplatePage();
+                        }
+                        drawer.close();
                     }
                 }
 
