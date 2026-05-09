@@ -25,6 +25,7 @@ ApplicationWindow {
     property alias settingsApi: settingsApi
 
     readonly property bool trainingPageActive: stackView.currentItem && stackView.currentItem.isTrainingPage === true
+    property bool trainingRecordingStartedOnce: false
 
     function getTheme() {
         return settingsApi.theme === "dark" ? Material.Dark : (settingsApi.theme === "light" ? Material.Light : Material.System);

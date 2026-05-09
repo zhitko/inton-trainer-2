@@ -108,9 +108,10 @@ Page {
     onVisibleChanged: {
         if (visible) {
             _isExiting = false;
-            // Guard against uninitialized window.settingsApi during destruction/initialization
-            if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
+            // Start recording only on the first app-level training open, or when explicitly resumed.
+            if (!window.trainingRecordingStartedOnce && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
                 startRecordingWithCalibration(true);
+                window.trainingRecordingStartedOnce = true;
             }
         } else {
             _isExiting = true;
@@ -182,10 +183,15 @@ Page {
     Component.onCompleted: {
         updateReferenceUMP();
         loadPreviousResults();
-        
+
         if (visible && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
             _isExiting = false;
-            startRecordingWithCalibration(true);
+            if (!window.trainingRecordingStartedOnce) {
+                startRecordingWithCalibration(true);
+                window.trainingRecordingStartedOnce = true;
+            } else {
+                startRecordingWithCalibration(false);
+            }
         }
     }
 
