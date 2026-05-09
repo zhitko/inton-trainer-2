@@ -137,6 +137,7 @@ qt_add_qml_module(appinton-trainer-2
         res/fonts/fa-brands-400.ttf
         res/fonts/fa-regular-400.ttf
         res/fonts/fa-solid-900.ttf
+        res/images/wave.png
 )
 
 qt_add_translations(appinton-trainer-2

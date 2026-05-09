@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material 6.8
+import QtQuick.Effects
 import by.intontrainer.statistics 1.0
 import "../components"
 import "../components/cards"
@@ -54,25 +55,78 @@ Page {
 
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: 40
-                Layout.bottomMargin: 40
-                spacing: 12
+                Layout.topMargin: 24
+                Layout.bottomMargin: 22
+                spacing: 20
 
-                Label {
-                    text: qsTr("Inton@Trainer 2.0")
-                    font.weight: Font.Bold
-                    font.pixelSize: 32
-                    color: Theme.primary(Material.theme)
-                    Layout.alignment: Qt.AlignHCenter
-                }
+                // Full-bleed hero: neutral surface; wave styled via MultiEffect (clarity, no tinted bg)
+                Rectangle {
+                    id: heroBanner
+                    Layout.fillWidth: true
+                    Layout.leftMargin: -24
+                    Layout.rightMargin: -24
+                    Layout.preferredHeight: titleColumn.implicitHeight + 48
+                    topLeftRadius: 0
+                    topRightRadius: 0
+                    bottomLeftRadius: Theme.shapeLarge
+                    bottomRightRadius: Theme.shapeLarge
+                    clip: true
+                    color: Theme.surface(Material.theme)
 
-                Label {
-                    text: qsTr("Master Your Intonation")
-                    font.pixelSize: 18
-                    font.weight: Font.Medium
-                    color: Theme.onSurfaceVariant(Material.theme)
-                    Layout.alignment: Qt.AlignHCenter
-                    opacity: 0.8
+                    // Source-only: MultiEffect draws the processed texture (layer.effect on Image is unreliable here).
+                    Image {
+                        id: waveImage
+                        anchors.fill: parent
+                        visible: false
+                        source: "qrc:/qt/qml/inton-trainer-2/res/images/wave.png"
+                        fillMode: Image.PreserveAspectCrop
+                        horizontalAlignment: Image.AlignHCenter
+                        verticalAlignment: Image.AlignVCenter
+                        asynchronous: true
+                        mipmap: true
+                        smooth: true
+                    }
+
+                    MultiEffect {
+                        anchors.fill: parent
+                        source: waveImage
+                        opacity: Material.theme === Material.Dark ? 0.5 : 0.4
+                        // saturation: -1
+                        contrast: 0.38
+                        brightness: Material.theme === Material.Dark ? 0.06 : -0.05
+                        colorization: 0.64
+                        colorizationColor: settingsApi.primaryColor
+                    }
+
+                    ColumnLayout {
+                        id: titleColumn
+                        anchors.centerIn: parent
+                        width: parent.width - 32
+                        spacing: 8
+
+                        Label {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.fillWidth: true
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.Wrap
+                            text: qsTr("Inton@Trainer 2.0")
+                            font.weight: Font.Bold
+                            font.pixelSize: 30
+                            color: Theme.onSurface(Material.theme)
+                        }
+
+                        Label {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.fillWidth: true
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.Wrap
+                            text: qsTr("Master Your Intonation")
+                            font.pixelSize: 17
+                            font.weight: Font.Medium
+                            color: Theme.onSurfaceVariant(Material.theme)
+                            opacity: 0.95
+                        }
+                    }
                 }
 
                 // MD3 Chip component for language selection
@@ -95,7 +149,7 @@ Page {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 85
-                Layout.topMargin: 40
+                Layout.topMargin: 20
                 spacing: 12
 
                 StatBox {
