@@ -38,7 +38,7 @@ Dialog {
     contentItem: ColumnLayout {
         spacing: 16
         Label {
-            text: qsTr("Please stay quiet for 2 seconds so the background noise level can be measured.")
+            text: qsTr("Please stay quiet for %1 seconds so the background noise level can be measured.").arg(window.settingsApi ? Math.round(window.settingsApi.vadCalibrationDurationMs / 1000) : 2)
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
             font.pixelSize: 15

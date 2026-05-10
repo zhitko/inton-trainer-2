@@ -352,9 +352,10 @@ void AudioApi::calibrateVad()
     }
 
     // Record for 2 seconds synchronously using a local event loop
+    AppSettings settings = Settings::loadSettings();
     QTimer stopTimer;
     stopTimer.setSingleShot(true);
-    stopTimer.setInterval(2000);
+    stopTimer.setInterval(settings.vadCalibrationDurationMs);
 
     QEventLoop loop;
     connect(&stopTimer, &QTimer::timeout, &loop, &QEventLoop::quit);

@@ -30,6 +30,8 @@ struct AppSettings {
     bool autoStopRecording = true;
     // Run VAD calibration before starting a new recording session
     bool autoCalibrate = true;
+    // Calibration duration for VAD auto-thresholding, in milliseconds
+    int vadCalibrationDurationMs = 2000;
     // Duration of silence in ms before auto-stop triggers
     int autoStopSilenceDuration = 2000;
     // VAD settings

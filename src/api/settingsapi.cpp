@@ -224,6 +224,25 @@ void SettingsApi::setAutoCalibrate(bool autoCalibrate)
     LOG_DEBUG() << "Finish: setAutoCalibrate";
 }
 
+int SettingsApi::vadCalibrationDurationMs() const
+{
+    LOG_DEBUG() << "Start: vadCalibrationDurationMs";
+    int result = m_settings.vadCalibrationDurationMs;
+    LOG_DEBUG() << "Finish: vadCalibrationDurationMs - result=" << result;
+    return result;
+}
+
+void SettingsApi::setVadCalibrationDurationMs(int vadCalibrationDurationMs)
+{
+    LOG_DEBUG() << "Start: setVadCalibrationDurationMs - vadCalibrationDurationMs=" << vadCalibrationDurationMs;
+    if (m_settings.vadCalibrationDurationMs != vadCalibrationDurationMs) {
+        m_settings.vadCalibrationDurationMs = vadCalibrationDurationMs;
+        save();
+        emit vadCalibrationDurationMsChanged();
+    }
+    LOG_DEBUG() << "Finish: setVadCalibrationDurationMs";
+}
+
 int SettingsApi::autoStopSilenceDuration() const
 {
     LOG_DEBUG() << "Start: autoStopSilenceDuration";

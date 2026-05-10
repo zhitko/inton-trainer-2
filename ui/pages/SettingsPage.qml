@@ -262,6 +262,21 @@ Page {
                         }
 
                         Label {
+                            text: qsTr("Calibration Duration (ms)")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        TextField {
+                            id: vadCalibrationDurationField
+                            text: settingsApi ? settingsApi.vadCalibrationDurationMs.toString() : 2000
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.vadCalibrationDurationMs = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+                        }
+
+                        Label {
                             text: qsTr("Silence Duration (ms)")
                             color: Theme.onSurface(Material.theme)
                         }
