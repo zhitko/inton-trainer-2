@@ -815,7 +815,7 @@ Page {
 
                         Text {
                             text: root._isVadPaused ? qsTr("Paused") : (isAnyPlaybackActive ? qsTr("Playing...") : (trainingAudioApi.isRecording ? (trainingAudioApi.isVoiceDetected ? qsTr("Recording...") : qsTr("Listening...")) : qsTr("Processing...")))
-                            font.pixelSize: 18
+                            font.pixelSize: 26
                             font.weight: 600
                             color: root._isVadPaused ? Theme.error(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : (trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : Theme.error(root.Material.theme)))
                         }
@@ -824,7 +824,7 @@ Page {
                     Text {
                         Layout.alignment: Qt.AlignHCenter
                         text: root._isVadPaused ? qsTr("Press Resume to continue recording.") : (isAnyPlaybackActive ? qsTr("Listen carefully") : qsTr("Repeat the phrase into the mic"))
-                        font.pixelSize: 14
+                        font.pixelSize: 20
                         color: Theme.onSurface(root.Material.theme)
                         opacity: 0.6
                         horizontalAlignment: Text.AlignHCenter

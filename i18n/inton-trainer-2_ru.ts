@@ -992,7 +992,8 @@ Reference</source>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="822"/>
         <source>Press Resume to continue recording.</source>
-        <translation>Нажмите «Продолжить», чтобы возобновить запись.</translation>
+        <translation>Нажмите «Продолжить»,
+чтобы возобновить запись.</translation>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="845"/>

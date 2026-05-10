@@ -123,7 +123,7 @@ ColumnLayout {
     Text {
         Layout.alignment: Qt.AlignHCenter
         text: root.text
-        font.pixelSize: 12
+        font.pixelSize: 18
         font.weight: 500
         horizontalAlignment: Text.AlignHCenter
         color: Theme.onSurface(Material.theme)
