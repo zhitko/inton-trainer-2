@@ -109,9 +109,13 @@ Page {
         if (visible) {
             _isExiting = false;
             // Start recording only on the first app-level training open, or when explicitly resumed.
-            if (!window.trainingRecordingStartedOnce && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
-                startRecordingWithCalibration(true);
-                window.trainingRecordingStartedOnce = true;
+            if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
+                if (!window.trainingRecordingStartedOnce) {
+                    startRecordingWithCalibration(true);
+                    window.trainingRecordingStartedOnce = true;
+                } else {
+                    startRecordingWithCalibration(false);
+                }
             }
         } else {
             _isExiting = true;
@@ -794,9 +798,9 @@ Page {
                         spacing: 8
 
                         Rectangle {
-                            width: 14
-                            height: 14
-                            radius: 7
+                            width: 28
+                            height: 28
+                            radius: 14
                             // Change color based on playback or recording
                             color: trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : Theme.error(root.Material.theme))
                             visible: trainingAudioApi.isRecording || isAnyPlaybackActive
