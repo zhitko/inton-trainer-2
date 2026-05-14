@@ -50,12 +50,12 @@ Page {
         ColumnLayout {
             width: scrollView.width - 48
             x: 24
-            y: 24
+            // y: 24
             spacing: 24
 
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: 24
+                // Layout.topMargin: 24
                 Layout.bottomMargin: 22
                 spacing: 20
 
@@ -76,7 +76,10 @@ Page {
                     // Source-only: MultiEffect draws the processed texture (layer.effect on Image is unreliable here).
                     Image {
                         id: waveImage
-                        anchors.fill: parent
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: 80
                         visible: false
                         source: "qrc:/qt/qml/inton-trainer-2/res/images/wave.png"
                         fillMode: Image.PreserveAspectCrop
@@ -88,10 +91,12 @@ Page {
                     }
 
                     MultiEffect {
-                        anchors.fill: parent
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: 80
                         source: waveImage
                         opacity: Material.theme === Material.Dark ? 0.5 : 0.4
-                        // saturation: -1
                         contrast: 0.38
                         brightness: Material.theme === Material.Dark ? 0.06 : -0.05
                         colorization: 0.64
@@ -107,6 +112,7 @@ Page {
                         Label {
                             Layout.alignment: Qt.AlignHCenter
                             Layout.fillWidth: true
+                            Layout.topMargin: 48
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.Wrap
                             text: qsTr("Inton@Trainer 2.0")
@@ -142,7 +148,7 @@ Page {
             // 2. Center Action Button with Waveform Visuals
             StartTrainingButton {
                 text: qsTr("Start Training")
-                onClicked: stackView.push("CategoriesPage.qml")
+                onClicked: stackView.push("TemplateCategoriesPage.qml")
             }
 
             // 3. Stats Row

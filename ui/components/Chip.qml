@@ -20,23 +20,23 @@ Rectangle {
 
     // MD3 Chip styling
     implicitWidth: layout.implicitWidth + 16
-    implicitHeight: 32
-    radius: Theme.shapeMedium
+    implicitHeight: 28
+    radius: Theme.shapeExtraSmall
 
     // Color based on selection state
-    color: selected ? Theme.secondaryContainer(Material.theme) : Theme.surfaceContainerLow(Material.theme)
+    color: selected ? Theme.secondaryContainer(Material.theme) : Theme.surfaceContainerHigh(Material.theme)
     border.color: selected ? "transparent" : Theme.outline(Material.theme)
     border.width: selected ? 0 : 1
 
     // MD3 Elevation 0 (no shadow for chips)
     layer.enabled: false
 
-    // MD3 State Layer - hover effect (8% opacity)
+    // MD3 State Layer - hover / pressed effect
     Rectangle {
         anchors.fill: parent
         radius: parent.radius
         color: Theme.onSurface(Material.theme)
-        opacity: mouseArea.containsMouse && chip.enabled ? 0.08 : 0
+        opacity: chip.enabled ? (mouseArea.pressed ? 0.12 : mouseArea.containsMouse ? 0.08 : 0) : 0
 
         Behavior on opacity {
             NumberAnimation {
@@ -48,26 +48,32 @@ Rectangle {
 
     RowLayout {
         id: layout
-        anchors.centerIn: parent
+        anchors.fill: parent
+        anchors.leftMargin: 8
+        anchors.rightMargin: 8
         spacing: 8
+        Layout.alignment: Qt.AlignVCenter
 
         // Icon (optional)
         Text {
             visible: chip.icon !== ""
             text: chip.icon
             font.family: Icons.familySolid
-            font.pixelSize: 22
+            font.weight: 900
+            font.pixelSize: 14
             color: selected ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
-            Layout.leftMargin: 8
+            Layout.alignment: Qt.AlignVCenter
         }
 
         // Text label
         Text {
             text: chip.text
-            font.pixelSize: 18
+            font.pixelSize: 12
             font.weight: Font.Medium
             color: selected ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
+            elide: Text.ElideRight
             Layout.fillWidth: true
+            Layout.alignment: Qt.AlignVCenter
         }
 
         // Delete button (optional)
@@ -75,16 +81,15 @@ Rectangle {
             visible: chip.deletable
             text: Icons.faXmark
             font.family: Icons.familySolid
-            font.pixelSize: 20
+            font.pixelSize: 14
             color: selected ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
+            Layout.alignment: Qt.AlignVCenter
 
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: chip.deleted()
             }
-
-            Layout.rightMargin: 8
         }
     }
 

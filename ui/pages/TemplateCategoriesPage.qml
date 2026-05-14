@@ -1,4 +1,3 @@
-pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -6,16 +5,25 @@ import QtQuick.Controls.Material 6.8
 import by.intontrainer.file 1.0
 import by.intontrainer.statistics 1.0
 import "../components"
-import "../components/cards"
 import "../utils"
-import QtQuick.Effects
 
 Page {
-    id: root
+    id: categoriesPage
     title: qsTr("Reference samples")
 
     property string path: "data/patterns"
     property var allFolders: []
+
+    Component.onCompleted: {
+        allFolders = fileApi.getFolders(categoriesPage.path);
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            // Reload when page becomes visible
+            listView.forceLayout();
+        }
+    }
 
     FileApi {
         id: fileApi
@@ -23,17 +31,6 @@ Page {
 
     StatisticsApi {
         id: statisticsApi
-    }
-
-    Component.onCompleted: {
-        allFolders = fileApi.getFolders(root.path);
-    }
-
-    onVisibleChanged: {
-        if (visible) {
-            // Trigger update of list items
-            listView.forceLayout();
-        }
     }
 
     ColumnLayout {
@@ -46,7 +43,7 @@ Page {
             id: searchField
         }
 
-        // Categories List
+        // Categories (Folders) List
         ListView {
             id: listView
             Layout.fillWidth: true
@@ -61,26 +58,17 @@ Page {
             }
 
             delegate: ListItem {
-                required property string modelData
-                required property int index
                 itemData: modelData
                 itemIndex: index
-                filePath: root.path + "/" + modelData
+                icon: Icons.faFolder
+                filePath: fileApi.getApplicationDirPath() + "/" + categoriesPage.path + "/" + modelData
                 isFolder: true
                 onClicked: {
                     console.log("Clicked category:", modelData);
-                    let folderPath = root.path + "/" + modelData;
-                    let subFolders = fileApi.getFolders(folderPath);
-                    if (subFolders.length > 0) {
-                        stackView.push("CategoriesPage.qml", {
-                            path: folderPath
-                        });
-                    } else {
-                        stackView.push("TemplateFilesPage.qml", {
-                            categoryPath: folderPath,
-                            categoryName: modelData
-                        });
-                    }
+                    stackView.push("TemplateFilesPage.qml", {
+                        categoryPath: modelData,
+                        categoryName: modelData
+                    });
                 }
             }
         }

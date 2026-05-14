@@ -1,6 +1,8 @@
 HomePage HomePage.qml
 RecordsPage RecordsPage.qml
 TemplatesPage TemplatesPage.qml
+TemplateCategoriesPage TemplateCategoriesPage.qml
+TemplateFilesPage TemplateFilesPage.qml
 RecordingPage RecordingPage.qml
 TemplatePage TemplatePage.qml
 TrainingPage TrainingPage.qml

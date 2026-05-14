@@ -103,9 +103,10 @@ qt_add_qml_module(appinton-trainer-2
         ui/Main.qml
         ui/pages/RecordingPage.qml
         ui/pages/HomePage.qml
-        ui/pages/CategoriesPage.qml
         ui/pages/RecordsPage.qml
         ui/pages/TemplatesPage.qml
+        ui/pages/TemplateCategoriesPage.qml
+        ui/pages/TemplateFilesPage.qml
         ui/pages/TemplatePage.qml
         ui/pages/TrainingPage.qml
         ui/pages/SettingsPage.qml

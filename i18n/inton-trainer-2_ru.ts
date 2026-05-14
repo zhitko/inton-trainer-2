@@ -4,14 +4,12 @@
 <context>
     <name>CategoriesPage</name>
     <message>
-        <location filename="../ui/pages/CategoriesPage.qml" line="15"/>
         <source>Reference samples</source>
-        <translation>Эталонные образцы</translation>
+        <translation type="vanished">Эталонные образцы</translation>
     </message>
     <message>
-        <location filename="../ui/pages/CategoriesPage.qml" line="92"/>
         <source>No categories found</source>
-        <translation>Категории не найдены</translation>
+        <translation type="vanished">Категории не найдены</translation>
     </message>
 </context>
 <context>
@@ -790,6 +788,67 @@ Check analysis settings (e.g. increase FFT length).</source>
     </message>
 </context>
 <context>
+    <name>TemplateCategoriesPage</name>
+    <message>
+        <location filename="../ui/pages/TemplateCategoriesPage.qml" line="12"/>
+        <source>Reference samples</source>
+        <translation>Эталонные образцы</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplateCategoriesPage.qml" line="81"/>
+        <source>No categories found</source>
+        <translation>Категории не найдены</translation>
+    </message>
+</context>
+<context>
+    <name>TemplateFilesPage</name>
+    <message>
+        <location filename="../ui/pages/TemplateFilesPage.qml" line="42"/>
+        <source>Root</source>
+        <translation>Корневая папка</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplateFilesPage.qml" line="110"/>
+        <source>Filter</source>
+        <translation>Фильтр</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplateFilesPage.qml" line="124"/>
+        <source>All files</source>
+        <translation>Все файлы</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplateFilesPage.qml" line="133"/>
+        <source>New</source>
+        <translation>Новые</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplateFilesPage.qml" line="142"/>
+        <source>Mastered</source>
+        <translation>Освоено</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplateFilesPage.qml" line="151"/>
+        <source>Improve</source>
+        <translation>Улучшить</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplateFilesPage.qml" line="205"/>
+        <source>No files found</source>
+        <translation>Файлы не найдены</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplateFilesPage.qml" line="207"/>
+        <source>No files match your search</source>
+        <translation>Файлы не соответствуют поиску</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TemplateFilesPage.qml" line="209"/>
+        <source>No files match the current filter</source>
+        <translation>Файлы не соответствуют фильтру</translation>
+    </message>
+</context>
+<context>
     <name>TemplatePage</name>
     <message>
         <location filename="../ui/pages/TemplatePage.qml" line="576"/>
@@ -943,82 +1002,90 @@ Check analysis settings (e.g. increase FFT length).</source>
 <context>
     <name>TrainingPage</name>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="629"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="633"/>
         <source>Shape Similarity</source>
         <translation>Сходство</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="783"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="787"/>
         <source>Play
 Reference</source>
         <translation>Слушать
 Эталон</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="813"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="817"/>
         <source>Playing...</source>
         <translation>Воспроизведение...</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="813"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="817"/>
         <source>Listening...</source>
         <translation>Слушаю...</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="813"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="817"/>
         <source>Recording...</source>
         <translation>Запись...</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="813"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="817"/>
         <source>Processing...</source>
         <translation>Обработка...</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="813"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="817"/>
         <source>Paused</source>
         <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="822"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="826"/>
         <source>Listen carefully</source>
         <translation>Слушайте внимательно</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="822"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="826"/>
         <source>Repeat the phrase into the mic</source>
         <translation>Повторите фразу в микрофон</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="822"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="826"/>
+        <source>Press Continue to continue recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Press Resume to continue recording.</source>
-        <translation>Нажмите «Продолжить»,
+        <translation type="vanished">Нажмите «Продолжить»,
 чтобы возобновить запись.</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="845"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="849"/>
         <source>Play
 Me</source>
         <translation>Слушать
 Запись</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="865"/>
         <source>Resume</source>
-        <translation>Продолжить</translation>
+        <translation type="vanished">Продолжить</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="865"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="869"/>
         <source>Pause</source>
         <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="935"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="869"/>
+        <source>Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/TrainingPage.qml" line="939"/>
         <source>Open Test File</source>
         <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../ui/pages/TrainingPage.qml" line="1002"/>
+        <location filename="../ui/pages/TrainingPage.qml" line="1006"/>
         <source>Open test file</source>
         <translation>Открыть файл</translation>
     </message>

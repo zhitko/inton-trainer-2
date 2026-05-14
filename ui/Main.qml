@@ -134,7 +134,7 @@ ApplicationWindow {
                     text: Icons.faArrowLeft
                     font.pixelSize: 20
                     onClicked: stackView.pop()
-                    visible: stackView.depth > 1 && settingsApi.showNavigationMenu
+                    visible: stackView.depth > 1
 
                     background: Rectangle {
                         implicitWidth: 48
@@ -155,59 +155,6 @@ ApplicationWindow {
                                     easing.type: Easing.OutQuad
                                 }
                             }
-                        }
-                    }
-                }
-            }
-        }
-
-        // ── Bottom Back Button (when navigation menu is hidden) ──
-        ToolButton {
-            id: bottomBackButton
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.bottomMargin: 16
-            anchors.leftMargin: 16
-            onClicked: stackView.pop()
-            visible: !settingsApi.showNavigationMenu && stackView.depth > 1
-            z: 1
-
-            contentItem: RowLayout {
-                spacing: 8
-                anchors.centerIn: parent
-
-                Text {
-                    font.family: Icons.familySolid
-                    font.weight: Icons.fontSolid.weight
-                    text: Icons.faArrowLeft
-                    font.pixelSize: 18
-                    color: Theme.onSurfaceVariant(Material.theme)
-                }
-
-                Label {
-                    text: qsTr("Back")
-                    font.pixelSize: 14
-                    color: Theme.onSurfaceVariant(Material.theme)
-                }
-            }
-
-            background: Rectangle {
-                implicitWidth: 120
-                implicitHeight: 48
-                radius: Theme.shapeMedium
-                color: bottomBackButton.hovered ? Theme.surfaceContainerLow(Material.theme) : Theme.surfaceContainer(Material.theme)
-
-                // MD3 State Layer - hover effect (8% opacity)
-                Rectangle {
-                    anchors.fill: parent
-                    radius: parent.radius
-                    color: Theme.onSurface(Material.theme)
-                    opacity: bottomBackButton.hovered ? 0.08 : 0
-
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 150
-                            easing.type: Easing.OutQuad
                         }
                     }
                 }
@@ -432,7 +379,7 @@ ApplicationWindow {
                         {
                             text: qsTr("Patterns"),
                             icon: Icons.faFolderTree,
-                            page: "pages/TemplatesPage.qml",
+                            page: "pages/TemplateCategoriesPage.qml",
                             clear: false
                         },
                         {

@@ -823,7 +823,7 @@ Page {
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        text: root._isVadPaused ? qsTr("Press Resume to continue recording.") : (isAnyPlaybackActive ? qsTr("Listen carefully") : qsTr("Repeat the phrase into the mic"))
+                        text: root._isVadPaused ? qsTr("Press Continue to continue recording.") : (isAnyPlaybackActive ? qsTr("Listen carefully") : qsTr("Repeat the phrase into the mic"))
                         font.pixelSize: 20
                         color: Theme.onSurface(root.Material.theme)
                         opacity: 0.6
@@ -866,7 +866,7 @@ Page {
                 visible: window.settingsApi ? window.settingsApi.autoStopRecording : false
 
                 contentItem: Text {
-                    text: root._isVadPaused ? qsTr("Resume") : qsTr("Pause")
+                    text: root._isVadPaused ? qsTr("Continue") : qsTr("Pause")
                     font.pixelSize: 16
                     font.weight: 600
                     color: pauseVadButton.down ? Qt.darker(Theme.onSecondaryContainer(root.Material.theme), 1.1) : Theme.onSecondaryContainer(root.Material.theme)
