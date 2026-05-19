@@ -1559,6 +1559,15 @@ void SettingsApi::setDpUseFixedStartEndDP(bool val)
         emit dpUseFixedStartEndDPChanged();
     }
 }
+double SettingsApi::dtwDistanceLimit() const { return m_settings.dtwDistanceLimit; }
+void SettingsApi::setDtwDistanceLimit(double val)
+{
+    if (qAbs(m_settings.dtwDistanceLimit - val) > 0.0001) {
+        m_settings.dtwDistanceLimit = val;
+        save();
+        emit dtwDistanceLimitChanged();
+    }
+}
 
 void SettingsApi::updateTranslator()
 {

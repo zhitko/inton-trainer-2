@@ -131,6 +131,7 @@ Settings::loadSettings()
     settings.dpInsertionCoef = qsettings.value("dpInsertionCoef", 1.0).toDouble();
     settings.dpDeletionCoef = qsettings.value("dpDeletionCoef", 1.0).toDouble();
     settings.dpUseFixedStartEndDP = qsettings.value("dpUseFixedStartEndDP", false).toBool();
+    settings.dtwDistanceLimit = qsettings.value("dtwDistanceLimit", 100.0).toDouble();
     qsettings.endGroup();
 
     return settings;
@@ -255,6 +256,7 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("dpInsertionCoef", settings.dpInsertionCoef);
     qsettings.setValue("dpDeletionCoef", settings.dpDeletionCoef);
     qsettings.setValue("dpUseFixedStartEndDP", settings.dpUseFixedStartEndDP);
+    qsettings.setValue("dtwDistanceLimit", settings.dtwDistanceLimit);
     qsettings.endGroup();
 
     qsettings.sync();

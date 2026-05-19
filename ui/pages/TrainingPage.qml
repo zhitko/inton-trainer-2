@@ -539,6 +539,17 @@ Page {
             userPitchData, 
             scaledLoadedCuePoints
         );
+
+        // Skip microphone recording if DTW distance exceeds the configured limit.
+        // File-based results are always accepted regardless of distance.
+        if (isMicrophoneRecording) {
+            let distanceLimit = (window.settingsApi && window.settingsApi.dtwDistanceLimit > 0)
+                ? window.settingsApi.dtwDistanceLimit : Infinity;
+            if (dpResult.minFinalCost >= distanceLimit) {
+                Logger.info("Recording skipped: DTW distance (" + dpResult.minFinalCost + ") >= limit (" + distanceLimit + ")");
+                return;
+            }
+        }
         let scaledPitch = dpResult.pitch;
         Logger.debug("DP result pitch length: " + scaledPitch.length);
 

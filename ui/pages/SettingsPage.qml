@@ -21,7 +21,7 @@ Page {
     // VAD Calibration dialog (extracted component)
     VadCalibrationDialog {
         id: vadCalibrationDialog
-        onCalibrationDone: function(threshold) {
+        onCalibrationDone: function (threshold) {
             if (settingsApi) {
                 settingsApi.vadThreshold = threshold;
             }
@@ -339,10 +339,10 @@ Page {
                             Layout.columnSpan: 2
                             Layout.fillWidth: true
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
-                            
+
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Measure background noise for 2 seconds to set optimal threshold")
-                            
+
                             onClicked: vadCalibrationDialog.open()
                             visible: settingsApi ? (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
 
@@ -1189,6 +1189,21 @@ Page {
                             onToggled: if (settingsApi)
                                 settingsApi.dpUsePitchLogAsMask = checked
                             enabled: settingsApi ? settingsApi.dpUsePitchLog : false
+                            Layout.columnSpan: 3
+                        }
+
+                        // DTW Distance Limit
+                        Label {
+                            text: qsTr("DTW Distance Limit")
+                            color: Theme.onSurface(Material.theme)
+                            Layout.columnSpan: 1
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.dtwDistanceLimit.toString() : "100"
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.dtwDistanceLimit = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
                             Layout.columnSpan: 3
                         }
 

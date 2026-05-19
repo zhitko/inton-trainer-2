@@ -162,6 +162,8 @@ struct AppSettings {
     double dpDeletionCoef = 1.0;
     // When true, DTW is constrained to fixed start/end (full template vs full signal).
     bool dpUseFixedStartEndDP = false;
+    // Maximum allowed DTW distance (minFinalCost); recordings above this threshold are skipped.
+    double dtwDistanceLimit = 100.0;
 };
 
 /*
