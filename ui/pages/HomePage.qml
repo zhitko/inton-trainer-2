@@ -56,7 +56,7 @@ Page {
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 // Layout.topMargin: 24
-                Layout.bottomMargin: 22
+                Layout.bottomMargin: 26
                 spacing: 20
 
                 // Full-bleed hero: neutral surface; wave styled via MultiEffect (clarity, no tinted bg)
@@ -72,36 +72,6 @@ Page {
                     bottomRightRadius: Theme.shapeLarge
                     clip: true
                     color: Theme.surface(Material.theme)
-
-                    // Source-only: MultiEffect draws the processed texture (layer.effect on Image is unreliable here).
-                    Image {
-                        id: waveImage
-                        anchors.top: parent.top
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        height: 80
-                        visible: false
-                        source: "qrc:/qt/qml/inton-trainer-2/res/images/wave.png"
-                        fillMode: Image.PreserveAspectCrop
-                        horizontalAlignment: Image.AlignHCenter
-                        verticalAlignment: Image.AlignVCenter
-                        asynchronous: true
-                        mipmap: true
-                        smooth: true
-                    }
-
-                    MultiEffect {
-                        anchors.top: parent.top
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        height: 80
-                        source: waveImage
-                        opacity: Material.theme === Material.Dark ? 0.5 : 0.4
-                        contrast: 0.38
-                        brightness: Material.theme === Material.Dark ? 0.06 : -0.05
-                        colorization: 0.64
-                        colorizationColor: settingsApi.primaryColor
-                    }
 
                     ColumnLayout {
                         id: titleColumn
@@ -146,16 +116,46 @@ Page {
             }
 
             // 2. Center Action Button with Waveform Visuals
-            StartTrainingButton {
-                text: qsTr("Start Training")
-                onClicked: stackView.push("TemplateCategoriesPage.qml")
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 160
+
+                // Wave image rendered behind the button
+                Image {
+                    id: waveImage
+                    anchors.fill: parent
+                    visible: false
+                    source: "qrc:/qt/qml/inton-trainer-2/res/images/wave.png"
+                    fillMode: Image.PreserveAspectCrop
+                    horizontalAlignment: Image.AlignHCenter
+                    verticalAlignment: Image.AlignVCenter
+                    asynchronous: true
+                    mipmap: true
+                    smooth: true
+                }
+
+                MultiEffect {
+                    anchors.fill: parent
+                    source: waveImage
+                    opacity: Material.theme === Material.Dark ? 0.55 : 0.45
+                    contrast: 0.38
+                    brightness: Material.theme === Material.Dark ? 0.06 : -0.05
+                    colorization: 0.64
+                    colorizationColor: settingsApi ? settingsApi.primaryColor : "#6200ea"
+                }
+
+                StartTrainingButton {
+                    anchors.centerIn: parent
+                    text: qsTr("Start Training")
+                    onClicked: stackView.push("TemplateCategoriesPage.qml")
+                }
             }
 
             // 3. Stats Row
             RowLayout {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 85
-                Layout.topMargin: 20
+                Layout.topMargin: 26
                 spacing: 12
 
                 StatBox {
@@ -187,6 +187,7 @@ Page {
             Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 180
+                Layout.topMargin: 8
 
                 CircularProgress {
                     id: overallProgressCircle
