@@ -1022,15 +1022,13 @@ Page {
                     if (selectedPath) {
                         updateUserUMP(selectedPath, false);
                     }
-                    // Resume recording if it was active before opening the dialog and VAD is not paused
-                    if (_wasRecordingBeforeDialog && !root._isVadPaused && window.settingsApi && window.settingsApi.autoStopRecording) {
-                        console.log("Resuming recording after opening test file dialog");
-                        _isExiting = false; // Allow recording to auto-restart
-                        let minimumLength = -1;
-                        if (root.referenceWaveData && window.settingsApi) {
-                            minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
-                        }
-                        trainingAudioApi.startRecording(-1, minimumLength);
+                    // Pause VAD recording after loading a file so the user can review
+                    // the result before the microphone starts again.
+                    if (window.settingsApi && window.settingsApi.autoStopRecording) {
+                        root._isVadPaused = true;
+                        // Recording is already stopped (it was stopped before opening the dialog);
+                        // just leave _isExiting reset so the page stays in a clean state.
+                        _isExiting = false;
                     }
                 }
                 onRejected: {
