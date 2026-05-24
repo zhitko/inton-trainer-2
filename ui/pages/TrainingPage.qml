@@ -809,9 +809,9 @@ Page {
                         spacing: 8
 
                         Rectangle {
-                            width: 28
-                            height: 28
-                            radius: 14
+                            width: 56
+                            height: 56
+                            radius: 28
                             // Change color based on playback or recording
                             color: trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : Theme.error(root.Material.theme))
                             visible: trainingAudioApi.isRecording || isAnyPlaybackActive
@@ -824,17 +824,21 @@ Page {
                             }
                         }
 
-                        Text {
-                            text: root._isVadPaused ? qsTr("Paused") : (isAnyPlaybackActive ? qsTr("Playing...") : (trainingAudioApi.isRecording ? (trainingAudioApi.isVoiceDetected ? qsTr("Recording...") : qsTr("Listening...")) : qsTr("Processing...")))
-                            font.pixelSize: 26
-                            font.weight: 600
-                            color: root._isVadPaused ? Theme.error(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : (trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : Theme.error(root.Material.theme)))
-                        }
                     }
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        text: root._isVadPaused ? qsTr("Press Continue to continue recording.") : (isAnyPlaybackActive ? qsTr("Listen carefully") : qsTr("Repeat the phrase into the mic"))
+                        text: root._isVadPaused ? qsTr("Paused") : (isAnyPlaybackActive ? qsTr("Playing...") : (trainingAudioApi.isRecording ? qsTr("Listening...") : qsTr("Processing...")))
+                        font.pixelSize: 26
+                        font.weight: 600
+                        horizontalAlignment: Text.AlignHCenter
+                        color: root._isVadPaused ? Theme.error(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : (trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : Theme.error(root.Material.theme)))
+                    }
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        visible: root._isVadPaused || isAnyPlaybackActive
+                        text: root._isVadPaused ? qsTr("Press Continue to continue recording.") : qsTr("Listen carefully")
                         font.pixelSize: 20
                         color: Theme.onSurface(root.Material.theme)
                         opacity: 0.6

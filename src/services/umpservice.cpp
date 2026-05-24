@@ -277,9 +277,9 @@ UMPComparison UMPService::compareUMP(const std::vector<double>& referenceUmp,
 
     // Convert correlation from [-1, 1] to [0, 100]
     // -1 (completely opposite) -> 0
-    // 0 (no correlation) -> 50
+    // 0 (no correlation) -> 0
     // 1 (perfect match) -> 100
-    result.shapeSimilarity = (correlation + 1.0) * 50.0;
+    result.shapeSimilarity = std::max(0.0, correlation) * 100.0;
 
     LOG_DEBUG() << "compareUMP completed: refRange=" << result.referenceRange
                 << "%, userRange=" << result.userRange
