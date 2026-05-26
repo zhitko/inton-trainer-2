@@ -790,10 +790,12 @@ Page {
             // Controls
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 32
+                spacing: 12
 
                 PlayRoundButton {
                     id: playReferenceBtn
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: 220
                     filePath: root.referenceFilePath
                     text: qsTr("Play\nReference")
                 }
@@ -802,19 +804,99 @@ Page {
                     Layout.alignment: Qt.AlignVCenter
                     spacing: 8
                     Layout.preferredWidth: 220
+                    Layout.preferredHeight: 130
                     visible: window.settingsApi ? window.settingsApi.autoStopRecording : false
 
-                    RowLayout {
+                    // ── Recording indicator with waveform bars ─────────────────
+                    Item {
+                        id: micLevelIndicator
                         Layout.alignment: Qt.AlignHCenter
-                        spacing: 8
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: (trainingAudioApi.isRecording || isAnyPlaybackActive) ? 64 : 0
+                        opacity: (trainingAudioApi.isRecording || isAnyPlaybackActive) ? 1.0 : 0.0
+                        clip: true
 
+                        Behavior on Layout.preferredHeight {
+                            NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+                        }
+                        Behavior on opacity {
+                            NumberAnimation { duration: 200 }
+                        }
+
+                        property color activeColor: trainingAudioApi.isRecording
+                            ? Theme.success(root.Material.theme)
+                            : (isAnyPlaybackActive
+                                ? Theme.primary(root.Material.theme)
+                                : Theme.error(root.Material.theme))
+
+                        // Rolling buffer of recent audio levels (newest at end)
+                        property int barCount: 20
+                        property var levelHistory: {
+                            let arr = [];
+                            for (let i = 0; i < barCount; i++) arr.push(0);
+                            return arr;
+                        }
+
+                        // Poll audio level and shift the buffer
+                        Timer {
+                            id: waveformTimer
+                            interval: 50
+                            repeat: true
+                            running: trainingAudioApi.isRecording
+                            onTriggered: {
+                                let lvl = trainingAudioApi.audioLevel;
+                                let arr = micLevelIndicator.levelHistory.slice(1);
+                                arr.push(lvl);
+                                micLevelIndicator.levelHistory = arr;
+                            }
+                        }
+
+                        // Reset buffer when recording stops
+                        Connections {
+                            target: trainingAudioApi
+                            function onIsRecordingChanged() {
+                                if (!trainingAudioApi.isRecording) {
+                                    let arr = [];
+                                    for (let i = 0; i < micLevelIndicator.barCount; i++) arr.push(0);
+                                    micLevelIndicator.levelHistory = arr;
+                                }
+                            }
+                        }
+
+                        // ── Left-side waveform bars (newest near center) ─────────
+                        Row {
+                            anchors.right: centerDot.left
+                            anchors.rightMargin: 6
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+                            layoutDirection: Qt.RightToLeft  // newest bar closest to dot
+
+                            Repeater {
+                                model: micLevelIndicator.barCount
+                                delegate: Rectangle {
+                                    property real lvl: micLevelIndicator.levelHistory[micLevelIndicator.barCount - 1 - index] || 0
+                                    width: 3
+                                    height: Math.max(3, lvl * 50)
+                                    radius: 1.5
+                                    color: micLevelIndicator.activeColor
+                                    opacity: 0.3 + 0.7 * lvl
+                                    anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+                                    antialiasing: true
+
+                                    Behavior on height  { NumberAnimation { duration: 60; easing.type: Easing.OutQuad } }
+                                    Behavior on opacity { NumberAnimation { duration: 60; easing.type: Easing.OutQuad } }
+                                }
+                            }
+                        }
+
+                        // ── Original recording dot (unchanged) ───────────────────
                         Rectangle {
+                            id: centerDot
+                            anchors.centerIn: parent
                             width: 56
                             height: 56
                             radius: 28
-                            // Change color based on playback or recording
-                            color: trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : Theme.error(root.Material.theme))
-                            visible: trainingAudioApi.isRecording || isAnyPlaybackActive
+                            color: micLevelIndicator.activeColor
 
                             SequentialAnimation on opacity {
                                 running: trainingAudioApi.isRecording || isAnyPlaybackActive
@@ -824,10 +906,35 @@ Page {
                             }
                         }
 
+                        // ── Right-side waveform bars (mirror of left) ────────────
+                        Row {
+                            anchors.left: centerDot.right
+                            anchors.leftMargin: 6
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+
+                            Repeater {
+                                model: micLevelIndicator.barCount
+                                delegate: Rectangle {
+                                    property real lvl: micLevelIndicator.levelHistory[micLevelIndicator.barCount - 1 - index] || 0
+                                    width: 3
+                                    height: Math.max(3, lvl * 50)
+                                    radius: 1.5
+                                    color: micLevelIndicator.activeColor
+                                    opacity: 0.3 + 0.7 * lvl
+                                    anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+                                    antialiasing: true
+
+                                    Behavior on height  { NumberAnimation { duration: 60; easing.type: Easing.OutQuad } }
+                                    Behavior on opacity { NumberAnimation { duration: 60; easing.type: Easing.OutQuad } }
+                                }
+                            }
+                        }
                     }
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
+                        Layout.fillWidth: true
                         text: root._isVadPaused ? qsTr("Paused") : (isAnyPlaybackActive ? qsTr("Playing...") : (trainingAudioApi.isRecording ? qsTr("Listening...") : qsTr("Processing...")))
                         font.pixelSize: 26
                         font.weight: 600
@@ -837,11 +944,11 @@ Page {
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        visible: root._isVadPaused || isAnyPlaybackActive
+                        Layout.fillWidth: true
+                        opacity: (root._isVadPaused || isAnyPlaybackActive) ? 0.6 : 0.0
                         text: root._isVadPaused ? qsTr("Press Continue to continue recording.") : qsTr("Listen carefully")
-                        font.pixelSize: 20
+                        font.pixelSize: 14
                         color: Theme.onSurface(root.Material.theme)
-                        opacity: 0.6
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
                     }
@@ -850,6 +957,7 @@ Page {
                 RecordRoundButton {
                     id: manualRecordBtn
                     Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: 220
                     visible: window.settingsApi ? !window.settingsApi.autoStopRecording : false
                     onRecordingFinished: function(filePath) {
                         if (filePath !== "") {
@@ -860,6 +968,8 @@ Page {
 
                 PlayRoundButton {
                     id: playUserBtn
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: 220
                     filePath: root.userFilePath
                     text: qsTr("Play\nMe")
                     opacity: root.userFilePath !== "" ? 1.0 : 0.0
