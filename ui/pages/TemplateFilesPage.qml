@@ -15,6 +15,7 @@ Page {
     property string categoryName: ""
     property var allFiles: []
     property string currentFilter: "all" // all, noScore, above80, below80
+    property string unfoldedCategory: ""
 
     Component.onCompleted: {
         loadFiles();
@@ -149,38 +150,143 @@ Page {
             }
         }
 
-        // Files List
-        ListView {
-            id: listView
+        // Files List — wrapped in RowLayout so the scrollbar sits beside (not over) items
+        RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            clip: true
-            spacing: 10
+            spacing: 0
 
-            model: {
-                let filtered = applyFilter(allFiles);
-                if (!searchField.text)
-                    return filtered;
-                return filtered.filter(file => file.fileName.toLowerCase().includes(searchField.text.toLowerCase()));
+            ListView {
+                id: listView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                spacing: 0
+                cacheBuffer: 20000
+
+                model: {
+                    let filtered = applyFilter(allFiles);
+                    if (!searchField.text)
+                        return filtered;
+                    return filtered.filter(file => file.fileName.toLowerCase().includes(searchField.text.toLowerCase()));
+                }
+
+                section.property: "directory"
+                section.criteria: ViewSection.FullString
+                section.delegate: Item {
+                    id: sectionHeader
+                    width: listView.width
+                    height: 58 // 48 height + 10 spacing
+                    visible: section !== ""
+
+                    Rectangle {
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: 48
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: 8
+                        radius: Theme.shapeSmall
+                        color: headerMouseArea.containsMouse ? Theme.surfaceContainerLow(Material.theme) : Theme.surfaceContainerLowest(Material.theme)
+                        border.color: Theme.outlineVariant(Material.theme)
+                        border.width: 1
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 16
+                            anchors.rightMargin: 16
+                            spacing: 8
+
+                            Text {
+                                text: section
+                                font.pixelSize: 15
+                                font.weight: 700
+                                color: Theme.onSurface(Material.theme)
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                id: chevronIcon
+                                text: Icons.faChevronRight
+                                font.family: Icons.familySolid
+                                font.pixelSize: 14
+                                color: Theme.onSurfaceVariant(Material.theme)
+                                opacity: 0.7
+                                
+                                transformOrigin: Item.Center
+                                rotation: (searchField.text !== "" || filesPage.unfoldedCategory === section) ? 90 : 0
+                                Behavior on rotation {
+                                    NumberAnimation {
+                                        duration: 150
+                                        easing.type: Easing.OutQuad
+                                    }
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            id: headerMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (searchField.text !== "")
+                                    return;
+                                if (filesPage.unfoldedCategory === section) {
+                                    filesPage.unfoldedCategory = "";
+                                } else {
+                                    filesPage.unfoldedCategory = section;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                delegate: Item {
+                    width: listView.width
+                    visible: height > 0
+                    height: (searchField.text !== "" || modelData.directory === filesPage.unfoldedCategory) ? 110 : 0 // 100 height + 10 spacing
+                    clip: true
+
+                    Behavior on height {
+                        NumberAnimation {
+                            duration: 200
+                            easing.type: Easing.InOutQuad
+                        }
+                    }
+
+                    ListItem {
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: 100
+                        itemData: modelData.fileName
+                        itemIndex: index
+                        icon: Icons.faFileAudio
+                        filePath: modelData.fullPath
+                        isFolder: false
+                        onClicked: {
+                            console.log("Clicked file:", modelData.filePath);
+                            stackView.push("TrainingPage.qml", {
+                                referenceFilePath: modelData.fullPath
+                            });
+                        }
+                    }
+                }
             }
 
-            section.property: "directory"
-            section.criteria: ViewSection.FullString
-            section.delegate: ListSectionHeader {
-                sectionText: section
-            }
-
-            delegate: ListItem {
-                itemData: modelData.fileName
-                itemIndex: index
-                icon: Icons.faFileAudio
-                filePath: modelData.fullPath
-                isFolder: false
-                onClicked: {
-                    console.log("Clicked file:", modelData.filePath);
-                    stackView.push("TrainingPage.qml", {
-                        referenceFilePath: modelData.fullPath
-                    });
+            // External scrollbar — sits beside the list, never overlapping it
+            ScrollBar {
+                id: vScrollBar
+                Layout.fillHeight: true
+                Layout.preferredWidth: 16
+                orientation: Qt.Vertical
+                policy: (window.settingsApi && !window.settingsApi.showNavigationMenu) ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+                size: listView.visibleArea.heightRatio
+                position: listView.visibleArea.yPosition
+                onPositionChanged: {
+                    if (pressed) listView.contentY = position * listView.contentHeight
                 }
             }
         }

@@ -33,6 +33,7 @@ Page {
     ScrollView {
         anchors.fill: parent
         contentWidth: availableWidth
+        ScrollBar.vertical.policy: (window.settingsApi && !window.settingsApi.showNavigationMenu) ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
 
         ColumnLayout {
             width: parent.width

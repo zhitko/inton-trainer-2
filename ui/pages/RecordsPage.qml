@@ -173,6 +173,10 @@ Page {
             spacing: 10
             model: recordsPage.modelWrapper.items
 
+            ScrollBar.vertical: ScrollBar {
+                policy: (window.settingsApi && !window.settingsApi.showNavigationMenu) ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+            }
+
             section.property: "directory"
             section.criteria: ViewSection.FullString
             section.delegate: ListSectionHeader {

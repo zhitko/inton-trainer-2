@@ -591,6 +591,7 @@ Page {
                 anchors.fill: parent
                 anchors.margins: 10
                 contentWidth: availableWidth
+                ScrollBar.vertical.policy: (window.settingsApi && !window.settingsApi.showNavigationMenu) ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
 
                 Column {
                     spacing: 10

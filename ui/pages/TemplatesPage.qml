@@ -52,6 +52,10 @@ Page {
             clip: true
             spacing: 10
 
+            ScrollBar.vertical: ScrollBar {
+                policy: (window.settingsApi && !window.settingsApi.showNavigationMenu) ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+            }
+
             model: {
                 if (!searchField.text)
                     return allFiles;
