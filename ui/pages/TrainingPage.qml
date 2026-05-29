@@ -875,15 +875,19 @@ Page {
                                 model: micLevelIndicator.barCount
                                 delegate: Rectangle {
                                     property real lvl: micLevelIndicator.levelHistory[micLevelIndicator.barCount - 1 - index] || 0
-                                    width: 3
-                                    height: Math.max(3, lvl * 50)
-                                    radius: 1.5
+                                    // Mild log lift for quiet bars; peaks kept expressive (low compression)
+                                    property real logLvl: Math.log1p(lvl * 3) / Math.log1p(3)
+                                    // Bars widen dramatically at loud levels (2 px quiet → 5 px peak)
+                                    width: 2 + Math.pow(lvl, 1.8) * 3
+                                    height: Math.max(3, logLvl * 64)
+                                    radius: width / 2
                                     color: micLevelIndicator.activeColor
-                                    opacity: 0.3 + 0.7 * lvl
+                                    opacity: 0.25 + 0.75 * logLvl
                                     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
                                     antialiasing: true
 
                                     Behavior on height  { NumberAnimation { duration: 60; easing.type: Easing.OutQuad } }
+                                    Behavior on width   { NumberAnimation { duration: 60; easing.type: Easing.OutQuad } }
                                     Behavior on opacity { NumberAnimation { duration: 60; easing.type: Easing.OutQuad } }
                                 }
                             }
@@ -917,11 +921,13 @@ Page {
                                 model: micLevelIndicator.barCount
                                 delegate: Rectangle {
                                     property real lvl: micLevelIndicator.levelHistory[micLevelIndicator.barCount - 1 - index] || 0
+                                    // Logarithmic scaling: expands quiet signals, compresses peaks
+                                    property real logLvl: Math.log1p(lvl * 9) / Math.log1p(9)
                                     width: 3
-                                    height: Math.max(3, lvl * 50)
+                                    height: Math.max(3, logLvl * 58)
                                     radius: 1.5
                                     color: micLevelIndicator.activeColor
-                                    opacity: 0.3 + 0.7 * lvl
+                                    opacity: 0.25 + 0.75 * logLvl
                                     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
                                     antialiasing: true
 
