@@ -171,16 +171,27 @@ Page {
         }
     }
 
+    // Tracks whether any audio (reference or user) is currently playing.
     property bool isAnyPlaybackActive: playReferenceBtn.isPlaying || playUserBtn.isPlaying
+    // Remember if we were recording before playback started. Used to decide whether to auto‑restart recording after playback finishes.
+    property bool _wasRecordingBeforePlayback: false
 
     onIsAnyPlaybackActiveChanged: {
-        if (isAnyPlaybackActive && trainingAudioApi.isRecording) {
-            _isExiting = true; // Set to true so we don't save the aborted recording
-            trainingAudioApi.stopRecording();
-            _isExiting = false; // reset immediately
-        } else if (!isAnyPlaybackActive && !trainingAudioApi.isRecording && !root._isVadPaused) {
-            // Un-pause recording when playback finishes
-            restartRecordingTimer.start();
+        if (isAnyPlaybackActive) {
+            // Playback started – remember if we were recording so we can resume later if appropriate.
+            _wasRecordingBeforePlayback = trainingAudioApi.isRecording;
+            if (trainingAudioApi.isRecording) {
+                _isExiting = true; // Prevent saving an aborted recording
+                trainingAudioApi.stopRecording();
+                _isExiting = false;
+            }
+        } else {
+            // Playback stopped – only restart recording if we were recording before playback began.
+            if (_wasRecordingBeforePlayback && !trainingAudioApi.isRecording && !root._isVadPaused) {
+                restartRecordingTimer.start();
+            }
+            // Reset flag for next playback cycle.
+            _wasRecordingBeforePlayback = false;
         }
     }
 
