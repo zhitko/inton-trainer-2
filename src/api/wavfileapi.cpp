@@ -252,7 +252,7 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
     }
     result["cuePoints"] = modifiedCuePoints;
 
-    result["minFinalCost"] = cdtwService.getMinFinalCost();
+    result["minFinalCost"] = cdtwService.getNormalizedFinalCost();
 
     QVariantList streamDistancesList;
     const std::vector<double> streamDistances = cdtwService.getSignalStreamDistances();
@@ -286,7 +286,8 @@ QVariantMap WavFileApi::getDP(const QVariantList& patternAmplitude,
 
     LOG_DEBUG() << "Finish: getDP - pitch size=" << pathDataList.size()
                 << ", cuePoints size=" << modifiedCuePoints.size()
-                << ", minFinalCost=" << cdtwService.getMinFinalCost()
+                << ", minFinalCost (normalized)=" << cdtwService.getNormalizedFinalCost()
+                << ", minFinalCost (raw)=" << cdtwService.getMinFinalCost()
                 << ", signalStreamDistances size=" << streamDistancesList.size();
     return result;
 }

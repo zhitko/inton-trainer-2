@@ -91,6 +91,15 @@ public:
      */
     double getMinFinalCost() const { return minFinalCost; }
     /**
+     * @return The minimum final cost normalized to the range [0, 100].
+     * Computed as (minFinalCost / (m + n)) * 100, where m is the template
+     * length and n is the signal length (both fixed before compute() runs).
+     * 0 = perfect match, 100 = worst possible alignment.
+     * Strictly monotonic with minFinalCost — directly usable as a threshold
+     * independent of template and recording duration.
+     */
+    double getNormalizedFinalCost() const { return normalizedFinalCost; }
+    /**
      * @return A vector of DTW alignment costs at the full template length for
      * each signal frame (index i corresponds to signal frame i). This represents
      * the cost "curve" of the sliding-window alignment across the signal stream
@@ -158,6 +167,7 @@ private:
     int bestStartIndex;
     int bestEndIndex;
     double minFinalCost;
+    double normalizedFinalCost;
     std::vector<int> optimalPath;
     std::vector<double> signalStreamDistances;
 

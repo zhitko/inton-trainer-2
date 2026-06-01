@@ -31,6 +31,7 @@ CDTWService::CDTWService(
     , bestStartIndex(-1)
     , bestEndIndex(-1)
     , minFinalCost(std::numeric_limits<double>::infinity())
+    , normalizedFinalCost(std::numeric_limits<double>::infinity())
     , templateMask(std::move(templateMask))
     , signalMask(std::move(signalMask))
     , precomputedNumStreams(0)
@@ -348,6 +349,7 @@ void CDTWService::compute()
     prevRow[0] = 0.0;
 
     minFinalCost = std::numeric_limits<double>::infinity();
+    normalizedFinalCost = std::numeric_limits<double>::infinity();
     bestEndIndex = -1;
     bestStartIndex = -1;
     signalStreamDistances.clear();
@@ -474,9 +476,25 @@ void CDTWService::compute()
     auto endTotal = std::chrono::high_resolution_clock::now();
     auto totalMs = std::chrono::duration<double, std::milli>(endTotal - startTotal).count();
 
+    // Compute length-normalised cost, scaled to [0, 100].
+    // Divisor is (m + n) — both fixed before compute() — so the value is
+    // strictly monotonic with minFinalCost (bigger distance → bigger score).
+    //
+    // Why [0, 100] is achievable:
+    //   - Each local distance ≤ 1.0  (feature vectors are normalised to [0,1]
+    //     by all callers before passing data to CDTWService)
+    //   - Path length ≤ m + n        (upper bound on DP steps)
+    //   - Therefore minFinalCost ≤ m + n  →  raw ratio ≤ 1.0  →  × 100 ≤ 100
+    //   - A perfect frame-to-frame match with distance 0 gives score 0.
+    const int normDivisor = m + n;
+    normalizedFinalCost = (normDivisor > 0)
+                          ? (minFinalCost / static_cast<double>(normDivisor)) * 100.0
+                          : std::numeric_limits<double>::infinity();
+
     LOG_DEBUG() << "Finish: CDTWService::compute - bestStartIndex="
                 << bestStartIndex << ", bestEndIndex=" << bestEndIndex
-                << ", minFinalCost=" << minFinalCost;
+                << ", minFinalCost=" << minFinalCost
+                << ", normalizedFinalCost=" << normalizedFinalCost;
     LOG_DEBUG() << "CDTWService::compute - Total: " << totalMs << " ms"
                 << " (precompute: " << precomputeMs << "ms, distMatrix: " << distMatrixMs
                 << "ms, init: " << initMs << "ms, dpLoop: " << dpLoopMs
