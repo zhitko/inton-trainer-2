@@ -29,25 +29,32 @@ Page {
     // Shorthand computed accessors for repeated index→string lookups
     readonly property string pitchInterpolationName: settingsApi ? ["None", "Linear", "Cubic", "Akima", "Monotone"][window.settingsApi.pitchInterpolationType] : "None"
     readonly property string pitchSmoothingName:     settingsApi ? ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.pitchSmoothing]    : "None"
-    readonly property string amplitudeSmoothingName:  settingsApi ? ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing]           : "None"
-    readonly property string umpSmoothingName:        settingsApi ? ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing]       : "None"
+    readonly property string amplitudeSmoothingName: settingsApi ? ["None", "MovingAverage", "Median", "Gaussian"][window.settingsApi.amplitudeSmoothing]           : "None"
+    readonly property string umpSmoothingName:       settingsApi ? ["None", "MovingAverage", "Median", "Gaussian", "Spline"][window.settingsApi.umpSmoothing]       : "None"
 
     // ── Reference audio data ───────────────────────────────────────────────
-    property var referenceUMP:              null
-    property var referenceCuePoints:        null
-    property var referenceWaveData:         null
-    property var referencePitchData:        null
-    property var referenceLogPitchData:     null
-    property var referenceAmplitudeData:    null
+    property var referenceUMP:                null
+    property var referenceCuePoints:          null
+    property var referenceWaveData:           null
+    property var referencePitchData:          null
+    property var referenceLogPitchData:       null
+    property var referenceAmplitudeData:      null
     property var referenceAmplitudeDerivData: null
-    property var referencePitchDerivData:   null
-    property var referenceSpecData:         null
-    property var referenceCepstrData:       null
+    property var referencePitchDerivData:     null
+    property var referenceSpecData:           null
+    property var referenceCepstrData:         null
 
     // ── User results ─────────────────────────────────────────────────────
-    property var    userUMP:                  null
-    property double shapeSimilarity:          0
+    property var    userUMP:                   null
+    property double shapeSimilarity:           0
     property var    previousShapeSimilarities: []
+
+    property var userVadA:     []
+    property var userVadU:     []
+    property var userVadV:     []
+    property var userVadCorr:  []
+    property var userVadCorrU: []
+    property var userVadCorrV: []
 
     WavFileApi {
         id: wavFileApi
@@ -240,12 +247,12 @@ Page {
         sv.push("TemplatePage.qml", {
             referenceFilePath: root.referenceFilePath,
             userFilePath: root.userFilePath,
-            userVadA: trainingAudioApi.getVadA(),
-            userVadU: trainingAudioApi.getVadU(),
-            userVadV: trainingAudioApi.getVadV(),
-            userVadCorr: trainingAudioApi.getVadCorr(),
-            userVadCorrU: trainingAudioApi.getVadCorrU(),
-            userVadCorrV: trainingAudioApi.getVadCorrV()
+            userVadA: root.userVadA,
+            userVadU: root.userVadU,
+            userVadV: root.userVadV,
+            userVadCorr: root.userVadCorr,
+            userVadCorrU: root.userVadCorrU,
+            userVadCorrV: root.userVadCorrV
         });
     }
 
@@ -599,6 +606,19 @@ Page {
             root.previousShapeSimilarities = [Math.round(root.shapeSimilarity)].concat(root.previousShapeSimilarities).slice(0, 5);
         }
         root.shapeSimilarity = newShapeSimilarity;
+
+        root.userVadA = trainingAudioApi.getVadA();
+        root.userVadU = trainingAudioApi.getVadU();
+        root.userVadV = trainingAudioApi.getVadV();
+        root.userVadCorr = trainingAudioApi.getVadCorr();
+        root.userVadCorrU = trainingAudioApi.getVadCorrU();
+        root.userVadCorrV = trainingAudioApi.getVadCorrV();
+        console.log("VAD A: " + root.userVadA.length);
+        console.log("VAD U: " + root.userVadU.length);
+        console.log("VAD V: " + root.userVadV.length);
+        console.log("VAD Corr: " + root.userVadCorr.length);
+        console.log("VAD Corr U: " + root.userVadCorrU.length);
+        console.log("VAD Corr V: " + root.userVadCorrV.length);
 
         // Register the result in statistics FIRST
         statisticsApi.registerResult(root.referenceFilePath, root.shapeSimilarity);

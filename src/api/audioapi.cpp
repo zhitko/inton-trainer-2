@@ -455,11 +455,11 @@ void AudioApi::stopRecording(bool isAutoStop)
         }
     }
 
-    emit isRecordingChanged();
-
     // Save current VAD metrics
     m_vadService->updateSavedMetrics();
     m_vadAutocorrService->updateSavedMetrics();
+
+    emit isRecordingChanged();
 
     // Crop saved metrics to synchronize with m_buffer
     if (m_autoStopEnabled && m_voiceDetected && m_firstSpeechFrame >= 0 && m_lastSpeechFrame >= 0) {
