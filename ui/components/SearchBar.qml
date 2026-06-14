@@ -35,7 +35,7 @@ Rectangle {
             text: Icons.faMagnifyingGlass
             font.family: Icons.familySolid
             font.weight: Icons.fontSolid.weight
-            font.pixelSize: 24
+            font.pixelSize: AppScale.fs(24)
             color: Theme.onSurfaceVariant(Material.theme)
             Layout.alignment: Qt.AlignVCenter
         }
@@ -45,7 +45,7 @@ Rectangle {
             Layout.fillWidth: true
             placeholderText: qsTr("Search")
             background: null
-            font.pixelSize: 16
+            font.pixelSize: AppScale.fs(16)
             color: Theme.onSurfaceVariant(Material.theme)
         }
     }

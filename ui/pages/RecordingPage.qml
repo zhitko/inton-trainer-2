@@ -92,9 +92,9 @@ Page {
         showLabel: true
         label: Icons.faWaveSquare + " " + qsTr("Open")
         onClicked: {
-            console.log("ui/pages/RecordsPage.qml:onFileClicked:", lastRecordedFile);
+            console.log("ui/pages/RecordingPage.qml:onFileClicked:", lastRecordedFile);
             stackView.push("TemplatePage.qml", {
-                "filePath": lastRecordedFile
+                "userFilePath": lastRecordedFile
             });
         }
     }

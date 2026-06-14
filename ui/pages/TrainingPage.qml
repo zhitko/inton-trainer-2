@@ -646,13 +646,13 @@ Page {
             width: scrollView.width - 32
             x: 16
             y: 16
-            spacing: 20
+            spacing: 16
 
             // Shape Similarity Card
             Rectangle {
                 id: shapeSimilarityCard
                 Layout.fillWidth: true
-                Layout.preferredHeight: 90
+                Layout.preferredHeight: 80
                 color: Theme.secondaryContainer(root.Material.theme)
                 radius: 16
 
@@ -672,8 +672,8 @@ Page {
                         left: parent.left
                         leftMargin: 36
                     }
-                    text: qsTr("Shape Similarity")
-                    font.pixelSize: 24
+                    text: qsTr("Similarity")
+                    font.pixelSize: AppScale.fs(24)
                     font.weight: 600
                     color: Theme.onSecondaryContainer(root.Material.theme)
                     opacity: 0.55
@@ -682,16 +682,13 @@ Page {
                 // Current result — centered
                 Column {
                     id: currentResultColumn
-                    anchors {
-                        centerIn: parent
-                        verticalCenterOffset: 0
-                    }
+                    anchors.centerIn: parent
                     spacing: 0
 
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: Math.round(root.shapeSimilarity) + "%"
-                        font.pixelSize: 46
+                        font.pixelSize: AppScale.fs(38)
                         font.weight: 700
                         color: Theme.primary(root.Material.theme)
 
@@ -719,14 +716,11 @@ Page {
 
                     // Trend indicator: show delta vs most recent previous result
                     Text {
-                        anchors {
-                            horizontalCenter: parent.horizontalCenter
-                            verticalCenterOffset: -10
-                        }
+                        anchors.horizontalCenter: parent.horizontalCenter
                         visible: root.previousShapeSimilarities.length > 0
                         property int delta: root.previousShapeSimilarities.length > 0 ? Math.round(root.shapeSimilarity) - root.previousShapeSimilarities[0] : 0
                         text: delta > 0 ? ("▲ +" + delta + "%") : (delta < 0 ? ("▼ " + delta + "%") : "● 0%")
-                        font.pixelSize: 12
+                        font.pixelSize: AppScale.fs(12)
                         font.weight: 600
                         color: delta > 0 ? "#4caf50" : (delta < 0 ? "#ef5350" : Theme.onSecondaryContainer(root.Material.theme))
                         opacity: 0.85
@@ -743,7 +737,7 @@ Page {
                     }
                     visible: root.previousShapeSimilarities.length > 0
                     text: "›"
-                    font.pixelSize: 20
+                    font.pixelSize: AppScale.fs(20)
                     color: Theme.primary(root.Material.theme)
                     opacity: 0.7
                 }
@@ -810,7 +804,7 @@ Page {
                 id: umpGraph
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.minimumHeight: 400
+                Layout.minimumHeight: 390
                 independentScale: true
                 datasetColors: ["#d62728", "#83270b"]
                 lineWidth: 5
@@ -821,12 +815,12 @@ Page {
             // Controls
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 12
+                spacing: 8
 
                 PlayRoundButton {
                     id: playReferenceBtn
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 220
+                    Layout.preferredWidth: 200
                     filePath: root.referenceFilePath
                     text: qsTr("Play\nReference")
                 }
@@ -834,7 +828,7 @@ Page {
                 ColumnLayout {
                     Layout.alignment: Qt.AlignVCenter
                     spacing: 8
-                    Layout.preferredWidth: 220
+                    Layout.preferredWidth: 240
                     Layout.preferredHeight: 130
                     visible: window.settingsApi ? window.settingsApi.autoStopRecording : false
 
@@ -973,7 +967,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
                         Layout.fillWidth: true
                         text: root._isVadPaused ? qsTr("Paused") : (isAnyPlaybackActive ? qsTr("Playing...") : (trainingAudioApi.isRecording ? qsTr("Listening...") : qsTr("Processing...")))
-                        font.pixelSize: 26
+                        font.pixelSize: AppScale.fs(26)
                         font.weight: 600
                         horizontalAlignment: Text.AlignHCenter
                         color: root._isVadPaused ? Theme.error(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : (trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : Theme.error(root.Material.theme)))
@@ -984,7 +978,7 @@ Page {
                         Layout.fillWidth: true
                         opacity: (root._isVadPaused || isAnyPlaybackActive) ? 0.6 : 0.0
                         text: root._isVadPaused ? qsTr("Press Continue to continue recording.") : qsTr("Listen carefully")
-                        font.pixelSize: 14
+                        font.pixelSize: AppScale.fs(14)
                         color: Theme.onSurface(root.Material.theme)
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
@@ -994,7 +988,7 @@ Page {
                 RecordRoundButton {
                     id: manualRecordBtn
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 220
+                    Layout.preferredWidth: 240
                     visible: window.settingsApi ? !window.settingsApi.autoStopRecording : false
                     onRecordingFinished: function(filePath) {
                         if (filePath !== "") {
@@ -1006,7 +1000,7 @@ Page {
                 PlayRoundButton {
                     id: playUserBtn
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 220
+                    Layout.preferredWidth: 200
                     filePath: root.userFilePath
                     text: qsTr("Play\nMe")
                     opacity: root.userFilePath !== "" ? 1.0 : 0.0
@@ -1022,14 +1016,14 @@ Page {
             Button {
                 id: pauseVadButton
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 48
+                Layout.preferredWidth: 160
+                Layout.preferredHeight: 50
                 flat: false
                 visible: window.settingsApi ? window.settingsApi.autoStopRecording : false
 
                 contentItem: Text {
                     text: root._isVadPaused ? qsTr("Continue") : qsTr("Pause")
-                    font.pixelSize: 16
+                    font.pixelSize: AppScale.fs(16)
                     font.weight: 600
                     color: pauseVadButton.down ? Qt.darker(Theme.onSecondaryContainer(root.Material.theme), 1.1) : Theme.onSecondaryContainer(root.Material.theme)
                     horizontalAlignment: Text.AlignHCenter
@@ -1093,13 +1087,13 @@ Page {
             Button {
                 id: openTestFileButton
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 200
-                Layout.preferredHeight: 48
+                Layout.preferredWidth: 240
+                Layout.preferredHeight: 50
                 flat: false
 
                 contentItem: Text {
                     text: qsTr("Open Test File")
-                    font.pixelSize: 16
+                    font.pixelSize: AppScale.fs(16)
                     font.weight: 600
                     color: openTestFileButton.down ? Qt.darker(Theme.onPrimary(root.Material.theme), 1.1) : Theme.onPrimary(root.Material.theme)
                     horizontalAlignment: Text.AlignHCenter

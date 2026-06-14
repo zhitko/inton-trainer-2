@@ -13,7 +13,7 @@ Item {
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         text: sectionText
-        font.pixelSize: 16
+        font.pixelSize: AppScale.fs(16)
         font.weight: 700
         color: Theme.onSurfaceVariant(Material.theme)
         opacity: 0.7

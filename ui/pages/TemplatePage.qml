@@ -600,7 +600,7 @@ Page {
                     Text {
                         color: Theme.onSurface(root.Material.theme)
                         font.bold: true
-                        font.pixelSize: 16
+                        font.pixelSize: AppScale.fs(16)
                         text: qsTr("Reference waveform") + " - " + root.referenceFilePath.substring(root.referenceFilePath.lastIndexOf('/') + 1)
                     }
 
@@ -626,7 +626,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Reference Pitch (F0)")
                         }
 
@@ -645,7 +645,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Reference Processed Pitch (F0)")
                         }
 
@@ -664,7 +664,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Reference Log Pitch (LOG_F0)")
                         }
 
@@ -683,7 +683,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Reference UMP")
                         }
 
@@ -698,7 +698,7 @@ Page {
                     Text {
                         color: Theme.onSurface(root.Material.theme)
                         font.bold: true
-                        font.pixelSize: 16
+                        font.pixelSize: AppScale.fs(16)
                         text: qsTr("User waveform") + " - " + root.userFilePath.substring(root.userFilePath.lastIndexOf('/') + 1)
                     }
 
@@ -724,7 +724,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("User Pitch (F0)")
                         }
 
@@ -743,7 +743,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("User Processed Pitch (F0)")
                         }
 
@@ -762,7 +762,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("User Log Pitch (LOG_F0)")
                         }
 
@@ -781,7 +781,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("User UMP")
                         }
 
@@ -802,14 +802,14 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Amplitude")
                         }
 
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("Reference")
                         }
 
@@ -822,7 +822,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("User")
                         }
 
@@ -841,14 +841,14 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Amplitude Derivative")
                         }
 
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("Reference")
                         }
 
@@ -861,7 +861,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("User")
                         }
 
@@ -880,14 +880,14 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Spectrum")
                         }
 
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("Reference")
                         }
 
@@ -900,7 +900,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("User")
                         }
 
@@ -919,14 +919,14 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Cepstrum")
                         }
 
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("Reference")
                         }
 
@@ -939,7 +939,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("User")
                         }
 
@@ -959,7 +959,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("VAD Correlation")
                         }
 
@@ -1002,7 +1002,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("VAD Energy")
                         }
 
@@ -1046,20 +1046,20 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("DTW Distances")
                         }
 
                         Text {
                             color: Theme.onSurface(root.Material.theme)
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("Best alignment cost: ") + root.dpMinFinalCost.toFixed(6)
                         }
 
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             text: qsTr("Signal Distances")
                         }
 
@@ -1078,7 +1078,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Template Data")
                         }
 
@@ -1117,7 +1117,7 @@ Page {
                         Text {
                             color: Theme.onSurface(root.Material.theme)
                             font.bold: true
-                            font.pixelSize: 16
+                            font.pixelSize: AppScale.fs(16)
                             text: qsTr("Signal Data")
                         }
 

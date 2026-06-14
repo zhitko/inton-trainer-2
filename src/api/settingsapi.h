@@ -20,6 +20,7 @@ class SettingsApi : public QObject {
     Q_PROPERTY(
         QString languageTitle READ languageTitle WRITE setLanguageTitle NOTIFY languageTitleChanged)
     Q_PROPERTY(QString theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(double fontSizeMultiplier READ fontSizeMultiplier WRITE setFontSizeMultiplier NOTIFY fontSizeMultiplierChanged)
     Q_PROPERTY(QString primaryColor READ primaryColor WRITE setPrimaryColor NOTIFY primaryColorChanged)
     Q_PROPERTY(bool showNavigationMenu READ showNavigationMenu WRITE setShowNavigationMenu NOTIFY showNavigationMenuChanged)
     Q_PROPERTY(bool showVadA READ showVadA WRITE setShowVadA NOTIFY showVadAChanged)
@@ -190,6 +191,9 @@ public:
 
     QString theme() const;
     void setTheme(const QString& theme);
+
+    double fontSizeMultiplier() const;
+    void setFontSizeMultiplier(double fontSizeMultiplier);
 
     QString primaryColor() const;
     void setPrimaryColor(const QString& primaryColor);
@@ -420,6 +424,7 @@ signals:
     void languageChanged();
     void languageTitleChanged();
     void themeChanged();
+    void fontSizeMultiplierChanged();
     void primaryColorChanged();
     void showNavigationMenuChanged();
     void showVadAChanged();

@@ -53,14 +53,14 @@ Rectangle {
         anchors.right: cardText.left
         anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
-        font.pixelSize: 16
+        font.pixelSize: AppScale.fs(16)
         color: mouseArea.containsMouse ? Theme.secondary(Material.theme) : Theme.onSurface(Material.theme)
     }
 
     Text {
         id: cardText
         anchors.centerIn: parent
-        font.pixelSize: 16
+        font.pixelSize: AppScale.fs(16)
         color: Theme.onSurface(Material.theme)
     }
 

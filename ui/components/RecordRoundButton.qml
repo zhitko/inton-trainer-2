@@ -63,7 +63,7 @@ ColumnLayout {
         Rectangle {
             id: innerCircle
             anchors.centerIn: parent
-            width: root.isRecording ? 64 : 72
+            width: root.isRecording ? 68 : 76
             height: width
             radius: width / 2
             color: Theme.error(Material.theme)
@@ -80,7 +80,7 @@ ColumnLayout {
                 text: root.isRecording ? Icons.faStop : Icons.faMicrophone
                 font.family: Icons.familySolid
                 font.weight: Icons.fontSolid.weight
-                font.pixelSize: 28
+                font.pixelSize: AppScale.fs(28)
                 color: Theme.onError(Material.theme)
             }
 
@@ -163,7 +163,7 @@ ColumnLayout {
     Text {
         Layout.alignment: Qt.AlignHCenter
         text: root.isRecording ? qsTr("Recording") : qsTr("Record")
-        font.pixelSize: 14
+        font.pixelSize: AppScale.fs(14)
         font.weight: 600
         color: Theme.onSurface(Material.theme)
     }

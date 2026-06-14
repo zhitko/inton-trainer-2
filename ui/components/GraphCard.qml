@@ -25,7 +25,7 @@ Frame {
 
         Label {
             text: root.title
-            font.pixelSize: 18
+            font.pixelSize: AppScale.fs(18)
             font.weight: Font.Medium
             color: Theme.primary(Material.theme)
             visible: root.title !== ""

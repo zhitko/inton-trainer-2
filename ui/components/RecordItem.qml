@@ -79,7 +79,7 @@ Item {
                 text: Icons.faMicrophoneLines
                 font.family: Icons.familySolid
                 font.bold: true
-                font.pixelSize: 20
+                font.pixelSize: AppScale.fs(20)
                 color: Theme.onPrimaryContainer(Material.theme)
             }
         }
@@ -96,7 +96,7 @@ Item {
             // Record name
             Text {
                 text: root.recordName
-                font.pixelSize: 16
+                font.pixelSize: AppScale.fs(16)
                 font.weight: 600
                 color: Theme.onSurface(Material.theme)
                 Layout.fillWidth: true
@@ -112,17 +112,15 @@ Item {
                 Text {
                     text: Icons.faMusic
                     font.family: Icons.familySolid
-                    font.pixelSize: 12
+                    font.pixelSize: AppScale.fs(12)
                     color: Theme.onSurfaceVariant(Material.theme)
                 }
                 Text {
                     text: root.patternName
-                    font.pixelSize: 12
+                    font.pixelSize: AppScale.fs(12)
                     color: Theme.onSurfaceVariant(Material.theme)
                     opacity: 0.7
                     elide: Text.ElideMiddle
-                    maximumLineCount: 2
-                    wrapMode: Text.Wrap
                     Layout.fillWidth: true
                 }
             }
@@ -138,7 +136,7 @@ Item {
                     else if (root.result > 0) return qsTr("Poor");
                     else return "";
                 }
-                font.pixelSize: 12
+                font.pixelSize: AppScale.fs(12)
                 color: {
                     if (root.result >= 80) return "#4caf50";
                     else if (root.result >= 60) return "#ff9800";
@@ -176,7 +174,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: Math.round(root.result) + "%"
-                    font.pixelSize: 14
+                    font.pixelSize: AppScale.fs(14)
                     font.weight: Font.Bold
                     color: Theme.onSurfaceVariant(Material.theme)
                 }

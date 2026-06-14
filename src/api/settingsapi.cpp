@@ -3,6 +3,8 @@
 #include "helpers/statistics.h"
 #include <algorithm>
 #include <QCoreApplication>
+#include <QGuiApplication>
+#include <QFont>
 #include <QDebug>
 #include <QDir>
 #include <QQmlEngine>
@@ -70,6 +72,31 @@ void SettingsApi::setTheme(const QString& theme)
         emit themeChanged();
     }
     LOG_DEBUG() << "Finish: setTheme";
+}
+
+double SettingsApi::fontSizeMultiplier() const
+{
+    LOG_DEBUG() << "Start: fontSizeMultiplier";
+    double result = m_settings.fontSizeMultiplier;
+    LOG_DEBUG() << "Finish: fontSizeMultiplier - result=" << result;
+    return result;
+}
+
+void SettingsApi::setFontSizeMultiplier(double fontSizeMultiplier)
+{
+    LOG_DEBUG() << "Start: setFontSizeMultiplier - fontSizeMultiplier=" << fontSizeMultiplier;
+    double clamped = std::clamp(fontSizeMultiplier, 1.0, 2.0);
+    if (qAbs(m_settings.fontSizeMultiplier - clamped) >= 0.0001) {
+        m_settings.fontSizeMultiplier = clamped;
+        // Propagate the new base font size to the entire Qt application so all
+        // Labels and Text items scale — even those with explicit font.pixelSize.
+        QFont appFont = QGuiApplication::font();
+        appFont.setPixelSize(qRound(14 * clamped));
+        QGuiApplication::setFont(appFont);
+        save();
+        emit fontSizeMultiplierChanged();
+    }
+    LOG_DEBUG() << "Finish: setFontSizeMultiplier";
 }
 
 QString SettingsApi::primaryColor() const
@@ -517,9 +544,16 @@ void SettingsApi::load()
     LOG_DEBUG() << "Start: load";
     m_settings = Settings::loadSettings();
     updateTranslator();
+    // Apply persisted font size multiplier on startup
+    {
+        QFont appFont = QGuiApplication::font();
+        appFont.setPixelSize(qRound(14 * m_settings.fontSizeMultiplier));
+        QGuiApplication::setFont(appFont);
+    }
     emit languageChanged();
     emit languageTitleChanged();
     emit themeChanged();
+    emit fontSizeMultiplierChanged();
     emit primaryColorChanged();
     emit showNavigationMenuChanged();
     emit autoStopRecordingChanged();

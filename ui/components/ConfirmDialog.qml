@@ -15,7 +15,7 @@ Dialog {
 
     header: Label {
         text: titleText
-        font.pixelSize: 20
+        font.pixelSize: AppScale.fs(20)
         font.bold: true
         padding: 24
         bottomPadding: 0
@@ -25,7 +25,7 @@ Dialog {
     contentItem: Text {
         text: messageText
         color: Theme.onSurfaceVariant(Material.theme)
-        font.pixelSize: 16
+        font.pixelSize: AppScale.fs(16)
         padding: 24
     }
 

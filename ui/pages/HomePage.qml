@@ -57,7 +57,7 @@ Page {
                 Layout.alignment: Qt.AlignHCenter
                 // Layout.topMargin: 24
                 Layout.bottomMargin: 26
-                spacing: 20
+                spacing: 14
 
                 // Full-bleed hero: neutral surface; wave styled via MultiEffect (clarity, no tinted bg)
                 Rectangle {
@@ -82,12 +82,12 @@ Page {
                         Label {
                             Layout.alignment: Qt.AlignHCenter
                             Layout.fillWidth: true
-                            Layout.topMargin: 48
+                            Layout.topMargin: 10
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.Wrap
                             text: qsTr("Inton@Trainer 2.0")
                             font.weight: Font.Bold
-                            font.pixelSize: 30
+                            font.pixelSize: AppScale.fs(30)
                             color: Theme.onSurface(Material.theme)
                         }
 
@@ -97,7 +97,7 @@ Page {
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.Wrap
                             text: qsTr("Master Your Intonation")
-                            font.pixelSize: 17
+                            font.pixelSize: AppScale.fs(17)
                             font.weight: Font.Medium
                             color: Theme.onSurfaceVariant(Material.theme)
                             opacity: 0.95
@@ -154,14 +154,14 @@ Page {
             // 3. Stats Row
             RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 85
+                Layout.preferredHeight: 110
                 Layout.topMargin: 26
                 spacing: 12
 
                 StatBox {
                     id: avgAccuracyBox
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 75
+                    Layout.preferredHeight: 110
                     icon: Icons.faChartLine
                     title: qsTr("Avg Accuracy:")
                 }
@@ -169,7 +169,7 @@ Page {
                 StatBox {
                     id: totalResultsBox
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 75
+                    Layout.preferredHeight: 110
                     icon: Icons.faTrophy
                     title: qsTr("Mastered Files:")
                 }
@@ -177,7 +177,7 @@ Page {
                 StatBox {
                     id: filesCountBox
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 75
+                    Layout.preferredHeight: 110
                     icon: Icons.faFolderOpen
                     title: qsTr("Files Trained:")
                 }
@@ -205,14 +205,14 @@ Page {
 
                         Text {
                             text: qsTr("Completion")
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             color: Theme.onSurfaceVariant(Material.theme)
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text {
                             id: overallProgressText
                             text: "85%"
-                            font.pixelSize: 36
+                            font.pixelSize: AppScale.fs(36)
                             font.bold: true
                             color: Theme.onSurface(Material.theme)
                             anchors.horizontalCenter: parent.horizontalCenter

@@ -241,7 +241,7 @@ Item {
         anchors.centerIn: parent
         text: qsTr("No spectrum data available.\nCheck analysis settings (e.g. increase FFT length).")
         color: Theme.onSurfaceVariant(root.Material.theme)
-        font.pixelSize: 16
+        font.pixelSize: AppScale.fs(16)
         horizontalAlignment: Text.AlignHCenter
         visible: !spectrumData || spectrumData.length === 0
     }

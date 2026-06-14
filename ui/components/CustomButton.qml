@@ -16,7 +16,7 @@ Button {
         text: control.iconText
         font.family: Icons.familySolid
         font.weight: Icons.fontSolid.weight
-        font.pixelSize: 24
+        font.pixelSize: AppScale.fs(24)
         color: control.primary ? Theme.onPrimary(Material.theme) : Theme.onSurface(Material.theme)
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
@@ -97,7 +97,7 @@ Button {
             when: control.hovered
             PropertyChanges {
                 target: control.contentItem
-                font.pixelSize: 28
+                font.pixelSize: AppScale.fs(28)
             }
         }
     ]

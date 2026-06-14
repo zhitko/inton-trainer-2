@@ -41,7 +41,7 @@ Dialog {
             text: qsTr("Please stay quiet for %1 seconds so the background noise level can be measured.").arg(window.settingsApi ? Math.round(window.settingsApi.vadCalibrationDurationMs / 1000) : 2)
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
-            font.pixelSize: 15
+            font.pixelSize: AppScale.fs(15)
         }
         // Animated dots to show progress
         Row {

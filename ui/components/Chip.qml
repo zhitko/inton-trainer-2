@@ -20,7 +20,7 @@ Rectangle {
 
     // MD3 Chip styling
     implicitWidth: layout.implicitWidth + 16
-    implicitHeight: 28
+    implicitHeight: 35
     radius: Theme.shapeExtraSmall
 
     // Color based on selection state
@@ -60,7 +60,7 @@ Rectangle {
             text: chip.icon
             font.family: Icons.familySolid
             font.weight: 900
-            font.pixelSize: 14
+            font.pixelSize: AppScale.fs(14)
             color: selected ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
             Layout.alignment: Qt.AlignVCenter
         }
@@ -68,7 +68,7 @@ Rectangle {
         // Text label
         Text {
             text: chip.text
-            font.pixelSize: 12
+            font.pixelSize: AppScale.fs(12)
             font.weight: Font.Medium
             color: selected ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
             elide: Text.ElideRight
@@ -81,7 +81,7 @@ Rectangle {
             visible: chip.deletable
             text: Icons.faXmark
             font.family: Icons.familySolid
-            font.pixelSize: 14
+            font.pixelSize: AppScale.fs(14)
             color: selected ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
             Layout.alignment: Qt.AlignVCenter
 

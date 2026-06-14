@@ -254,7 +254,8 @@ Column {
                 // Draw label
                 if (root.showCueLabels || root.cueNLabels.length > 0) {
                     ctx.fillStyle = Theme.onSurface(Material.theme);
-                    ctx.font = "10px sans-serif";
+                    let fontSize = AppScale.fs(10);
+                    ctx.font = fontSize + "px sans-serif";
                     var labelY = canvas.height - bottomPadding + 15;
                     if (root.showCueLabels)
                         ctx.fillText(cue.label, x + width / 2, labelY);
@@ -264,7 +265,8 @@ Column {
                             var nLabel = root.cueNLabels[nIdx];
                             if (nLabel) {
                                 ctx.save();
-                                ctx.font = "bold 21px sans-serif";
+                                let nFontSize = AppScale.fs(21);
+                                ctx.font = "bold " + nFontSize + "px sans-serif";
                                 ctx.fillStyle = Theme.primary(Material.theme);
                                 ctx.fillText(nLabel, x + width / 2, labelY + 16);
                                 ctx.restore();
@@ -403,7 +405,7 @@ Column {
                     text: root.datasetLabels[index]
                     color: Theme.onSurface(Material.theme)
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 12
+                    font.pixelSize: AppScale.fs(12)
                 }
             }
         }

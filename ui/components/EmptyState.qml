@@ -11,7 +11,7 @@ Item {
     
     Text {
         text: emptyMessage
-        font.pixelSize: 18
+        font.pixelSize: AppScale.fs(18)
         color: Theme.onSurfaceVariant(Material.theme)
         anchors.centerIn: parent
         opacity: 0.7

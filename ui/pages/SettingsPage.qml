@@ -55,7 +55,7 @@ Page {
                     Label {
                         text: qsTr("General")
                         font.bold: true
-                        font.pixelSize: 20
+                        font.pixelSize: AppScale.fs(20)
                         color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
@@ -181,6 +181,31 @@ Page {
                             onToggled: if (settingsApi)
                                 settingsApi.showNavigationMenu = checked
                         }
+
+                        Label {
+                            text: qsTr("Font Size")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        ComboBox {
+                            id: fontSizeCombo
+                            textRole: "name"
+                            valueRole: "value"
+                            model: [
+                                { "name": qsTr("Small"), "value": 1.0 },
+                                { "name": qsTr("Normal"), "value": 1.3 },
+                                { "name": qsTr("Big"), "value": 1.6 }
+                            ]
+                            currentIndex: {
+                                if (!settingsApi) return 0;
+                                let val = settingsApi.fontSizeMultiplier;
+                                if (Math.abs(val - 1.3) < 0.1) return 1;
+                                if (Math.abs(val - 1.6) < 0.1) return 2;
+                                return 0;
+                            }
+                            onActivated: if (settingsApi)
+                                settingsApi.fontSizeMultiplier = model[index].value
+                            Layout.fillWidth: true
+                        }
                     }
 
                     Button {
@@ -216,7 +241,7 @@ Page {
                     Label {
                         text: qsTr("Automated Recording (VAD)")
                         font.bold: true
-                        font.pixelSize: 20
+                        font.pixelSize: AppScale.fs(20)
                         color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
@@ -365,7 +390,7 @@ Page {
                             contentItem: Text {
                                 text: calibrateBtn.text
                                 color: Theme.onPrimary(Material.theme)
-                                font.pixelSize: 13
+                                font.pixelSize: AppScale.fs(13)
                                 font.weight: 600
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
@@ -511,7 +536,7 @@ Page {
                     Label {
                         text: qsTr("Pitch")
                         font.bold: true
-                        font.pixelSize: 20
+                        font.pixelSize: AppScale.fs(20)
                         color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
@@ -734,7 +759,7 @@ Page {
                     Label {
                         text: qsTr("Pitch Log")
                         font.bold: true
-                        font.pixelSize: 20
+                        font.pixelSize: AppScale.fs(20)
                         color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
@@ -816,7 +841,7 @@ Page {
                     Label {
                         text: qsTr("UMP")
                         font.bold: true
-                        font.pixelSize: 20
+                        font.pixelSize: AppScale.fs(20)
                         color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
@@ -914,7 +939,7 @@ Page {
                     Label {
                         text: qsTr("Amplitude")
                         font.bold: true
-                        font.pixelSize: 20
+                        font.pixelSize: AppScale.fs(20)
                         color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
@@ -1033,7 +1058,7 @@ Page {
                     Label {
                         text: qsTr("Spectrum")
                         font.bold: true
-                        font.pixelSize: 20
+                        font.pixelSize: AppScale.fs(20)
                         color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
@@ -1142,7 +1167,7 @@ Page {
                     Label {
                         text: qsTr("DP Calculation")
                         font.bold: true
-                        font.pixelSize: 20
+                        font.pixelSize: AppScale.fs(20)
                         color: Theme.primary(Material.theme)
                         Layout.fillWidth: true
                     }
@@ -1456,7 +1481,7 @@ Page {
             text: qsTr("This action will permanently delete all user statistics and user records.\nThis cannot be undone. Are you sure?")
             color: Theme.onSurface(Material.theme)
             wrapMode: Text.Wrap
-            font.pixelSize: AppScale.font(14)
+            font.pixelSize: AppScale.fs(14)
             width: parent.width - AppScale.px(40)
         }
 
@@ -1466,12 +1491,12 @@ Page {
             }
             Button {
                 text: qsTr("Yes")
-                font.pixelSize: AppScale.font(14)
+                font.pixelSize: AppScale.fs(14)
                 DialogButtonBox.buttonRole: DialogButtonBox.YesRole
             }
             Button {
                 text: qsTr("No")
-                font.pixelSize: AppScale.font(14)
+                font.pixelSize: AppScale.fs(14)
                 DialogButtonBox.buttonRole: DialogButtonBox.NoRole
             }
         }

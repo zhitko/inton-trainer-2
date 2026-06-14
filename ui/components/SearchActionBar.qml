@@ -33,12 +33,12 @@ RowLayout {
                 text: Icons.faTrash
                 font.family: Icons.familySolid
                 font.bold: true
-                font.pixelSize: 16
+                font.pixelSize: AppScale.fs(16)
                 color: Theme.onError(Material.theme)
             }
             Text {
                 text: actionButtonText
-                font.pixelSize: 14
+                font.pixelSize: AppScale.fs(14)
                 font.weight: 600
                 color: Theme.onError(Material.theme)
             }

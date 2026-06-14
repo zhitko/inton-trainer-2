@@ -29,7 +29,7 @@ ColumnLayout {
         font.family: Icons.familySolid
         font.weight: Icons.fontSolid.weight
         text: root.isPlaying ? Icons.faStop : root.icon
-        font.pixelSize: 20
+        font.pixelSize: AppScale.fs(20)
         Material.background: root.isPlaying ? Theme.errorContainer(Material.theme) : Theme.primaryContainer(Material.theme)
         Material.foreground: root.isPlaying ? Theme.onErrorContainer(Material.theme) : Theme.onPrimaryContainer(Material.theme)
 
@@ -123,7 +123,7 @@ ColumnLayout {
     Text {
         Layout.alignment: Qt.AlignHCenter
         text: root.text
-        font.pixelSize: 18
+        font.pixelSize: AppScale.fs(18)
         font.weight: 500
         horizontalAlignment: Text.AlignHCenter
         color: Theme.onSurface(Material.theme)

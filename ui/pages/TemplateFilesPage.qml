@@ -199,7 +199,7 @@ Page {
 
                             Text {
                                 text: section
-                                font.pixelSize: 15
+                                font.pixelSize: AppScale.fs(15)
                                 font.weight: 700
                                 color: Theme.onSurface(Material.theme)
                                 Layout.fillWidth: true
@@ -210,7 +210,7 @@ Page {
                                 id: chevronIcon
                                 text: Icons.faChevronRight
                                 font.family: Icons.familySolid
-                                font.pixelSize: 14
+                                font.pixelSize: AppScale.fs(14)
                                 color: Theme.onSurfaceVariant(Material.theme)
                                 opacity: 0.7
                                 

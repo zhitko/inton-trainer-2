@@ -61,8 +61,8 @@ Item {
 
         // Main Circle Button
         Item {
-            width: 180
-            height: 180
+            width: 200
+            height: 200
 
             // MD3 Elevation shadow effect (replaces glow)
             Rectangle {
@@ -158,7 +158,7 @@ Item {
                     text: qsTr("Start Training")
                     color: Theme.onPrimary(Material.theme)
                     font.bold: true
-                    font.pixelSize: 18
+                    font.pixelSize: AppScale.fs(18)
                 }
             }
         }

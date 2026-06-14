@@ -201,7 +201,7 @@ Page {
                     var refPath = modelData.refFilePath ? fileApi.getApplicationDirPath() + "/" + modelData.refFilePath : "";
                     stackView.push("TemplatePage.qml", {
                         "userFilePath": filePath,
-                        "refFilePath": refPath
+                        "referenceFilePath": refPath
                     });
                 }
 

@@ -37,6 +37,7 @@ Settings::loadSettings()
     settings.language = qsettings.value("language", "ru").toString().toStdString();
     settings.languageTitle = qsettings.value("languageTitle", "Русский").toString().toStdString();
     settings.theme = qsettings.value("theme", "light").toString().toStdString();
+    settings.fontSizeMultiplier = qsettings.value("fontSizeMultiplier", 1.0).toDouble();
     settings.primaryColor = qsettings.value("primaryColor", "blue").toString().toStdString();
     settings.showNavigationMenu = qsettings.value("showNavigationMenu", false).toBool();
     settings.autoStopRecording = qsettings.value("autoStopRecording", true).toBool();
@@ -152,6 +153,7 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("language", QString::fromStdString(settings.language));
     qsettings.setValue("languageTitle", QString::fromStdString(settings.languageTitle));
     qsettings.setValue("theme", QString::fromStdString(settings.theme));
+    qsettings.setValue("fontSizeMultiplier", settings.fontSizeMultiplier);
     qsettings.setValue("primaryColor", QString::fromStdString(settings.primaryColor));
     qsettings.setValue("showNavigationMenu", settings.showNavigationMenu);
     qsettings.setValue("autoStopRecording", settings.autoStopRecording);

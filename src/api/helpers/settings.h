@@ -21,6 +21,8 @@ struct AppSettings {
     // Language title for display (e.g., "American English", "Русский")
     std::string languageTitle = "Русский";
     std::string theme = "light";
+    // Font size multiplier: 1.0 = Normal (x1), 1.5 = Big (x1.5), 2.0 = Large (x2)
+    double fontSizeMultiplier = 1.0;
 
     // Primary color options: "blue", "green", "purple", "orange", "red"
     std::string primaryColor = "blue";

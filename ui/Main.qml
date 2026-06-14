@@ -39,6 +39,12 @@ ApplicationWindow {
         value: settingsApi.primaryColor
     }
 
+    Binding {
+        target: AppScale
+        property: "fontScale"
+        value: settingsApi ? settingsApi.fontSizeMultiplier : 1
+    }
+
     Component.onCompleted: {
         Logger.info("Main window initialized");
         Logger.debug("Initial theme: " + window.theme);
@@ -91,7 +97,7 @@ ApplicationWindow {
                     font.family: Icons.familyRegular
                     font.weight: Icons.fontRegular.weight
                     text: Icons.faBars
-                    font.pixelSize: 20
+                    font.pixelSize: AppScale.fs(20)
                     onClicked: drawer.open()
 
                     background: Rectangle {
@@ -119,7 +125,7 @@ ApplicationWindow {
 
                 Label {
                     text: (stackView.currentItem && stackView.currentItem.title) ? stackView.currentItem.title : qsTr("Inton Trainer")
-                    font.pixelSize: 22
+                    font.pixelSize: AppScale.fs(22)
                     font.weight: Font.Normal
                     Layout.fillWidth: true
                     elide: Label.ElideRight
@@ -132,7 +138,7 @@ ApplicationWindow {
                     font.family: Icons.familySolid
                     font.weight: Icons.fontSolid.weight
                     text: Icons.faArrowLeft
-                    font.pixelSize: 20
+                    font.pixelSize: AppScale.fs(20)
                     onClicked: stackView.pop()
                     visible: stackView.depth > 1
 
@@ -193,7 +199,7 @@ ApplicationWindow {
                                 anchors.centerIn: parent
                                 font.family: Icons.familySolid
                                 font.weight: Icons.fontSolid.weight
-                                font.pixelSize: 20
+                                font.pixelSize: AppScale.fs(20)
                                 text: Icons.faHome
                                 color: stackView.depth <= 1 ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
                             }
@@ -202,7 +208,7 @@ ApplicationWindow {
                         Text {
                             text: qsTr("Home")
                             anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: 12
+                            font.pixelSize: AppScale.fs(12)
                             font.weight: stackView.depth <= 1 ? Font.Bold : Font.Normal
                             color: stackView.depth <= 1 ? Theme.onSurface(Material.theme) : Theme.onSurfaceVariant(Material.theme)
                         }
@@ -239,7 +245,7 @@ ApplicationWindow {
                                 anchors.centerIn: parent
                                 font.family: Icons.familySolid
                                 font.weight: Icons.fontSolid.weight
-                                font.pixelSize: 20
+                                font.pixelSize: AppScale.fs(20)
                                 text: Icons.faSliders
                                 color: Theme.onPrimaryContainer(Material.theme)
                             }
@@ -248,7 +254,7 @@ ApplicationWindow {
                         Text {
                             text: qsTr("Advanced")
                             anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: 12
+                            font.pixelSize: AppScale.fs(12)
                             font.weight: Font.Medium
                             color: Theme.onSurface(Material.theme)
                         }
@@ -285,7 +291,7 @@ ApplicationWindow {
                                 anchors.centerIn: parent
                                 font.family: Icons.familySolid
                                 font.weight: Icons.fontSolid.weight
-                                font.pixelSize: 20
+                                font.pixelSize: AppScale.fs(20)
                                 text: Icons.faGear
                                 color: stackView.currentItem && stackView.currentItem.title === qsTr("Settings") ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
                             }
@@ -294,7 +300,7 @@ ApplicationWindow {
                         Text {
                             text: qsTr("Settings")
                             anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: 12
+                            font.pixelSize: AppScale.fs(12)
                             font.weight: stackView.currentItem && stackView.currentItem.title === qsTr("Settings") ? Font.Bold : Font.Normal
                             color: stackView.currentItem && stackView.currentItem.title === qsTr("Settings") ? Theme.onSurface(Material.theme) : Theme.onSurfaceVariant(Material.theme)
                         }
@@ -360,7 +366,7 @@ ApplicationWindow {
 
                 Label {
                     text: qsTr("Inton Trainer")
-                    font.pixelSize: 14
+                    font.pixelSize: AppScale.fs(14)
                     font.weight: Font.Medium
                     color: Theme.onSurfaceVariant(Material.theme)
                     Layout.topMargin: 16
@@ -406,14 +412,14 @@ ApplicationWindow {
                                 font.family: Icons.familySolid
                                 font.weight: Icons.fontSolid.weight
                                 text: modelData.icon
-                                font.pixelSize: 18
+                                font.pixelSize: AppScale.fs(18)
                                 font.bold: true
                                 color: parent.parent.highlighted ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
                                 Layout.leftMargin: 4
                             }
                             Label {
                                 text: modelData.text
-                                font.pixelSize: 14
+                                font.pixelSize: AppScale.fs(14)
                                 font.weight: parent.parent.highlighted ? Font.Bold : Font.Normal
                                 color: parent.parent.highlighted ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
                                 Layout.fillWidth: true
@@ -452,14 +458,14 @@ ApplicationWindow {
                             font.family: Icons.familySolid
                             font.weight: Icons.fontSolid.weight
                             text: Icons.faSliders
-                            font.pixelSize: 18
+                            font.pixelSize: AppScale.fs(18)
                             font.bold: true
                             color: parent.parent.highlighted ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
                             Layout.leftMargin: 4
                         }
                         Label {
                             text: qsTr("Advanced")
-                            font.pixelSize: 14
+                            font.pixelSize: AppScale.fs(14)
                             font.weight: parent.parent.highlighted ? Font.Bold : Font.Normal
                             color: parent.parent.highlighted ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
                             Layout.fillWidth: true

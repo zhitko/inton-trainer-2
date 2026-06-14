@@ -132,11 +132,11 @@ Item {
         // Icon Circle (Left)
         Rectangle {
             id: iconCircle
-            width: 48
-            height: 48
-            radius: 24
+            width: 50
+            height: 50
+            radius: 25
             anchors.left: parent.left
-            anchors.leftMargin: 24
+            anchors.leftMargin: 25
             anchors.verticalCenter: parent.verticalCenter
             color: {
                 var colors = [Theme.primaryContainer(Material.theme), Theme.secondaryContainer(Material.theme), Theme.tertiaryContainer(Material.theme)];
@@ -147,7 +147,7 @@ Item {
                 anchors.centerIn: parent
                 text: root.icon
                 font.family: Icons.familySolid
-                font.pixelSize: 20
+                font.pixelSize: AppScale.fs(18)
                 color: Theme.onPrimaryContainer(Material.theme)
             }
         }
@@ -163,7 +163,7 @@ Item {
 
             Text {
                 text: root.itemData // Folder name
-                font.pixelSize: 18
+                font.pixelSize: AppScale.fs(18)
                 font.weight: 600
                 color: Theme.onSurface(Material.theme)
                 Layout.fillWidth: true
@@ -180,7 +180,7 @@ Item {
                 Text {
                     id: percentageText
                     color: Theme.onSurfaceVariant(Material.theme)
-                    font.pixelSize: 14
+                    font.pixelSize: AppScale.fs(14)
                 }
             }
         }
@@ -188,8 +188,8 @@ Item {
         // Progress Indicator / Status
         Item {
             id: statusIndicatorContainer
-            width: 64
-            height: 64
+            width: 76
+            height: 76
             anchors.right: parent.right
             anchors.rightMargin: 28
             anchors.verticalCenter: parent.verticalCenter
@@ -206,24 +206,13 @@ Item {
                     color: Theme.primary(Material.theme)
                     backgroundColor: Theme.surfaceContainerHighest(Material.theme)
 
-                    Column {
+                    Text {
+                        id: progressText
+                        text: root.avgScore > 0 ? Math.round(root.avgScore) + "%" : "--"
+                        font.pixelSize: AppScale.fs(16)
+                        font.weight: Font.Bold
+                        color: Theme.onSurfaceVariant(Material.theme)
                         anchors.centerIn: parent
-                        Text {
-                            text: root.isFolder ? qsTr("Accuracy") : qsTr("Best result")
-                            font.pixelSize: 8
-                            font.weight: Font.Medium
-                            color: Theme.onSurfaceVariant(Material.theme)
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            horizontalAlignment: Text.AlignHCenter
-                        }
-                        Text {
-                            id: progressText
-                            text: root.avgScore > 0 ? Math.round(root.avgScore) + "%" : "--"
-                            font.pixelSize: 14
-                            font.weight: Font.Bold
-                            color: Theme.onSurfaceVariant(Material.theme)
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
                     }
                 }
             }
