@@ -35,6 +35,7 @@ class SettingsApi : public QObject {
     Q_PROPERTY(int vadMethod READ vadMethod WRITE setVadMethod NOTIFY vadMethodChanged)
     Q_PROPERTY(double vadThreshold READ vadThreshold WRITE setVadThreshold NOTIFY vadThresholdChanged)
     Q_PROPERTY(double autoCorrThreshold READ autoCorrThreshold WRITE setAutoCorrThreshold NOTIFY autoCorrThresholdChanged)
+    Q_PROPERTY(double autoCorrThresholdK READ autoCorrThresholdK WRITE setAutoCorrThresholdK NOTIFY autoCorrThresholdKChanged)
     Q_PROPERTY(double autoCorrMinF0 READ autoCorrMinF0 WRITE setAutoCorrMinF0 NOTIFY autoCorrMinF0Changed)
     Q_PROPERTY(double autoCorrMaxF0 READ autoCorrMaxF0 WRITE setAutoCorrMaxF0 NOTIFY autoCorrMaxF0Changed)
     Q_PROPERTY(QString algorithm READ algorithm WRITE setAlgorithm NOTIFY
@@ -233,6 +234,9 @@ public:
 
     double autoCorrThreshold() const;
     void setAutoCorrThreshold(double threshold);
+
+    double autoCorrThresholdK() const;
+    void setAutoCorrThresholdK(double thresholdK);
 
     double autoCorrMinF0() const;
     void setAutoCorrMinF0(double minF0);
@@ -439,6 +443,7 @@ signals:
     void vadMethodChanged();
     void vadThresholdChanged();
     void autoCorrThresholdChanged();
+    void autoCorrThresholdKChanged();
     void autoCorrMinF0Changed();
     void autoCorrMaxF0Changed();
     void algorithmChanged();

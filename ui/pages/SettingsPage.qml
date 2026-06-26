@@ -429,6 +429,32 @@ Page {
                         }
 
                         Label {
+                            text: qsTr("Autocorr. Threshold K:")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                        }
+
+                        TextField {
+                            id: autoCorrThresholdKField
+                            text: settingsApi ? settingsApi.autoCorrThresholdK.toFixed(2) : "1.00"
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.autoCorrThresholdK = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            enabled: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+
+                            Connections {
+                                target: settingsApi
+                                function onAutoCorrThresholdKChanged() {
+                                    if (!autoCorrThresholdKField.activeFocus)
+                                        autoCorrThresholdKField.text = settingsApi.autoCorrThresholdK.toFixed(2);
+                                }
+                            }
+                        }
+
+                        Label {
                             text: qsTr("Autocorr Min F0 (Hz)")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false

@@ -366,6 +366,25 @@ void SettingsApi::setAutoCorrThreshold(double threshold)
     LOG_DEBUG() << "Finish: setAutoCorrThreshold";
 }
 
+double SettingsApi::autoCorrThresholdK() const
+{
+    LOG_DEBUG() << "Start: autoCorrThresholdK";
+    double result = m_settings.autoCorrThresholdK;
+    LOG_DEBUG() << "Finish: autoCorrThresholdK - result=" << result;
+    return result;
+}
+
+void SettingsApi::setAutoCorrThresholdK(double thresholdK)
+{
+    LOG_DEBUG() << "Start: setAutoCorrThresholdK - thresholdK=" << thresholdK;
+    if (qAbs(m_settings.autoCorrThresholdK - thresholdK) >= 0.001) {
+        m_settings.autoCorrThresholdK = thresholdK;
+        save();
+        emit autoCorrThresholdKChanged();
+    }
+    LOG_DEBUG() << "Finish: setAutoCorrThresholdK";
+}
+
 double SettingsApi::autoCorrMinF0() const
 {
     LOG_DEBUG() << "Start: autoCorrMinF0";

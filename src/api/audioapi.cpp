@@ -490,9 +490,11 @@ void AudioApi::calibrateVadAutocorrelation()
         }
         double mean = sum / static_cast<double>(uValues.size());
         
-        // Use mean + 0.1 as the threshold (conservative estimate)
-        // Autocorrelation is [0, 1], so add a reasonable margin above background noise
-        threshold = mean + 0.1;
+// Load settings for the threshold multiplier
+    AppSettings settings = Settings::loadSettings();
+    // Use mean as the threshold (conservative estimate)
+    // Autocorrelation is [0, 1], so add a reasonable margin above background noise
+    threshold = mean * settings.autoCorrThresholdK;
         
         // Clamp to reasonable range [0.2, 0.6]
         if (threshold < 0.2) threshold = 0.2;

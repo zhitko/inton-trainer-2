@@ -47,6 +47,7 @@ Settings::loadSettings()
     settings.vadMethod = qsettings.value("vadMethod", 0).toInt();
     settings.vadThreshold = qsettings.value("vadThreshold", 10000.0).toDouble();
     settings.autoCorrThreshold = qsettings.value("autoCorrThreshold", 0.3).toDouble();
+    settings.autoCorrThresholdK = qsettings.value("autoCorrThresholdK", 1.0).toDouble();
     settings.autoCorrMinF0 = qsettings.value("autoCorrMinF0", 80.0).toDouble();
     settings.autoCorrMaxF0 = qsettings.value("autoCorrMaxF0", 200.0).toDouble();
     settings.minimumRecordLengthPercent = qsettings.value("minimumRecordLengthPercent", 1.0).toDouble();
@@ -163,6 +164,7 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("vadMethod", settings.vadMethod);
     qsettings.setValue("vadThreshold", settings.vadThreshold);
     qsettings.setValue("autoCorrThreshold", settings.autoCorrThreshold);
+    qsettings.setValue("autoCorrThresholdK", settings.autoCorrThresholdK);
     qsettings.setValue("autoCorrMinF0", settings.autoCorrMinF0);
     qsettings.setValue("autoCorrMaxF0", settings.autoCorrMaxF0);
     qsettings.setValue("minimumRecordLengthPercent", settings.minimumRecordLengthPercent);

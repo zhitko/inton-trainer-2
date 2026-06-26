@@ -40,6 +40,7 @@ struct AppSettings {
     int vadMethod = 0; // 0: energy, 1: autocorr, 2: hybrid
     double vadThreshold = 10000.0;
     double autoCorrThreshold = 0.3;
+    double autoCorrThresholdK = 1.0; // Multiplier for autocorrelation threshold during calibration
     double autoCorrMinF0 = 80.0;
     double autoCorrMaxF0 = 300.0;
     double autoCorrEnergyThreshold = 0.02; // Energy threshold for autocorrelation VAD
