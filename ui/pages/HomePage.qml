@@ -147,7 +147,34 @@ Page {
                 StartTrainingButton {
                     anchors.centerIn: parent
                     text: qsTr("Start Training")
-                    onClicked: stackView.push("TemplateCategoriesPage.qml")
+                    // If auto‑calibration is enabled, run the VAD calibration dialog first;
+                    // otherwise navigate directly to the template categories page.
+                    onClicked: {
+                        if (window.settingsApi && window.settingsApi.autoCalibrate) {
+                            homeVadCalibrationDialog.open();
+                        } else {
+                            stackView.push("TemplateCategoriesPage.qml");
+                        }
+                    }
+                }
+
+                // VAD calibration dialog – runs before entering training flow
+                VadCalibrationDialog {
+                    id: homeVadCalibrationDialog
+                    onCalibrationDoneEnergy: function(threshold) {
+                        if (window.settingsApi) {
+                            window.settingsApi.vadThreshold = threshold;
+                        }
+                        // After successful calibration, navigate to the template categories page
+                        stackView.push("TemplateCategoriesPage.qml");
+                    }
+                    onCalibrationDoneAutocorrelation: function(threshold) {
+                        if (window.settingsApi) {
+                            window.settingsApi.autoCorrThreshold = threshold;
+                        }
+                        // After successful calibration, navigate to the template categories page
+                        stackView.push("TemplateCategoriesPage.qml");
+                    }
                 }
             }
 

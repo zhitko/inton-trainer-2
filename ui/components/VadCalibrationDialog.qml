@@ -18,7 +18,8 @@ Dialog {
     id: root
 
     // Emitted when calibration finishes successfully.
-    signal calibrationDone(real threshold)
+    signal calibrationDoneEnergy(real threshold)
+    signal calibrationDoneAutocorrelation(real threshold)
 
     title: qsTr("VAD Calibration")
     modal: true
@@ -29,8 +30,12 @@ Dialog {
     // Internal AudioApi — callers do not need to provide one.
     AudioApi {
         id: _calibrationAudioApi
-        onCalibrationFinished: function(threshold) {
-            root.calibrationDone(threshold);
+        onCalibrationFinishedEnergy: function(threshold) {
+            root.calibrationDoneEnergy(threshold);
+            root.close();
+        }
+        onCalibrationFinishedAutocorrelation: function(threshold) {
+            root.calibrationDoneAutocorrelation(threshold);
             root.close();
         }
     }
@@ -67,6 +72,11 @@ Dialog {
     }
 
     onOpened: {
-        _calibrationAudioApi.calibrateVad();
+        const method = window.settingsApi ? window.settingsApi.vadMethod : 0;
+        if (method === 1) {  // 1: autocorr
+            _calibrationAudioApi.calibrateVadAutocorrelation();
+        } else {  // 0: energy, 2: hybrid (default to energy)
+            _calibrationAudioApi.calibrateVadEnergy();
+        }
     }
 }

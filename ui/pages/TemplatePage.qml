@@ -54,7 +54,6 @@ Page {
     property var userVadV:     []
     property var userVadCorr:  []
     property var userVadCorrU: []
-    property var userVadCorrV: []
 
     function updateColorScheme() {
         let scheme = window.settingsApi.specColorScheme;
@@ -973,19 +972,15 @@ Page {
                                     datasets.push(root.userVadCorr);
                                 if (window.settingsApi.showVadCorr && root.userVadCorrU.length > 0)
                                     datasets.push(root.userVadCorrU);
-                                if (window.settingsApi.showVadCorr && root.userVadCorrV.length > 0)
-                                    datasets.push(root.userVadCorrV);
                                 return datasets;
                             }
-                            showLegend: window.settingsApi.showVadCorr && (root.userVadCorr.length > 0 || root.userVadCorrU.length > 0 || root.userVadCorrV.length > 0)
+                            showLegend: window.settingsApi.showVadCorr && (root.userVadCorr.length > 0 || root.userVadCorrU.length > 0)
                             datasetLabels: {
                                 let labels = [];
                                 if (root.userVadCorr.length > 0)
                                     labels.push("R(n)");
                                 if (root.userVadCorrU.length > 0)
                                     labels.push("U(n)");
-                                if (root.userVadCorrV.length > 0)
-                                    labels.push("V(n)");
                                 return labels;
                             }
                             datasetColors: Theme.chartPalette(root.Material.theme).slice(0, datasetLabels.length)

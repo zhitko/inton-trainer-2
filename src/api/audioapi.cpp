@@ -122,11 +122,8 @@ QVariantList AudioApi::getVadCorrU() const
 
 QVariantList AudioApi::getVadCorrV() const
 {
-    QVariantList list;
-    const auto& savedV = m_vadAutocorrService->getSavedV();
-    for (int i = 0; i < static_cast<int>(savedV.size()); ++i)
-        list.append(QPointF(i, savedV[i]));
-    return list;
+    // V(n) is no longer calculated, return empty list
+    return QVariantList();
 }
 
 void AudioApi::setVadMethod(int method)
@@ -210,8 +207,9 @@ void AudioApi::startRecording(int durationSeconds, int minimumRecordLength)
         m_vadAutocorrService->setVoiceThresholdHigh(0.45);
         m_vadAutocorrService->setVoiceThresholdLow(0.35);
     }
-    // Less strict energy threshold - allows more speech through
-    m_vadAutocorrService->setEnergyThreshold(0.02);
+    // Use calibrated energy threshold from settings, fallback to default if not set
+    double energyThreshold = settings.autoCorrEnergyThreshold > 0 ? settings.autoCorrEnergyThreshold : 0.02;
+    m_vadAutocorrService->setEnergyThreshold(energyThreshold);
 
     if (m_voiceDetected) {
         m_voiceDetected = false;
@@ -241,16 +239,30 @@ void AudioApi::startRecording(int durationSeconds, int minimumRecordLength)
             std::vector<double> newVValues = m_vadService->processAudioSamples(samples, numSamples);
             std::vector<double> newCorrValues = m_vadAutocorrService->processAudioSamples(samples, numSamples);
             
-            // Process new V values for auto-stop if enabled
+            // Process new VAD frames for auto-stop if enabled
             if (m_autoStopEnabled) {
-                // They should produce same amount of frames as they use same FRAME_SIZE/HOP_SIZE
-                size_t numFrames = std::min(newVValues.size(), newCorrValues.size());
-                int validV = m_vadService->getValidVIndex();
-                int firstFrameIdx = validV - static_cast<int>(newVValues.size());
-                
-                for (size_t i = 0; i < numFrames; ++i) {
-                    // We might need to pass both values for hybrid mode
-                    processVadFrame(firstFrameIdx + i, newVValues[i], newCorrValues[i]);
+                const int validEnergyV = m_vadService->getValidVIndex();
+                const int validAutocorrU = m_vadAutocorrService->getValidUIndex();
+
+                if (m_vadMethod == 1) {
+                    // Autocorr only — U(n) is one stage earlier than energy V(n)
+                    const int firstFrame = validAutocorrU - static_cast<int>(newCorrValues.size());
+                    for (size_t i = 0; i < newCorrValues.size(); ++i) {
+                        processVadFrame(firstFrame + static_cast<int>(i), 0.0, newCorrValues[i]);
+                    }
+                } else if (m_vadMethod == 0) {
+                    const int firstFrame = validEnergyV - static_cast<int>(newVValues.size());
+                    for (size_t i = 0; i < newVValues.size(); ++i) {
+                        processVadFrame(firstFrame + static_cast<int>(i), newVValues[i], 0.0);
+                    }
+                } else {
+                    // Hybrid AND/OR — use energy frame index; U at same index is always ready
+                    const int firstFrame = validEnergyV - static_cast<int>(newVValues.size());
+                    for (size_t i = 0; i < newVValues.size(); ++i) {
+                        const int frameIdx = firstFrame + static_cast<int>(i);
+                        processVadFrame(frameIdx, newVValues[i],
+                                        m_vadAutocorrService->getU(frameIdx));
+                    }
                 }
             }
         }
@@ -330,7 +342,7 @@ void AudioApi::processVadFrame(int frameIndex, double V_n, double correlation)
     }
 }
 
-void AudioApi::calibrateVad()
+void AudioApi::calibrateVadEnergy()
 {
     LOG_DEBUG() << "Start: calibrateVad";
     if (m_isRecording) {
@@ -347,7 +359,7 @@ void AudioApi::calibrateVad()
     QIODevice* io = source->start();
     if (!io) {
         LOG_DEBUG() << "Finish: calibrateVad - Failed to open audio device";
-        emit calibrationFinished(50000.0);
+        emit calibrationFinishedEnergy(50000.0);
         return;
     }
 
@@ -358,15 +370,31 @@ void AudioApi::calibrateVad()
     stopTimer.setInterval(settings.vadCalibrationDurationMs);
 
     QEventLoop loop;
+    // Vector to collect frame energies (R0) for energy threshold calculation
+    std::vector<double> r0Values;
     connect(&stopTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
-    connect(io, &QIODevice::readyRead, this, [this, io, calibrationService = calibrationService.get(), fmt]() {
+    connect(io, &QIODevice::readyRead, this, [this, io, calibrationService = calibrationService.get(), fmt, &r0Values]() {
         QByteArray data = io->readAll();
         qint64 numSamples = data.size() / fmt.bytesPerSample();
         if (numSamples > 0) {
             const auto samples = reinterpret_cast<const qint16*>(data.constData());
             // Process audio samples through calibration service
             calibrationService->processAudioSamples(samples, numSamples);
+            
+            // Also collect frame energies (R0) for energy threshold calculation
+            // Process the same samples to compute frame energies
+            const int frameSize = 256; // FRAME_SIZE from vadautocorrelationservice.cpp
+            const int hopSize = 64;    // HOP_SIZE from vadautocorrelationservice.cpp
+            
+            for (int i = 0; i + frameSize <= numSamples; i += hopSize) {
+                double r0 = 0.0;
+                for (int j = 0; j < frameSize; ++j) {
+                    double sample = static_cast<double>(samples[i + j]) / 32768.0;
+                    r0 += sample * sample;
+                }
+                r0Values.push_back(r0);
+            }
         }
     });
 
@@ -381,8 +409,143 @@ void AudioApi::calibrateVad()
     
     LOG_DEBUG() << "Calibration done: threshold=" << threshold
                 << " (from" << vValues.size() << "frames)";
-    emit calibrationFinished(threshold);
+    emit calibrationFinishedEnergy(threshold);
     LOG_DEBUG() << "Finish: calibrateVad";
+}
+
+void AudioApi::calibrateVadAutocorrelation()
+{
+    LOG_DEBUG() << "Start: calibrateVadAutocorrelation";
+    if (m_isRecording) {
+        LOG_DEBUG() << "Finish: calibrateVadAutocorrelation - Already recording, skipping";
+        return;
+    }
+
+    // Create a temporary VAD autocorrelation service for calibration
+    auto calibrationService = std::make_unique<VADAutocorrelationService>(nullptr);
+
+    QAudioFormat fmt = m_format;
+    auto source = std::unique_ptr<QAudioSource>(new QAudioSource(m_audioDevice, fmt, this));
+    QIODevice* io = source->start();
+    if (!io) {
+        LOG_DEBUG() << "Finish: calibrateVadAutocorrelation - Failed to open audio device";
+        emit calibrationFinishedAutocorrelation(0.4);  // Default fallback threshold for autocorrelation
+        return;
+    }
+
+    // Record for 2 seconds synchronously using a local event loop
+    AppSettings settings = Settings::loadSettings();
+    QTimer stopTimer;
+    stopTimer.setSingleShot(true);
+    stopTimer.setInterval(settings.vadCalibrationDurationMs);
+
+    QEventLoop loop;
+    // Vector to collect frame energies (R0) for energy threshold calculation
+    std::vector<double> r0Values;
+    connect(&stopTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+
+    // Configure service with settings
+    calibrationService->setSampleRate(fmt.sampleRate());
+    calibrationService->setPitchRange(settings.autoCorrMinF0, settings.autoCorrMaxF0);
+
+    connect(io, &QIODevice::readyRead, this, [this, io, calibrationService = calibrationService.get(), fmt, &r0Values]() {
+        QByteArray data = io->readAll();
+        qint64 numSamples = data.size() / fmt.bytesPerSample();
+        if (numSamples > 0) {
+            const auto samples = reinterpret_cast<const qint16*>(data.constData());
+            // Process audio samples through calibration service
+            calibrationService->processAudioSamples(samples, numSamples);
+            
+            // Also collect frame energies (R0) for energy threshold calculation
+            // Process the same samples to compute frame energies
+            const int frameSize = 256; // FRAME_SIZE from vadautocorrelationservice.cpp
+            const int hopSize = 64;    // HOP_SIZE from vadautocorrelationservice.cpp
+            
+            for (int i = 0; i + frameSize <= numSamples; i += hopSize) {
+                double r0 = 0.0;
+                for (int j = 0; j < frameSize; ++j) {
+                    double sample = static_cast<double>(samples[i + j]) / 32768.0;
+                    r0 += sample * sample;
+                }
+                r0Values.push_back(r0);
+            }
+        }
+    });
+
+    stopTimer.start();
+    loop.exec();
+
+    source->stop();
+
+    // Get U(n) values and calculate threshold
+    calibrationService->updateSavedMetrics();
+    const auto& uValues = calibrationService->getSavedU();
+    
+    double threshold = 0.4;  // Default threshold for autocorrelation [0..1]
+    if (!uValues.empty()) {
+        // Calculate mean of U(n) values (silence/background noise autocorrelation)
+        double sum = 0.0;
+        for (double val : uValues) {
+            sum += val;
+        }
+        double mean = sum / static_cast<double>(uValues.size());
+        
+        // Use mean + 0.1 as the threshold (conservative estimate)
+        // Autocorrelation is [0, 1], so add a reasonable margin above background noise
+        threshold = mean + 0.1;
+        
+        // Clamp to reasonable range [0.2, 0.6]
+        if (threshold < 0.2) threshold = 0.2;
+        if (threshold > 0.6) threshold = 0.6;
+        
+        LOG_DEBUG() << "Autocorrelation calibration:"
+                    << "mean U(n)=" << QString::number(mean, 'f', 4)
+                    << " threshold=" << QString::number(threshold, 'f', 4)
+                    << " (from" << uValues.size() << "frames)";
+    } else {
+        LOG_DEBUG() << "Autocorrelation calibration: no U(n) values collected, using default threshold";
+    }
+
+    // Calculate energy threshold from collected R0 values
+    double energyThreshold = 0.0001;  // Default energy threshold
+    if (!r0Values.empty()) {
+        // Calculate mean of R0 values (frame energies)
+        double sumR0 = 0.0;
+        for (double val : r0Values) {
+            sumR0 += val;
+        }
+        double meanR0 = sumR0 / static_cast<double>(r0Values.size());
+        
+        // Use mean + 3*stddev as threshold for energy (similar to energy VAD calibration)
+        double sumSqDiff = 0.0;
+        for (double val : r0Values) {
+            double diff = val - meanR0;
+            sumSqDiff += diff * diff;
+        }
+        double stddevR0 = std::sqrt(sumSqDiff / static_cast<double>(r0Values.size()));
+        energyThreshold = meanR0 + 3.0 * stddevR0;
+        
+        // Clamp to reasonable range [0.0001, 0.1]
+        if (energyThreshold < 0.0001) energyThreshold = 0.0001;
+        if (energyThreshold > 0.1) energyThreshold = 0.1;
+        
+        LOG_DEBUG() << "Energy threshold from R0 values:"
+                    << "mean R0=" << QString::number(meanR0, 'f', 6)
+                    << " stddev R0=" << QString::number(stddevR0, 'f', 6)
+                    << " energyThreshold=" << QString::number(energyThreshold, 'f', 6)
+                    << " (from" << r0Values.size() << "frames)";
+    } else {
+        LOG_DEBUG() << "No R0 values collected for energy threshold, using default: " << energyThreshold;
+    }
+
+    // Save the energy threshold to settings for use in future recordings
+    AppSettings currentSettings = Settings::loadSettings();
+    currentSettings.autoCorrEnergyThreshold = energyThreshold;
+    Settings::saveSettings(currentSettings);
+    LOG_DEBUG() << "Saved autoCorrEnergyThreshold to settings: " << energyThreshold;
+
+    emit calibrationFinishedAutocorrelation(threshold);
+    LOG_DEBUG() << "Finish: calibrateVadAutocorrelation";
 }
 
 void AudioApi::stopRecording(bool isAutoStop)
@@ -394,9 +557,9 @@ void AudioApi::stopRecording(bool isAutoStop)
     }
 
     if (m_minimumRecordLength > 0) {
-        int currentSamples = m_buffer.size() / m_format.bytesPerSample();
+        int currentSamples = m_buffer.size() / m_format.bytesPerSample() + 2 * ((PRE_BUFFER_MS * m_format.sampleRate()) / 1000);
         int effectiveLength = currentSamples;
-        
+
         // If auto-stop is enabled and voice was detected, use speech length instead of total buffer
         // to account for recorded silence at the end
         if (m_autoStopEnabled && m_voiceDetected && m_firstSpeechFrame >= 0 && m_lastSpeechFrame >= 0) {

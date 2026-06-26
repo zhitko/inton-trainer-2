@@ -7,14 +7,12 @@
 
 /**
  * VADAutocorrelationService — Voice Activity Detection via NACF
- * with a two-stage smoothing pipeline identical in structure to VADEnergyService:
+ * with a single-stage smoothing pipeline:
  *
  *   C(n) — raw max Normalized Autocorrelation Function per frame  [0..1]
  *   U(n) — smoothed mean of C  over window [n-K+1 .. n+K-1]
- *   H(n) — |C(n) - U(n)|        deviation from local mean
- *   V(n) — smoothed mean of H  over the same window
  *
- * VAD decisions are taken exclusively on V(n) with hysteresis.
+ * VAD decisions are taken directly on U(n) with hysteresis.
  *
  * Uses F0 bounds in Hz from settings and converts them to lag indices:
  *   lag = sampleRate / frequency
@@ -44,32 +42,32 @@ public:
      * Process audio samples incrementally.
      * @param samples    raw int16 audio
      * @param numSamples number of samples
-     * @return newly computed V(n) values (empty if not enough data yet)
+     * @return newly computed U(n) values (empty if not enough data yet)
      */
     std::vector<double> processAudioSamples(const qint16* samples, qint64 numSamples);
 
     // ------------------------------------------------------------------ //
-    //  Speech detection — based exclusively on V(n)
+    //  Speech detection — based on U(n)
     // ------------------------------------------------------------------ //
 
     /**
-     * VAD decision on smoothed V(n) with hysteresis.
-     * ON  when V > voiceThresholdHigh
-     * OFF when V < voiceThresholdLow
-     * @param V_n          smoothed deviation value
+     * VAD decision on smoothed U(n) with hysteresis.
+     * ON  when U > voiceThresholdHigh
+     * OFF when U < voiceThresholdLow
+     * @param U_n          smoothed mean autocorrelation value
      * @param currentState current VAD state (true = speech)
      */
-    bool isSpeech(double V_n, bool currentState = false) const;
+    bool isSpeech(double U_n, bool currentState = false) const;
 
     // ------------------------------------------------------------------ //
     //  Threshold setters
     // ------------------------------------------------------------------ //
 
-    /** Hysteresis ON  threshold for V(n). Default 0.05. */
-    void setVoiceThresholdHigh(double t) { m_voiceThresholdVHigh = t; }
+    /** Hysteresis ON  threshold for U(n). Default 0.45. */
+    void setVoiceThresholdHigh(double t) { m_voiceThresholdUHigh = t; }
 
-    /** Hysteresis OFF threshold for V(n). Default 0.03. */
-    void setVoiceThresholdLow(double t)  { m_voiceThresholdVLow  = t; }
+    /** Hysteresis OFF threshold for U(n). Default 0.35. */
+    void setVoiceThresholdLow(double t)  { m_voiceThresholdULow  = t; }
 
     /**
      * Minimum frame energy (R0 after Hamming) below which C(n) is forced to 0.
@@ -106,21 +104,17 @@ public:
     /** First-pass smoothed mean U(n) from the last recording. */
     const std::vector<double>& getSavedU() const { return m_savedU; }
 
-    /** Second-pass smoothed deviation V(n) from the last recording. */
-    const std::vector<double>& getSavedV() const { return m_savedV; }
-
     /** Legacy alias for getSavedC(). */
     const std::vector<double>& getSavedCorrelations() const { return m_savedC; }
 
-    // ------------------------------------------------------------------ //
-    //  Streaming / incremental access
-    // ------------------------------------------------------------------ //
+    /** Index of the next frame to be folded into U (mirrors VADEnergyService::getValidVIndex). */
+    int getValidUIndex() const { return m_valid_U; }
 
-    /**
-     * Returns V(n) values computed since the last call.
-     * Does NOT drain m_V — updateSavedMetrics() remains unaffected.
-     */
-    std::vector<double> getAndClearRecentVValues();
+    /** Smoothed U(n) at frame index, or 0 if not yet computed. */
+    double getU(int frameIndex) const {
+        if (frameIndex < 0 || frameIndex >= m_valid_U) return 0.0;
+        return m_U[static_cast<std::size_t>(frameIndex)];
+    }
 
 private:
     void   applyHammingWindow(std::vector<double>& frame);
@@ -132,8 +126,8 @@ private:
     static constexpr int HOP_SIZE   = 64;     // ~8 ms  at 8 kHz (50% overlap)
     static constexpr int K_FRAMES   = 16;     // smoothing half-window (matches VADEnergyService)
 
-    static constexpr double DEFAULT_VOICE_THRESHOLD_V_HIGH = 0.05;
-    static constexpr double DEFAULT_VOICE_THRESHOLD_V_LOW  = 0.03;
+    static constexpr double DEFAULT_VOICE_THRESHOLD_U_HIGH = 0.45;
+    static constexpr double DEFAULT_VOICE_THRESHOLD_U_LOW  = 0.35;
 
     // Intentionally low: 0.005 (old default) gates out quiet Windows mic input entirely.
     static constexpr double DEFAULT_ENERGY_THRESHOLD = 0.0001;
@@ -145,21 +139,17 @@ private:
     std::vector<double> m_C;
     std::vector<double> m_U;
     std::vector<double> m_H;
-    std::vector<double> m_V;
 
     // --- Saved snapshots ---
     std::vector<double> m_savedC;
     std::vector<double> m_savedU;
-    std::vector<double> m_savedV;
 
     // --- Incremental cursors (same pattern as VADEnergyService) ---
-    int         m_valid_U      = 0;  // next C index to be folded into U/H
-    int         m_valid_V      = 0;  // next H index to be folded into V
-    std::size_t m_recentOffset = 0;  // start of unreturned slice in m_V
+    int m_valid_U = 0;  // next C index to be folded into U/H
 
     // --- Thresholds ---
-    double m_voiceThresholdVHigh = DEFAULT_VOICE_THRESHOLD_V_HIGH;
-    double m_voiceThresholdVLow  = DEFAULT_VOICE_THRESHOLD_V_LOW;
+    double m_voiceThresholdUHigh = DEFAULT_VOICE_THRESHOLD_U_HIGH;
+    double m_voiceThresholdULow  = DEFAULT_VOICE_THRESHOLD_U_LOW;
     double m_energyThreshold     = DEFAULT_ENERGY_THRESHOLD;
 
     // --- VAD state ---

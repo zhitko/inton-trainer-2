@@ -21,9 +21,14 @@ Page {
     // VAD Calibration dialog (extracted component)
     VadCalibrationDialog {
         id: vadCalibrationDialog
-        onCalibrationDone: function (threshold) {
+        onCalibrationDoneEnergy: function (threshold) {
             if (settingsApi) {
                 settingsApi.vadThreshold = threshold;
+            }
+        }
+        onCalibrationDoneAutocorrelation: function (threshold) {
+            if (settingsApi) {
+                settingsApi.autoCorrThreshold = threshold;
             }
         }
     }
@@ -472,6 +477,44 @@ Page {
                                     if (!autoCorrMaxF0Field.activeFocus)
                                         autoCorrMaxF0Field.text = settingsApi.autoCorrMaxF0.toFixed(0);
                                 }
+                            }
+                        }
+
+                        Button {
+                            id: calibrateAutoCorrBtn
+                            text: qsTr("Calibrate")
+                            Layout.columnSpan: 2
+                            Layout.fillWidth: true
+                            enabled: settingsApi ? settingsApi.autoStopRecording : false
+
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Measure background noise for 2 seconds to set optimal threshold")
+
+                            onClicked: vadCalibrationDialog.open()
+                            visible: settingsApi ? (settingsApi.vadMethod === 1) : true
+
+                            background: Rectangle {
+                                radius: 8
+                                gradient: Gradient {
+                                    GradientStop {
+                                        position: 0.0
+                                        color: calibrateAutoCorrBtn.hovered ? Qt.lighter(Theme.primary(Material.theme), 1.1) : Theme.primary(Material.theme)
+                                    }
+                                    GradientStop {
+                                        position: 1.0
+                                        color: calibrateAutoCorrBtn.hovered ? Theme.primary(Material.theme) : Qt.darker(Theme.primary(Material.theme), 1.15)
+                                    }
+                                }
+                                opacity: calibrateAutoCorrBtn.enabled ? 1.0 : 0.4
+                            }
+
+                            contentItem: Text {
+                                text: calibrateAutoCorrBtn.text
+                                color: Theme.onPrimary(Material.theme)
+                                font.pixelSize: AppScale.fs(13)
+                                font.weight: 600
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
                             }
                         }
 

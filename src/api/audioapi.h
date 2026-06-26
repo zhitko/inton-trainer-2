@@ -2,9 +2,9 @@
 #define AUDIOAPI_H
 
 #include "src/services/helpers/wavFile.h"
-#include "src/services/wavfileservice.h"
-#include "src/services/vadenergryservice.h"
 #include "src/services/vadautocorrelationservice.h"
+#include "src/services/vadenergryservice.h"
+#include "src/services/wavfileservice.h"
 #include <QAudioFormat>
 #include <QAudioSource>
 #include <QMediaDevices>
@@ -137,10 +137,19 @@ public slots:
 
     /**
      * Records 2 seconds of silence and calculates the VAD threshold (Pe)
-     * based on the background noise level. Emits calibrationFinished(threshold)
+     * based on the background noise level. Emits calibrationFinishedEnergy(threshold)
      * when done.
      */
-    Q_INVOKABLE void calibrateVad();
+    // Calibrate VAD using energy-based method.
+    Q_INVOKABLE void calibrateVadEnergy();
+
+    /**
+     * Records 2 seconds of silence and calculates the autocorrelation VAD threshold
+     * based on the background noise level. Emits calibrationFinishedAutocorrelation(threshold)
+     * when done. The threshold represents the autocorrelation value (0-1 range)
+     * above which speech is detected.
+     */
+    Q_INVOKABLE void calibrateVadAutocorrelation();
 
 signals:
     /**
@@ -162,10 +171,15 @@ signals:
     void isVoiceDetectedChanged();
     void vadMethodChanged();
     /**
-     * Emitted when VAD calibration completes. The parameter is the computed
+     * Emitted when VAD energy calibration completes. The parameter is the computed
      * threshold value that should be saved in settings.
      */
-    void calibrationFinished(double threshold);
+    void calibrationFinishedEnergy(double threshold);
+    /**
+     * Emitted when VAD autocorrelation calibration completes. The parameter is the computed
+     * threshold value that should be saved in settings.
+     */
+    void calibrationFinishedAutocorrelation(double threshold);
 
 private:
     /**
@@ -194,7 +208,7 @@ private:
     bool m_autoStopEnabled = false;
     int m_silenceDurationMs = 2000;
     bool m_voiceDetected = false;
-    static constexpr int PRE_BUFFER_MS = 250; // Pre/post buffer duration in ms
+    static constexpr int PRE_BUFFER_MS = 300; // Pre/post buffer duration in ms
 
     // VAD services
     std::unique_ptr<VADEnergyService> m_vadService;
