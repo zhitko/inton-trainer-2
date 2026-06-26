@@ -29,7 +29,7 @@ QtObject {
     // Scale a font pixel size (minimum 8 px to stay legible).
     // Applies both the layout scale factor AND the user font size multiplier.
     function fs(pixelSize) {
-        return Math.max(8, Math.round(pixelSize * factor * fontScale))
+        return Math.max(8, Math.round(pixelSize * fontScale))
     }
 
     // Legacy alias kept for backward compat (layout scale only, no font scale)
