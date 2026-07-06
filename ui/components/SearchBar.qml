@@ -34,7 +34,7 @@ Rectangle {
         Text {
             text: Icons.faMagnifyingGlass
             font.family: Icons.familySolid
-            font.weight: Icons.fontSolid.weight
+            font.weight: Font.Black
             font.pixelSize: AppScale.fs(24)
             color: Theme.onSurfaceVariant(Material.theme)
             Layout.alignment: Qt.AlignVCenter

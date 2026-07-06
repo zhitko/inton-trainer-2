@@ -15,7 +15,7 @@ Button {
     contentItem: Text {
         text: control.iconText
         font.family: Icons.familySolid
-        font.weight: Icons.fontSolid.weight
+        font.weight: Font.Black
         font.pixelSize: AppScale.fs(24)
         color: control.primary ? Theme.onPrimary(Material.theme) : Theme.onSurface(Material.theme)
         horizontalAlignment: Text.AlignHCenter

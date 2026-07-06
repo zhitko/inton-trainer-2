@@ -4,8 +4,45 @@ project(inton-trainer-2 VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Quick Multimedia LinguistTools)
-find_package(OpenMP REQUIRED)
+find_package(Qt6 6.11 REQUIRED COMPONENTS Quick Multimedia LinguistTools)
+
+# ---------------------------------------------------------------------------
+# OpenMP: on Android the NDK ships libomp (clang runtime) but CMake's
+# FindOpenMP won't discover it automatically when cross-compiling.
+# We locate it manually and create a thin imported target that wraps it.
+# ---------------------------------------------------------------------------
+if(ANDROID)
+    # Use CMAKE_ANDROID_ARCH_ABI to find the correct libomp for the target architecture
+    find_library(OMP_LIBRARY
+        NAMES omp
+        PATHS "${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/*/lib/linux/${CMAKE_ANDROID_ARCH_ABI_TRIPLET}"
+        NO_DEFAULT_PATH
+    )
+    if(NOT OMP_LIBRARY)
+        # Fallback: try with ANDROID_ABI
+        find_library(OMP_LIBRARY
+            NAMES omp
+            PATHS "${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/*/lib/linux/${ANDROID_ABI}"
+            NO_DEFAULT_PATH
+        )
+    endif()
+    if(NOT OMP_LIBRARY)
+        message(WARNING
+            "libomp not found in NDK. OpenMP support will be disabled on Android. "
+            "Set OMP_LIBRARY manually to the path of libomp.so for your ABI."
+        )
+        set(ANDROID_OMP_FLAGS "")
+    else()
+        message(STATUS "Android OpenMP library: ${OMP_LIBRARY}")
+        set(ANDROID_OMP_FLAGS "-fopenmp")
+        add_library(AndroidOMP SHARED IMPORTED)
+        set_target_properties(AndroidOMP PROPERTIES
+            IMPORTED_LOCATION "${OMP_LIBRARY}"
+        )
+    endif()
+else()
+    find_package(OpenMP REQUIRED)
+endif()
 
 qt_standard_project_setup(REQUIRES 6.8 I18N_TRANSLATED_LANGUAGES en ru)
 
@@ -63,25 +100,45 @@ target_include_directories(appinton-trainer-2 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/alglib-cpp/src
 )
 
-target_sources(appinton-trainer-2 PRIVATE
-    3rdparty/alglib-cpp/src/alglibinternal.cpp
-    3rdparty/alglib-cpp/src/alglibmisc.cpp
-    3rdparty/alglib-cpp/src/ap.cpp
-    3rdparty/alglib-cpp/src/dataanalysis.cpp
-    3rdparty/alglib-cpp/src/diffequations.cpp
-    3rdparty/alglib-cpp/src/fasttransforms.cpp
-    3rdparty/alglib-cpp/src/integration.cpp
-    3rdparty/alglib-cpp/src/interpolation.cpp
-    3rdparty/alglib-cpp/src/kernels_avx2.cpp
-    3rdparty/alglib-cpp/src/kernels_fma.cpp
-    3rdparty/alglib-cpp/src/kernels_sse2.cpp
-    3rdparty/alglib-cpp/src/linalg.cpp
-    3rdparty/alglib-cpp/src/minlp.cpp
-    3rdparty/alglib-cpp/src/optimization.cpp
-    3rdparty/alglib-cpp/src/solvers.cpp
-    3rdparty/alglib-cpp/src/specialfunctions.cpp
-    3rdparty/alglib-cpp/src/statistics.cpp
-)
+# alglib: AVX2/FMA/SSE2 kernels are x86-only; skip them on ARM Android
+if(ANDROID)
+    target_sources(appinton-trainer-2 PRIVATE
+        3rdparty/alglib-cpp/src/alglibinternal.cpp
+        3rdparty/alglib-cpp/src/alglibmisc.cpp
+        3rdparty/alglib-cpp/src/ap.cpp
+        3rdparty/alglib-cpp/src/dataanalysis.cpp
+        3rdparty/alglib-cpp/src/diffequations.cpp
+        3rdparty/alglib-cpp/src/fasttransforms.cpp
+        3rdparty/alglib-cpp/src/integration.cpp
+        3rdparty/alglib-cpp/src/interpolation.cpp
+        3rdparty/alglib-cpp/src/linalg.cpp
+        3rdparty/alglib-cpp/src/minlp.cpp
+        3rdparty/alglib-cpp/src/optimization.cpp
+        3rdparty/alglib-cpp/src/solvers.cpp
+        3rdparty/alglib-cpp/src/specialfunctions.cpp
+        3rdparty/alglib-cpp/src/statistics.cpp
+    )
+else()
+    target_sources(appinton-trainer-2 PRIVATE
+        3rdparty/alglib-cpp/src/alglibinternal.cpp
+        3rdparty/alglib-cpp/src/alglibmisc.cpp
+        3rdparty/alglib-cpp/src/ap.cpp
+        3rdparty/alglib-cpp/src/dataanalysis.cpp
+        3rdparty/alglib-cpp/src/diffequations.cpp
+        3rdparty/alglib-cpp/src/fasttransforms.cpp
+        3rdparty/alglib-cpp/src/integration.cpp
+        3rdparty/alglib-cpp/src/interpolation.cpp
+        3rdparty/alglib-cpp/src/kernels_avx2.cpp
+        3rdparty/alglib-cpp/src/kernels_fma.cpp
+        3rdparty/alglib-cpp/src/kernels_sse2.cpp
+        3rdparty/alglib-cpp/src/linalg.cpp
+        3rdparty/alglib-cpp/src/minlp.cpp
+        3rdparty/alglib-cpp/src/optimization.cpp
+        3rdparty/alglib-cpp/src/solvers.cpp
+        3rdparty/alglib-cpp/src/specialfunctions.cpp
+        3rdparty/alglib-cpp/src/statistics.cpp
+    )
+endif()
 
 set(SPTK_BUILD_COMMANDS OFF CACHE BOOL "Build SPTK commands" FORCE)
 add_subdirectory(3rdparty/SPTK)
@@ -156,9 +213,36 @@ set_target_properties(appinton-trainer-2 PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-target_link_libraries(appinton-trainer-2
-    PRIVATE Qt6::Quick Qt6::Multimedia sptk OpenMP::OpenMP_CXX
-)
+if(ANDROID)
+    set_target_properties(appinton-trainer-2 PROPERTIES
+        QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
+        QT_ANDROID_TARGET_SDK_VERSION 35
+        QT_ANDROID_MIN_SDK_VERSION 26
+        QT_ANDROID_VERSION_CODE 1
+        QT_ANDROID_VERSION_NAME "0.1"
+        # App name shown on launcher
+        QT_ANDROID_APP_NAME "Intonation Trainer"
+        # Package identifier
+        QT_ANDROID_PACKAGE_NAME "by.intontrainer"
+    )
+endif()
+
+if(ANDROID)
+    if(TARGET AndroidOMP)
+        target_compile_options(appinton-trainer-2 PRIVATE ${ANDROID_OMP_FLAGS})
+        target_link_libraries(appinton-trainer-2
+            PRIVATE Qt6::Quick Qt6::Multimedia sptk AndroidOMP
+        )
+    else()
+        target_link_libraries(appinton-trainer-2
+            PRIVATE Qt6::Quick Qt6::Multimedia sptk
+        )
+    endif()
+else()
+    target_link_libraries(appinton-trainer-2
+        PRIVATE Qt6::Quick Qt6::Multimedia sptk OpenMP::OpenMP_CXX
+    )
+endif()
 
 include(GNUInstallDirs)
 install(TARGETS appinton-trainer-2

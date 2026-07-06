@@ -32,6 +32,7 @@ RowLayout {
             Text {
                 text: Icons.faTrash
                 font.family: Icons.familySolid
+                font.weight: Font.Black
                 font.bold: true
                 font.pixelSize: AppScale.fs(16)
                 color: Theme.onError(Material.theme)

@@ -78,6 +78,7 @@ Item {
                 anchors.centerIn: parent
                 text: Icons.faMicrophoneLines
                 font.family: Icons.familySolid
+                font.weight: Font.Black
                 font.bold: true
                 font.pixelSize: AppScale.fs(20)
                 color: Theme.onPrimaryContainer(Material.theme)
@@ -112,6 +113,7 @@ Item {
                 Text {
                     text: Icons.faMusic
                     font.family: Icons.familySolid
+                    font.weight: Font.Black
                     font.pixelSize: AppScale.fs(12)
                     color: Theme.onSurfaceVariant(Material.theme)
                 }

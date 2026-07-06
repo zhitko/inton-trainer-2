@@ -147,6 +147,7 @@ Item {
                 anchors.centerIn: parent
                 text: root.icon
                 font.family: Icons.familySolid
+                font.weight: Font.Black
                 font.pixelSize: AppScale.fs(18)
                 color: Theme.onPrimaryContainer(Material.theme)
             }
@@ -175,6 +176,7 @@ Item {
                 Text {
                     text: Icons.faSquareCheck
                     font.family: Icons.familySolid
+                    font.weight: Font.Black
                     color: Theme.onSurfaceVariant(Material.theme)
                 }
                 Text {

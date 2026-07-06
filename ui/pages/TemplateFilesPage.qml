@@ -210,6 +210,7 @@ Page {
                                 id: chevronIcon
                                 text: Icons.faChevronRight
                                 font.family: Icons.familySolid
+                                font.weight: Font.Black
                                 font.pixelSize: AppScale.fs(14)
                                 color: Theme.onSurfaceVariant(Material.theme)
                                 opacity: 0.7

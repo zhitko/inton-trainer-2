@@ -79,7 +79,7 @@ ColumnLayout {
                 anchors.centerIn: parent
                 text: root.isRecording ? Icons.faStop : Icons.faMicrophone
                 font.family: Icons.familySolid
-                font.weight: Icons.fontSolid.weight
+                font.weight: Font.Black
                 font.pixelSize: AppScale.fs(28)
                 color: Theme.onError(Material.theme)
             }

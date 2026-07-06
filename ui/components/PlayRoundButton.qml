@@ -27,7 +27,7 @@ ColumnLayout {
         Layout.preferredWidth: 56
         Layout.preferredHeight: 56
         font.family: Icons.familySolid
-        font.weight: Icons.fontSolid.weight
+        font.weight: Font.Black
         text: root.isPlaying ? Icons.faStop : root.icon
         font.pixelSize: AppScale.fs(20)
         Material.background: root.isPlaying ? Theme.errorContainer(Material.theme) : Theme.primaryContainer(Material.theme)

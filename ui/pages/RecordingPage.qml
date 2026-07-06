@@ -41,6 +41,7 @@ Page {
 
         background: Label {
             font.family: Icons.familySolid
+            font.weight: Font.Black
             font.bold: true
             text: audioApi.isRecording ? Icons.faMicrophoneLines : Icons.faMicrophone
             color: audioApi.isRecording ? Theme.error(Material.theme) : Theme.onSurface(Material.theme)

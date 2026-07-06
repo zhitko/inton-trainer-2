@@ -94,8 +94,8 @@ ApplicationWindow {
 
                 ToolButton {
                     id: menuButton
-                    font.family: Icons.familyRegular
-                    font.weight: Icons.fontRegular.weight
+                    font.family: Icons.familySolid
+                    font.weight: Font.Black
                     text: Icons.faBars
                     font.pixelSize: AppScale.fs(20)
                     onClicked: drawer.open()
@@ -136,7 +136,7 @@ ApplicationWindow {
                 ToolButton {
                     id: backButton
                     font.family: Icons.familySolid
-                    font.weight: Icons.fontSolid.weight
+                    font.weight: Font.Black
                     text: Icons.faArrowLeft
                     font.pixelSize: AppScale.fs(20)
                     onClicked: stackView.pop()
@@ -198,7 +198,7 @@ ApplicationWindow {
                             Text {
                                 anchors.centerIn: parent
                                 font.family: Icons.familySolid
-                                font.weight: Icons.fontSolid.weight
+                                font.weight: Font.Black
                                 font.pixelSize: AppScale.fs(20)
                                 text: Icons.faHome
                                 color: stackView.depth <= 1 ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
@@ -244,7 +244,7 @@ ApplicationWindow {
                             Text {
                                 anchors.centerIn: parent
                                 font.family: Icons.familySolid
-                                font.weight: Icons.fontSolid.weight
+                                font.weight: Font.Black
                                 font.pixelSize: AppScale.fs(20)
                                 text: Icons.faSliders
                                 color: Theme.onPrimaryContainer(Material.theme)
@@ -290,7 +290,7 @@ ApplicationWindow {
                             Text {
                                 anchors.centerIn: parent
                                 font.family: Icons.familySolid
-                                font.weight: Icons.fontSolid.weight
+                                font.weight: Font.Black
                                 font.pixelSize: AppScale.fs(20)
                                 text: Icons.faGear
                                 color: stackView.currentItem && stackView.currentItem.title === qsTr("Settings") ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurfaceVariant(Material.theme)
@@ -410,7 +410,7 @@ ApplicationWindow {
                             spacing: 12
                             Text {
                                 font.family: Icons.familySolid
-                                font.weight: Icons.fontSolid.weight
+                                font.weight: Font.Black
                                 text: modelData.icon
                                 font.pixelSize: AppScale.fs(18)
                                 font.bold: true
@@ -456,7 +456,7 @@ ApplicationWindow {
                         spacing: 12
                         Text {
                             font.family: Icons.familySolid
-                            font.weight: Icons.fontSolid.weight
+                            font.weight: Font.Black
                             text: Icons.faSliders
                             font.pixelSize: AppScale.fs(18)
                             font.bold: true

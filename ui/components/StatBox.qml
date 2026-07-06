@@ -35,7 +35,8 @@ Rectangle {
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: root.icon
-            font.family: root.iconFamily
+            font.family: Icons.familySolid
+            font.weight: Font.Black
             font.pixelSize: AppScale.fs(22)
             color: Theme.primary(Material.theme)
         }

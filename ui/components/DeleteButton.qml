@@ -27,6 +27,7 @@ RoundButton {
             id: label
             anchors.centerIn: parent
             font.family: Icons.familySolid
+            font.weight: Font.Black
             font.bold: true
             text: Icons.faTrash
             font.pixelSize: (parent.width / 2) + (control.hovered ? 4 : 0)

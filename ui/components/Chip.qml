@@ -81,6 +81,7 @@ Rectangle {
             visible: chip.deletable
             text: Icons.faXmark
             font.family: Icons.familySolid
+            font.weight: Font.Black
             font.pixelSize: AppScale.fs(14)
             color: selected ? Theme.onSecondaryContainer(Material.theme) : Theme.onSurface(Material.theme)
             Layout.alignment: Qt.AlignVCenter
