@@ -244,6 +244,20 @@ else()
     )
 endif()
 
+# Copy runtime resources to build directory so settings.ini and data/ are
+# available next to the built executable. This runs at build time.
+add_custom_target(copy_runtime_resources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/settings.ini"
+        "${CMAKE_BINARY_DIR}/settings.ini"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/data"
+        "${CMAKE_BINARY_DIR}/data"
+    COMMENT "Copying settings.ini and data/ to build directory"
+)
+
+add_dependencies(appinton-trainer-2 copy_runtime_resources)
+
 include(GNUInstallDirs)
 install(TARGETS appinton-trainer-2
     BUNDLE DESTINATION .
