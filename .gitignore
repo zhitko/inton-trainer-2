@@ -90,3 +90,4 @@ application.log
 stories/
 build_appimage/
 data/
+*.log

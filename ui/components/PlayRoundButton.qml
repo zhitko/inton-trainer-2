@@ -12,13 +12,32 @@ ColumnLayout {
     property string filePath: ""
     property string icon: Icons.faPlay
     property string text: ""
-    readonly property bool isPlaying: audioApi.isPlaying
+    property bool isPlaying: false
     property alias enabled: button.enabled
     enabled: filePath !== ""
     signal clicked
 
     AudioApi {
         id: audioApi
+    }
+
+    Connections {
+        target: audioApi
+
+        function onIsPlayingChanged() {
+            if (audioApi.isPlaying) {
+                root.isPlaying = true;
+                delayTimer.stop();
+            } else {
+                delayTimer.restart();
+            }
+        }
+    }
+
+    Timer {
+        id: delayTimer
+        interval: 100
+        onTriggered: root.isPlaying = false
     }
 
     RoundButton {

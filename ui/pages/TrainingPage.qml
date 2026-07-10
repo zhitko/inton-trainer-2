@@ -88,26 +88,26 @@ Page {
         trainingAudioApi.startRecording(-1, minimumLength);
     }
 
-        onVisibleChanged: {
-            if (visible) {
-                _isExiting = false;
-                // Start recording without VAD calibration (calibration now occurs on HomePage)
-                if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
-                    if (!window.trainingRecordingStartedOnce) {
-                        // Previously started with calibration; now start directly.
-                        startRecording();
-                        window.trainingRecordingStartedOnce = true;
-                    } else {
-                        startRecording();
-                    }
-                }
-            } else {
-                _isExiting = true;
-                if (trainingAudioApi.isRecording) {
-                    trainingAudioApi.stopRecording();
+    onVisibleChanged: {
+        if (visible) {
+            _isExiting = false;
+            // Start recording without VAD calibration (calibration now occurs on HomePage)
+            if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
+                if (!window.trainingRecordingStartedOnce) {
+                    // Previously started with calibration; now start directly.
+                    startRecording();
+                    window.trainingRecordingStartedOnce = true;
+                } else {
+                    startRecording();
                 }
             }
+        } else {
+            _isExiting = true;
+            if (trainingAudioApi.isRecording) {
+                trainingAudioApi.stopRecording();
+            }
         }
+    }
 
     Component.onDestruction: {
         _isExiting = true;
@@ -133,7 +133,8 @@ Page {
                     }
                 }
                 // Restart recording after a small delay if playback isn't active
-                if (!isAnyPlaybackActive && window.settingsApi && window.settingsApi.autoStopRecording) {
+                // but only if we weren't forcibly stopped (e.g. by playback starting)
+                if (!root._isExiting && !isAnyPlaybackActive && window.settingsApi && window.settingsApi.autoStopRecording) {
                     restartRecordingTimer.start();
                 }
             }
@@ -167,11 +168,12 @@ Page {
             if (trainingAudioApi.isRecording) {
                 _isExiting = true; // Prevent saving an aborted recording
                 trainingAudioApi.stopRecording();
-                _isExiting = false;
+                // _isExiting will be reset in onIsRecordingChanged
             }
         } else {
             // Playback stopped – only restart recording if we were recording before playback began.
             if (_wasRecordingBeforePlayback && !trainingAudioApi.isRecording && !root._isVadPaused) {
+                _isExiting = false; // Allow recording to restart
                 restartRecordingTimer.start();
             }
             // Reset flag for next playback cycle.

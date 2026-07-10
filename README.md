@@ -215,84 +215,54 @@ After building, the executable will be located in the build directory:
 ```
 inton-trainer-2/
 ├── src/
-│   ├── api/              # QML-exposed C++ backends
-│   │   ├── audioapi      # Microphone recording, VAD, audio level
-│   │   ├── wavfileapi    # WAV loading, pitch/amplitude/spectrum/UMP/DTW
-│   │   ├── analysisapi   # UMP comparison, shape similarity
-│   │   ├── fileapi       # File system browsing
-│   │   ├── statisticsapi # Score persistence and history
-│   │   ├── settingsapi   # All settings exposed to QML
-│   │   └── helpers/      # AppSettings struct, load/save
-│   └── services/         # DSP business logic
-│       ├── cdtwservice   # Constrained DTW alignment
-│       ├── pitchservice  # F0 extraction (RAPT via SPTK)
-│       ├── umpservice    # Unified Melodic Profile computation
-│       ├── specservice   # Spectrum / cepstrum
+│   ├── api/                            # QML-exposed C++ backends
+│   │   ├── audioapi                    # Microphone recording, VAD, audio level
+│   │   ├── wavfileapi                  # WAV loading, pitch/amplitude/spectrum/UMP/DTW
+│   │   ├── analysisapi                 # UMP comparison, shape similarity
+│   │   ├── fileapi                     # File system browsing
+│   │   ├── statisticsapi               # Score persistence and history
+│   │   ├── settingsapi                 # All settings exposed to QML
+│   │   └── helpers/                    # AppSettings struct, load/save
+│   └── services/                       # DSP business logic
+│       ├── cdtwservice                 # Constrained DTW alignment
+│       ├── pitchservice                # F0 extraction (RAPT via SPTK)
+│       ├── umpservice                  # Unified Melodic Profile computation
+│       ├── specservice                 # Spectrum / cepstrum
 │       ├── amplitudeservice
 │       ├── vadautocorrelationservice
 │       ├── vadenergryservice
-│       └── dpservice     # DP stream combination
+│       └── dpservice                   # DP stream combination
 ├── ui/
-│   ├── pages/            # Application screens (QML)
+│   ├── pages/                          # Application screens (QML)
 │   │   ├── HomePage.qml
 │   │   ├── TrainingPage.qml
-│   │   ├── TemplatePage.qml      # Advanced analysis
+│   │   ├── TemplatePage.qml            # Advanced analysis
 │   │   ├── TemplateCategoriesPage.qml
 │   │   ├── TemplateFilesPage.qml
 │   │   ├── CategoriesPage.qml
 │   │   ├── RecordsPage.qml
 │   │   ├── RecordingPage.qml
 │   │   └── SettingsPage.qml
-│   ├── components/       # Reusable QML components
-│   └── utils/            # Theme, icons, scale helpers
-├── res/                  # Fonts (Font Awesome), images
-├── i18n/                 # Translation files (EN, RU)
+│   ├── components/                     # Reusable QML components
+│   └── utils/                          # Theme, icons, scale helpers
+├── res/                                # Fonts (Font Awesome), images
+├── i18n/                               # Translation files (EN, RU)
 ├── data/
-│   ├── patterns/         # Reference WAV templates (organized in folders)
-│   └── records/          # User microphone recordings
+│   ├── patterns/                       # Reference WAV templates (organized in folders)
+│   └── records/                        # User microphone recordings
 ├── 3rdparty/
-│   ├── SPTK/             # Speech Signal Processing Toolkit 4.3
-│   ├── alglib-cpp/       # ALGLIB 4.06.0 (spline math)
-│   └── ten-vad/          # Local VAD package
-└── CMakeLists.txt
+│   ├── SPTK/                           # Speech Signal Processing Toolkit 4.3
+│   ├── alglib-cpp/                     # ALGLIB 4.06.0 (spline math)
+│   └── ten-vad/                        # Local VAD package
+├── CMakeLists.txt
+└── settings.ini                        # Default user preferences
 ```
-
----
-
-## Authors
-
-- **Zhitko Vladimir** — Development — [LinkedIn](https://www.linkedin.com/in/zhitko-vladimir-92662255/)
-- **Boris Lobanov** — Scientific — [LinkedIn](https://www.linkedin.com/in/boris-lobanov-50628384/)
 
 ---
 
 ## License
 
-This project is licensed under the MIT License — see below for details:
-
-```
-MIT License
-
-Copyright (c) 2025 Zhitko Vladimir, Boris Lobanov
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
@@ -304,3 +274,10 @@ SOFTWARE.
 | **ALGLIB** 4.06.0 | Spline smoothing for pitch and UMP profiles |
 | **Font Awesome** | Icon font used throughout the UI |
 | **ten-vad** | Additional VAD support |
+
+---
+
+## Authors
+
+- **Zhitko Vladimir** — Development — [LinkedIn](https://www.linkedin.com/in/zhitko-vladimir-92662255/)
+- **Boris Lobanov** — Scientific — [LinkedIn](https://www.linkedin.com/in/boris-lobanov-50628384/)
