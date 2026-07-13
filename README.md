@@ -1,6 +1,6 @@
 # Intonation Trainer 2
 
-**Inton@Trainer 2.0** is a desktop application for learning and improving speech intonation. It records your voice, compares your pitch contour against a reference recording using Dynamic Time Warping (DTW), and gives you an instant similarity score — so you can hear, see, and track how closely your melody matches the target.
+**Inton@Trainer 2.0** is a cross-platform desktop (and Android) application for learning and improving speech intonation. It records your voice, compares your pitch contour against a reference recording using Constrained Dynamic Time Warping (CDTW), and gives you an instant similarity score — so you can hear, see, and track how closely your melody matches the target.
 
 Designed for language learners, phonetics students, speech therapists, and researchers who need objective, repeatable feedback on intonation patterns.
 
@@ -14,7 +14,7 @@ The application works on a **template-based training** model:
 
 1. A **reference WAV file** (template) represents the target intonation pattern — e.g. a native speaker's recording of a sentence.
 2. You **record yourself** speaking the same phrase.
-3. The app **aligns** your recording to the template using constrained DTW across multiple acoustic streams (pitch, amplitude, spectrum, cepstrum).
+3. The app **aligns** your recording to the template using constrained DTW across multiple configurable acoustic streams (pitch, pitch derivative, log pitch, amplitude, amplitude derivative, spectrum, cepstrum).
 4. It computes a **Unified Melodic Profile (UMP)** — a normalized pitch contour — for both recordings and compares their shapes.
 5. You get a **similarity score (0–100%)** with a trend indicator showing whether you're improving.
 
@@ -94,7 +94,7 @@ A comprehensive settings panel organized into collapsible sections:
 | Section | What you control |
 |---------|-----------------|
 | **General** | UI language (EN/RU), light/dark/system theme, accent color (Blue/Green/Purple/Orange/Red/Stainless Steel), navigation menu visibility, font size |
-| **Automated Recording (VAD)** | Auto-stop on/off, auto-calibrate before recording, VAD method (Energy / Autocorrelation / Hybrid AND / Hybrid OR), silence duration, minimum record length %, energy threshold, autocorrelation thresholds and F0 range, diagnostic curve toggles |
+| **Automated Recording (VAD)** | Auto-stop on/off, auto-calibrate before recording, VAD method (Energy / Autocorrelation / Hybrid AND / Hybrid OR), silence duration, minimum record length % (of reference), energy threshold, autocorrelation thresholds and F0 range, diagnostic curve toggles |
 | **Pitch** | F0 algorithm (RAPT), frame shift, sample rate, F0 min/max range, voicing threshold, normalization (min_max / mean), interpolation (Linear/Cubic/Akima/Monotone), smoothing (Moving Average/Median/Gaussian/Spline) with window/sigma/penalty controls |
 | **Pitch Log** | Median smoothing window, moving average size, binary transform on/off with threshold |
 | **UMP** | Smoothing type and parameters for the melodic profile |
@@ -114,9 +114,9 @@ Settings persist across sessions and take effect immediately (most DSP settings 
 | **Unified Melodic Profile (UMP)** | Normalized pitch contour computed on syllable-nucleus cue points, providing a speaker-independent shape for comparison. |
 | **VAD** | Voice Activity Detection with four modes: energy threshold, autocorrelation-based periodicity detection, and two hybrid combinations. Configurable auto-calibration measures background noise before each session. |
 | **Pitch (F0) extraction** | RAPT algorithm via SPTK, with full normalization, interpolation, and smoothing pipeline. |
-| **Spectrogram / Cepstrogram** | 2-D heat map visualizations rendered in QML using Canvas, supporting multiple color palettes. |
+| **Spectrogram / Cepstrogram** | 2-D heat map visualizations rendered in QML using Canvas, supporting multiple color palettes (Viridis, Plasma, Hot, Cool). |
 | **Statistics persistence** | Best scores, average accuracy, and full per-recording history are stored locally and surfaced across all views. |
-| **DTW distance limit** | Microphone recordings whose alignment cost exceeds a threshold are silently skipped, keeping only meaningful utterances in statistics. |
+| **DTW distance limit** | Microphone recordings whose alignment cost exceeds a configurable threshold are silently skipped, keeping only meaningful utterances in statistics. |
 | **Live waveform visualizer** | Real-time logarithmic bar graph driven by 20-sample rolling audio-level history, updating at 50 ms intervals during recording. |
 | **i18n** | Full English and Russian UI translation via Qt Linguist. |
 
@@ -130,6 +130,7 @@ Home
 │   └── [category] → [subcategory] → Template Files
 │       └── [file] → Training Page → Analysis Page (advanced)
 ├── Categories (browse reference library)
+│   └── [category] → Templates (reference samples)
 ├── Records (past microphone sessions)
 │   └── [record] → Analysis Page
 └── Settings
@@ -142,7 +143,7 @@ Home
 ### Build Requirements
 
 - **CMake**: 3.16 or higher
-- **Qt**: 6.10 or higher with the following modules:
+- **Qt**: 6.11 or higher with the following modules:
   - Qt Quick
   - Qt Multimedia
   - Qt Linguist Tools
@@ -150,9 +151,15 @@ Home
 - **OpenMP**: For parallelized DSP routines
 - **Git**: For cloning the repository and submodules
 
+### Android Build Requirements (optional)
+
+- **Android NDK**: 26+ (with LLVM/clang toolchain)
+- **Java**: 17 (required by Gradle for AAB/APK packaging)
+- **Android SDK**: compileSdk 35+, build tools 35+
+
 ### Runtime Requirements
 
-- Operating System: Windows, Linux, or macOS
+- Operating System: Windows, Linux, macOS, or Android 8+ (API 26+)
 - Audio input/output device (microphone required for training)
 
 ---
@@ -201,6 +208,29 @@ cmake -G "Visual Studio 17 2022" ..
 cmake --build . --config Release --target appinton-trainer-2
 ```
 
+#### Android (arm64-v8a)
+
+```bash
+# Requires Android NDK + SDK and Java 17
+chmod +x scripts/build_android.sh
+./scripts/build_android.sh
+```
+
+The script produces an Android App Bundle (`.aab`) at:
+`build_android_arm64_v8a/android-build/build/outputs/bundle/release/android-build-release.aab`
+
+An emulator launch script is also available:
+
+```bash
+./scripts/run_emulator.sh
+```
+
+Use `--logcat` mode to stream logs from a running device:
+
+```bash
+./scripts/run_emulator.sh --logcat
+```
+
 ### Run the Application
 
 After building, the executable will be located in the build directory:
@@ -222,7 +252,8 @@ inton-trainer-2/
 │   │   ├── fileapi                     # File system browsing
 │   │   ├── statisticsapi               # Score persistence and history
 │   │   ├── settingsapi                 # All settings exposed to QML
-│   │   └── helpers/                    # AppSettings struct, load/save
+│   │   ├── qmllogger                   # QML-side logging bridge
+│   │   └── helpers/                    # AppSettings struct, load/save, statistics
 │   └── services/                       # DSP business logic
 │       ├── cdtwservice                 # Constrained DTW alignment
 │       ├── pitchservice                # F0 extraction (RAPT via SPTK)
@@ -231,7 +262,9 @@ inton-trainer-2/
 │       ├── amplitudeservice
 │       ├── vadautocorrelationservice
 │       ├── vadenergryservice
-│       └── dpservice                   # DP stream combination
+│       ├── dpservice                   # DP stream combination
+│       ├── wavfileservice              # WAV file I/O
+│       └── helpers/                    # Vector utils, interpolation, smoothing, normalization, file logger
 ├── ui/
 │   ├── pages/                          # Application screens (QML)
 │   │   ├── HomePage.qml
@@ -239,14 +272,28 @@ inton-trainer-2/
 │   │   ├── TemplatePage.qml            # Advanced analysis
 │   │   ├── TemplateCategoriesPage.qml
 │   │   ├── TemplateFilesPage.qml
+│   │   ├── TemplatesPage.qml           # Reference samples browser
 │   │   ├── CategoriesPage.qml
 │   │   ├── RecordsPage.qml
 │   │   ├── RecordingPage.qml
 │   │   └── SettingsPage.qml
 │   ├── components/                     # Reusable QML components
-│   └── utils/                          # Theme, icons, scale helpers
+│   └── utils/                          # Theme, icons, scale helpers, logger
+│       ├── AppScale.qml, Icons.qml, Logger.qml, Theme.qml
 ├── res/                                # Fonts (Font Awesome), images
 ├── i18n/                               # Translation files (EN, RU)
+├── android/                            # Android packaging
+│   ├── AndroidManifest.xml
+│   └── res/values/styles.xml
+├── scripts/                            # Build and automation scripts
+│   ├── build_android.sh
+│   ├── run_emulator.sh
+│   ├── android_build_guide.md
+│   └── build-appimage/
+├── docs/                               # Documentation
+│   ├── data_flow.md
+│   ├── settings_guide_ru.md
+│   └── ui_screens.md
 ├── data/
 │   ├── patterns/                       # Reference WAV templates (organized in folders)
 │   └── records/                        # User microphone recordings
@@ -272,8 +319,8 @@ This project is licensed under the MIT License — see [LICENSE](LICENSE) for de
 |---------|---------|
 | **SPTK** (Speech Signal Processing Toolkit 4.3) | F0 extraction (RAPT algorithm), audio feature processing |
 | **ALGLIB** 4.06.0 | Spline smoothing for pitch and UMP profiles |
-| **Font Awesome** | Icon font used throughout the UI |
-| **ten-vad** | Additional VAD support |
+| **Font Awesome** (Free 6.x) | Icon font used throughout the UI |
+| **ten-vad** | Additional VAD support (energy + autocorrelation-based) |
 
 ---
 
