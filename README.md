@@ -101,13 +101,13 @@ A comprehensive settings panel organized into collapsible sections:
 | Section | What you control |
 |---------|-----------------|
 | **General** | UI language (EN/RU), light/dark/system theme, accent color (Blue/Green/Purple/Orange/Red/Stainless Steel), navigation menu visibility, font size |
-| **Automated Recording (VAD)** | Auto-stop on/off, auto-calibrate before recording, VAD method (Energy / Autocorrelation / Hybrid AND / Hybrid OR), silence duration, minimum record length % (of reference), energy threshold, autocorrelation thresholds and F0 range, diagnostic curve toggles |
+| **Automated Recording (VAD)** | Auto-stop on/off, auto-calibrate before recording, calibration duration (ms), VAD method (Energy / Autocorrelation / Hybrid AND / Hybrid OR), silence duration (ms), minimum record length % (of reference), energy threshold, autocorrelation thresholds and F0 range, autocorrelation energy threshold, threshold K multiplier, diagnostic curve toggles (A, U, V, Corr) |
 | **Guided Mode** | Enable "Play & Listen" training mode, listen window timeout (ms), post-playback delay (ms) |
 | **Pitch** | F0 algorithm (RAPT), frame shift, sample rate, F0 min/max range, voicing threshold, normalization (min_max / mean), interpolation (Linear/Cubic/Akima/Monotone), smoothing (Moving Average/Median/Gaussian/Spline) with window/sigma/penalty controls |
 | **Pitch Log** | Median smoothing window, moving average size, binary transform on/off with threshold |
-| **UMP** | Smoothing type and parameters for the melodic profile |
-| **Amplitude** | Window/shift sizes, smoothing |
-| **Spectrum** | FFT length, F0 refinement, log scale, color scheme, cepstrum order |
+| **UMP** | Smoothing type (None / MovingAverage / Median / Gaussian / Spline) with window size, sigma, and penalty controls; show/hide toggle |
+| **Amplitude** | Window/shift sizes, smoothing (MovingAverage / Median / Gaussian) with window and sigma controls; show/hide amplitude and derivative |
+| **Spectrum** | FFT length, F0 refinement toggle, log scale toggle, color scheme (Viridis / Plasma / Hot / Cool), cepstrum order, show/hide spectrum and cepstrum |
 | **DP Calculation** | Which acoustic streams feed the DTW (pitch, pitch derivative, log pitch, amplitude, amplitude derivative, spectrum, cepstrum), per-stream weights, match/insertion/deletion costs, fixed start/end alignment (morph) mode, pitch-log-as-mask, DTW distance limit for auto-rejecting noisy recordings |
 
 Settings persist across sessions and take effect immediately (most DSP settings re-trigger analysis on the open page automatically).
@@ -184,17 +184,33 @@ cd inton-trainer-2
 
 ### Clone 3rd-Party Dependencies
 
-The SPTK (Speech Signal Processing Toolkit) library is required but not included in the repository. Clone it into the `3rdparty` directory:
+The following third-party libraries are required. They are **not** included in the repository and must be fetched separately:
+
+#### SPTK (Speech Signal Processing Toolkit 4.3)
+
+F0 extraction (RAPT algorithm) and audio feature processing.
 
 ```bash
 git clone https://github.com/sp-nitech/SPTK.git 3rdparty/SPTK
+cd 3rdparty/SPTK && git checkout 68f4158 && cd ../..
 ```
 
-The ALGLIB library is required but not included in the repository. Download it into the `3rdparty` directory:
+#### ALGLIB 4.06.0
+
+Spline smoothing for pitch and UMP profiles.
 
 ```bash
 wget https://www.alglib.net/translator/re/alglib-4.06.0.cpp.gpl.zip
 unzip alglib-4.06.0.cpp.gpl.zip -d 3rdparty/alglib-cpp
+```
+
+#### ten-vad
+
+Additional VAD support (energy + autocorrelation-based).
+
+```bash
+git clone https://github.com/TEN-framework/ten-vad.git 3rdparty/ten-vad
+cd 3rdparty/ten-vad && git checkout 22a3bcd && cd ../..
 ```
 
 ### Build Steps
@@ -255,24 +271,24 @@ After building, the executable will be located in the build directory:
 inton-trainer-2/
 ├── src/
 │   ├── api/                            # QML-exposed C++ backends
-│   │   ├── audioapi                    # Microphone recording, VAD, audio level
-│   │   ├── wavfileapi                  # WAV loading, pitch/amplitude/spectrum/UMP/DTW
-│   │   ├── analysisapi                 # UMP comparison, shape similarity
-│   │   ├── fileapi                     # File system browsing
-│   │   ├── statisticsapi               # Score persistence and history
-│   │   ├── settingsapi                 # All settings exposed to QML
-│   │   ├── qmllogger                   # QML-side logging bridge
+│   │   ├── audioapi.{h,cpp}           # Microphone recording, VAD, audio level
+│   │   ├── wavfileapi.{h,cpp}         # WAV loading, pitch/amplitude/spectrum/UMP/DTW
+│   │   ├── analysisapi.{h,cpp}        # UMP comparison, shape similarity
+│   │   ├── fileapi.{h,cpp}            # File system browsing
+│   │   ├── statisticsapi.{h,cpp}      # Score persistence and history
+│   │   ├── settingsapi.{h,cpp}        # All settings exposed to QML
+│   │   ├── qmllogger.{h,cpp}          # QML-side logging bridge
 │   │   └── helpers/                    # AppSettings struct, load/save, statistics
 │   └── services/                       # DSP business logic
-│       ├── cdtwservice                 # Constrained DTW alignment
-│       ├── pitchservice                # F0 extraction (RAPT via SPTK)
-│       ├── umpservice                  # Unified Melodic Profile computation
-│       ├── specservice                 # Spectrum / cepstrum
-│       ├── amplitudeservice
-│       ├── vadautocorrelationservice
-│       ├── vadenergryservice
-│       ├── dpservice                   # DP stream combination
-│       ├── wavfileservice              # WAV file I/O
+│       ├── cdtwservice.{h,cpp}        # Constrained DTW alignment
+│       ├── pitchservice.{h,cpp}       # F0 extraction (RAPT via SPTK)
+│       ├── umpservice.{h,cpp}         # Unified Melodic Profile computation
+│       ├── specservice.{h,cpp}        # Spectrum / cepstrum
+│       ├── amplitudeservice.{h,cpp}
+│       ├── vadautocorrelationservice.{h,cpp}
+│       ├── vadenergryservice.{h,cpp}
+│       ├── dpservice.{h,cpp}          # DP stream combination
+│       ├── wavfileservice.{h,cpp}     # WAV file I/O
 │       └── helpers/                    # Vector utils, interpolation, smoothing, normalization, file logger
 ├── ui/
 │   ├── pages/                          # Application screens (QML)
@@ -288,8 +304,15 @@ inton-trainer-2/
 │   │   └── SettingsPage.qml
 │   ├── components/                     # Reusable QML components
 │   └── utils/                          # Theme, icons, scale helpers, logger
-│       ├── AppScale.qml, Icons.qml, Logger.qml, Theme.qml
-├── res/                                # Fonts (Font Awesome), images
+│       ├── AppScale.qml
+│       ├── Icons.qml
+│       ├── Logger.qml
+│       └── Theme.qml
+├── res/                                # Qt resource files
+│   ├── fonts/                          # Font Awesome 6 (brands, regular, solid)
+│   ├── images/                         # PNG assets (wave.png)
+│   ├── src/                            # C++ source resources (api/, helpers/, services/)
+│   └── ui/                             # QML resource copies (components/, pages/, utils/)
 ├── i18n/                               # Translation files (EN, RU)
 ├── android/                            # Android packaging
 │   ├── AndroidManifest.xml
@@ -298,7 +321,7 @@ inton-trainer-2/
 │   ├── build_android.sh
 │   ├── run_emulator.sh
 │   ├── android_build_guide.md
-│   └── build-appimage/
+│   └── build-appimage/                 # AppImage packaging (empty)
 ├── docs/                               # Documentation
 │   ├── data_flow.md
 │   ├── settings_guide_ru.md
@@ -311,7 +334,8 @@ inton-trainer-2/
 │   ├── alglib-cpp/                     # ALGLIB 4.06.0 (spline math)
 │   └── ten-vad/                        # Local VAD package
 ├── CMakeLists.txt
-└── settings.ini                        # Default user preferences
+├── settings.ini                        # Default user preferences
+└── README.md
 ```
 
 ---
@@ -326,10 +350,10 @@ This project is licensed under the MIT License — see [LICENSE](LICENSE) for de
 
 | Library | Purpose |
 |---------|---------|
-| **SPTK** (Speech Signal Processing Toolkit 4.3) | F0 extraction (RAPT algorithm), audio feature processing |
-| **ALGLIB** 4.06.0 | Spline smoothing for pitch and UMP profiles |
-| **Font Awesome** (Free 6.x) | Icon font used throughout the UI |
-| **ten-vad** | Additional VAD support (energy + autocorrelation-based) |
+| **[SPTK](https://github.com/sp-nitech/SPTK)** (Speech Signal Processing Toolkit 4.3) | F0 extraction (RAPT algorithm), audio feature processing |
+| **[ALGLIB](https://www.alglib.net/)** 4.06.0 | Spline smoothing for pitch and UMP profiles |
+| **[Font Awesome](https://fontawesome.com/)** (Free 6.x) | Icon font used throughout the UI |
+| **[ten-vad](https://github.com/TEN-framework/ten-vad)** | Additional VAD support (energy + autocorrelation-based) |
 
 ---
 
