@@ -144,6 +144,9 @@ class SettingsApi : public QObject {
     Q_PROPERTY(double dpDeletionCoef READ dpDeletionCoef WRITE setDpDeletionCoef NOTIFY dpDeletionCoefChanged)
     Q_PROPERTY(bool dpUseFixedStartEndDP READ dpUseFixedStartEndDP WRITE setDpUseFixedStartEndDP NOTIFY dpUseFixedStartEndDPChanged)
     Q_PROPERTY(double dtwDistanceLimit READ dtwDistanceLimit WRITE setDtwDistanceLimit NOTIFY dtwDistanceLimitChanged)
+    Q_PROPERTY(bool   guidedModeEnabled         READ guidedModeEnabled         WRITE setGuidedModeEnabled         NOTIFY guidedModeEnabledChanged)
+    Q_PROPERTY(int    guidedListenTimeoutMs      READ guidedListenTimeoutMs      WRITE setGuidedListenTimeoutMs      NOTIFY guidedListenTimeoutMsChanged)
+    Q_PROPERTY(int    guidedPrePlayListenDelayMs READ guidedPrePlayListenDelayMs WRITE setGuidedPrePlayListenDelayMs NOTIFY guidedPrePlayListenDelayMsChanged)
 
 public:
     enum class SpecColorScheme { Viridis,
@@ -391,6 +394,13 @@ public:
     double dtwDistanceLimit() const;
     void setDtwDistanceLimit(double dtwDistanceLimit);
 
+    bool   guidedModeEnabled() const;
+    void   setGuidedModeEnabled(bool v);
+    int    guidedListenTimeoutMs() const;
+    void   setGuidedListenTimeoutMs(int v);
+    int    guidedPrePlayListenDelayMs() const;
+    void   setGuidedPrePlayListenDelayMs(int v);
+
     /**
      * Loads the settings from a file and updates the internal state of the
      * SettingsApi object. This method should be called when the application
@@ -499,6 +509,9 @@ signals:
     void dpDeletionCoefChanged();
     void dpUseFixedStartEndDPChanged();
     void dtwDistanceLimitChanged();
+    void guidedModeEnabledChanged();
+    void guidedListenTimeoutMsChanged();
+    void guidedPrePlayListenDelayMsChanged();
 
 private:
     AppSettings m_settings;

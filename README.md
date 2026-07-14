@@ -50,6 +50,13 @@ Selecting a template opens the **Training Page**:
 - After each utterance the app processes your recording and immediately shows the result, then restarts listening for the next attempt — a seamless, hands-free loop.
 - A **Pause / Continue** button lets you temporarily suspend the recording loop (e.g. to listen to the reference or check graphs) without leaving the page.
 
+**Guided ("Play & Listen") mode**
+- An alternative to Auto mode, enabled in Settings. The training flow becomes a step-by-step cycle: press play → hear the reference → a short delay → the app opens a timed "listen window" → speak the phrase → the recording is automatically stopped and processed.
+- A large play button (with redo icon on timeout) replaces the continuous VAD loop controls.
+- If no speech is detected within the configurable **Listen Window Timeout**, the app returns to idle and lets you try again.
+- The **Post-Playback Delay** setting controls the pause between the end of reference playback and microphone activation.
+- You can switch between Auto and Guided at any time; pending recordings are cancelled cleanly.
+
 **Manual recording mode**
 - When auto-stop is disabled, a **Record button** appears. Tap once to start, tap again to stop. Useful for controlled environments or when VAD mis-fires.
 
@@ -95,6 +102,7 @@ A comprehensive settings panel organized into collapsible sections:
 |---------|-----------------|
 | **General** | UI language (EN/RU), light/dark/system theme, accent color (Blue/Green/Purple/Orange/Red/Stainless Steel), navigation menu visibility, font size |
 | **Automated Recording (VAD)** | Auto-stop on/off, auto-calibrate before recording, VAD method (Energy / Autocorrelation / Hybrid AND / Hybrid OR), silence duration, minimum record length % (of reference), energy threshold, autocorrelation thresholds and F0 range, diagnostic curve toggles |
+| **Guided Mode** | Enable "Play & Listen" training mode, listen window timeout (ms), post-playback delay (ms) |
 | **Pitch** | F0 algorithm (RAPT), frame shift, sample rate, F0 min/max range, voicing threshold, normalization (min_max / mean), interpolation (Linear/Cubic/Akima/Monotone), smoothing (Moving Average/Median/Gaussian/Spline) with window/sigma/penalty controls |
 | **Pitch Log** | Median smoothing window, moving average size, binary transform on/off with threshold |
 | **UMP** | Smoothing type and parameters for the melodic profile |
@@ -117,6 +125,7 @@ Settings persist across sessions and take effect immediately (most DSP settings 
 | **Spectrogram / Cepstrogram** | 2-D heat map visualizations rendered in QML using Canvas, supporting multiple color palettes (Viridis, Plasma, Hot, Cool). |
 | **Statistics persistence** | Best scores, average accuracy, and full per-recording history are stored locally and surfaced across all views. |
 | **DTW distance limit** | Microphone recordings whose alignment cost exceeds a configurable threshold are silently skipped, keeping only meaningful utterances in statistics. |
+| **Guided training mode** | Step-by-step "Play & Listen" cycle (listen to reference → short delay → timed recording window) as an alternative to continuous VAD auto-stop. Configurable listen timeout and post-playback delay. |
 | **Live waveform visualizer** | Real-time logarithmic bar graph driven by 20-sample rolling audio-level history, updating at 50 ms intervals during recording. |
 | **i18n** | Full English and Russian UI translation via Qt Linguist. |
 

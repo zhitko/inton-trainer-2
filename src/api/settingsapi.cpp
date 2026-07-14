@@ -1622,6 +1622,35 @@ void SettingsApi::setDtwDistanceLimit(double val)
     }
 }
 
+// ── Guided mode ────────────────────────────────────────────────────────────
+bool SettingsApi::guidedModeEnabled() const { return m_settings.guidedModeEnabled; }
+void SettingsApi::setGuidedModeEnabled(bool v)
+{
+    if (m_settings.guidedModeEnabled != v) {
+        m_settings.guidedModeEnabled = v;
+        save();
+        emit guidedModeEnabledChanged();
+    }
+}
+int SettingsApi::guidedListenTimeoutMs() const { return m_settings.guidedListenTimeoutMs; }
+void SettingsApi::setGuidedListenTimeoutMs(int v)
+{
+    if (m_settings.guidedListenTimeoutMs != v) {
+        m_settings.guidedListenTimeoutMs = v;
+        save();
+        emit guidedListenTimeoutMsChanged();
+    }
+}
+int SettingsApi::guidedPrePlayListenDelayMs() const { return m_settings.guidedPrePlayListenDelayMs; }
+void SettingsApi::setGuidedPrePlayListenDelayMs(int v)
+{
+    if (m_settings.guidedPrePlayListenDelayMs != v) {
+        m_settings.guidedPrePlayListenDelayMs = v;
+        save();
+        emit guidedPrePlayListenDelayMsChanged();
+    }
+}
+
 void SettingsApi::updateTranslator()
 {
     LOG_DEBUG() << "Start: updateTranslator";

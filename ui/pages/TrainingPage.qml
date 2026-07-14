@@ -79,6 +79,38 @@ Page {
     property bool _wasRecordingBeforeDialog: false
     property bool _isVadPaused: false
 
+    // ── Guided mode state ────────────────────────────────────────────────────
+    // 0 = Auto (existing continuous VAD), 1 = Guided (Play & Listen)
+    property int trainingMode: (window.settingsApi && window.settingsApi.guidedModeEnabled) ? 1 : 0
+    readonly property int gsIdle       : 0
+    readonly property int gsPlaying    : 1
+    readonly property int gsPending    : 2
+    readonly property int gsListening  : 3
+    readonly property int gsProcessing : 4
+    property int  guidedState: 0
+    // True when the last listen window timed out without a capture
+    property bool guidedTimedOut: false
+
+    onTrainingModeChanged: {
+        guidedDelayTimer.stop();
+        guidedTimeoutTimer.stop();
+        if (root.guidedState === root.gsListening) {
+            root._isExiting = true;
+            trainingAudioApi.stopRecording();
+            root._isExiting = false;
+        }
+        root.guidedState = root.gsIdle;
+        root.guidedTimedOut = false;
+
+        if (trainingMode === 0 && visible && window.settingsApi
+                && window.settingsApi.autoStopRecording
+                && !trainingAudioApi.isRecording
+                && !root._isVadPaused && !isAnyPlaybackActive) {
+            root._isExiting = false;
+            startRecording();
+        }
+    }
+
     // Starts recording without VAD calibration (calibration is performed on HomePage).
     function startRecording() {
         let minimumLength = -1;
@@ -90,11 +122,12 @@ Page {
 
     onVisibleChanged: {
         if (visible) {
-            _isExiting = false;
-            // Start recording without VAD calibration (calibration now occurs on HomePage)
-            if (window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
+            _isExiting = false
+            // Auto mode only: start recording on page show
+            if (root.trainingMode === 0
+                    && window.settingsApi && window.settingsApi.autoStopRecording
+                    && !trainingAudioApi.isRecording && !root._isVadPaused) {
                 if (!window.trainingRecordingStartedOnce) {
-                    // Previously started with calibration; now start directly.
                     startRecording();
                     window.trainingRecordingStartedOnce = true;
                 } else {
@@ -103,6 +136,10 @@ Page {
             }
         } else {
             _isExiting = true;
+            // Cancel any pending guided activity when navigating away
+            guidedDelayTimer.stop();
+            guidedTimeoutTimer.stop();
+            root.guidedState = root.gsIdle;
             if (trainingAudioApi.isRecording) {
                 trainingAudioApi.stopRecording();
             }
@@ -119,23 +156,44 @@ Page {
     Connections {
         target: trainingAudioApi
         onIsRecordingChanged: {
-            if (!trainingAudioApi.isRecording && !root._isExiting && !root._isVadPaused && window.settingsApi && window.settingsApi.autoStopRecording) {
-                let tempFilePath = trainingAudioApi.saveWavFile();
-                if (tempFilePath !== "") {
-                    let userWavHandle = wavFileApi.openWavFile(tempFilePath);
-                    let userWaveData = wavFileApi.getWaveData(userWavHandle);
-                    
-                    if (userWaveData) {
-                        Logger.info("Recording successful, backend minimum length enforced.");
-                        updateUserUMP(tempFilePath, true);
-                    } else {
-                        Logger.info("Recording save failed or no wave data available.");
+            if (!trainingAudioApi.isRecording && !root._isExiting) {
+
+                // ── AUTO MODE (unchanged logic) ──────────────────────────────
+                if (root.trainingMode === 0
+                        && window.settingsApi && window.settingsApi.autoStopRecording) {
+                    let tempFilePath = trainingAudioApi.saveWavFile();
+                    if (tempFilePath !== "") {
+                        let userWavHandle = wavFileApi.openWavFile(tempFilePath);
+                        let userWaveData = wavFileApi.getWaveData(userWavHandle);
+                        if (userWaveData) {
+                            Logger.info("Recording successful, backend minimum length enforced.");
+                            updateUserUMP(tempFilePath, true);
+                        } else {
+                            Logger.info("Recording save failed or no wave data available.");
+                        }
+                    }
+                    if (!root._isExiting && !isAnyPlaybackActive
+                            && window.settingsApi && window.settingsApi.autoStopRecording) {
+                        restartRecordingTimer.start();
                     }
                 }
-                // Restart recording after a small delay if playback isn't active
-                // but only if we weren't forcibly stopped (e.g. by playback starting)
-                if (!root._isExiting && !isAnyPlaybackActive && window.settingsApi && window.settingsApi.autoStopRecording) {
-                    restartRecordingTimer.start();
+
+                // ── GUIDED MODE ─────────────────────────────────────────────
+                else if (root.trainingMode === 1
+                         && root.guidedState === root.gsListening) {
+                    guidedTimeoutTimer.stop();
+                    root.guidedState = root.gsProcessing;
+                    let tempFilePath = trainingAudioApi.saveWavFile();
+                    if (tempFilePath !== "") {
+                        let userWavHandle = wavFileApi.openWavFile(tempFilePath);
+                        let userWaveData = wavFileApi.getWaveData(userWavHandle);
+                        if (userWaveData) {
+                            Logger.info("Guided: attempt captured — processing");
+                            updateUserUMP(tempFilePath, true);
+                        }
+                    }
+                    root.guidedState = root.gsIdle;
+                    root.guidedTimedOut = false;
                 }
             }
         }
@@ -156,6 +214,36 @@ Page {
         }
     }
 
+    // Post-playback delay before LISTEN opens (Guided mode)
+    Timer {
+        id: guidedDelayTimer
+        repeat: false
+        onTriggered: {
+            if (root.trainingMode !== 1 || root.guidedState !== root.gsPending) return;
+            root.guidedState = root.gsListening;
+            root.guidedTimedOut = false;
+            startRecording();
+            guidedTimeoutTimer.interval = window.settingsApi
+                ? window.settingsApi.guidedListenTimeoutMs : 4000;
+            guidedTimeoutTimer.start();
+        }
+    }
+
+    // Timeout: close LISTEN window if no speech onset within limit (Guided mode)
+    Timer {
+        id: guidedTimeoutTimer
+        repeat: false
+        onTriggered: {
+            if (root.trainingMode !== 1 || root.guidedState !== root.gsListening) return;
+            Logger.info("Guided: listen window timed out — no speech detected");
+            root._isExiting = true;  // prevent saving empty recording
+            trainingAudioApi.stopRecording();
+            root._isExiting = false;
+            root.guidedState = root.gsIdle;
+            root.guidedTimedOut = true;
+        }
+    }
+
     // Tracks whether any audio (reference or user) is currently playing.
     property bool isAnyPlaybackActive: playReferenceBtn.isPlaying || playUserBtn.isPlaying
     // Remember if we were recording before playback started. Used to decide whether to auto‑restart recording after playback finishes.
@@ -168,16 +256,32 @@ Page {
             if (trainingAudioApi.isRecording) {
                 _isExiting = true; // Prevent saving an aborted recording
                 trainingAudioApi.stopRecording();
-                // _isExiting will be reset in onIsRecordingChanged
+            }
+
+            // Only enter guided cycle when reference audio is played, not user recording
+            if (root.trainingMode === 1 && playReferenceBtn.isPlaying) {
+                root.guidedState = root.gsPlaying;
+                root.guidedTimedOut = false;
             }
         } else {
-            // Playback stopped – only restart recording if we were recording before playback began.
-            if (_wasRecordingBeforePlayback && !trainingAudioApi.isRecording && !root._isVadPaused) {
-                _isExiting = false; // Allow recording to restart
-                restartRecordingTimer.start();
+            // Playback stopped
+
+            // Auto mode: restart recording if we were recording before playback
+            if (root.trainingMode === 0) {
+                if (_wasRecordingBeforePlayback && !trainingAudioApi.isRecording && !root._isVadPaused) {
+                    _isExiting = false;
+                    restartRecordingTimer.start();
+                }
+                _wasRecordingBeforePlayback = false;
             }
-            // Reset flag for next playback cycle.
-            _wasRecordingBeforePlayback = false;
+
+            // Only start guided listen cycle when reference playback finished
+            if (root.trainingMode === 1 && root.guidedState === root.gsPlaying && !playReferenceBtn.isPlaying) {
+                root.guidedState = root.gsPending;
+                guidedDelayTimer.interval = window.settingsApi
+                    ? window.settingsApi.guidedPrePlayListenDelayMs : 150;
+                guidedDelayTimer.start();
+            }
         }
     }
 
@@ -185,10 +289,11 @@ Page {
         updateReferenceUMP();
         loadPreviousResults();
 
-        if (visible && window.settingsApi && window.settingsApi.autoStopRecording && !trainingAudioApi.isRecording && !root._isVadPaused) {
+        if (root.trainingMode === 0
+                && visible && window.settingsApi && window.settingsApi.autoStopRecording
+                && !trainingAudioApi.isRecording && !root._isVadPaused) {
             _isExiting = false;
             if (!window.trainingRecordingStartedOnce) {
-                // Start without calibration; calibration handled earlier.
                 startRecording();
                 window.trainingRecordingStartedOnce = true;
             } else {
@@ -789,6 +894,8 @@ Page {
                 cueNLabels: root.titleText.replace(/\([^)]*\)/g, "").replace(/\d+/, "").replace("-", "").split(",").map(s => s.trim())
             }
 
+
+
             // Controls
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
@@ -800,6 +907,17 @@ Page {
                     Layout.preferredWidth: 200
                     filePath: root.referenceFilePath
                     text: qsTr("Play\nReference")
+                    visible: root.trainingMode !== 1
+                    enabled: root.trainingMode !== 1
+                             || root.guidedState === root.gsIdle
+                             || root.guidedState === root.gsPlaying
+                }
+
+                // Spacer to keep center column centered when playReferenceBtn is hidden in guided mode
+                Item {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: 200
+                    visible: root.trainingMode === 1
                 }
 
                 ColumnLayout {
@@ -943,18 +1061,96 @@ Page {
                     Text {
                         Layout.alignment: Qt.AlignHCenter
                         Layout.fillWidth: true
-                        text: root._isVadPaused ? qsTr("Paused") : (isAnyPlaybackActive ? qsTr("Playing...") : (trainingAudioApi.isRecording ? qsTr("Listening...") : qsTr("Processing...")))
+                        visible: !(root.trainingMode === 1 && root.guidedState === root.gsIdle) || isAnyPlaybackActive
+                        text: {
+                            if (root._isVadPaused) return qsTr("Paused");
+                            if (root.trainingMode === 1) {
+                                switch (root.guidedState) {
+                                    case root.gsPlaying:    return qsTr("Playing...");
+                                    case root.gsPending:    return qsTr("Get ready...");
+                                    case root.gsListening:  return qsTr("Listening...");
+                                    case root.gsProcessing: return qsTr("Processing...");
+                                    default: return isAnyPlaybackActive ? qsTr("Playing...") : "";
+                                }
+                            }
+                            return isAnyPlaybackActive ? qsTr("Playing...") :
+                                   (trainingAudioApi.isRecording ? qsTr("Listening...") : qsTr("Processing..."));
+                        }
                         font.pixelSize: AppScale.fs(26)
                         font.weight: 600
                         horizontalAlignment: Text.AlignHCenter
-                        color: root._isVadPaused ? Theme.error(root.Material.theme) : (isAnyPlaybackActive ? Theme.primary(root.Material.theme) : (trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : Theme.error(root.Material.theme)))
+                        color: {
+                            if (root._isVadPaused) return Theme.error(root.Material.theme);
+                            if (root.trainingMode === 1) {
+                                if (root.guidedState === root.gsListening)
+                                    return Theme.success(root.Material.theme);
+                                if (root.guidedTimedOut)
+                                    return Theme.error(root.Material.theme);
+                                return Theme.primary(root.Material.theme);
+                            }
+                            return isAnyPlaybackActive ? Theme.primary(root.Material.theme) :
+                                   (trainingAudioApi.isRecording ? Theme.success(root.Material.theme) : Theme.error(root.Material.theme));
+                        }
+                    }
+
+                    Item {
+                        id: guidedPlayBtn
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.preferredWidth: 84
+                        Layout.preferredHeight: 84
+                        visible: root.trainingMode === 1 && root.guidedState === root.gsIdle && !isAnyPlaybackActive
+
+                        Rectangle {
+                            id: guidedOuterCircle
+                            anchors.fill: parent
+                            radius: width / 2
+                            color: "transparent"
+                            border.color: Theme.outline(Material.theme)
+                            border.width: 1
+                        }
+
+                        Rectangle {
+                            id: guidedInnerCircle
+                            anchors.centerIn: parent
+                            width: 76
+                            height: 76
+                            radius: width / 2
+                            color: root.guidedTimedOut ? Theme.error(Material.theme) : Theme.primary(Material.theme)
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: root.guidedTimedOut ? Icons.faRedo : Icons.faPlay
+                                font.family: Icons.familySolid
+                                font.weight: Font.Black
+                                font.pixelSize: AppScale.fs(28)
+                                color: root.guidedTimedOut ? Theme.onError(Material.theme) : Theme.onPrimary(Material.theme)
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                hoverEnabled: true
+                                onClicked: {
+                                    playReferenceBtn.trigger();
+                                }
+                            }
+                        }
                     }
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
                         Layout.fillWidth: true
-                        opacity: (root._isVadPaused || isAnyPlaybackActive) ? 0.6 : 0.0
-                        text: root._isVadPaused ? qsTr("Press Continue to continue recording.") : qsTr("Listen carefully")
+                        opacity: (root._isVadPaused || isAnyPlaybackActive || (root.trainingMode === 1 && root.guidedState === root.gsIdle)) ? 0.6 : 0.0
+                        text: {
+                            if (root._isVadPaused) return qsTr("Press Continue to continue recording.");
+                            if (isAnyPlaybackActive) return qsTr("Listen carefully");
+                            if (root.trainingMode === 1 && root.guidedState === root.gsIdle && !isAnyPlaybackActive) {
+                                return root.guidedTimedOut
+                                    ? qsTr("No speech detected — press to try again")
+                                    : qsTr("Press to start");
+                            }
+                            return "";
+                        }
                         font.pixelSize: AppScale.fs(14)
                         color: Theme.onSurface(root.Material.theme)
                         horizontalAlignment: Text.AlignHCenter
@@ -996,7 +1192,8 @@ Page {
                 Layout.preferredWidth: 160
                 Layout.preferredHeight: 50
                 flat: false
-                visible: window.settingsApi ? window.settingsApi.autoStopRecording : false
+                visible: (window.settingsApi ? window.settingsApi.autoStopRecording : false)
+                         && root.trainingMode === 0
 
                 contentItem: Text {
                     text: root._isVadPaused ? qsTr("Continue") : qsTr("Pause")

@@ -168,7 +168,15 @@ struct AppSettings {
     bool dpUseFixedStartEndDP = false;
     // Maximum allowed DTW distance (minFinalCost); recordings above this threshold are skipped.
     double dtwDistanceLimit = 100.0;
-};
+
+    // == Guided mode settings ==
+    // Whether the "Play & Listen" switch position is visible on TrainingPage.
+    bool guidedModeEnabled = true;
+    // Max duration (ms) the single-shot LISTEN window waits for speech onset.
+    int guidedListenTimeoutMs = 4000;
+    // Delay (ms) between end of playback and LISTEN window opening.
+    int guidedPrePlayListenDelayMs = 150;
+    };
 
 /*
  * The Settings class provides static methods to load and save the application

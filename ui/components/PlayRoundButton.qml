@@ -17,6 +17,15 @@ ColumnLayout {
     enabled: filePath !== ""
     signal clicked
 
+    function trigger() {
+        if (audioApi.isPlaying) {
+            audioApi.stopPlayback();
+        } else if (root.filePath !== "") {
+            audioApi.play(root.filePath);
+        }
+        root.clicked();
+    }
+
     AudioApi {
         id: audioApi
     }

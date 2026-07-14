@@ -258,6 +258,46 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
+                            text: qsTr("Enable \"Guided\" training mode")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            id: guidedModeSwitch
+                            checked: settingsApi ? settingsApi.guidedModeEnabled : true
+                            onToggled: if (settingsApi) settingsApi.guidedModeEnabled = checked
+                        }
+
+                        Label {
+                            text: qsTr("Listen Window Timeout (ms)")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.guidedModeEnabled : false
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.guidedListenTimeoutMs.toString() : "4000"
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.guidedListenTimeoutMs = parseInt(text)
+                            enabled: settingsApi ? settingsApi.guidedModeEnabled : false
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                        }
+
+                        Label {
+                            text: qsTr("Post-Playback Delay (ms)")
+                            color: Theme.onSurface(Material.theme)
+                            enabled: settingsApi ? settingsApi.guidedModeEnabled : false
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.guidedPrePlayListenDelayMs.toString() : "150"
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.guidedPrePlayListenDelayMs = parseInt(text)
+                            enabled: settingsApi ? settingsApi.guidedModeEnabled : false
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                        }
+
+                        Label {
                             text: qsTr("Auto Stop Recording")
                             color: Theme.onSurface(Material.theme)
                         }
