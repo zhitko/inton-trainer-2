@@ -96,19 +96,19 @@ A separate **Categories / Reference Samples** section (accessible from the navig
 
 ### 6. Settings
 
-A comprehensive settings panel organized into collapsible sections:
+A comprehensive settings panel organized with an **Advanced** toggle (non-persistent, at the top of the page). When Advanced is off, only the primary controls are shown:
 
 | Section | What you control |
 |---------|-----------------|
-| **General** | UI language (EN/RU), light/dark/system theme, accent color (Blue/Green/Purple/Orange/Red/Stainless Steel), navigation menu visibility, font size |
-| **Automated Recording (VAD)** | Auto-stop on/off, auto-calibrate before recording, calibration duration (ms), VAD method (Energy / Autocorrelation / Hybrid AND / Hybrid OR), silence duration (ms), minimum record length % (of reference), energy threshold, autocorrelation thresholds and F0 range, autocorrelation energy threshold, threshold K multiplier, diagnostic curve toggles (A, U, V, Corr) |
-| **Guided Mode** | Enable "Play & Listen" training mode, listen window timeout (ms), post-playback delay (ms) |
-| **Pitch** | F0 algorithm (RAPT), frame shift, sample rate, F0 min/max range, voicing threshold, normalization (min_max / mean), interpolation (Linear/Cubic/Akima/Monotone), smoothing (Moving Average/Median/Gaussian/Spline) with window/sigma/penalty controls |
-| **Pitch Log** | Median smoothing window, moving average size, binary transform on/off with threshold |
-| **UMP** | Smoothing type (None / MovingAverage / Median / Gaussian / Spline) with window size, sigma, and penalty controls; show/hide toggle |
-| **Amplitude** | Window/shift sizes, smoothing (MovingAverage / Median / Gaussian) with window and sigma controls; show/hide amplitude and derivative |
-| **Spectrum** | FFT length, F0 refinement toggle, log scale toggle, color scheme (Viridis / Plasma / Hot / Cool), cepstrum order, show/hide spectrum and cepstrum |
-| **DP Calculation** | Which acoustic streams feed the DTW (pitch, pitch derivative, log pitch, amplitude, amplitude derivative, spectrum, cepstrum), per-stream weights, match/insertion/deletion costs, fixed start/end alignment (morph) mode, pitch-log-as-mask, DTW distance limit for auto-rejecting noisy recordings |
+| **General (always visible)** | UI language (EN/RU), light/dark/system theme, accent color (Blue/Green/Purple/Orange/Red/Stainless Steel), navigation menu visibility, font size, delete user data |
+| **Automated Recording (always visible)** | Enable Guided Mode, Auto Stop Recording, Auto-calibrate before recording, Calibrate button |
+| **Advanced (hidden behind toggle)** | Language Title, Guided Mode subs (listen window timeout, post-playback delay), VAD Method, Calibration Duration, Silence Duration, Min Record Length %, Energy Threshold, Autocorrelation Threshold/K/MinF0/MaxF0, both Calibrate buttons, diagnostic curve toggles (A, U, V, Corr) |
+| **Pitch (advanced)** | F0 algorithm (RAPT), frame shift, sample rate, F0 min/max range, voicing threshold, normalization (min_max / mean), interpolation (Linear/Cubic/Akima/Monotone), smoothing (Moving Average/Median/Gaussian/Spline) with window/sigma/penalty controls |
+| **Pitch Log (advanced)** | Median smoothing window, moving average size, binary transform on/off with threshold |
+| **UMP (advanced)** | Smoothing type (None / MovingAverage / Median / Gaussian / Spline) with window size, sigma, and penalty controls; show/hide toggle |
+| **Amplitude (advanced)** | Window/shift sizes, smoothing (MovingAverage / Median / Gaussian) with window and sigma controls; show/hide amplitude and derivative |
+| **Spectrum (advanced)** | FFT length, F0 refinement toggle, log scale toggle, color scheme (Viridis / Plasma / Hot / Cool), cepstrum order, show/hide spectrum and cepstrum |
+| **DP Calculation (advanced)** | Which acoustic streams feed the DTW (pitch, pitch derivative, log pitch, amplitude, amplitude derivative, spectrum, cepstrum), per-stream weights, match/insertion/deletion costs, fixed start/end alignment (morph) mode, pitch-log-as-mask, DTW distance limit for auto-rejecting noisy recordings |
 
 Settings persist across sessions and take effect immediately (most DSP settings re-trigger analysis on the open page automatically).
 

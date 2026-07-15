@@ -12,6 +12,9 @@ Page {
 
     readonly property var settingsApi: ApplicationWindow.window ? ApplicationWindow.window.settingsApi : null
 
+    // Non-persistent toggle to show/hide advanced settings (not stored in settings file)
+    property bool showAdvanced: false
+
     // Helper function to parse float values with support for both "." and "," as decimal separators
     function parseDoubleValue(text) {
         // Replace comma with dot and parse as float
@@ -42,7 +45,42 @@ Page {
 
         ColumnLayout {
             width: parent.width
-            spacing: 20
+            spacing: 0
+
+            // Advanced settings toggle (not persisted) — always at the top
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.topMargin: 15
+                Layout.leftMargin: 5
+                Layout.rightMargin: 5
+                height: advancedToggleRow.height + 5
+                color: showAdvanced ? Theme.primaryContainer(Material.theme) : "transparent"
+                radius: 8
+
+                RowLayout {
+                    id: advancedToggleRow
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    spacing: 10
+
+                    Label {
+                        text: qsTr("Advanced")
+                        font.bold: true
+                        font.pixelSize: AppScale.fs(14)
+                        color: showAdvanced ? Theme.onPrimaryContainer(Material.theme) : Theme.onSurface(Material.theme)
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignRight
+                    }
+
+                    Switch {
+                        checked: showAdvanced
+                        onToggled: showAdvanced = checked
+                    }
+                }
+            }
 
             Frame {
                 Layout.fillWidth: true
@@ -86,6 +124,7 @@ Page {
                         Label {
                             text: qsTr("Language Title")
                             color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
                         }
                         TextField {
                             text: settingsApi ? settingsApi.languageTitle : ""
@@ -93,6 +132,7 @@ Page {
                                 settingsApi.languageTitle = text
                             Layout.fillWidth: true
                             selectByMouse: true
+                            visible: showAdvanced
                         }
 
                         Label {
@@ -264,13 +304,17 @@ Page {
                         Switch {
                             id: guidedModeSwitch
                             checked: settingsApi ? settingsApi.guidedModeEnabled : true
-                            onToggled: if (settingsApi) settingsApi.guidedModeEnabled = checked
+                            onToggled: if (settingsApi) {
+                                settingsApi.guidedModeEnabled = checked;
+                                if (checked) settingsApi.autoStopRecording = true;
+                            }
                         }
 
                         Label {
                             text: qsTr("Listen Window Timeout (ms)")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.guidedModeEnabled : false
+                            visible: showAdvanced
                         }
                         TextField {
                             text: settingsApi ? settingsApi.guidedListenTimeoutMs.toString() : "4000"
@@ -280,12 +324,14 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
+                            visible: showAdvanced
                         }
 
                         Label {
                             text: qsTr("Post-Playback Delay (ms)")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.guidedModeEnabled : false
+                            visible: showAdvanced
                         }
                         TextField {
                             text: settingsApi ? settingsApi.guidedPrePlayListenDelayMs.toString() : "150"
@@ -295,6 +341,7 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
+                            visible: showAdvanced
                         }
 
                         Label {
@@ -303,8 +350,10 @@ Page {
                         }
                         Switch {
                             checked: settingsApi ? settingsApi.autoStopRecording : true
-                            onToggled: if (settingsApi)
-                                settingsApi.autoStopRecording = checked
+                            onToggled: if (settingsApi) {
+                                settingsApi.autoStopRecording = checked;
+                                if (!checked) settingsApi.guidedModeEnabled = false;
+                            }
                         }
 
                         Label {
@@ -322,6 +371,7 @@ Page {
                             text: qsTr("VAD Method")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: showAdvanced
                         }
                         ComboBox {
                             model: [qsTr("Energy"), qsTr("Autocorrelation"), qsTr("Hybrid AND"), qsTr("Hybrid OR")]
@@ -330,11 +380,13 @@ Page {
                                 settingsApi.vadMethod = currentIndex
                             Layout.fillWidth: true
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: showAdvanced
                         }
 
                         Label {
                             text: qsTr("Calibration Duration (ms)")
                             color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
                         }
                         TextField {
                             id: vadCalibrationDurationField
@@ -345,11 +397,13 @@ Page {
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: showAdvanced
                         }
 
                         Label {
                             text: qsTr("Silence Duration (ms)")
                             color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
                         }
                         TextField {
                             id: silenceDurationField
@@ -360,12 +414,14 @@ Page {
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: showAdvanced
                         }
 
                         Label {
                             text: qsTr("Minimum Record Length (%)")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: showAdvanced
                         }
                         TextField {
                             id: minimumRecordLengthField
@@ -376,13 +432,14 @@ Page {
                             selectByMouse: true
                             inputMethodHints: Qt.ImhDigitsOnly
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
+                            visible: showAdvanced
                         }
 
                         Label {
                             text: qsTr("Energy Threshold (Pe)")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
-                            visible: settingsApi ? (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
                         }
 
                         TextField {
@@ -393,7 +450,7 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
-                            visible: settingsApi ? (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
 
                             Connections {
                                 target: settingsApi
@@ -415,7 +472,7 @@ Page {
                             ToolTip.text: qsTr("Measure background noise for 2 seconds to set optimal threshold")
 
                             onClicked: vadCalibrationDialog.open()
-                            visible: settingsApi ? (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 0 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
 
                             background: Rectangle {
                                 radius: 8
@@ -446,7 +503,7 @@ Page {
                             text: qsTr("Autocorr. Threshold")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
-                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
                         }
 
                         TextField {
@@ -457,7 +514,7 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
-                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
 
                             Connections {
                                 target: settingsApi
@@ -472,7 +529,7 @@ Page {
                             text: qsTr("Autocorr. Threshold K:")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
-                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
                         }
 
                         TextField {
@@ -483,7 +540,7 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
-                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
 
                             Connections {
                                 target: settingsApi
@@ -498,7 +555,7 @@ Page {
                             text: qsTr("Autocorr Min F0 (Hz)")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
-                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
                         }
 
                         TextField {
@@ -509,7 +566,7 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
-                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
 
                             Connections {
                                 target: settingsApi
@@ -524,7 +581,7 @@ Page {
                             text: qsTr("Autocorr Max F0 (Hz)")
                             color: Theme.onSurface(Material.theme)
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
-                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
                         }
 
                         TextField {
@@ -535,7 +592,7 @@ Page {
                             Layout.fillWidth: true
                             selectByMouse: true
                             enabled: settingsApi ? settingsApi.autoStopRecording : false
-                            visible: settingsApi ? (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 1 || settingsApi.vadMethod === 2 || settingsApi.vadMethod === 3) : showAdvanced && true
 
                             Connections {
                                 target: settingsApi
@@ -557,7 +614,7 @@ Page {
                             ToolTip.text: qsTr("Measure background noise for 2 seconds to set optimal threshold")
 
                             onClicked: vadCalibrationDialog.open()
-                            visible: settingsApi ? (settingsApi.vadMethod === 1) : true
+                            visible: settingsApi ? showAdvanced && (settingsApi.vadMethod === 1) : showAdvanced && true
 
                             background: Rectangle {
                                 radius: 8
@@ -587,47 +644,56 @@ Page {
                         Label {
                             text: qsTr("Show A(n)")
                             color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
                         }
                         Switch {
                             checked: settingsApi ? settingsApi.showVadA : false
                             onToggled: if (settingsApi)
                                 settingsApi.showVadA = checked
+                            visible: showAdvanced
                         }
 
                         Label {
                             text: qsTr("Show U(n)")
                             color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
                         }
                         Switch {
                             checked: settingsApi ? settingsApi.showVadU : false
                             onToggled: if (settingsApi)
                                 settingsApi.showVadU = checked
+                            visible: showAdvanced
                         }
 
                         Label {
                             text: qsTr("Show V(n)")
                             color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
                         }
                         Switch {
                             checked: settingsApi ? settingsApi.showVadV : false
                             onToggled: if (settingsApi)
                                 settingsApi.showVadV = checked
+                            visible: showAdvanced
                         }
 
                         Label {
                             text: qsTr("Show Corr.")
                             color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
                         }
                         Switch {
                             checked: settingsApi ? settingsApi.showVadCorr : false
                             onToggled: if (settingsApi)
                                 settingsApi.showVadCorr = checked
+                            visible: showAdvanced
                         }
                     }
                 }
             }
 
             Frame {
+                visible: showAdvanced
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
                 Layout.rightMargin: 20
@@ -851,6 +917,7 @@ Page {
             }
 
             Frame {
+                visible: showAdvanced
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
                 Layout.rightMargin: 20
@@ -933,6 +1000,7 @@ Page {
             }
 
             Frame {
+                visible: showAdvanced
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
                 Layout.rightMargin: 20
@@ -1030,6 +1098,7 @@ Page {
             }
 
             Frame {
+                visible: showAdvanced
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
                 Layout.rightMargin: 20
@@ -1150,6 +1219,7 @@ Page {
             }
 
             Frame {
+                visible: showAdvanced
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
                 Layout.rightMargin: 20
@@ -1259,6 +1329,7 @@ Page {
             }
 
             Frame {
+                visible: showAdvanced
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
                 Layout.rightMargin: 20

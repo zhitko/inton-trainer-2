@@ -9,7 +9,9 @@
 #include "src/services/specservice.h"
 #include "src/services/umpservice.h"
 #include "src/services/wavfileservice.h"
+#include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
 #include <QPointF>
 #include <limits>
 
@@ -371,9 +373,12 @@ QVariantList WavFileApi::getPitchDerivative(
 WaveFile* WavFileApi::openWavFile(const QString& filePath)
 {
     LOG_DEBUG() << "Start: openWavFile - filePath=" << filePath;
-    std::string stdPath = filePath.toStdString();
+    // Resolve relative paths against the application directory so fopen()
+    // finds the file regardless of the current working directory
+    QString fullPath = QDir(QCoreApplication::applicationDirPath()).filePath(filePath);
+    std::string stdPath = fullPath.toStdString();
     WaveFile* result = waveOpenFile(stdPath);
-    LOG_DEBUG() << "Finish: openWavFile - success=" << (result != nullptr);
+    LOG_DEBUG() << "Finish: openWavFile - path=" << fullPath << ", success=" << (result != nullptr);
     return result;
 }
 
