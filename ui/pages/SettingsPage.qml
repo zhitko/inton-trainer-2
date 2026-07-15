@@ -14,6 +14,7 @@ Page {
 
     // Non-persistent toggle to show/hide advanced settings (not stored in settings file)
     property bool showAdvanced: false
+    property bool hideAdvancedToggle: false
 
     // Helper function to parse float values with support for both "." and "," as decimal separators
     function parseDoubleValue(text) {
@@ -56,6 +57,7 @@ Page {
                 height: advancedToggleRow.height + 5
                 color: showAdvanced ? Theme.primaryContainer(Material.theme) : "transparent"
                 radius: 8
+                visible: !hideAdvancedToggle
 
                 RowLayout {
                     id: advancedToggleRow

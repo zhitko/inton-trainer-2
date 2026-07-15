@@ -1157,6 +1157,8 @@ Page {
             Layout.fillHeight: true
             Layout.preferredWidth: 450
             visible: root.showSettings
+            showAdvanced: true
+            hideAdvancedToggle: true
 
             background: Rectangle {
                 color: Theme.surface(root.Material.theme)
