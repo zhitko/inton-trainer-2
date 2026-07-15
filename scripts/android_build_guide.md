@@ -66,6 +66,18 @@ Output `.aab`:
 
 ---
 
+## Cleaning Android Builds
+
+To remove all `build_android_*` directories:
+
+```bash
+./scripts/clean_android_build.sh            # prompt before deleting
+./scripts/clean_android_build.sh --force    # skip confirmation
+./scripts/clean_android_build.sh --dry-run  # preview only
+```
+
+---
+
 ## Manual CMake Configure + Build
 
 If you want to run the configure steps manually:

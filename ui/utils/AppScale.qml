@@ -2,6 +2,12 @@ pragma Singleton
 import QtQuick 6.8
 
 QtObject {
+    // ── Platform detection ──────────────────────────────────────────────────
+    // On mobile (Android) the OS handles screen-density scaling, so our
+    // layout transform must be an identity (factor = 1.0) to avoid making
+    // the UI microscopically small.
+    readonly property bool isMobile: Qt.platform.os === "android"
+
     // Design dimensions the UI was built for
     readonly property int designWidth: 640
     readonly property int designHeight: 950
@@ -13,7 +19,8 @@ QtObject {
 
     // Scale factor: shrink to fit if the screen is smaller than the design size,
     // but never enlarge beyond 1.0 (keeps the UI crisp on larger screens).
-    readonly property real factor: Math.min(1.0, Math.min((screenWidth - 100) / designWidth, (screenHeight - 100) / designHeight))
+    // On mobile platforms the OS handles density scaling, so factor is fixed at 1.0.
+    readonly property real factor: isMobile ? 1.0 : Math.min(1.0, Math.min((screenWidth - 100) / designWidth, (screenHeight - 100) / designHeight))
 
     // Font size multiplier from user settings (1.0 = Normal, 1.5 = Big, 2.0 = Large).
     // Updated from Main.qml via Binding so all QML fs() calls react reactively.
