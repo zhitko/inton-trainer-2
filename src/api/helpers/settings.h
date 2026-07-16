@@ -212,6 +212,16 @@ public:
      */
     static AppSettings getDefaultSettings();
 
+    /**
+     * Returns the base directory for application data.
+     *
+     * On desktop this is QCoreApplication::applicationDirPath().
+     * On Android this is QStandardPaths::writableLocation(AppDataLocation)
+     * because the APK's assets/ are extracted there at startup by
+     * extractAndroidAssets().
+     */
+    static QString getAppDataDir();
+
 private:
     /**
      * Returns the file path for the settings JSON file. This is typically located

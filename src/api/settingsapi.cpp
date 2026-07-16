@@ -1,5 +1,6 @@
 #include "settingsapi.h"
 #include "helpers/logger.h"
+#include "helpers/settings.h"
 #include "helpers/statistics.h"
 #include <algorithm>
 #include <QCoreApplication>
@@ -9,6 +10,7 @@
 #include <QDir>
 #include <QQmlEngine>
 #include <QFile>
+#include <QStandardPaths>
 
 SettingsApi::SettingsApi(QObject* parent)
     : QObject(parent)
@@ -676,7 +678,7 @@ void SettingsApi::clearUserStatistics()
     Statistics::clearAllStatistics();
     
     // Get the statistics file path
-    QString filePath = QCoreApplication::applicationDirPath() + "/statistics.json";
+    QString filePath = Settings::getAppDataDir() + "/statistics.json";
     QFile file(filePath);
     
     if (file.exists()) {
@@ -688,7 +690,7 @@ void SettingsApi::clearUserStatistics()
     }
     
     // Delete all user records from data/records folder
-    QString recordsPath = QCoreApplication::applicationDirPath() + "/data/records";
+    QString recordsPath = Settings::getAppDataDir() + "/data/records";
     QDir recordsDir(recordsPath);
     
     if (recordsDir.exists()) {

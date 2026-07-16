@@ -1,5 +1,6 @@
 #include "fileapi.h"
 #include "helpers/logger.h"
+#include "helpers/settings.h"
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
@@ -48,7 +49,7 @@ FileApi::FileApi(QObject* parent)
 void FileApi::deleteFile(const QString& file)
 {
     LOG_DEBUG() << "Start: deleteFile - file=" << file;
-    QString basePath = QCoreApplication::applicationDirPath();
+    QString basePath = Settings::getAppDataDir();
     QString searchPath = QDir(basePath).filePath(file);
     QFile f(searchPath);
     f.remove();
@@ -57,7 +58,7 @@ void FileApi::deleteFile(const QString& file)
 
 QString FileApi::getApplicationDirPath()
 {
-    return QCoreApplication::applicationDirPath();
+    return Settings::getAppDataDir();
 }
 
 QUrl FileApi::getUrlFromPath(const QString& path)
@@ -73,7 +74,7 @@ QString FileApi::getPathFromUrl(const QUrl& url)
 bool FileApi::directoryExists(const QString& path)
 {
     LOG_DEBUG() << "Start: directoryExists - path=" << path;
-    QString basePath = QCoreApplication::applicationDirPath();
+    QString basePath = Settings::getAppDataDir();
     QString searchPath = QDir(basePath).filePath(path);
     bool exists = QDir(searchPath).exists();
     LOG_DEBUG() << "Finish: directoryExists - exists=" << exists
@@ -86,7 +87,7 @@ QVariantMap FileApi::getFiles(const QString& path,
 {
     LOG_DEBUG() << "Start: getFiles - path=" << path
                 << ", nameFilters=" << nameFilters;
-    QString basePath = QCoreApplication::applicationDirPath();
+    QString basePath = Settings::getAppDataDir();
     QString searchPath = QDir(basePath).filePath(path);
 
     QVariantMap fileTree;
@@ -139,7 +140,7 @@ QVariantMap FileApi::getFiles(const QString& path,
 QVariantList FileApi::getFolders(const QString& path)
 {
     LOG_DEBUG() << "Start: getFolders - path=" << path;
-    QString basePath = QCoreApplication::applicationDirPath();
+    QString basePath = Settings::getAppDataDir();
     QString searchPath = QDir(basePath).filePath(path);
 
     QDir dir(searchPath);
@@ -159,7 +160,7 @@ QVariantList FileApi::getFilesList(const QString& path,
 {
     LOG_DEBUG() << "Start: getFilesList - path=" << path
                 << ", nameFilters=" << nameFilters;
-    QString basePath = QCoreApplication::applicationDirPath();
+    QString basePath = Settings::getAppDataDir();
     QString searchPath = QDir(basePath).filePath(path);
 
     QVariantList fileList;

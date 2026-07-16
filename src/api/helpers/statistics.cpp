@@ -9,11 +9,13 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QStandardPaths>
 #include <algorithm>
 #include <functional>
 #include <numeric>
 
 #include "logger.h"
+#include "settings.h"
 
 // Helper function to normalize path separators to forward slashes
 static std::string normalizePath(const std::string& path) {
@@ -35,8 +37,14 @@ bool Statistics::statisticsLoaded = false;
 QString
 Statistics::getStatisticsFilePath()
 {
+#ifdef Q_OS_ANDROID
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/statistics.json";
+    QDir().mkpath(QFileInfo(path).absolutePath());
+    return path;
+#else
     QString path = QCoreApplication::applicationDirPath() + "/statistics.json";
     return path;
+#endif
 }
 
 static QJsonObject itemToJson(const std::shared_ptr<StatisticsItem>& item)
@@ -106,7 +114,7 @@ Statistics::loadStatistics()
     if (!file.open(QIODevice::ReadOnly)) {
         LOG_INFO() << "Statistics file not found, initializing from disk";
 
-        QString appDir = QCoreApplication::applicationDirPath();
+        QString appDir = Settings::getAppDataDir();
         QString patternsDir = appDir + "/data/patterns";
 
         if (QDir(patternsDir).exists()) {
@@ -669,7 +677,7 @@ std::vector<HistoryEntry> Statistics::getAllHistory()
 void Statistics::clearAllStatistics()
 {
     // Reinitialize statistics from patterns directory instead of just clearing
-    QString appDir = QCoreApplication::applicationDirPath();
+    QString appDir = Settings::getAppDataDir();
     QString patternsDir = QDir(appDir).filePath("data/patterns");
     
     // Check if patterns directory exists

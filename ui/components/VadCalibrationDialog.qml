@@ -38,6 +38,20 @@ Dialog {
             root.calibrationDoneAutocorrelation(threshold);
             root.close();
         }
+        onPermissionResultReceived: function(granted) {
+            if (granted) {
+                // Retry calibration after permission granted
+                const method = window.settingsApi ? window.settingsApi.vadMethod : 0;
+                if (method === 1) {
+                    _calibrationAudioApi.calibrateVadAutocorrelation();
+                } else {
+                    _calibrationAudioApi.calibrateVadEnergy();
+                }
+            } else {
+                Logger.warning("Microphone permission denied — cannot calibrate");
+                root.close();
+            }
+        }
     }
 
     contentItem: ColumnLayout {
@@ -72,6 +86,12 @@ Dialog {
     }
 
     onOpened: {
+        // Request microphone permission first (no-op on desktop)
+        if (!_calibrationAudioApi.requestAudioPermission()) {
+            // Permission request is pending — will retry calibration in
+            // onPermissionResultReceived callback
+            return;
+        }
         const method = window.settingsApi ? window.settingsApi.vadMethod : 0;
         if (method === 1) {  // 1: autocorr
             _calibrationAudioApi.calibrateVadAutocorrelation();

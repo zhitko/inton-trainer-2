@@ -12,6 +12,7 @@
 #include <memory>
 
 #include <QMediaPlayer>
+#include <QPermission>
 #include <vector>
 
 class WavFileService;
@@ -81,6 +82,17 @@ public:
     void setVadMethod(int method);
 
 public slots:
+    /**
+     * Requests the RECORD_AUDIO permission on Android (runtime permission).
+     * On desktop this is a no-op and returns true immediately.
+     * Must be called from a UI context (QML signal handler or main thread).
+     *
+     * @return true if the permission is already granted (or not needed),
+     *         false if the permission request is pending (result delivered
+     *         via permissionResultReceived signal).
+     */
+    Q_INVOKABLE bool requestAudioPermission();
+
     /**
      * Starts recording audio from the microphone. If durationSeconds is greater
      * than 0, the recording will automatically stop after the specified number of
@@ -170,6 +182,13 @@ signals:
      */
     void isVoiceDetectedChanged();
     void vadMethodChanged();
+    /**
+     * Emitted when a runtime permission request completes.
+     * Only used on Android (RECORD_AUDIO); on desktop this is never emitted.
+     *
+     * @param permissionGranted - true if the user granted the permission.
+     */
+    void permissionResultReceived(bool permissionGranted);
     /**
      * Emitted when VAD energy calibration completes. The parameter is the computed
      * threshold value that should be saved in settings.

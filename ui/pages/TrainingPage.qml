@@ -73,7 +73,22 @@ Page {
 
     AudioApi {
         id: trainingAudioApi
+        onPermissionResultReceived: function(granted) {
+            if (granted) {
+                Logger.debug("Microphone permission granted, starting recording");
+                if (root.pendingStartRecording) {
+                    root.pendingStartRecording = false;
+                    root.doStartRecording();
+                }
+            } else {
+                Logger.warning("Microphone permission denied");
+                root.pendingStartRecording = false;
+            }
+        }
     }
+
+    // Set to true when we're waiting for the async permission prompt
+    property bool pendingStartRecording: false
 
     property bool _isExiting: false
     property bool _wasRecordingBeforeDialog: false
@@ -113,6 +128,16 @@ Page {
 
     // Starts recording without VAD calibration (calibration is performed on HomePage).
     function startRecording() {
+        // On Android, request mic permission first (async). If pending,
+        // doStartRecording() will be called from the callback.
+        if (!trainingAudioApi.requestAudioPermission()) {
+            pendingStartRecording = true;
+            return;
+        }
+        doStartRecording();
+    }
+
+    function doStartRecording() {
         let minimumLength = -1;
         if (root.referenceWaveData && window.settingsApi) {
             minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
@@ -205,11 +230,7 @@ Page {
         repeat: false
         onTriggered: {
             if (root.visible && !root._isExiting && !root._isVadPaused) {
-                let minimumLength = -1;
-                if (root.referenceWaveData && window.settingsApi) {
-                    minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
-                }
-                trainingAudioApi.startRecording(-1, minimumLength);
+                root.startRecording();
             }
         }
     }
@@ -1356,11 +1377,7 @@ Page {
                     if (_wasRecordingBeforeDialog && !root._isVadPaused && window.settingsApi && window.settingsApi.autoStopRecording) {
                         console.log("Resuming recording after opening test file dialog");
                         _isExiting = false; // Allow recording to auto-restart
-                        let minimumLength = -1;
-                        if (root.referenceWaveData && window.settingsApi) {
-                            minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
-                        }
-                        trainingAudioApi.startRecording(-1, minimumLength);
+                        root.startRecording();
                     }
                 }
             }

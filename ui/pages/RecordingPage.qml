@@ -11,6 +11,14 @@ Page {
 
     AudioApi {
         id: audioApi
+        onPermissionResultReceived: function(granted) {
+            if (granted) {
+                Logger.debug("Permission granted, starting recording");
+                audioApi.startRecording();
+            } else {
+                Logger.warning("Microphone permission denied");
+            }
+        }
     }
 
     // Handle auto-stop recording - when recording stops automatically
@@ -56,6 +64,12 @@ Page {
                 lastRecordedFile = audioApi.saveWavFile();
             } else {
                 lastRecordedFile = "";
+                // Request microphone permission (no-op on desktop)
+                if (!audioApi.requestAudioPermission()) {
+                    // Permission request is pending — will start recording in
+                    // onPermissionResultReceived callback
+                    return;
+                }
                 audioApi.startRecording();
             }
         }

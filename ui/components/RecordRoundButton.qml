@@ -17,6 +17,17 @@ ColumnLayout {
 
     AudioApi {
         id: audioApi
+        onPermissionResultReceived: function(granted) {
+            if (granted) {
+                Logger.debug("Permission granted, starting recording");
+                root.filePath = "";
+                audioApi.startRecording();
+                Logger.debug("Recording started");
+                root.clicked();
+            } else {
+                Logger.warning("Microphone permission denied");
+            }
+        }
     }
 
     // Handle auto-stop recording - when recording stops automatically
@@ -96,6 +107,11 @@ ColumnLayout {
                         root.recordingFinished(root.filePath);
                         Logger.debug("Recording finished: " + root.filePath);
                     } else {
+                        // Request microphone permission (no-op on desktop)
+                        if (!audioApi.requestAudioPermission()) {
+                            // Permission request is pending — will start in callback
+                            return;
+                        }
                         root.filePath = "";
                         audioApi.startRecording();
                         Logger.debug("Recording started");

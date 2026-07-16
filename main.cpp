@@ -1,6 +1,12 @@
+#include <QCoreApplication>
+#include <QDir>
+#include <QDirIterator>
+#include <QFile>
+#include <QFileInfo>
 #include <QFontDatabase>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QStandardPaths>
 #include <QStringList>
 #include <QtQml>
 
@@ -16,10 +22,82 @@
 #include "qmllogger.h"
 #include "src/services/helpers/fileLogger.h"
 
+#ifdef Q_OS_ANDROID
+/**
+ * Extracts bundled assets from the APK to the writable app data directory.
+ * Qt for Android does NOT automatically extract assets/ to the filesystem —
+ * they are only accessible via the assets:/ URI scheme. Since our C++ code
+ * (and the C-level WAV library) uses real filesystem paths, we must copy
+ * them out on first launch.
+ *
+ * Only files that don't already exist in the destination are copied, so
+ * repeated startup is fast.
+ */
+static void extractAndroidAssets()
+{
+    const QString srcPrefix = QStringLiteral("assets:/");
+    const QString dstDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    // The asset paths to extract (relative to assets:/)
+    const QStringList assetRoots = {
+        QStringLiteral("settings.ini"),
+        QStringLiteral("data")
+    };
+
+    for (const QString& root : assetRoots) {
+        const QString srcPath = srcPrefix + root;
+        const QString dstPath = dstDir + QLatin1Char('/') + root;
+
+        QFileInfo dstInfo(dstPath);
+        if (dstInfo.exists()) {
+            // Already extracted — skip
+            continue;
+        }
+
+        // Recursively copy assets
+        // Use a stack of (source, destination) pairs
+        struct Entry { QString src; QString dst; };
+        QList<Entry> stack = { { srcPath, dstPath } };
+
+        while (!stack.isEmpty()) {
+            Entry e = stack.takeLast();
+            QFileInfo srcInfo(e.src);
+
+            // Qt's asset file engine doesn't support QFileInfo::isDir() reliably,
+            // so we try to list the directory contents first.
+            QDir dir(e.src);
+            QStringList entries = dir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+            if (!entries.isEmpty()) {
+                // It's a directory — create destination and enqueue children
+                QDir().mkpath(e.dst);
+                for (const QString& entry : entries) {
+                    stack.append({
+                        e.src + QLatin1Char('/') + entry,
+                        e.dst + QLatin1Char('/') + entry
+                    });
+                }
+            } else {
+                // It's a file — copy it
+                if (QFile::exists(e.src)) {
+                    QDir().mkpath(QFileInfo(e.dst).absolutePath());
+                    QFile::copy(e.src, e.dst);
+                }
+            }
+        }
+    }
+}
+#endif // Q_OS_ANDROID
+
 int main(int argc, char* argv[])
 {
     // Initialize file logger (clears the log file)
     FileLogger::getInstance().initialize();
+
+#ifdef Q_OS_ANDROID
+    // Extract bundled assets (settings.ini, data/patterns, …) from APK
+    // to the writable filesystem so fopen() and QFile paths work.
+    extractAndroidAssets();
+#endif
 
     QGuiApplication app(argc, argv);
 

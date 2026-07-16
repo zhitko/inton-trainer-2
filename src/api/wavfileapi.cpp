@@ -375,7 +375,7 @@ WaveFile* WavFileApi::openWavFile(const QString& filePath)
     LOG_DEBUG() << "Start: openWavFile - filePath=" << filePath;
     // Resolve relative paths against the application directory so fopen()
     // finds the file regardless of the current working directory
-    QString fullPath = QDir(QCoreApplication::applicationDirPath()).filePath(filePath);
+    QString fullPath = QDir(Settings::getAppDataDir()).filePath(filePath);
     std::string stdPath = fullPath.toStdString();
     WaveFile* result = waveOpenFile(stdPath);
     LOG_DEBUG() << "Finish: openWavFile - path=" << fullPath << ", success=" << (result != nullptr);

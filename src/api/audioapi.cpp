@@ -28,8 +28,13 @@ AudioApi::AudioApi(QObject* parent)
     m_format.setSampleRate(8000);
     m_format.setChannelCount(1);
     m_format.setSampleFormat(QAudioFormat::Int16);
+    #ifdef Q_OS_ANDROID
+    m_wavFileService = std::unique_ptr<WavFileService>(new WavFileService(
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString()));
+#else
     m_wavFileService = std::unique_ptr<WavFileService>(new WavFileService(
         QCoreApplication::applicationDirPath().toStdString()));
+#endif
 
     m_vadService = std::unique_ptr<VADEnergyService>(new VADEnergyService(this));
     m_vadAutocorrService = std::unique_ptr<VADAutocorrelationService>(new VADAutocorrelationService(this));
@@ -141,7 +146,7 @@ void AudioApi::play(const QString& filePath)
         LOG_CRITICAL() << "QMediaPlayer is not initialized";
         return;
     }
-    QString fullPath = QDir(QCoreApplication::applicationDirPath()).filePath(filePath);
+    QString fullPath = QDir(Settings::getAppDataDir()).filePath(filePath);
     m_player->setSource(QUrl::fromLocalFile(fullPath));
     m_player->play();
     LOG_DEBUG() << "Finish: play";
@@ -163,6 +168,34 @@ void AudioApi::setAudioLevel(qreal level)
     }
     m_audioLevel = level;
     emit isAudioLevelChanged();
+}
+
+bool AudioApi::requestAudioPermission()
+{
+#ifdef Q_OS_ANDROID
+    // Qt 6.5+ QPermission API for runtime permission requests
+    QMicrophonePermission microphonePermission;
+    auto *app = qApp;
+    if (!app) return false;
+    if (app->checkPermission(microphonePermission) == Qt::PermissionStatus::Granted) {
+        return true;
+    }
+
+    // Request the permission asynchronously — result arrives via
+    // permissionResultReceived signal.
+    app->requestPermission(microphonePermission, this,
+        [this](const QPermission &permission) {
+            bool granted = (qApp->checkPermission(permission) == Qt::PermissionStatus::Granted);
+            if (!granted) {
+                LOG_WARNING() << "RECORD_AUDIO permission denied by user";
+            }
+            emit permissionResultReceived(granted);
+        });
+    return false;
+#else
+    // Desktop — no runtime permission needed
+    return true;
+#endif
 }
 
 void AudioApi::startRecording(int durationSeconds, int minimumRecordLength)

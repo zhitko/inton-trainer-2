@@ -2,8 +2,10 @@
 
 #include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
 #include <QFileInfo>
 #include <QSettings>
+#include <QStandardPaths>
 
 #include "logger.h"
 
@@ -14,10 +16,26 @@ Settings::getDefaultSettings()
 }
 
 QString
+Settings::getAppDataDir()
+{
+#ifdef Q_OS_ANDROID
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#else
+    return QCoreApplication::applicationDirPath();
+#endif
+}
+
+QString
 Settings::getSettingsFilePath()
 {
-    QString path = QCoreApplication::applicationDirPath() + "/settings.ini";
+#ifdef Q_OS_ANDROID
+    QString path = getAppDataDir() + "/settings.ini";
+    // Ensure the directory exists — QSettings will create the file on first write
+    QDir().mkpath(QFileInfo(path).absolutePath());
     return path;
+#else
+    return getAppDataDir() + "/settings.ini";
+#endif
 }
 
 AppSettings

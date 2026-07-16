@@ -1,4 +1,5 @@
 #include "statisticsapi.h"
+#include "helpers/settings.h"
 
 #include <QCoreApplication>
 #include <QFileInfo>
@@ -10,7 +11,7 @@ StatisticsApi::StatisticsApi(QObject* parent)
 
 static QString removeApplicationPath(const QString& filePath)
 {
-    QString appPath = QCoreApplication::applicationDirPath();
+    QString appPath = Settings::getAppDataDir();
     QString normalizedPath = filePath;
 
     // Remove application path prefix if present
