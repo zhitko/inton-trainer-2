@@ -73,6 +73,8 @@ Settings::loadSettings()
     settings.showVadU = qsettings.value("showVadU", false).toBool();
     settings.showVadV = qsettings.value("showVadV", false).toBool();
     settings.showVadCorr = qsettings.value("showVadCorr", false).toBool();
+    settings.playSignalBeforeRecording = qsettings.value("playSignalBeforeRecording", true).toBool();
+    settings.playSignalAfterRecording = qsettings.value("playSignalAfterRecording", true).toBool();
     settings.guidedModeEnabled = qsettings.value("guidedModeEnabled", true).toBool();
     settings.guidedListenTimeoutMs = qsettings.value("guidedListenTimeoutMs", 4000).toInt();
     settings.guidedPrePlayListenDelayMs = qsettings.value("guidedPrePlayListenDelayMs", 150).toInt();
@@ -193,6 +195,8 @@ void Settings::saveSettings(const AppSettings& settings)
     qsettings.setValue("showVadU", settings.showVadU);
     qsettings.setValue("showVadV", settings.showVadV);
     qsettings.setValue("showVadCorr", settings.showVadCorr);
+    qsettings.setValue("playSignalBeforeRecording", settings.playSignalBeforeRecording);
+    qsettings.setValue("playSignalAfterRecording", settings.playSignalAfterRecording);
     qsettings.setValue("guidedModeEnabled", settings.guidedModeEnabled);
     qsettings.setValue("guidedListenTimeoutMs", settings.guidedListenTimeoutMs);
     qsettings.setValue("guidedPrePlayListenDelayMs", settings.guidedPrePlayListenDelayMs);

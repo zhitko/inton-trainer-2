@@ -144,6 +144,8 @@ class SettingsApi : public QObject {
     Q_PROPERTY(double dpDeletionCoef READ dpDeletionCoef WRITE setDpDeletionCoef NOTIFY dpDeletionCoefChanged)
     Q_PROPERTY(bool dpUseFixedStartEndDP READ dpUseFixedStartEndDP WRITE setDpUseFixedStartEndDP NOTIFY dpUseFixedStartEndDPChanged)
     Q_PROPERTY(double dtwDistanceLimit READ dtwDistanceLimit WRITE setDtwDistanceLimit NOTIFY dtwDistanceLimitChanged)
+    Q_PROPERTY(bool   playSignalBeforeRecording  READ playSignalBeforeRecording  WRITE setPlaySignalBeforeRecording  NOTIFY playSignalBeforeRecordingChanged)
+    Q_PROPERTY(bool   playSignalAfterRecording   READ playSignalAfterRecording   WRITE setPlaySignalAfterRecording   NOTIFY playSignalAfterRecordingChanged)
     Q_PROPERTY(bool   guidedModeEnabled         READ guidedModeEnabled         WRITE setGuidedModeEnabled         NOTIFY guidedModeEnabledChanged)
     Q_PROPERTY(int    guidedListenTimeoutMs      READ guidedListenTimeoutMs      WRITE setGuidedListenTimeoutMs      NOTIFY guidedListenTimeoutMsChanged)
     Q_PROPERTY(int    guidedPrePlayListenDelayMs READ guidedPrePlayListenDelayMs WRITE setGuidedPrePlayListenDelayMs NOTIFY guidedPrePlayListenDelayMsChanged)
@@ -394,6 +396,10 @@ public:
     double dtwDistanceLimit() const;
     void setDtwDistanceLimit(double dtwDistanceLimit);
 
+    bool   playSignalBeforeRecording() const;
+    void   setPlaySignalBeforeRecording(bool v);
+    bool   playSignalAfterRecording() const;
+    void   setPlaySignalAfterRecording(bool v);
     bool   guidedModeEnabled() const;
     void   setGuidedModeEnabled(bool v);
     int    guidedListenTimeoutMs() const;
@@ -509,6 +515,8 @@ signals:
     void dpDeletionCoefChanged();
     void dpUseFixedStartEndDPChanged();
     void dtwDistanceLimitChanged();
+    void playSignalBeforeRecordingChanged();
+    void playSignalAfterRecordingChanged();
     void guidedModeEnabledChanged();
     void guidedListenTimeoutMsChanged();
     void guidedPrePlayListenDelayMsChanged();

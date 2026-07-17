@@ -169,6 +169,10 @@ struct AppSettings {
     // Maximum allowed DTW distance (minFinalCost); recordings above this threshold are skipped.
     double dtwDistanceLimit = 100.0;
 
+    // Play a short tone signal before/after recording starts/stops
+    bool playSignalBeforeRecording = true;
+    bool playSignalAfterRecording = true;
+
     // == Guided mode settings ==
     // Whether the "Play & Listen" switch position is visible on TrainingPage.
     bool guidedModeEnabled = true;

@@ -85,6 +85,24 @@ Page {
                 root.pendingStartRecording = false;
             }
         }
+        onBeepFinished: {
+            if (root._pendingBeepRecording) {
+                root._pendingBeepRecording = false;
+                if (root.visible && !root._isExiting) {
+                    root.doStartRecording();
+                }
+            } else if (root._pendingAfterBeep) {
+                root._pendingAfterBeep = false;
+                if (!root._isExiting && !isAnyPlaybackActive
+                        && window.settingsApi && window.settingsApi.autoStopRecording) {
+                    restartRecordingTimer.start();
+                }
+            } else if (root._pendingDoubleBeep) {
+                root._pendingDoubleBeep = false;
+                // Play the second tone of the double-beep
+                trainingAudioApi.playBeep(440, 120, 0.5);
+            }
+        }
     }
 
     // Set to true when we're waiting for the async permission prompt
@@ -134,6 +152,13 @@ Page {
             pendingStartRecording = true;
             return;
         }
+
+        // Play a short beep before recording starts if enabled
+        if (window.settingsApi && window.settingsApi.playSignalBeforeRecording) {
+            root._pendingBeepRecording = true;
+            trainingAudioApi.playBeep(660, 80, 0.4);
+            return;
+        }
         doStartRecording();
     }
 
@@ -144,6 +169,13 @@ Page {
         }
         trainingAudioApi.startRecording(-1, minimumLength);
     }
+
+    // When true, recording will start as soon as the beep finishes playing
+    property bool _pendingBeepRecording: false
+    // When true, the auto-restart cycle waits for the after-recording beep to finish
+    property bool _pendingAfterBeep: false
+    // When true, a second tone of a double-beep is queued
+    property bool _pendingDoubleBeep: false
 
     onVisibleChanged: {
         if (visible) {
@@ -165,6 +197,9 @@ Page {
             guidedDelayTimer.stop();
             guidedTimeoutTimer.stop();
             root.guidedState = root.gsIdle;
+            root._pendingBeepRecording = false;
+            root._pendingAfterBeep = false;
+            root._pendingDoubleBeep = false;
             if (trainingAudioApi.isRecording) {
                 trainingAudioApi.stopRecording();
             }
@@ -183,7 +218,7 @@ Page {
         onIsRecordingChanged: {
             if (!trainingAudioApi.isRecording && !root._isExiting) {
 
-                // ── AUTO MODE (unchanged logic) ──────────────────────────────
+                // ── AUTO MODE ──────────────────────────────────────────────
                 if (root.trainingMode === 0
                         && window.settingsApi && window.settingsApi.autoStopRecording) {
                     let tempFilePath = trainingAudioApi.saveWavFile();
@@ -197,7 +232,13 @@ Page {
                             Logger.info("Recording save failed or no wave data available.");
                         }
                     }
-                    if (!root._isExiting && !isAnyPlaybackActive
+
+                    // Play after-recording beep if enabled (before restart logic)
+                    if (window.settingsApi && window.settingsApi.playSignalAfterRecording
+                            && !root._isExiting) {
+                        root._pendingAfterBeep = true;
+                        trainingAudioApi.playBeep(440, 150, 0.5);
+                    } else if (!root._isExiting && !isAnyPlaybackActive
                             && window.settingsApi && window.settingsApi.autoStopRecording) {
                         restartRecordingTimer.start();
                     }
@@ -215,6 +256,11 @@ Page {
                         if (userWaveData) {
                             Logger.info("Guided: attempt captured — processing");
                             updateUserUMP(tempFilePath, true);
+                            // Play after-recording beep if enabled (two-tone)
+                            if (window.settingsApi && window.settingsApi.playSignalAfterRecording) {
+                                root._pendingDoubleBeep = true;
+                                trainingAudioApi.playBeep(880, 60, 0.5);
+                            }
                         }
                     }
                     root.guidedState = root.gsIdle;

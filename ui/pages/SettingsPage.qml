@@ -690,6 +690,26 @@ Page {
                                 settingsApi.showVadCorr = checked
                             visible: showAdvanced
                         }
+
+                        Label {
+                            text: qsTr("Play signal before recording")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.playSignalBeforeRecording : true
+                            onToggled: if (settingsApi)
+                                settingsApi.playSignalBeforeRecording = checked
+                        }
+
+                        Label {
+                            text: qsTr("Play signal after recording")
+                            color: Theme.onSurface(Material.theme)
+                        }
+                        Switch {
+                            checked: settingsApi ? settingsApi.playSignalAfterRecording : true
+                            onToggled: if (settingsApi)
+                                settingsApi.playSignalAfterRecording = checked
+                        }
                     }
                 }
             }

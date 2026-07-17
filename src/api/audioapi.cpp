@@ -161,6 +161,186 @@ void AudioApi::stopPlayback()
     LOG_DEBUG() << "Finish: stopPlayback";
 }
 
+void AudioApi::playBeep(double frequencyHz, int durationMs, double amplitude)
+{
+    LOG_DEBUG() << "Start: playBeep - freq=" << frequencyHz
+                << " dur=" << durationMs << " amp=" << amplitude;
+    if (!m_player) {
+        LOG_CRITICAL() << "QMediaPlayer is not initialized";
+        return;
+    }
+
+    // Stop any current playback and disconnect old beepFinished connections
+    m_player->stop();
+    disconnect(m_player, &QMediaPlayer::playbackStateChanged, nullptr, nullptr);
+
+    const int sampleRate = 8000;
+    const int numSamples = sampleRate * durationMs / 1000;
+
+    // Build WAV header for 16-bit mono PCM at sampleRate
+    const int dataBytes = numSamples * 2;
+    const int fileSize  = 36 + dataBytes;
+
+    QByteArray wavData;
+    wavData.reserve(44 + dataBytes);
+
+    auto write32 = [&](uint32_t v) {
+        wavData.append(static_cast<char>( v        & 0xFF));
+        wavData.append(static_cast<char>((v >> 8)  & 0xFF));
+        wavData.append(static_cast<char>((v >> 16) & 0xFF));
+        wavData.append(static_cast<char>((v >> 24) & 0xFF));
+    };
+    auto write16 = [&](uint16_t v) {
+        wavData.append(static_cast<char>( v       & 0xFF));
+        wavData.append(static_cast<char>((v >> 8) & 0xFF));
+    };
+
+    // RIFF header
+    wavData.append("RIFF", 4);
+    write32(fileSize);
+    wavData.append("WAVE", 4);
+
+    // fmt chunk (PCM)
+    wavData.append("fmt ", 4);
+    write32(16);
+    write16(1);
+    write16(1);
+    write32(sampleRate);
+    write32(sampleRate * 2);
+    write16(2);
+    write16(16);
+
+    // data chunk
+    wavData.append("data", 4);
+    write32(dataBytes);
+
+    // PCM samples
+    for (int i = 0; i < numSamples; ++i) {
+        double t = static_cast<double>(i) / sampleRate;
+        double sample = amplitude * std::sin(2.0 * M_PI * frequencyHz * t);
+        int16_t value = static_cast<int16_t>(std::clamp(sample, -1.0, 1.0) * 32767.0);
+        wavData.append(static_cast<char>( value       & 0xFF));
+        wavData.append(static_cast<char>((value >> 8) & 0xFF));
+    }
+
+    // Play the in-memory WAV via a fresh buffer each time
+    auto* buf = new QBuffer(this);
+    buf->setData(wavData);
+    buf->open(QIODevice::ReadOnly);
+
+    m_player->setSourceDevice(buf, QUrl());
+    m_player->play();
+
+    // Clean up the buffer when playback finishes
+    connect(m_player, &QMediaPlayer::playbackStateChanged, this,
+        [this, buf](QMediaPlayer::PlaybackState state) {
+            if (state == QMediaPlayer::StoppedState) {
+                buf->deleteLater();
+                emit beepFinished();
+            }
+        });
+
+    LOG_DEBUG() << "Finish: playBeep";
+}
+
+void AudioApi::playDoubleBeep(double freq1, int dur1, double freq2, int dur2, double amp)
+{
+    LOG_DEBUG() << "Start: playDoubleBeep - freq1=" << freq1 << " dur1=" << dur1
+                << " freq2=" << freq2 << " dur2=" << dur2 << " amp=" << amp;
+    if (!m_player) {
+        LOG_CRITICAL() << "QMediaPlayer is not initialized";
+        return;
+    }
+
+    // Stop any current playback and disconnect old connections
+    m_player->stop();
+    disconnect(m_player, &QMediaPlayer::playbackStateChanged, nullptr, nullptr);
+
+    const int sampleRate = 8000;
+    const int gapSamples = sampleRate * 80 / 1000; // 80 ms silence between tones
+    const int numSamples1 = sampleRate * dur1 / 1000;
+    const int numSamples2 = sampleRate * dur2 / 1000;
+    const int totalSamples = numSamples1 + gapSamples + numSamples2;
+    const int dataBytes = totalSamples * 2;
+    const int fileSize  = 36 + dataBytes;
+
+    QByteArray wavData;
+    wavData.reserve(44 + dataBytes);
+
+    auto write32 = [&](uint32_t v) {
+        wavData.append(static_cast<char>( v        & 0xFF));
+        wavData.append(static_cast<char>((v >> 8)  & 0xFF));
+        wavData.append(static_cast<char>((v >> 16) & 0xFF));
+        wavData.append(static_cast<char>((v >> 24) & 0xFF));
+    };
+    auto write16 = [&](uint16_t v) {
+        wavData.append(static_cast<char>( v       & 0xFF));
+        wavData.append(static_cast<char>((v >> 8) & 0xFF));
+    };
+
+    // RIFF header
+    wavData.append("RIFF", 4);
+    write32(fileSize);
+    wavData.append("WAVE", 4);
+
+    // fmt chunk
+    wavData.append("fmt ", 4);
+    write32(16);
+    write16(1);
+    write16(1);
+    write32(sampleRate);
+    write32(sampleRate * 2);
+    write16(2);
+    write16(16);
+
+    // data chunk
+    wavData.append("data", 4);
+    write32(dataBytes);
+
+    // First tone
+    for (int i = 0; i < numSamples1; ++i) {
+        double t = static_cast<double>(i) / sampleRate;
+        double sample = amp * std::sin(2.0 * M_PI * freq1 * t);
+        int16_t value = static_cast<int16_t>(std::clamp(sample, -1.0, 1.0) * 32767.0);
+        wavData.append(static_cast<char>( value       & 0xFF));
+        wavData.append(static_cast<char>((value >> 8) & 0xFF));
+    }
+
+    // Silence gap
+    for (int i = 0; i < gapSamples; ++i) {
+        wavData.append(static_cast<char>(0));
+        wavData.append(static_cast<char>(0));
+    }
+
+    // Second tone
+    for (int i = 0; i < numSamples2; ++i) {
+        double t = static_cast<double>(i) / sampleRate;
+        double sample = amp * std::sin(2.0 * M_PI * freq2 * t);
+        int16_t value = static_cast<int16_t>(std::clamp(sample, -1.0, 1.0) * 32767.0);
+        wavData.append(static_cast<char>( value       & 0xFF));
+        wavData.append(static_cast<char>((value >> 8) & 0xFF));
+    }
+
+    // Play via a fresh buffer
+    auto* buf = new QBuffer(this);
+    buf->setData(wavData);
+    buf->open(QIODevice::ReadOnly);
+
+    m_player->setSourceDevice(buf, QUrl());
+    m_player->play();
+
+    // Clean up and emit beepFinished when done
+    connect(m_player, &QMediaPlayer::playbackStateChanged, this,
+        [this, buf](QMediaPlayer::PlaybackState state) {
+            if (state == QMediaPlayer::StoppedState) {
+                buf->deleteLater();
+                emit beepFinished();
+            }
+        });
+
+    LOG_DEBUG() << "Finish: playDoubleBeep";
+}
+
 void AudioApi::setAudioLevel(qreal level)
 {
     if (qFuzzyCompare(m_audioLevel, level)) {

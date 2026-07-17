@@ -142,6 +142,28 @@ public slots:
      */
     Q_INVOKABLE void play(const QString& filePath);
     /**
+     * Plays a beep tone generated in memory (no temporary file).
+     * The beep is a sine wave at the given frequency for the given duration.
+     *
+     * @param frequencyHz - Tone frequency in Hz (default 440).
+     * @param durationMs  - Tone length in milliseconds (default 100).
+     * @param amplitude   - Amplitude 0.0–1.0 (default 0.5).
+     */
+    Q_INVOKABLE void playBeep(double frequencyHz = 440.0, int durationMs = 100, double amplitude = 0.5);
+    /**
+     * Plays a two-tone "ding-dong" beep generated in memory.
+     * Two tones play back-to-back with a short silence gap between them.
+     *
+     * @param freq1 - First tone frequency in Hz (default 880).
+     * @param dur1  - First tone length in ms (default 60).
+     * @param freq2 - Second tone frequency in Hz (default 440).
+     * @param dur2  - Second tone length in ms (default 120).
+     * @param amp   - Amplitude 0.0–1.0 (default 0.5).
+     */
+    Q_INVOKABLE void playDoubleBeep(double freq1 = 880.0, int dur1 = 60,
+                                     double freq2 = 440.0, int dur2 = 120,
+                                     double amp = 0.5);
+    /**
      * Stops any ongoing audio playback. If no playback is in progress, this
      * method has no effect.
      */
@@ -199,6 +221,10 @@ signals:
      * threshold value that should be saved in settings.
      */
     void calibrationFinishedAutocorrelation(double threshold);
+    /**
+     * Emitted when the beep signal finishes playing.
+     */
+    void beepFinished();
 
 private:
     /**

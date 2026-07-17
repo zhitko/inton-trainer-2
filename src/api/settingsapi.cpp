@@ -639,6 +639,8 @@ void SettingsApi::load()
     emit dpSpectrumCoefChanged();
     emit dpUseCepstrumChanged();
     emit dpCepstrumCoefChanged();
+    emit playSignalBeforeRecordingChanged();
+    emit playSignalAfterRecordingChanged();
     emit settingsChanged();
     LOG_DEBUG() << "Finish: load";
 }
@@ -1621,6 +1623,26 @@ void SettingsApi::setDtwDistanceLimit(double val)
         m_settings.dtwDistanceLimit = val;
         save();
         emit dtwDistanceLimitChanged();
+    }
+}
+
+// ── Play signal ────────────────────────────────────────────────────────────
+bool SettingsApi::playSignalBeforeRecording() const { return m_settings.playSignalBeforeRecording; }
+void SettingsApi::setPlaySignalBeforeRecording(bool v)
+{
+    if (m_settings.playSignalBeforeRecording != v) {
+        m_settings.playSignalBeforeRecording = v;
+        save();
+        emit playSignalBeforeRecordingChanged();
+    }
+}
+bool SettingsApi::playSignalAfterRecording() const { return m_settings.playSignalAfterRecording; }
+void SettingsApi::setPlaySignalAfterRecording(bool v)
+{
+    if (m_settings.playSignalAfterRecording != v) {
+        m_settings.playSignalAfterRecording = v;
+        save();
+        emit playSignalAfterRecordingChanged();
     }
 }
 
