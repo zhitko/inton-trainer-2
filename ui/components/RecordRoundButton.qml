@@ -10,11 +10,7 @@ ColumnLayout {
     spacing: 8
 
     property string filePath: ""
-    readonly property bool isRecording: audioApi.isRecording
-    readonly property real audioLevel: audioApi.audioLevel
-    signal clicked
-    signal recordingFinished(string filePath)
-
+    // Optional shared AudioApi instance. If not set, creates its own.
     AudioApi {
         id: audioApi
         onPermissionResultReceived: function(granted) {
@@ -29,6 +25,10 @@ ColumnLayout {
             }
         }
     }
+    readonly property bool isRecording: audioApi.isRecording
+    readonly property real audioLevel: audioApi.audioLevel
+    signal clicked
+    signal recordingFinished(string filePath)
 
     // Handle auto-stop recording - when recording stops automatically
     Connections {

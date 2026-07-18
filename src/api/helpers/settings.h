@@ -180,7 +180,7 @@ struct AppSettings {
     int guidedListenTimeoutMs = 4000;
     // Delay (ms) between end of playback and LISTEN window opening.
     int guidedPrePlayListenDelayMs = 150;
-    };
+};
 
 /*
  * The Settings class provides static methods to load and save the application

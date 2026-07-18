@@ -52,11 +52,11 @@ Settings::loadSettings()
     LOG_INFO() << "Loading settings from:" << absolutePath;
 
     qsettings.beginGroup("General");
-    settings.language = qsettings.value("language", "ru").toString().toStdString();
-    settings.languageTitle = qsettings.value("languageTitle", "Русский").toString().toStdString();
-    settings.theme = qsettings.value("theme", "light").toString().toStdString();
+    settings.language = qsettings.value("language", QString("ru")).toString().toStdString();
+    settings.languageTitle = qsettings.value("languageTitle", QString("Русский")).toString().toStdString();
+    settings.theme = qsettings.value("theme", QString("light")).toString().toStdString();
     settings.fontSizeMultiplier = qsettings.value("fontSizeMultiplier", 1.0).toDouble();
-    settings.primaryColor = qsettings.value("primaryColor", "blue").toString().toStdString();
+    settings.primaryColor = qsettings.value("primaryColor", QString("blue")).toString().toStdString();
     settings.showNavigationMenu = qsettings.value("showNavigationMenu", false).toBool();
     settings.autoStopRecording = qsettings.value("autoStopRecording", true).toBool();
     settings.autoCalibrate = qsettings.value("autoCalibrate", true).toBool();
@@ -67,7 +67,7 @@ Settings::loadSettings()
     settings.autoCorrThreshold = qsettings.value("autoCorrThreshold", 0.3).toDouble();
     settings.autoCorrThresholdK = qsettings.value("autoCorrThresholdK", 1.0).toDouble();
     settings.autoCorrMinF0 = qsettings.value("autoCorrMinF0", 80.0).toDouble();
-    settings.autoCorrMaxF0 = qsettings.value("autoCorrMaxF0", 200.0).toDouble();
+    settings.autoCorrMaxF0 = qsettings.value("autoCorrMaxF0", 300.0).toDouble();
     settings.minimumRecordLengthPercent = qsettings.value("minimumRecordLengthPercent", 1.0).toDouble();
     settings.showVadA = qsettings.value("showVadA", false).toBool();
     settings.showVadU = qsettings.value("showVadU", false).toBool();
@@ -81,26 +81,26 @@ Settings::loadSettings()
     qsettings.endGroup();
 
     qsettings.beginGroup("Pitch");
-    settings.algorithm = qsettings.value("algorithm", "SWIPE").toString().toStdString();
-    settings.frameShift = qsettings.value("frameShift", 80.0).toDouble();
-    settings.sampleRate = qsettings.value("sampleRate", 16000.0).toDouble();
-    settings.minF0 = qsettings.value("minF0", 20.0).toDouble();
-    settings.maxF0 = qsettings.value("maxF0", 600.0).toDouble();
-    settings.voicingThreshold = qsettings.value("voicingThreshold", 0.3).toDouble();
-    settings.pitchNormalization = qsettings.value("pitchNormalization", "max").toString().toStdString();
-    settings.pitchInterpolationType = qsettings.value("pitchInterpolationType", "Linear")
+    settings.algorithm = qsettings.value("algorithm", QString("RAPT")).toString().toStdString();
+    settings.frameShift = qsettings.value("frameShift", 32.0).toDouble();
+    settings.sampleRate = qsettings.value("sampleRate", 8000.0).toDouble();
+    settings.minF0 = qsettings.value("minF0", 80.0).toDouble();
+    settings.maxF0 = qsettings.value("maxF0", 500.0).toDouble();
+    settings.voicingThreshold = qsettings.value("voicingThreshold", 0).toDouble();
+    settings.pitchNormalization = qsettings.value("pitchNormalization", QString("min_max")).toString().toStdString();
+    settings.pitchInterpolationType = qsettings.value("pitchInterpolationType", QString("Linear"))
                                           .toString()
                                           .toStdString();
-    settings.pitchSmoothing = qsettings.value("pitchSmoothing", "None").toString().toStdString();
-    settings.pitchSmoothingWindowSize = qsettings.value("pitchSmoothingWindowSize", 5).toInt();
-    settings.pitchGaussianSmoothingSigma = qsettings.value("pitchGaussianSmoothingSigma", 2.0).toDouble();
+    settings.pitchSmoothing = qsettings.value("pitchSmoothing", QString("Median")).toString().toStdString();
+    settings.pitchSmoothingWindowSize = qsettings.value("pitchSmoothingWindowSize", 16).toInt();
+    settings.pitchGaussianSmoothingSigma = qsettings.value("pitchGaussianSmoothingSigma", 1.0).toDouble();
 
-    settings.pitchSplineSmoothingPenalty = qsettings.value("pitchSplineSmoothingPenalty", 10.0).toDouble();
+    settings.pitchSplineSmoothingPenalty = qsettings.value("pitchSplineSmoothingPenalty", 1.0).toDouble();
     qsettings.endGroup();
 
     qsettings.beginGroup("UMP");
     settings.showUMP = qsettings.value("showUMP", true).toBool();
-    settings.umpSmoothing = qsettings.value("umpSmoothing", "None").toString().toStdString();
+    settings.umpSmoothing = qsettings.value("umpSmoothing", QString("None")).toString().toStdString();
     settings.umpSmoothingWindowSize = qsettings.value("umpSmoothingWindowSize", 5).toInt();
     settings.umpGaussianSmoothingSigma = qsettings.value("umpGaussianSmoothingSigma", 1.0).toDouble();
     settings.umpSplineSmoothingPenalty = qsettings.value("umpSplineSmoothingPenalty", 1.0).toDouble();
@@ -110,7 +110,7 @@ Settings::loadSettings()
     qsettings.beginGroup("Amplitude");
     settings.amplitudeWindow = qsettings.value("window", 1024).toInt();
     settings.amplitudeShift = qsettings.value("shift", 512).toInt();
-    settings.amplitudeSmoothing = qsettings.value("amplitudeSmoothing", "Median").toString().toStdString();
+    settings.amplitudeSmoothing = qsettings.value("amplitudeSmoothing", QString("Median")).toString().toStdString();
     settings.amplitudeSmoothingWindowSize = qsettings.value("amplitudeSmoothingWindowSize", 16).toInt();
     settings.amplitudeGaussianSmoothingSigma = qsettings.value("amplitudeGaussianSmoothingSigma", 1.0).toDouble();
     settings.showAmplitude = qsettings.value("showAmplitude", true).toBool();
@@ -122,10 +122,10 @@ Settings::loadSettings()
     qsettings.endGroup();
 
     qsettings.beginGroup("Spectrum");
-    settings.specFftLength = qsettings.value("specFftLength", 2048).toInt();
-    settings.specF0Refinement = qsettings.value("specF0Refinement", false).toBool();
+    settings.specFftLength = qsettings.value("specFftLength", 1024).toInt();
+    settings.specF0Refinement = qsettings.value("specF0Refinement", true).toBool();
     settings.specUseLogScale = qsettings.value("specUseLogScale", true).toBool();
-    settings.specColorScheme = qsettings.value("specColorScheme", "Viridis").toString().toStdString();
+    settings.specColorScheme = qsettings.value("specColorScheme", QString("Viridis")).toString().toStdString();
     settings.showSpectrum = qsettings.value("showSpectrum", false).toBool();
     settings.showCepstrum = qsettings.value("showCepstrum", false).toBool();
     settings.cepstrNumOrder = qsettings.value("cepstrNumOrder", 25).toInt();

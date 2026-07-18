@@ -97,10 +97,6 @@ Page {
                         && window.settingsApi && window.settingsApi.autoStopRecording) {
                     restartRecordingTimer.start();
                 }
-            } else if (root._pendingDoubleBeep) {
-                root._pendingDoubleBeep = false;
-                // Play the second tone of the double-beep
-                trainingAudioApi.playBeep(440, 120, 0.5);
             }
         }
     }
@@ -174,23 +170,11 @@ Page {
     property bool _pendingBeepRecording: false
     // When true, the auto-restart cycle waits for the after-recording beep to finish
     property bool _pendingAfterBeep: false
-    // When true, a second tone of a double-beep is queued
-    property bool _pendingDoubleBeep: false
 
     onVisibleChanged: {
         if (visible) {
             _isExiting = false
-            // Auto mode only: start recording on page show
-            if (root.trainingMode === 0
-                    && window.settingsApi && window.settingsApi.autoStopRecording
-                    && !trainingAudioApi.isRecording && !root._isVadPaused) {
-                if (!window.trainingRecordingStartedOnce) {
-                    startRecording();
-                    window.trainingRecordingStartedOnce = true;
-                } else {
-                    startRecording();
-                }
-            }
+            startIfNeeded();
         } else {
             _isExiting = true;
             // Cancel any pending guided activity when navigating away
@@ -199,10 +183,18 @@ Page {
             root.guidedState = root.gsIdle;
             root._pendingBeepRecording = false;
             root._pendingAfterBeep = false;
-            root._pendingDoubleBeep = false;
             if (trainingAudioApi.isRecording) {
                 trainingAudioApi.stopRecording();
             }
+        }
+    }
+
+    // Helper: start recording if conditions are right (auto mode, auto-stop enabled, not already recording)
+    function startIfNeeded() {
+        if (root.trainingMode === 0
+                && window.settingsApi && window.settingsApi.autoStopRecording
+                && !trainingAudioApi.isRecording && !root._isVadPaused) {
+            startRecording();
         }
     }
 
@@ -256,10 +248,9 @@ Page {
                         if (userWaveData) {
                             Logger.info("Guided: attempt captured — processing");
                             updateUserUMP(tempFilePath, true);
-                            // Play after-recording beep if enabled (two-tone)
+                            // Play after-recording double-beep if enabled
                             if (window.settingsApi && window.settingsApi.playSignalAfterRecording) {
-                                root._pendingDoubleBeep = true;
-                                trainingAudioApi.playBeep(880, 60, 0.5);
+                                trainingAudioApi.playDoubleBeep(880, 60, 660, 120, 0.5);
                             }
                         }
                     }
@@ -360,12 +351,7 @@ Page {
                 && visible && window.settingsApi && window.settingsApi.autoStopRecording
                 && !trainingAudioApi.isRecording && !root._isVadPaused) {
             _isExiting = false;
-            if (!window.trainingRecordingStartedOnce) {
-                startRecording();
-                window.trainingRecordingStartedOnce = true;
-            } else {
-                startRecording();
-            }
+            startRecording();
         }
     }
 
