@@ -36,7 +36,7 @@ Tapping **Start Training** navigates to the **Template Categories** browser:
 - Templates are organized in **folders** (categories and subcategories).
 - Each folder can be drilled into; leaf folders show the individual WAV files.
 - Files are displayed in an **accordion list** — subcategories collapse and expand with animated chevrons.
-- Filter chips let you quickly show: **All**, **New** (not yet trained), **Improve** (score < 80%), or **Mastered** (score ≥ 80%).
+- Filter chips let you quickly show: **All**, **New** (not yet trained), **Improve** (score < 90%), or **Mastered** (score ≥ 90%).
 - A **search bar** instantly narrows the list; active search auto-expands all accordion sections so results are never hidden.
 - Each file item shows its **best score** so you can see progress at a glance.
 

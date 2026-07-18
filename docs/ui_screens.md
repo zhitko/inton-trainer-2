@@ -30,7 +30,7 @@ These are the primary user-facing screens involved in the training and configura
   * **Overall Completion Circle**: A large circular progress indicator showing the user's total course completion percentage.
   * **Quick Statistics**: Three summary cards showing:
     * *Avg Accuracy*: Average score across all processed template files.
-    * *Mastered Files*: Count of template files trained to $\ge 80\%$ accuracy.
+    * *Mastered Files*: Count of template files trained to $\ge 90\%$ accuracy.
     * *Files Trained*: Fraction of total templates completed (e.g., `12 / 48`).
 * **What the User Can Do**:
   * Click **Start Training**:
@@ -61,7 +61,7 @@ These are the primary user-facing screens involved in the training and configura
     * *All files*: Displays everything.
     * *New*: Files with no registered training scores.
     * *Improve*: Files with a best score below 80%.
-    * *Mastered*: Files with a best score of 80% or higher.
+    * *Mastered*: Files with a best score of 90% or higher.
   * **Collapsible Accordions (Subcategories)**: Groups files under subfolder headers (e.g., *Question*, *Statement*) with an animated chevron. Subsections fold and unfold smoothly. Searching automatically expands all accordions.
   * **File Items**: Lists individual speech files showing their names and the best historical accuracy score recorded for them.
 * **What the User Can Do**:

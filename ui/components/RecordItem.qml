@@ -131,17 +131,18 @@ Item {
             Text {
                 visible: root.isHistory
                 text: {
-                    if (root.result >= 90) return qsTr("Mastered");
-                    else if (root.result >= 75) return qsTr("Excellent");
-                    else if (root.result >= 60) return qsTr("Good");
-                    else if (root.result >= 40) return qsTr("Needs work");
-                    else if (root.result > 0) return qsTr("Poor");
+                    if (root.result >= 90) return qsTr("Excellent");
+                    else if (root.result >= 70) return qsTr("Good");
+                    else if (root.result >= 40) return qsTr("Medium");
+                    else if (root.result >= 20) return qsTr("Bad");
+                    else if (root.result > 0) return qsTr("Failure");
                     else return "";
                 }
                 font.pixelSize: AppScale.fs(12)
                 color: {
-                    if (root.result >= 80) return "#4caf50";
-                    else if (root.result >= 60) return "#ff9800";
+                    if (root.result >= 90) return "#4caf50";
+                    else if (root.result >= 70) return "#ff9800";
+                    else if (root.result >= 20) return "#ef5350";
                     else if (root.result > 0) return "#ef5350";
                     else return Theme.onSurfaceVariant(Material.theme);
                 }
@@ -166,8 +167,9 @@ Item {
                 lineWidth: 5
                 progress: Math.min(root.result / 100, 1.0)
                 color: {
-                    if (root.result >= 80) return "#4caf50";
-                    else if (root.result >= 60) return "#ff9800";
+                    if (root.result >= 90) return "#4caf50";
+                    else if (root.result >= 70) return "#ff9800";
+                    else if (root.result >= 20) return "#ef5350";
                     else if (root.result > 0) return "#ef5350";
                     else return Theme.primary(Material.theme);
                 }

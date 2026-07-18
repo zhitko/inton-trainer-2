@@ -55,15 +55,15 @@ Item {
             Logger.debug("Calculated best result for file: " + avgScoreVal);
 
             if (avgScoreVal >= 90)
-                percentageText.text = qsTr("Mastered");
-            else if (avgScoreVal >= 75)
                 percentageText.text = qsTr("Excellent");
-            else if (avgScoreVal >= 60)
+            else if (avgScoreVal >= 70)
                 percentageText.text = qsTr("Good");
             else if (avgScoreVal >= 40)
-                percentageText.text = qsTr("Needs work");
+                percentageText.text = qsTr("Medium");
+            else if (avgScoreVal >= 20)
+                percentageText.text = qsTr("Bad");
             else if (avgScoreVal > 0)
-                percentageText.text = qsTr("Poor");
+                percentageText.text = qsTr("Failure");
             else
                 percentageText.text = qsTr("Not practiced yet");
         }
@@ -73,16 +73,19 @@ Item {
         progressCircle.progress = Math.min(avgScoreVal / 100, 1.0);
 
         // Update circle color based on score
-        if (avgScoreVal >= 80)
-            progressCircle.color = "#4CAF50";
+        if (avgScoreVal >= 90)
+            progressCircle.color = "#4caf50";
         else
         // Green
-        if (avgScoreVal >= 40)
-            progressCircle.color = "#FF9800";
+        if (avgScoreVal >= 70)
+            progressCircle.color = "#ff9800";
         else
         // Orange
+        if (avgScoreVal >= 20)
+            progressCircle.color = "#ef5350";
+        else
         if (avgScoreVal > 0)
-            progressCircle.color = "#F44336";
+            progressCircle.color = "#ef5350";
         else
             // Red
             progressCircle.color = Theme.primary(Material.theme);

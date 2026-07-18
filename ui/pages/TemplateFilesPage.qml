@@ -14,7 +14,7 @@ Page {
     property string categoryPath: ""
     property string categoryName: ""
     property var allFiles: []
-    property string currentFilter: "all" // all, noScore, above80, below80
+    property string currentFilter: "all" // all, noScore, above90, below90
     property string unfoldedCategory: ""
 
     Component.onCompleted: {
@@ -65,10 +65,10 @@ Page {
             switch (currentFilter) {
                 case "noScore":
                     return !file.hasScore;
-                case "above80":
-                    return file.hasScore && file.score >= 80;
-                case "below80":
-                    return file.hasScore && file.score < 80;
+                case "above90":
+                    return file.hasScore && file.score >= 90;
+                case "below90":
+                    return file.hasScore && file.score < 90;
                 default:
                     return true;
             }
@@ -132,18 +132,18 @@ Page {
                     Chip {
                         text: qsTr("Improve")
                         icon: Icons.faArrowTrendUp
-                        selected: currentFilter === "below80"
+                        selected: currentFilter === "below90"
                         onClicked: {
-                            currentFilter = "below80";
+                            currentFilter = "below90";
                         }
                     }
 
                     Chip {
                         text: qsTr("Mastered")
                         icon: Icons.faTrophy
-                        selected: currentFilter === "above80"
+                        selected: currentFilter === "above90"
                         onClicked: {
-                            currentFilter = "above80";
+                            currentFilter = "above90";
                         }
                     }
                 }
