@@ -641,6 +641,14 @@ void SettingsApi::load()
     emit dpCepstrumCoefChanged();
     emit playSignalBeforeRecordingChanged();
     emit playSignalAfterRecordingChanged();
+    emit beepBeforeFreqChanged();
+    emit beepBeforeDurationChanged();
+    emit beepBeforeAmplitudeChanged();
+    emit beepAfterDoubleFreq1Changed();
+    emit beepAfterDoubleDur1Changed();
+    emit beepAfterDoubleFreq2Changed();
+    emit beepAfterDoubleDur2Changed();
+    emit beepAfterDoubleAmplitudeChanged();
     emit settingsChanged();
     LOG_DEBUG() << "Finish: load";
 }
@@ -1643,6 +1651,80 @@ void SettingsApi::setPlaySignalAfterRecording(bool v)
         m_settings.playSignalAfterRecording = v;
         save();
         emit playSignalAfterRecordingChanged();
+    }
+}
+
+// ── Beep signal parameters ─────────────────────────────────────────────────
+double SettingsApi::beepBeforeFreq() const { return m_settings.beepBeforeFreq; }
+void SettingsApi::setBeepBeforeFreq(double v)
+{
+    if (qAbs(m_settings.beepBeforeFreq - v) > 0.01) {
+        m_settings.beepBeforeFreq = v;
+        save();
+        emit beepBeforeFreqChanged();
+    }
+}
+int SettingsApi::beepBeforeDuration() const { return m_settings.beepBeforeDuration; }
+void SettingsApi::setBeepBeforeDuration(int v)
+{
+    if (m_settings.beepBeforeDuration != v) {
+        m_settings.beepBeforeDuration = v;
+        save();
+        emit beepBeforeDurationChanged();
+    }
+}
+double SettingsApi::beepBeforeAmplitude() const { return m_settings.beepBeforeAmplitude; }
+void SettingsApi::setBeepBeforeAmplitude(double v)
+{
+    if (qAbs(m_settings.beepBeforeAmplitude - v) > 0.001) {
+        m_settings.beepBeforeAmplitude = v;
+        save();
+        emit beepBeforeAmplitudeChanged();
+    }
+}
+double SettingsApi::beepAfterDoubleFreq1() const { return m_settings.beepAfterDoubleFreq1; }
+void SettingsApi::setBeepAfterDoubleFreq1(double v)
+{
+    if (qAbs(m_settings.beepAfterDoubleFreq1 - v) > 0.01) {
+        m_settings.beepAfterDoubleFreq1 = v;
+        save();
+        emit beepAfterDoubleFreq1Changed();
+    }
+}
+int SettingsApi::beepAfterDoubleDur1() const { return m_settings.beepAfterDoubleDur1; }
+void SettingsApi::setBeepAfterDoubleDur1(int v)
+{
+    if (m_settings.beepAfterDoubleDur1 != v) {
+        m_settings.beepAfterDoubleDur1 = v;
+        save();
+        emit beepAfterDoubleDur1Changed();
+    }
+}
+double SettingsApi::beepAfterDoubleFreq2() const { return m_settings.beepAfterDoubleFreq2; }
+void SettingsApi::setBeepAfterDoubleFreq2(double v)
+{
+    if (qAbs(m_settings.beepAfterDoubleFreq2 - v) > 0.01) {
+        m_settings.beepAfterDoubleFreq2 = v;
+        save();
+        emit beepAfterDoubleFreq2Changed();
+    }
+}
+int SettingsApi::beepAfterDoubleDur2() const { return m_settings.beepAfterDoubleDur2; }
+void SettingsApi::setBeepAfterDoubleDur2(int v)
+{
+    if (m_settings.beepAfterDoubleDur2 != v) {
+        m_settings.beepAfterDoubleDur2 = v;
+        save();
+        emit beepAfterDoubleDur2Changed();
+    }
+}
+double SettingsApi::beepAfterDoubleAmplitude() const { return m_settings.beepAfterDoubleAmplitude; }
+void SettingsApi::setBeepAfterDoubleAmplitude(double v)
+{
+    if (qAbs(m_settings.beepAfterDoubleAmplitude - v) > 0.001) {
+        m_settings.beepAfterDoubleAmplitude = v;
+        save();
+        emit beepAfterDoubleAmplitudeChanged();
     }
 }
 

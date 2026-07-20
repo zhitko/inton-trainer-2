@@ -152,7 +152,10 @@ Page {
         // Play a short beep before recording starts if enabled
         if (window.settingsApi && window.settingsApi.playSignalBeforeRecording) {
             root._pendingBeepRecording = true;
-            trainingAudioApi.playBeep(660, 80, 0.4);
+            trainingAudioApi.playBeep(
+                window.settingsApi.beepBeforeFreq,
+                window.settingsApi.beepBeforeDuration,
+                window.settingsApi.beepBeforeAmplitude);
             return;
         }
         doStartRecording();
@@ -225,11 +228,16 @@ Page {
                         }
                     }
 
-                    // Play after-recording beep if enabled (before restart logic)
+                    // Play after-recording double-beep if enabled (before restart logic)
                     if (window.settingsApi && window.settingsApi.playSignalAfterRecording
                             && !root._isExiting) {
                         root._pendingAfterBeep = true;
-                        trainingAudioApi.playBeep(440, 150, 0.5);
+                        trainingAudioApi.playDoubleBeep(
+                            window.settingsApi.beepAfterDoubleFreq1,
+                            window.settingsApi.beepAfterDoubleDur1,
+                            window.settingsApi.beepAfterDoubleFreq2,
+                            window.settingsApi.beepAfterDoubleDur2,
+                            window.settingsApi.beepAfterDoubleAmplitude);
                     } else if (!root._isExiting && !isAnyPlaybackActive
                             && window.settingsApi && window.settingsApi.autoStopRecording) {
                         restartRecordingTimer.start();
@@ -250,7 +258,12 @@ Page {
                             updateUserUMP(tempFilePath, true);
                             // Play after-recording double-beep if enabled
                             if (window.settingsApi && window.settingsApi.playSignalAfterRecording) {
-                                trainingAudioApi.playDoubleBeep(880, 60, 660, 120, 0.5);
+                                trainingAudioApi.playDoubleBeep(
+                                    window.settingsApi.beepAfterDoubleFreq1,
+                                    window.settingsApi.beepAfterDoubleDur1,
+                                    window.settingsApi.beepAfterDoubleFreq2,
+                                    window.settingsApi.beepAfterDoubleDur2,
+                                    window.settingsApi.beepAfterDoubleAmplitude);
                             }
                         }
                     }

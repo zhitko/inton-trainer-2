@@ -172,6 +172,16 @@ struct AppSettings {
     // Play a short tone signal before/after recording starts/stops
     bool playSignalBeforeRecording = true;
     bool playSignalAfterRecording = true;
+    // Beep signal parameters — before recording
+    double beepBeforeFreq = 660.0;
+    int    beepBeforeDuration = 80;
+    double beepBeforeAmplitude = 0.4;
+    // Beep signal parameters — after recording (double tone)
+    double beepAfterDoubleFreq1 = 880.0;
+    int    beepAfterDoubleDur1 = 60;
+    double beepAfterDoubleFreq2 = 660.0;
+    int    beepAfterDoubleDur2 = 120;
+    double beepAfterDoubleAmplitude = 0.5;
 
     // == Guided mode settings ==
     // Whether the "Play & Listen" switch position is visible on TrainingPage.

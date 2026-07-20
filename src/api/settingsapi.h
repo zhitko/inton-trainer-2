@@ -146,6 +146,14 @@ class SettingsApi : public QObject {
     Q_PROPERTY(double dtwDistanceLimit READ dtwDistanceLimit WRITE setDtwDistanceLimit NOTIFY dtwDistanceLimitChanged)
     Q_PROPERTY(bool   playSignalBeforeRecording  READ playSignalBeforeRecording  WRITE setPlaySignalBeforeRecording  NOTIFY playSignalBeforeRecordingChanged)
     Q_PROPERTY(bool   playSignalAfterRecording   READ playSignalAfterRecording   WRITE setPlaySignalAfterRecording   NOTIFY playSignalAfterRecordingChanged)
+    Q_PROPERTY(double beepBeforeFreq             READ beepBeforeFreq             WRITE setBeepBeforeFreq             NOTIFY beepBeforeFreqChanged)
+    Q_PROPERTY(int    beepBeforeDuration         READ beepBeforeDuration         WRITE setBeepBeforeDuration         NOTIFY beepBeforeDurationChanged)
+    Q_PROPERTY(double beepBeforeAmplitude        READ beepBeforeAmplitude        WRITE setBeepBeforeAmplitude        NOTIFY beepBeforeAmplitudeChanged)
+    Q_PROPERTY(double beepAfterDoubleFreq1       READ beepAfterDoubleFreq1       WRITE setBeepAfterDoubleFreq1       NOTIFY beepAfterDoubleFreq1Changed)
+    Q_PROPERTY(int    beepAfterDoubleDur1        READ beepAfterDoubleDur1        WRITE setBeepAfterDoubleDur1        NOTIFY beepAfterDoubleDur1Changed)
+    Q_PROPERTY(double beepAfterDoubleFreq2       READ beepAfterDoubleFreq2       WRITE setBeepAfterDoubleFreq2       NOTIFY beepAfterDoubleFreq2Changed)
+    Q_PROPERTY(int    beepAfterDoubleDur2        READ beepAfterDoubleDur2        WRITE setBeepAfterDoubleDur2        NOTIFY beepAfterDoubleDur2Changed)
+    Q_PROPERTY(double beepAfterDoubleAmplitude   READ beepAfterDoubleAmplitude   WRITE setBeepAfterDoubleAmplitude   NOTIFY beepAfterDoubleAmplitudeChanged)
     Q_PROPERTY(bool   guidedModeEnabled         READ guidedModeEnabled         WRITE setGuidedModeEnabled         NOTIFY guidedModeEnabledChanged)
     Q_PROPERTY(int    guidedListenTimeoutMs      READ guidedListenTimeoutMs      WRITE setGuidedListenTimeoutMs      NOTIFY guidedListenTimeoutMsChanged)
     Q_PROPERTY(int    guidedPrePlayListenDelayMs READ guidedPrePlayListenDelayMs WRITE setGuidedPrePlayListenDelayMs NOTIFY guidedPrePlayListenDelayMsChanged)
@@ -400,6 +408,22 @@ public:
     void   setPlaySignalBeforeRecording(bool v);
     bool   playSignalAfterRecording() const;
     void   setPlaySignalAfterRecording(bool v);
+    double beepBeforeFreq() const;
+    void   setBeepBeforeFreq(double v);
+    int    beepBeforeDuration() const;
+    void   setBeepBeforeDuration(int v);
+    double beepBeforeAmplitude() const;
+    void   setBeepBeforeAmplitude(double v);
+    double beepAfterDoubleFreq1() const;
+    void   setBeepAfterDoubleFreq1(double v);
+    int    beepAfterDoubleDur1() const;
+    void   setBeepAfterDoubleDur1(int v);
+    double beepAfterDoubleFreq2() const;
+    void   setBeepAfterDoubleFreq2(double v);
+    int    beepAfterDoubleDur2() const;
+    void   setBeepAfterDoubleDur2(int v);
+    double beepAfterDoubleAmplitude() const;
+    void   setBeepAfterDoubleAmplitude(double v);
     bool   guidedModeEnabled() const;
     void   setGuidedModeEnabled(bool v);
     int    guidedListenTimeoutMs() const;
@@ -517,6 +541,14 @@ signals:
     void dtwDistanceLimitChanged();
     void playSignalBeforeRecordingChanged();
     void playSignalAfterRecordingChanged();
+    void beepBeforeFreqChanged();
+    void beepBeforeDurationChanged();
+    void beepBeforeAmplitudeChanged();
+    void beepAfterDoubleFreq1Changed();
+    void beepAfterDoubleDur1Changed();
+    void beepAfterDoubleFreq2Changed();
+    void beepAfterDoubleDur2Changed();
+    void beepAfterDoubleAmplitudeChanged();
     void guidedModeEnabledChanged();
     void guidedListenTimeoutMsChanged();
     void guidedPrePlayListenDelayMsChanged();

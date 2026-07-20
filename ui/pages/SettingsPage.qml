@@ -702,6 +702,49 @@ Page {
                         }
 
                         Label {
+                            text: qsTr("Before freq (Hz)")
+                            color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.beepBeforeFreq.toFixed(0) : 660
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.beepBeforeFreq = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: showAdvanced
+                        }
+
+                        Label {
+                            text: qsTr("Before duration (ms)")
+                            color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.beepBeforeDuration.toString() : 80
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.beepBeforeDuration = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            visible: showAdvanced
+                        }
+
+                        Label {
+                            text: qsTr("Before amplitude")
+                            color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.beepBeforeAmplitude.toFixed(2) : 0.4
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.beepBeforeAmplitude = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: showAdvanced
+                        }
+
+                        Label {
                             text: qsTr("Play signal after recording")
                             color: Theme.onSurface(Material.theme)
                         }
@@ -709,6 +752,78 @@ Page {
                             checked: settingsApi ? settingsApi.playSignalAfterRecording : true
                             onToggled: if (settingsApi)
                                 settingsApi.playSignalAfterRecording = checked
+                        }
+
+                        Label {
+                            text: qsTr("After freq 1 (Hz)")
+                            color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.beepAfterDoubleFreq1.toFixed(0) : 880
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.beepAfterDoubleFreq1 = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: showAdvanced
+                        }
+
+                        Label {
+                            text: qsTr("After dur 1 (ms)")
+                            color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.beepAfterDoubleDur1.toString() : 60
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.beepAfterDoubleDur1 = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            visible: showAdvanced
+                        }
+
+                        Label {
+                            text: qsTr("After freq 2 (Hz)")
+                            color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.beepAfterDoubleFreq2.toFixed(0) : 660
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.beepAfterDoubleFreq2 = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: showAdvanced
+                        }
+
+                        Label {
+                            text: qsTr("After dur 2 (ms)")
+                            color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.beepAfterDoubleDur2.toString() : 120
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.beepAfterDoubleDur2 = parseInt(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            visible: showAdvanced
+                        }
+
+                        Label {
+                            text: qsTr("After amplitude")
+                            color: Theme.onSurface(Material.theme)
+                            visible: showAdvanced
+                        }
+                        TextField {
+                            text: settingsApi ? settingsApi.beepAfterDoubleAmplitude.toFixed(2) : 0.5
+                            onEditingFinished: if (settingsApi)
+                                settingsApi.beepAfterDoubleAmplitude = parseDoubleValue(text)
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                            visible: showAdvanced
                         }
                     }
                 }
