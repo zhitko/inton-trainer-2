@@ -92,3 +92,5 @@ build_appimage/
 data/
 android/assets/
 *.log
+docs/user_guide.docx
+docs/user_guide.pdf

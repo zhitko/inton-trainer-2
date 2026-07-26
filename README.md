@@ -359,5 +359,5 @@ This project is licensed under the MIT License — see [LICENSE](LICENSE) for de
 
 ## Authors
 
-- **Zhitko Vladimir** — Development — [LinkedIn](https://www.linkedin.com/in/zhitko-vladimir-92662255/)
 - **Boris Lobanov** — Scientific — [LinkedIn](https://www.linkedin.com/in/boris-lobanov-50628384/)
+- **Vladimir Zhitko** — Development — [LinkedIn](https://www.linkedin.com/in/zhitko-vladimir-92662255/)
