@@ -67,6 +67,7 @@ qt_add_executable(appinton-trainer-2
     src/api/helpers/settings.cpp
     src/api/helpers/statistics.h
     src/api/helpers/statistics.cpp
+    src/api/helpers/beepplayer.h
     src/services/wavfileservice.h
     src/services/wavfileservice.cpp
     src/services/vadenergryservice.h

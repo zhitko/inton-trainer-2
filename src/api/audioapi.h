@@ -1,6 +1,7 @@
 #ifndef AUDIOAPI_H
 #define AUDIOAPI_H
 
+#include "helpers/beepplayer.h"
 #include "src/services/helpers/wavFile.h"
 #include "src/services/vadautocorrelationservice.h"
 #include "src/services/vadenergryservice.h"
@@ -249,6 +250,7 @@ private:
     QMediaPlayer* m_player = nullptr;
     QAudioOutput* m_audioOutput = nullptr;
     bool m_isPlaying = false;
+    BeepPlayer m_beepPlayer;
 
     bool m_autoStopEnabled = false;
     int m_silenceDurationMs = 2000;
