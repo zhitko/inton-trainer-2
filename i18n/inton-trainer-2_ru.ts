@@ -537,7 +537,7 @@
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="695"/>
-        <source>Play signal before recording</source>
+        <source>Play a beep to start recording</source>
         <translation>Воспроизводить сигнал перед записью</translation>
     </message>
     <message>
@@ -557,7 +557,7 @@
     </message>
     <message>
         <location filename="../ui/pages/SettingsPage.qml" line="750"/>
-        <source>Play signal after recording</source>
+        <source>Play the ready beep signal</source>
         <translation>Воспроизводить сигнал после записи</translation>
     </message>
     <message>

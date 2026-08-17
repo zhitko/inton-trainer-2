@@ -692,7 +692,7 @@ Page {
                         }
 
                         Label {
-                            text: qsTr("Play signal before recording")
+                            text: qsTr("Play a beep to start recording")
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
@@ -745,7 +745,7 @@ Page {
                         }
 
                         Label {
-                            text: qsTr("Play signal after recording")
+                            text: qsTr("Play the ready beep signal")
                             color: Theme.onSurface(Material.theme)
                         }
                         Switch {
