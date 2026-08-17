@@ -142,8 +142,8 @@ Page {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 24
-        spacing: 24
+        anchors.margins: AppScale.pagePadding
+        spacing: AppScale.pageSpacing
 
         // Action Bar (Search + Delete All)
         SearchActionBar {
@@ -170,7 +170,7 @@ Page {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            spacing: 10
+            spacing: AppScale.listSpacing
             model: recordsPage.modelWrapper.items
 
             ScrollBar.vertical: ScrollBar {

@@ -44,28 +44,29 @@ Page {
     ScrollView {
         id: scrollView
         anchors.fill: parent
-        contentWidth: parent.width
+        contentWidth: availableWidth
         clip: true
+        ScrollBar.vertical.policy: (window.settingsApi && !window.settingsApi.showNavigationMenu)
+                                   ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
         ColumnLayout {
-            width: scrollView.width - 48
-            x: 24
-            // y: 24
-            spacing: 24
+            width: Math.max(0, scrollView.availableWidth - AppScale.pagePadding * 2)
+            x: AppScale.pagePadding
+            spacing: AppScale.pageSpacing
 
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
-                // Layout.topMargin: 24
-                Layout.bottomMargin: 26
-                spacing: 14
+                Layout.bottomMargin: AppScale.isCompact ? 12 : 26
+                spacing: AppScale.isCompact ? 10 : 14
 
                 // Full-bleed hero: neutral surface; wave styled via MultiEffect (clarity, no tinted bg)
                 Rectangle {
                     id: heroBanner
                     Layout.fillWidth: true
-                    Layout.leftMargin: -24
-                    Layout.rightMargin: -24
-                    Layout.preferredHeight: titleColumn.implicitHeight + 48
+                    Layout.leftMargin: -AppScale.pagePadding
+                    Layout.rightMargin: -AppScale.pagePadding
+                    Layout.preferredHeight: titleColumn.implicitHeight + (AppScale.isCompact ? 28 : 48)
                     topLeftRadius: 0
                     topRightRadius: 0
                     bottomLeftRadius: Theme.shapeLarge
@@ -87,7 +88,7 @@ Page {
                             wrapMode: Text.Wrap
                             text: qsTr("Inton@Trainer 2.0")
                             font.weight: Font.Bold
-                            font.pixelSize: AppScale.fs(30)
+                            font.pixelSize: AppScale.fs(AppScale.isCompact ? 24 : 30)
                             color: Theme.onSurface(Material.theme)
                         }
 
@@ -118,7 +119,7 @@ Page {
             // 2. Center Action Button with Waveform Visuals
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 160
+                Layout.preferredHeight: AppScale.isCompact ? 140 : 160
 
                 // Wave image rendered behind the button
                 Image {
@@ -181,14 +182,14 @@ Page {
             // 3. Stats Row
             RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 110
-                Layout.topMargin: 26
-                spacing: 12
+                Layout.preferredHeight: AppScale.isCompact ? 96 : 110
+                Layout.topMargin: AppScale.isCompact ? 12 : 26
+                spacing: AppScale.isCompact ? 8 : 12
 
                 StatBox {
                     id: avgAccuracyBox
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 110
+                    Layout.preferredHeight: AppScale.isCompact ? 96 : 110
                     icon: Icons.faChartLine
                     title: qsTr("Avg Accuracy:")
                 }
@@ -196,7 +197,7 @@ Page {
                 StatBox {
                     id: totalResultsBox
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 110
+                    Layout.preferredHeight: AppScale.isCompact ? 96 : 110
                     icon: Icons.faTrophy
                     title: qsTr("Mastered Files:")
                 }
@@ -204,7 +205,7 @@ Page {
                 StatBox {
                     id: filesCountBox
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 110
+                    Layout.preferredHeight: AppScale.isCompact ? 96 : 110
                     icon: Icons.faFolderOpen
                     title: qsTr("Files Trained:")
                 }
@@ -213,8 +214,8 @@ Page {
             // 4. Overall Progress
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 180
-                Layout.topMargin: 8
+                Layout.preferredHeight: AppScale.isShort || AppScale.isCompact ? 140 : 180
+                Layout.bottomMargin: AppScale.pagePadding
 
                 CircularProgress {
                     id: overallProgressCircle

@@ -22,6 +22,26 @@ QtObject {
     // On mobile platforms the OS handles density scaling, so factor is fixed at 1.0.
     readonly property real factor: isMobile ? 1.0 : Math.min(1.0, Math.min((screenWidth - 100) / designWidth, (screenHeight - 100) / designHeight))
 
+    // Current content area (StackView) in design-space pixels. Bound from Main.qml.
+    property real viewWidth: designWidth
+    property real viewHeight: designHeight
+
+    // ── Breakpoints (phone / tablet / desktop) ──────────────────────────────
+    readonly property int compactWidth: 400
+    readonly property int narrowWidth: 520
+    readonly property int shortHeight: 640
+
+    readonly property bool isCompact: viewWidth < compactWidth
+    readonly property bool isNarrow: viewWidth < narrowWidth
+    readonly property bool isShort: viewHeight < shortHeight
+    readonly property bool isWide: viewWidth >= 720
+
+    readonly property int pagePadding: isCompact ? 12 : (isNarrow ? 16 : 24)
+    readonly property int pageSpacing: isCompact ? 12 : (isNarrow ? 16 : 24)
+    readonly property int listSpacing: isCompact ? 6 : 10
+    readonly property int listItemHeight: isCompact ? 80 : 100
+    readonly property int searchBarHeight: isCompact ? 48 : 56
+
     // Font size multiplier from user settings (1.0 = Normal, 1.5 = Big, 2.0 = Large).
     // Updated from Main.qml via Binding so all QML fs() calls react reactively.
     property double fontScale: 1.0

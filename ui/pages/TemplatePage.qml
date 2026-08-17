@@ -23,6 +23,11 @@ Page {
     property string referenceFilePath: ""
     property string userFilePath:      ""
 
+    readonly property int mainGraphHeight: (AppScale.isShort || AppScale.isCompact) ? 180 : 300
+    readonly property int auxGraphHeight: (AppScale.isShort || AppScale.isCompact) ? 140 : 200
+    readonly property int specGraphHeight: (AppScale.isShort || AppScale.isCompact) ? 220 : 400
+    readonly property int graphGutter: AppScale.isCompact ? 8 : 16
+
     // ── WAV file handles ────────────────────────────────────────────────────
     property var referenceWavFileHandle: null
     property var userWavFileHandle:      null
@@ -572,6 +577,8 @@ Page {
     Button {
         anchors.right: parent.right
         anchors.top: parent.top
+        anchors.rightMargin: AppScale.isCompact ? 8 : 12
+        anchors.topMargin: AppScale.isCompact ? 8 : 12
         text: root.showSettings ? qsTr("Hide Settings") : qsTr("Show Settings")
         z: 99
 
@@ -584,11 +591,12 @@ Page {
 
         Item {
             Layout.fillHeight: true
-            Layout.fillWidth: true
+            Layout.fillWidth: !(AppScale.isNarrow && root.showSettings)
+            visible: !(AppScale.isNarrow && root.showSettings)
 
             ScrollView {
                 anchors.fill: parent
-                anchors.margins: 10
+                anchors.margins: AppScale.pagePadding
                 contentWidth: availableWidth
                 ScrollBar.vertical.policy: (window.settingsApi && !window.settingsApi.showNavigationMenu) ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
 
@@ -605,8 +613,8 @@ Page {
 
                     WaveFormGraph {
                         id: refWaveFormGraph
-                        height: 300
-                        width: parent.width - 80
+                        height: root.mainGraphHeight
+                        width: parent.width - root.graphGutter
                     }
 
                     PlayButton {
@@ -631,8 +639,8 @@ Page {
 
                         WaveFormGraph {
                             id: refPitchWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
                     }
 
@@ -650,8 +658,8 @@ Page {
 
                         WaveFormGraph {
                             id: refPitchProcessedWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
                     }
 
@@ -669,8 +677,8 @@ Page {
 
                         WaveFormGraph {
                             id: refLogPitchWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
                     }
 
@@ -688,8 +696,8 @@ Page {
 
                         WaveFormGraph {
                             id: refUmpWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                             lineWidth: 5
                         }
                     }
@@ -703,8 +711,8 @@ Page {
 
                     WaveFormGraph {
                         id: userWaveFormGraph
-                        height: 300
-                        width: parent.width - 80
+                        height: root.mainGraphHeight
+                        width: parent.width - root.graphGutter
                     }
 
                     PlayButton {
@@ -729,8 +737,8 @@ Page {
 
                         WaveFormGraph {
                             id: userPitchWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
                     }
 
@@ -748,8 +756,8 @@ Page {
 
                         WaveFormGraph {
                             id: userPitchProcessedWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
                     }
 
@@ -767,8 +775,8 @@ Page {
 
                         WaveFormGraph {
                             id: userLogPitchWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
                     }
 
@@ -786,8 +794,8 @@ Page {
 
                         WaveFormGraph {
                             id: userUmpWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                             lineWidth: 5
                         }
                     }
@@ -814,8 +822,8 @@ Page {
 
                         WaveFormGraph {
                             id: refAmplitudeWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
 
                         Text {
@@ -827,8 +835,8 @@ Page {
 
                         WaveFormGraph {
                             id: userAmplitudeWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
                     }
 
@@ -853,8 +861,8 @@ Page {
 
                         WaveFormGraph {
                             id: refAmplitudeDerivWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
 
                         Text {
@@ -866,8 +874,8 @@ Page {
 
                         WaveFormGraph {
                             id: userAmplitudeDerivWaveFormGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
                     }
 
@@ -892,7 +900,7 @@ Page {
 
                         Spectrogram2DGraph {
                             id: refSpectrumGraph
-                            height: 400
+                            height: root.specGraphHeight
                             width: parent.width
                         }
 
@@ -905,7 +913,7 @@ Page {
 
                         Spectrogram2DGraph {
                             id: userSpectrumGraph
-                            height: 400
+                            height: root.specGraphHeight
                             width: parent.width
                         }
                     }
@@ -931,7 +939,7 @@ Page {
 
                         Spectrogram2DGraph {
                             id: refCepstrogramGraph
-                            height: 400
+                            height: root.specGraphHeight
                             width: parent.width
                         }
 
@@ -944,7 +952,7 @@ Page {
 
                         Spectrogram2DGraph {
                             id: userCepstrogramGraph
-                            height: 400
+                            height: root.specGraphHeight
                             width: parent.width
                         }
                     }
@@ -964,8 +972,8 @@ Page {
 
                         WaveFormGraph {
                             id: userVadCorrGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                             waveData: {
                                 let datasets = [];
                                 if (window.settingsApi.showVadCorr && root.userVadCorr.length > 0)
@@ -1005,7 +1013,7 @@ Page {
                             id: userVadGraph
                             onWaveDataChanged: console.log("userVadGraph waveData changed, datasets:", waveData.length)
                             height: 250
-                            width: parent.width - 80
+                            width: parent.width - root.graphGutter
                             waveData: {
                                 let datasets = [];
                                 if (window.settingsApi.showVadA && root.userVadA.length > 0)
@@ -1060,8 +1068,8 @@ Page {
 
                         WaveFormGraph {
                             id: dtwSignalStreamGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                         }
                     }
 
@@ -1079,8 +1087,8 @@ Page {
 
                         WaveFormGraph {
                             id: templateGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                             showLegend: true
                             datasetLabels: {
                                 let labels = [];
@@ -1118,8 +1126,8 @@ Page {
 
                         WaveFormGraph {
                             id: signalGraph
-                            height: 200
-                            width: parent.width - 80
+                            height: root.auxGraphHeight
+                            width: parent.width - root.graphGutter
                             showLegend: true
                             datasetLabels: {
                                 let labels = [];
@@ -1150,12 +1158,14 @@ Page {
             Layout.fillHeight: true
             Layout.preferredWidth: 1
             color: Theme.outlineVariant(root.Material.theme)
-            visible: root.showSettings
+            visible: root.showSettings && !AppScale.isNarrow
         }
 
         SettingsPage {
             Layout.fillHeight: true
-            Layout.preferredWidth: 450
+            Layout.fillWidth: AppScale.isNarrow && root.showSettings
+            Layout.preferredWidth: AppScale.isNarrow ? (root.showSettings ? 1 : 0) : 450
+            Layout.minimumWidth: AppScale.isNarrow && root.showSettings ? 200 : 0
             visible: root.showSettings
             showAdvanced: true
             hideAdvancedToggle: true

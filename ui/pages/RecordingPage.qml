@@ -5,6 +5,7 @@ import by.intontrainer.audio 1.0
 import QtQuick.Controls.Material 6.8
 
 import "../components"
+import "../utils"
 
 Page {
     property string lastRecordedFile: ""
@@ -38,79 +39,78 @@ Page {
         }
     }
 
-    RoundButton {
-        id: recordButton
+    ColumnLayout {
         anchors.centerIn: parent
-        width: 100
-        height: 100
-        radius: 50
+        width: Math.min(parent.width - AppScale.pagePadding * 2, 280)
+        spacing: AppScale.isCompact ? 8 : 12
 
-        hoverEnabled: true
+        RoundButton {
+            id: recordButton
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: AppScale.isCompact ? 84 : 100
+            Layout.preferredHeight: AppScale.isCompact ? 84 : 100
+            width: Layout.preferredWidth
+            height: Layout.preferredHeight
+            radius: width / 2
 
-        background: Label {
-            font.family: Icons.familySolid
-            font.weight: Font.Black
-            font.bold: true
-            text: audioApi.isRecording ? Icons.faMicrophoneLines : Icons.faMicrophone
-            color: audioApi.isRecording ? Theme.error(Material.theme) : Theme.onSurface(Material.theme)
-            anchors.centerIn: parent
-            font.pixelSize: recordButton.hovered ? parent.width / 2 + 5 : parent.width / 2
-            horizontalAlignment: Label.AlignHCenter
-        }
+            hoverEnabled: true
 
-        onClicked: {
-            if (audioApi.isRecording) {
-                audioApi.stopRecording();
-                lastRecordedFile = audioApi.saveWavFile();
-            } else {
-                lastRecordedFile = "";
-                // Request microphone permission (no-op on desktop)
-                if (!audioApi.requestAudioPermission()) {
-                    // Permission request is pending — will start recording in
-                    // onPermissionResultReceived callback
-                    return;
+            background: Label {
+                font.family: Icons.familySolid
+                font.weight: Font.Black
+                font.bold: true
+                text: audioApi.isRecording ? Icons.faMicrophoneLines : Icons.faMicrophone
+                color: audioApi.isRecording ? Theme.error(Material.theme) : Theme.onSurface(Material.theme)
+                anchors.centerIn: parent
+                font.pixelSize: recordButton.hovered ? parent.width / 2 + 5 : parent.width / 2
+                horizontalAlignment: Label.AlignHCenter
+            }
+
+            onClicked: {
+                if (audioApi.isRecording) {
+                    audioApi.stopRecording();
+                    lastRecordedFile = audioApi.saveWavFile();
+                } else {
+                    lastRecordedFile = "";
+                    if (!audioApi.requestAudioPermission()) {
+                        return;
+                    }
+                    audioApi.startRecording();
                 }
-                audioApi.startRecording();
             }
         }
-    }
 
-    ProgressBar {
-        id: volumeIndicator
-        anchors.top: recordButton.bottom
-        anchors.topMargin: 5
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: 100
-        value: audioApi.audioLevel
-        visible: audioApi.isRecording
-    }
+        ProgressBar {
+            id: volumeIndicator
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: AppScale.isCompact ? 84 : 100
+            value: audioApi.audioLevel
+            visible: audioApi.isRecording
+        }
 
-    PlayButton {
-        id: playButton
-        anchors.top: volumeIndicator.bottom
-        anchors.topMargin: 5
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: 50
-        height: 50
-        file: lastRecordedFile
-        showLabel: true
-    }
+        PlayButton {
+            id: playButton
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 50
+            Layout.preferredHeight: 50
+            file: lastRecordedFile
+            showLabel: true
+        }
 
-    CustomButton {
-        id: openButton
-        anchors.top: playButton.bottom
-        anchors.topMargin: 5
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: 50
-        height: 50
-        visible: !!lastRecordedFile
-        showLabel: true
-        label: Icons.faWaveSquare + " " + qsTr("Open")
-        onClicked: {
-            console.log("ui/pages/RecordingPage.qml:onFileClicked:", lastRecordedFile);
-            stackView.push("TemplatePage.qml", {
-                "userFilePath": lastRecordedFile
-            });
+        CustomButton {
+            id: openButton
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 50
+            Layout.preferredHeight: 50
+            visible: !!lastRecordedFile
+            showLabel: true
+            label: Icons.faWaveSquare + " " + qsTr("Open")
+            onClicked: {
+                console.log("ui/pages/RecordingPage.qml:onFileClicked:", lastRecordedFile);
+                stackView.push("TemplatePage.qml", {
+                    "userFilePath": lastRecordedFile
+                });
+            }
         }
     }
 }

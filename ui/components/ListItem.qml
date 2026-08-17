@@ -92,7 +92,7 @@ Item {
     }
 
     width: ListView.view ? ListView.view.width : 0
-    height: 100
+    height: AppScale.listItemHeight
 
     Rectangle {
         id: cardBg
@@ -135,11 +135,11 @@ Item {
         // Icon Circle (Left)
         Rectangle {
             id: iconCircle
-            width: 50
-            height: 50
-            radius: 25
+            width: AppScale.isCompact ? 40 : 50
+            height: AppScale.isCompact ? 40 : 50
+            radius: width / 2
             anchors.left: parent.left
-            anchors.leftMargin: 25
+            anchors.leftMargin: AppScale.isCompact ? 12 : 25
             anchors.verticalCenter: parent.verticalCenter
             color: {
                 var colors = [Theme.primaryContainer(Material.theme), Theme.secondaryContainer(Material.theme), Theme.tertiaryContainer(Material.theme)];
@@ -167,7 +167,7 @@ Item {
 
             Text {
                 text: root.itemData // Folder name
-                font.pixelSize: AppScale.fs(18)
+                font.pixelSize: AppScale.fs(AppScale.isCompact ? 15 : 18)
                 font.weight: 600
                 color: Theme.onSurface(Material.theme)
                 Layout.fillWidth: true
@@ -193,10 +193,10 @@ Item {
         // Progress Indicator / Status
         Item {
             id: statusIndicatorContainer
-            width: 76
-            height: 76
+            width: AppScale.isCompact ? 56 : 76
+            height: AppScale.isCompact ? 56 : 76
             anchors.right: parent.right
-            anchors.rightMargin: 28
+            anchors.rightMargin: AppScale.isCompact ? 10 : 28
             anchors.verticalCenter: parent.verticalCenter
 
             Item {
@@ -214,7 +214,7 @@ Item {
                     Text {
                         id: progressText
                         text: root.avgScore > 0 ? Math.round(root.avgScore) + "%" : "--"
-                        font.pixelSize: AppScale.fs(16)
+                        font.pixelSize: AppScale.fs(AppScale.isCompact ? 13 : 16)
                         font.weight: Font.Bold
                         color: Theme.onSurfaceVariant(Material.theme)
                         anchors.centerIn: parent

@@ -120,6 +120,24 @@ Page {
     // True when the last listen window timed out without a capture
     property bool guidedTimedOut: false
 
+    // ── Responsive layout (page pixels; works for Android and resized desktop) ─
+    readonly property bool isNarrow: AppScale.isNarrow
+    readonly property bool isCompact: AppScale.isCompact
+    readonly property bool isShort: AppScale.isShort
+    readonly property int pagePadding: AppScale.pagePadding
+    readonly property int sideSlotMinWidth: isCompact ? 56 : 72
+    readonly property int graphMinHeight: {
+        if (isShort && isCompact)
+            return 160;
+        if (isShort)
+            return 200;
+        if (isCompact)
+            return 220;
+        if (isNarrow)
+            return 260;
+        return 360;
+    }
+
     onTrainingModeChanged: {
         guidedDelayTimer.stop();
         guidedTimeoutTimer.stop();
@@ -787,22 +805,29 @@ Page {
     ScrollView {
         id: scrollView
         anchors.fill: parent
-        contentWidth: parent.width
+        contentWidth: availableWidth
         clip: true
+        ScrollBar.vertical.policy: (window.settingsApi && !window.settingsApi.showNavigationMenu)
+                                   ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
         ColumnLayout {
-            width: scrollView.width - 32
-            x: 16
-            y: 16
-            spacing: 16
+            id: pageLayout
+            width: Math.max(0, scrollView.availableWidth - root.pagePadding * 2)
+            x: root.pagePadding
+            y: root.pagePadding
+            height: Math.max(implicitHeight, scrollView.availableHeight - root.pagePadding * 2)
+            spacing: root.isCompact ? 10 : 16
 
             // Shape Similarity Card
             Rectangle {
                 id: shapeSimilarityCard
                 Layout.fillWidth: true
-                Layout.preferredHeight: 80
+                Layout.preferredHeight: Math.max(root.isCompact ? 56 : 80,
+                                                 currentResultColumn.implicitHeight + (root.isCompact ? 12 : 20))
                 color: Theme.secondaryContainer(root.Material.theme)
-                radius: 16
+                radius: root.isCompact ? 12 : 16
+                clip: true
 
                 layer.enabled: true
                 layer.effect: MultiEffect {
@@ -812,14 +837,15 @@ Page {
                     shadowVerticalOffset: 6
                 }
 
-                // Card title — top-left corner
+                // Card title — hidden on narrow screens so the score stays centered
                 Text {
                     id: cardTitle
                     anchors {
                         verticalCenter: currentResultColumn.verticalCenter
                         left: parent.left
-                        leftMargin: 36
+                        leftMargin: root.isCompact ? 12 : 24
                     }
+                    visible: shapeSimilarityCard.width >= 520
                     text: qsTr("Similarity")
                     font.pixelSize: AppScale.fs(24)
                     font.weight: 600
@@ -836,7 +862,7 @@ Page {
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: Math.round(root.shapeSimilarity) + "%"
-                        font.pixelSize: AppScale.fs(38)
+                        font.pixelSize: AppScale.fs(root.isCompact ? 28 : 38)
                         font.weight: 700
                         color: Theme.primary(root.Material.theme)
 
@@ -880,36 +906,38 @@ Page {
                     id: separatorArrow
                     anchors {
                         left: currentResultColumn.right
-                        leftMargin: 6
+                        leftMargin: root.isCompact ? 4 : 6
                         verticalCenter: currentResultColumn.verticalCenter
                     }
-                    visible: root.previousShapeSimilarities.length > 0
+                    visible: root.previousShapeSimilarities.length > 0 && !root.isCompact
                     text: "›"
-                    font.pixelSize: AppScale.fs(20)
+                    font.pixelSize: AppScale.fs(root.isCompact ? 16 : 20)
                     color: Theme.primary(root.Material.theme)
                     opacity: 0.7
                 }
 
-                // Previous results — right side
+                // Previous results — right side, clipped so they never overlap the score
                 // index 0 = most recent (closest to center, largest/boldest)
                 // index N = oldest (far right, smallest/most faded)
                 Row {
                     id: previousResultsRow
                     anchors {
-                        left: separatorArrow.right
-                        leftMargin: 16
+                        left: separatorArrow.visible ? separatorArrow.right : currentResultColumn.right
+                        leftMargin: root.isCompact ? 6 : 12
+                        right: parent.right
+                        rightMargin: root.isCompact ? 8 : 16
                         verticalCenter: parent.verticalCenter
-                        verticalCenterOffset: 0
                     }
                     spacing: 0
-                    visible: root.previousShapeSimilarities.length > 0
+                    clip: true
+                    visible: root.previousShapeSimilarities.length > 0 && !root.isCompact
 
                     Repeater {
                         model: root.previousShapeSimilarities
 
                         delegate: Item {
-                            property int baseSize: 22
-                            property int minSize: 10
+                            property int baseSize: root.isCompact ? 16 : 22
+                            property int minSize: root.isCompact ? 9 : 10
                             property real scaledSize: Math.max(minSize, baseSize - index * 3)
                             property real scaledOpacity: Math.max(0.15, 0.55 - index * 0.10)
 
@@ -923,13 +951,12 @@ Page {
                                     verticalCenter: parent.verticalCenter
                                 }
                                 text: modelData + "%"
-                                font.pixelSize: scaledSize
+                                font.pixelSize: AppScale.fs(scaledSize)
                                 font.weight: index === 0 ? 600 : 500
                                 color: Theme.onSecondaryContainer(root.Material.theme)
                                 opacity: scaledOpacity
                             }
 
-                            // Arrow separator after each value (except the last)
                             Text {
                                 id: arrowText
                                 anchors {
@@ -938,7 +965,7 @@ Page {
                                 }
                                 visible: index < root.previousShapeSimilarities.length
                                 text: " ›"
-                                font.pixelSize: scaledSize * 0.7
+                                font.pixelSize: AppScale.fs(scaledSize * 0.7)
                                 color: Theme.onSecondaryContainer(root.Material.theme)
                                 opacity: scaledOpacity * 0.6
                             }
@@ -947,50 +974,61 @@ Page {
                 }
             }
 
-            // Main Graph
+            // Main Graph — fills leftover viewport height; shrinks on short/narrow screens
             WaveFormGraph {
                 id: umpGraph
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.minimumHeight: 390
+                Layout.minimumHeight: root.graphMinHeight
                 independentScale: true
                 datasetColors: ["#d62728", "#83270b"]
-                lineWidth: 5
+                lineWidth: root.isCompact ? 3.5 : 5
                 showCueLabels: false
                 cueNLabels: root.titleText.replace(/\([^)]*\)/g, "").replace(/\d+/, "").replace("-", "").split(",").map(s => s.trim())
             }
 
 
 
-            // Controls
+            // Controls — three equal-stretch slots so the center play/record
+            // control stays page-centered on every width (phone, tablet, desktop).
             RowLayout {
+                Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 8
+                spacing: root.isCompact ? 4 : 8
 
-                PlayRoundButton {
-                    id: playReferenceBtn
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 200
-                    filePath: root.referenceFilePath
-                    text: qsTr("Play\nReference")
-                    visible: root.trainingMode !== 1
-                    enabled: root.trainingMode !== 1
-                             || root.guidedState === root.gsIdle
-                             || root.guidedState === root.gsPlaying
-                }
-
-                // Spacer to keep center column centered when playReferenceBtn is hidden in guided mode
                 Item {
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 200
-                    visible: root.trainingMode === 1
+                    id: leftSlot
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 120
+                    Layout.minimumWidth: root.sideSlotMinWidth
+                    implicitHeight: Math.max(
+                        playReferenceBtn.visible ? playReferenceBtn.implicitHeight : 0,
+                        playUserBtn.implicitHeight,
+                        72)
+
+                    PlayRoundButton {
+                        id: playReferenceBtn
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: Math.min(parent.width, 200)
+                        compact: root.isCompact
+                        filePath: root.referenceFilePath
+                        text: qsTr("Play\nReference")
+                        visible: root.trainingMode !== 1
+                        enabled: root.trainingMode !== 1
+                                 || root.guidedState === root.gsIdle
+                                 || root.guidedState === root.gsPlaying
+                    }
                 }
 
                 ColumnLayout {
-                    Layout.alignment: Qt.AlignVCenter
-                    spacing: 8
-                    Layout.preferredWidth: 240
-                    Layout.preferredHeight: 130
+                    id: centerControls
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 200
+                    Layout.minimumWidth: 96
+                    Layout.maximumWidth: root.isNarrow ? 100000 : 280
+                    spacing: root.isCompact ? 4 : 8
                     visible: window.settingsApi ? window.settingsApi.autoStopRecording : false
 
                     // ── Recording indicator with waveform bars ─────────────────
@@ -998,7 +1036,8 @@ Page {
                         id: micLevelIndicator
                         Layout.alignment: Qt.AlignHCenter
                         Layout.fillWidth: true
-                        Layout.preferredHeight: (trainingAudioApi.isRecording || isAnyPlaybackActive) ? 64 : 0
+                        Layout.preferredHeight: (trainingAudioApi.isRecording || isAnyPlaybackActive)
+                                                ? (root.isCompact ? 48 : 64) : 0
                         opacity: (trainingAudioApi.isRecording || isAnyPlaybackActive) ? 1.0 : 0.0
                         clip: true
 
@@ -1015,15 +1054,13 @@ Page {
                                 ? Theme.primary(root.Material.theme)
                                 : Theme.error(root.Material.theme))
 
-                        // Rolling buffer of recent audio levels (newest at end)
-                        property int barCount: 20
+                        property int barCount: root.isNarrow ? 10 : 20
                         property var levelHistory: {
                             let arr = [];
                             for (let i = 0; i < barCount; i++) arr.push(0);
                             return arr;
                         }
 
-                        // Poll audio level and shift the buffer
                         Timer {
                             id: waveformTimer
                             interval: 50
@@ -1037,7 +1074,6 @@ Page {
                             }
                         }
 
-                        // Reset buffer when recording stops
                         Connections {
                             target: trainingAudioApi
                             function onIsRecordingChanged() {
@@ -1049,23 +1085,20 @@ Page {
                             }
                         }
 
-                        // ── Left-side waveform bars (newest near center) ─────────
                         Row {
                             anchors.right: centerDot.left
                             anchors.rightMargin: 6
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 2
-                            layoutDirection: Qt.RightToLeft  // newest bar closest to dot
+                            layoutDirection: Qt.RightToLeft
 
                             Repeater {
                                 model: micLevelIndicator.barCount
                                 delegate: Rectangle {
                                     property real lvl: micLevelIndicator.levelHistory[micLevelIndicator.barCount - 1 - index] || 0
-                                    // Mild log lift for quiet bars; peaks kept expressive (low compression)
                                     property real logLvl: Math.log1p(lvl * 3) / Math.log1p(3)
-                                    // Bars widen dramatically at loud levels (2 px quiet → 5 px peak)
                                     width: 2 + Math.pow(lvl, 1.8) * 3
-                                    height: Math.max(3, logLvl * 64)
+                                    height: Math.max(3, logLvl * (root.isCompact ? 48 : 64))
                                     radius: width / 2
                                     color: micLevelIndicator.activeColor
                                     opacity: 0.25 + 0.75 * logLvl
@@ -1079,13 +1112,12 @@ Page {
                             }
                         }
 
-                        // ── Original recording dot (unchanged) ───────────────────
                         Rectangle {
                             id: centerDot
                             anchors.centerIn: parent
-                            width: 56
-                            height: 56
-                            radius: 28
+                            width: root.isCompact ? 44 : 56
+                            height: width
+                            radius: width / 2
                             color: micLevelIndicator.activeColor
 
                             SequentialAnimation on opacity {
@@ -1096,7 +1128,6 @@ Page {
                             }
                         }
 
-                        // ── Right-side waveform bars (mirror of left) ────────────
                         Row {
                             anchors.left: centerDot.right
                             anchors.leftMargin: 6
@@ -1107,10 +1138,9 @@ Page {
                                 model: micLevelIndicator.barCount
                                 delegate: Rectangle {
                                     property real lvl: micLevelIndicator.levelHistory[micLevelIndicator.barCount - 1 - index] || 0
-                                    // Logarithmic scaling: expands quiet signals, compresses peaks
                                     property real logLvl: Math.log1p(lvl * 9) / Math.log1p(9)
                                     width: 3
-                                    height: Math.max(3, logLvl * 58)
+                                    height: Math.max(3, logLvl * (root.isCompact ? 44 : 58))
                                     radius: 1.5
                                     color: micLevelIndicator.activeColor
                                     opacity: 0.25 + 0.75 * logLvl
@@ -1142,9 +1172,10 @@ Page {
                             return isAnyPlaybackActive ? qsTr("Playing...") :
                                    (trainingAudioApi.isRecording ? qsTr("Listening...") : qsTr("Processing..."));
                         }
-                        font.pixelSize: AppScale.fs(26)
+                        font.pixelSize: AppScale.fs(root.isCompact ? 18 : 26)
                         font.weight: 600
                         horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
                         color: {
                             if (root._isVadPaused) return Theme.error(root.Material.theme);
                             if (root.trainingMode === 1) {
@@ -1162,8 +1193,13 @@ Page {
                     Item {
                         id: guidedPlayBtn
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: 84
-                        Layout.preferredHeight: 84
+                        readonly property int btnSize: root.isCompact ? 72 : 84
+                        Layout.preferredWidth: btnSize
+                        Layout.preferredHeight: btnSize
+                        Layout.minimumWidth: btnSize
+                        Layout.minimumHeight: btnSize
+                        implicitWidth: btnSize
+                        implicitHeight: btnSize
                         visible: root.trainingMode === 1 && root.guidedState === root.gsIdle && !isAnyPlaybackActive
 
                         Rectangle {
@@ -1178,8 +1214,8 @@ Page {
                         Rectangle {
                             id: guidedInnerCircle
                             anchors.centerIn: parent
-                            width: 76
-                            height: 76
+                            width: parent.width - 8
+                            height: width
                             radius: width / 2
                             color: root.guidedTimedOut ? Theme.error(Material.theme) : Theme.primary(Material.theme)
 
@@ -1188,7 +1224,7 @@ Page {
                                 text: root.guidedTimedOut ? Icons.faRedo : Icons.faPlay
                                 font.family: Icons.familySolid
                                 font.weight: Font.Black
-                                font.pixelSize: AppScale.fs(28)
+                                font.pixelSize: AppScale.fs(root.isCompact ? 22 : 28)
                                 color: root.guidedTimedOut ? Theme.onError(Material.theme) : Theme.onPrimary(Material.theme)
                             }
 
@@ -1217,7 +1253,7 @@ Page {
                             }
                             return "";
                         }
-                        font.pixelSize: AppScale.fs(14)
+                        font.pixelSize: AppScale.fs(root.isCompact ? 12 : 14)
                         color: Theme.onSurface(root.Material.theme)
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
@@ -1226,8 +1262,8 @@ Page {
 
                 RecordRoundButton {
                     id: manualRecordBtn
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 240
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.preferredWidth: root.isCompact ? 96 : 160
                     visible: window.settingsApi ? !window.settingsApi.autoStopRecording : false
                     onRecordingFinished: function(filePath) {
                         if (filePath !== "") {
@@ -1236,26 +1272,38 @@ Page {
                     }
                 }
 
-                PlayRoundButton {
-                    id: playUserBtn
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 200
-                    filePath: root.userFilePath
-                    text: qsTr("Play\nMe")
-                    opacity: root.userFilePath !== "" ? 1.0 : 0.0
-                    enabled: root.userFilePath !== ""
-                    
-                    Behavior on opacity {
-                        NumberAnimation { duration: 250 }
+                Item {
+                    id: rightSlot
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 120
+                    Layout.minimumWidth: root.sideSlotMinWidth
+                    implicitHeight: playUserBtn.implicitHeight
+
+                    PlayRoundButton {
+                        id: playUserBtn
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: Math.min(parent.width, 200)
+                        compact: root.isCompact
+                        filePath: root.userFilePath
+                        text: qsTr("Play\nMe")
+                        opacity: root.userFilePath !== "" ? 1.0 : 0.0
+                        enabled: root.userFilePath !== ""
+
+                        Behavior on opacity {
+                            NumberAnimation { duration: 250 }
+                        }
                     }
                 }
             }
+
 
             // Pause/Resume VAD Button
             Button {
                 id: pauseVadButton
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 160
+                Layout.preferredWidth: root.isCompact ? 200 : 160
+                Layout.maximumWidth: pageLayout.width
                 Layout.preferredHeight: 50
                 flat: false
                 visible: (window.settingsApi ? window.settingsApi.autoStopRecording : false)
@@ -1327,8 +1375,10 @@ Page {
             Button {
                 id: openTestFileButton
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 240
+                Layout.preferredWidth: root.isCompact ? 200 : 240
+                Layout.maximumWidth: pageLayout.width
                 Layout.preferredHeight: 50
+                Layout.bottomMargin: root.pagePadding
                 flat: false
 
                 contentItem: Text {

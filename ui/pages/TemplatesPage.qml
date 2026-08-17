@@ -36,8 +36,8 @@ Page {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 24
-        spacing: 24
+        anchors.margins: AppScale.pagePadding
+        spacing: AppScale.pageSpacing
 
         // Search Bar
         SearchBar {
@@ -50,7 +50,7 @@ Page {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            spacing: 10
+            spacing: AppScale.listSpacing
 
             ScrollBar.vertical: ScrollBar {
                 policy: (window.settingsApi && !window.settingsApi.showNavigationMenu) ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded

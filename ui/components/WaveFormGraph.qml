@@ -379,6 +379,9 @@ Column {
         canvas.requestPaint();
     }
 
+    onWidthChanged: canvas.requestPaint()
+    onHeightChanged: canvas.requestPaint()
+
     RowLayout {
         id: legendRow
         anchors.horizontalCenter: parent.horizontalCenter

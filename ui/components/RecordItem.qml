@@ -23,7 +23,7 @@ Item {
     signal deleted(string filePath)
 
     width: ListView.view ? ListView.view.width : 0
-    height: 110
+    height: AppScale.isCompact ? 96 : 110
 
     Rectangle {
         id: cardBg
@@ -67,7 +67,7 @@ Item {
             height: 48
             radius: 24
             anchors.left: parent.left
-            anchors.leftMargin: 24
+            anchors.leftMargin: AppScale.isCompact ? 12 : 24
             anchors.verticalCenter: parent.verticalCenter
             color: {
                 var colors = [Theme.primaryContainer(Material.theme), Theme.secondaryContainer(Material.theme), Theme.tertiaryContainer(Material.theme)];
@@ -152,8 +152,8 @@ Item {
         // Progress Circle (Right side)
         Item {
             id: progressCircleContainer
-            width: 64
-            height: 64
+            width: AppScale.isCompact ? 48 : 64
+            height: AppScale.isCompact ? 48 : 64
             anchors.right: actionButtonsContainer.left
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
@@ -189,7 +189,7 @@ Item {
         RowLayout {
             id: actionButtonsContainer
             anchors.right: parent.right
-            anchors.rightMargin: 16
+            anchors.rightMargin: AppScale.isCompact ? 8 : 16
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 

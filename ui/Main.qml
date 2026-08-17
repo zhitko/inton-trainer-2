@@ -44,6 +44,18 @@ ApplicationWindow {
         value: settingsApi ? settingsApi.fontSizeMultiplier : 1
     }
 
+    Binding {
+        target: AppScale
+        property: "viewWidth"
+        value: stackView.width
+    }
+
+    Binding {
+        target: AppScale
+        property: "viewHeight"
+        value: stackView.height
+    }
+
     Component.onCompleted: {
         Logger.info("Main window initialized");
         Logger.debug("Initial theme: " + window.theme);
@@ -70,7 +82,7 @@ ApplicationWindow {
         ToolBar {
             id: toolbar
             width: parent.width
-            contentHeight: 64
+            contentHeight: AppScale.isCompact ? 56 : 64
             anchors.top: parent.top
 
             background: Rectangle {
@@ -170,7 +182,7 @@ ApplicationWindow {
         Rectangle {
             id: navigationBar
             width: parent.width
-            height: 80
+            height: AppScale.isCompact ? 68 : 80
             anchors.bottom: parent.bottom
             color: Theme.surfaceContainer(Material.theme)
             visible: settingsApi.showNavigationMenu

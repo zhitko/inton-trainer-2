@@ -8,8 +8,8 @@ import "../utils"
 Rectangle {
     id: root
     Layout.fillWidth: true
-    Layout.preferredHeight: 56
-    radius: 28
+    Layout.preferredHeight: AppScale.searchBarHeight
+    radius: AppScale.searchBarHeight / 2
     color: Theme.surfaceVariant(Material.theme)
 
     property alias text: searchInputField.text

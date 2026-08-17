@@ -11,7 +11,7 @@ Item {
 
     Layout.alignment: Qt.AlignHCenter
     Layout.fillWidth: true
-    Layout.preferredHeight: 200
+    Layout.preferredHeight: AppScale.isCompact ? 140 : 200
 
     property alias text: label.text
     signal clicked

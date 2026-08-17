@@ -7,12 +7,13 @@ import "../utils"
 
 ColumnLayout {
     id: root
-    spacing: 8
+    spacing: compact ? 4 : 8
 
     property string filePath: ""
     property string icon: Icons.faPlay
     property string text: ""
     property bool isPlaying: false
+    property bool compact: false
     property alias enabled: button.enabled
     enabled: filePath !== ""
     signal clicked
@@ -52,12 +53,12 @@ ColumnLayout {
     RoundButton {
         id: button
         Layout.alignment: Qt.AlignHCenter
-        Layout.preferredWidth: 56
-        Layout.preferredHeight: 56
+        Layout.preferredWidth: root.compact ? 48 : 56
+        Layout.preferredHeight: root.compact ? 48 : 56
         font.family: Icons.familySolid
         font.weight: Font.Black
         text: root.isPlaying ? Icons.faStop : root.icon
-        font.pixelSize: AppScale.fs(20)
+        font.pixelSize: AppScale.fs(root.compact ? 16 : 20)
         Material.background: root.isPlaying ? Theme.errorContainer(Material.theme) : Theme.primaryContainer(Material.theme)
         Material.foreground: root.isPlaying ? Theme.onErrorContainer(Material.theme) : Theme.onPrimaryContainer(Material.theme)
 
@@ -150,10 +151,14 @@ ColumnLayout {
 
     Text {
         Layout.alignment: Qt.AlignHCenter
+        Layout.fillWidth: true
         text: root.text
-        font.pixelSize: AppScale.fs(18)
+        font.pixelSize: AppScale.fs(root.compact ? 13 : 18)
         font.weight: 500
         horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WordWrap
+        maximumLineCount: 2
+        elide: Text.ElideRight
         color: Theme.onSurface(Material.theme)
     }
 }

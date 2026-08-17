@@ -38,6 +38,7 @@ RowLayout {
                 color: Theme.onError(Material.theme)
             }
             Text {
+                visible: !AppScale.isCompact
                 text: actionButtonText
                 font.pixelSize: AppScale.fs(14)
                 font.weight: 600
@@ -48,8 +49,8 @@ RowLayout {
         background: Rectangle {
             radius: 20
             color: Theme.error(Material.theme)
-            implicitHeight: 40
-            implicitWidth: 120
+            implicitHeight: AppScale.searchBarHeight - 8
+            implicitWidth: AppScale.isCompact ? 44 : 120
 
             Rectangle {
                 anchors.fill: parent

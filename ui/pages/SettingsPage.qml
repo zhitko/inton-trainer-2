@@ -86,7 +86,7 @@ Page {
 
             Frame {
                 Layout.fillWidth: true
-                Layout.margins: 20
+                Layout.margins: AppScale.pagePadding
 
                 background: Rectangle {
                     color: Theme.surfaceContainerLow(Material.theme)
@@ -274,7 +274,7 @@ Page {
 
             Frame {
                 Layout.fillWidth: true
-                Layout.margins: 20
+                Layout.margins: AppScale.pagePadding
 
                 background: Rectangle {
                     color: Theme.surfaceContainerLow(Material.theme)
@@ -832,8 +832,8 @@ Page {
             Frame {
                 visible: showAdvanced
                 Layout.fillWidth: true
-                Layout.leftMargin: 20
-                Layout.rightMargin: 20
+                Layout.leftMargin: AppScale.pagePadding
+                Layout.rightMargin: AppScale.pagePadding
                 Layout.bottomMargin: 20
 
                 background: Rectangle {
@@ -1056,8 +1056,8 @@ Page {
             Frame {
                 visible: showAdvanced
                 Layout.fillWidth: true
-                Layout.leftMargin: 20
-                Layout.rightMargin: 20
+                Layout.leftMargin: AppScale.pagePadding
+                Layout.rightMargin: AppScale.pagePadding
                 Layout.bottomMargin: 20
 
                 background: Rectangle {
@@ -1139,8 +1139,8 @@ Page {
             Frame {
                 visible: showAdvanced
                 Layout.fillWidth: true
-                Layout.leftMargin: 20
-                Layout.rightMargin: 20
+                Layout.leftMargin: AppScale.pagePadding
+                Layout.rightMargin: AppScale.pagePadding
                 Layout.bottomMargin: 20
 
                 background: Rectangle {
@@ -1237,8 +1237,8 @@ Page {
             Frame {
                 visible: showAdvanced
                 Layout.fillWidth: true
-                Layout.leftMargin: 20
-                Layout.rightMargin: 20
+                Layout.leftMargin: AppScale.pagePadding
+                Layout.rightMargin: AppScale.pagePadding
                 Layout.bottomMargin: 20
 
                 background: Rectangle {
@@ -1358,8 +1358,8 @@ Page {
             Frame {
                 visible: showAdvanced
                 Layout.fillWidth: true
-                Layout.leftMargin: 20
-                Layout.rightMargin: 20
+                Layout.leftMargin: AppScale.pagePadding
+                Layout.rightMargin: AppScale.pagePadding
                 Layout.bottomMargin: 20
 
                 background: Rectangle {
@@ -1468,8 +1468,8 @@ Page {
             Frame {
                 visible: showAdvanced
                 Layout.fillWidth: true
-                Layout.leftMargin: 20
-                Layout.rightMargin: 20
+                Layout.leftMargin: AppScale.pagePadding
+                Layout.rightMargin: AppScale.pagePadding
                 Layout.bottomMargin: 20
 
                 background: Rectangle {
@@ -1790,16 +1790,16 @@ Page {
         title: qsTr("Delete user data")
         modal: true
 
-        width: AppScale.px(root.width * 0.9)
-        x: (AppScale.px(root.width) - width) / 2
-        y: (AppScale.px(root.height) - height) / 2
+        width: Math.min(root.width * 0.9, 420)
+        x: (root.width - width) / 2
+        y: (root.height - height) / 2
 
         Label {
             text: qsTr("This action will permanently delete all user statistics and user records.\nThis cannot be undone. Are you sure?")
             color: Theme.onSurface(Material.theme)
             wrapMode: Text.Wrap
             font.pixelSize: AppScale.fs(14)
-            width: parent.width - AppScale.px(40)
+            width: parent.width - 24
         }
 
         footer: DialogButtonBox {

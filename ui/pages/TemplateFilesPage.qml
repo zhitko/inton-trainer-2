@@ -85,8 +85,8 @@ Page {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 24
-        spacing: 16
+        anchors.margins: AppScale.pagePadding
+        spacing: AppScale.isCompact ? 10 : 16
 
         // Search Bar
         SearchBar {
@@ -247,7 +247,7 @@ Page {
                 delegate: Item {
                     width: listView.width
                     visible: height > 0
-                    height: (searchField.text !== "" || modelData.directory === filesPage.unfoldedCategory) ? 110 : 0 // 100 height + 10 spacing
+                    height: (searchField.text !== "" || modelData.directory === filesPage.unfoldedCategory) ? (AppScale.listItemHeight + 10) : 0
                     clip: true
 
                     Behavior on height {
@@ -261,7 +261,7 @@ Page {
                         anchors.top: parent.top
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        height: 100
+                        height: AppScale.listItemHeight
                         itemData: modelData.fileName
                         itemIndex: index
                         icon: Icons.faFileAudio
@@ -281,7 +281,7 @@ Page {
             ScrollBar {
                 id: vScrollBar
                 Layout.fillHeight: true
-                Layout.preferredWidth: 16
+                Layout.preferredWidth: AppScale.isCompact ? 10 : 16
                 orientation: Qt.Vertical
                 policy: (window.settingsApi && !window.settingsApi.showNavigationMenu) ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
                 size: listView.visibleArea.heightRatio
