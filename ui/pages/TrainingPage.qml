@@ -1371,9 +1371,10 @@ Page {
                 }
             }
 
-            // Open Test File Button
+            // Open Test File Button (desktop only — file picker is not used on mobile)
             Button {
                 id: openTestFileButton
+                visible: !AppScale.isMobile
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredWidth: root.isCompact ? 200 : 240
                 Layout.maximumWidth: pageLayout.width
