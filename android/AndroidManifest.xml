@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="by.intontrainer"
-    android:versionCode="1"
-    android:versionName="0.1"
+    android:versionCode="-- %%INSERT_VERSION_CODE%% --"
+    android:versionName="-- %%INSERT_VERSION_NAME%% --"
     android:installLocation="auto">
 
-    <!-- Audio recording permission (required) -->
+    <!-- Microphone only. Deliberately omit %%INSERT_PERMISSIONS%% so
+         androiddeployqt does not inject Qt Core's INTERNET /
+         WRITE_EXTERNAL_STORAGE. File picker is desktop-only. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <!-- Read external storage (for opening WAV files from file picker) -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32"/>
-    <!-- Android 13+ granular media permissions -->
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
-    <!-- Write (for saving recordings if needed) -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove"/>
 
     <!-- Require a microphone -->
     <uses-feature android:name="android.hardware.microphone" android:required="true"/>
@@ -26,7 +26,7 @@
         android:hardwareAccelerated="true"
         android:supportsRtl="true"
         android:allowBackup="false"
-        android:extractNativeLibs="true">
+        android:fullBackupOnly="false">
 
         <activity
             android:name="org.qtproject.qt.android.bindings.QtActivity"

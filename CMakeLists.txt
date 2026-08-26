@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(inton-trainer-2 VERSION 0.1 LANGUAGES CXX)
+project(inton-trainer-2 VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
@@ -218,14 +218,20 @@ set_target_properties(appinton-trainer-2 PROPERTIES
 if(ANDROID)
     set_target_properties(appinton-trainer-2 PROPERTIES
         QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
-        QT_ANDROID_TARGET_SDK_VERSION 35
+        QT_ANDROID_TARGET_SDK_VERSION 36
+        QT_ANDROID_COMPILE_SDK_VERSION 36
         QT_ANDROID_MIN_SDK_VERSION 26
         QT_ANDROID_VERSION_CODE 1
-        QT_ANDROID_VERSION_NAME "0.1"
+        QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
         # App name shown on launcher
         QT_ANDROID_APP_NAME "Intonation Trainer"
         # Package identifier
         QT_ANDROID_PACKAGE_NAME "by.intontrainer"
+    )
+    # Google Play (API 35+): native libs must be 16 KB page-aligned.
+    target_link_options(appinton-trainer-2 PRIVATE
+        "-Wl,-z,max-page-size=16384"
+        "-Wl,-z,common-page-size=16384"
     )
 endif()
 
@@ -242,7 +248,7 @@ if(ANDROID)
     endif()
 
     # Copy runtime resources into android/assets/ so androiddeployqt bundles
-    # them into the APK (extracted to applicationDirPath() on device).
+    # them into the APK (extracted to AppDataLocation on device).
     add_custom_target(copy_runtime_resources ALL
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_SOURCE_DIR}/settings.ini"

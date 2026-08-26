@@ -68,7 +68,7 @@ Selecting a template opens the **Training Page**:
 
 **Playback controls**
 - **Play Reference** — listen to the reference recording while pausing the recording loop.
-- **Play Me** — listen to your last captured attempt.
+- **Listen to Yours** — listen to your last captured attempt.
 
 **Advanced analysis**
 - A button opens the full **Analysis Page** (TemplatePage) for a deep dive:
@@ -241,8 +241,11 @@ chmod +x scripts/build_android.sh
 ./scripts/build_android.sh
 ```
 
-The script produces an Android App Bundle (`.aab`) at:
-`build_android_arm64_v8a/android-build/build/outputs/bundle/release/android-build-release.aab`
+The script produces an APK and an Android App Bundle (`.aab`). Release AAB:
+
+`build_android_arm64-v8a/android-build/build/outputs/bundle/release/android-build-release.aab`
+
+See `scripts/android_build_guide.md` for signing, target SDK 36, and Play Console steps.
 
 An emulator launch script is also available:
 

@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 # =============================================================================
-# build_android.sh — Build Intonation Trainer 2 as an Android App Bundle (.aab)
+# build_android.sh — Build Intonation Trainer 2 APK + Android App Bundle (.aab)
 #
 # Usage:
-#   chmod +x scripts/build_android.sh
-#   ./scripts/build_android.sh [arm64-v8a|armv7|x86_64|all]  [debug|release]
+#   ./scripts/build_android.sh [arm64-v8a|armeabi-v7a|x86_64|all]  [debug|release]
 #
 # Defaults: ABI=arm64-v8a, BUILD_TYPE=release
 #
-# Optional signing env vars:
+# Signing (optional; required for a Play-uploadable AAB):
+#   QT_ANDROID_KEYSTORE_PATH, QT_ANDROID_KEYSTORE_ALIAS,
+#   QT_ANDROID_KEYSTORE_STORE_PASS, QT_ANDROID_KEYSTORE_KEY_PASS
+#
+# Aliases (copied into the QT_ANDROID_* vars if those are unset):
 #   ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_ALIAS, ANDROID_KEYSTORE_PASSWORD
 # =============================================================================
 
@@ -26,8 +29,32 @@ JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-17-openjdk-amd64}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-TARGET_ABI="${1:-arm64-v8a}"   # arm64-v8a | armv7 | x86_64 | all
+TARGET_ABI="${1:-arm64-v8a}"   # arm64-v8a | armeabi-v7a | x86_64 | all
 BUILD_TYPE="${2:-release}"      # debug | release
+
+# Convenience aliases → official Qt androiddeployqt env vars
+if [[ -n "${ANDROID_KEYSTORE_PATH:-}" && -z "${QT_ANDROID_KEYSTORE_PATH:-}" ]]; then
+    export QT_ANDROID_KEYSTORE_PATH="$ANDROID_KEYSTORE_PATH"
+fi
+if [[ -n "${ANDROID_KEYSTORE_ALIAS:-}" && -z "${QT_ANDROID_KEYSTORE_ALIAS:-}" ]]; then
+    export QT_ANDROID_KEYSTORE_ALIAS="$ANDROID_KEYSTORE_ALIAS"
+fi
+if [[ -n "${ANDROID_KEYSTORE_PASSWORD:-}" ]]; then
+    export QT_ANDROID_KEYSTORE_STORE_PASS="${QT_ANDROID_KEYSTORE_STORE_PASS:-$ANDROID_KEYSTORE_PASSWORD}"
+    export QT_ANDROID_KEYSTORE_KEY_PASS="${QT_ANDROID_KEYSTORE_KEY_PASS:-$ANDROID_KEYSTORE_PASSWORD}"
+fi
+
+SIGN_CMAKE_ARGS=()
+if [[ -n "${QT_ANDROID_KEYSTORE_PATH:-}" ]]; then
+    if [[ ! -f "$QT_ANDROID_KEYSTORE_PATH" ]]; then
+        echo "ERROR: keystore not found: $QT_ANDROID_KEYSTORE_PATH"
+        exit 1
+    fi
+    SIGN_CMAKE_ARGS=(-DQT_ANDROID_SIGN_AAB=ON -DQT_ANDROID_SIGN_APK=ON)
+    echo "Signing: enabled ($QT_ANDROID_KEYSTORE_PATH)"
+else
+    echo "Signing: disabled (set QT_ANDROID_KEYSTORE_PATH for a Play-uploadable AAB)"
+fi
 
 # ---------------------------------------------------------------------------
 # Helper: build a single ABI
@@ -35,13 +62,17 @@ BUILD_TYPE="${2:-release}"      # debug | release
 build_abi() {
     local ABI="$1"
     local QT_ANDROID_DIR
+    local CMAKE_ABI="$ABI"
 
     case "$ABI" in
         arm64-v8a)  QT_ANDROID_DIR="$QT_ROOT/android_arm64_v8a" ;;
-        armv7)      QT_ANDROID_DIR="$QT_ROOT/android_armv7"     ;;
+        armeabi-v7a|armv7)
+            QT_ANDROID_DIR="$QT_ROOT/android_armv7"
+            CMAKE_ABI="armeabi-v7a"
+            ;;
         x86_64)     QT_ANDROID_DIR="$QT_ROOT/android_x86_64"    ;;
         *)
-            echo "ERROR: unknown ABI '$ABI'. Valid: arm64-v8a armv7 x86_64"
+            echo "ERROR: unknown ABI '$ABI'. Valid: arm64-v8a armeabi-v7a x86_64"
             exit 1
             ;;
     esac
@@ -52,10 +83,10 @@ build_abi() {
         exit 1
     fi
 
-    local BUILD_DIR="$PROJECT_ROOT/build_android_${ABI}"
+    local BUILD_DIR="$PROJECT_ROOT/build_android_${CMAKE_ABI}"
     echo ""
     echo "============================================================"
-    echo "  Building ABI: $ABI"
+    echo "  Building ABI: $CMAKE_ABI"
     echo "  Qt:  $QT_ANDROID_DIR"
     echo "  NDK: $ANDROID_NDK"
     echo "  Build dir: $BUILD_DIR"
@@ -66,7 +97,7 @@ build_abi() {
         -B "$BUILD_DIR" \
         -G "Ninja" \
         -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake" \
-        -DANDROID_ABI="$ABI" \
+        -DANDROID_ABI="$CMAKE_ABI" \
         -DANDROID_PLATFORM="android-26" \
         -DANDROID_NDK="$ANDROID_NDK" \
         -DCMAKE_ANDROID_NDK="$ANDROID_NDK" \
@@ -75,12 +106,13 @@ build_abi() {
         -DQT_HOST_PATH="$QT_ROOT/gcc_64" \
         -DQT_HOST_PATH_CMAKE_DIR="$QT_ROOT/gcc_64/lib/cmake" \
         -DCMAKE_BUILD_TYPE="$(tr '[:lower:]' '[:upper:]' <<< ${BUILD_TYPE:0:1})${BUILD_TYPE:1}" \
-        -DANDROID_SDK_ROOT="$ANDROID_SDK"
+        -DANDROID_SDK_ROOT="$ANDROID_SDK" \
+        "${SIGN_CMAKE_ARGS[@]}"
 
     cmake --build "$BUILD_DIR" --target appinton-trainer-2 -- -j"$(nproc)"
 
     echo ""
-    echo "  ABI $ABI build complete. Artifacts in: $BUILD_DIR"
+    echo "  ABI $CMAKE_ABI build complete. Artifacts in: $BUILD_DIR"
 }
 
 # ---------------------------------------------------------------------------
@@ -104,7 +136,7 @@ for tool in cmake ninja java; do
 done
 
 if [[ "$TARGET_ABI" == "all" ]]; then
-    for abi in arm64-v8a armv7 x86_64; do
+    for abi in arm64-v8a armeabi-v7a x86_64; do
         build_abi "$abi"
     done
 else
@@ -112,42 +144,44 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# Package into an AAB (App Bundle) via Qt's built-in `aab` CMake target
+# Package APK (emulator / sideload) and AAB (Play) via Qt CMake targets
 # ---------------------------------------------------------------------------
-# Qt6's CMake integration exposes an `aab` target that:
-#   1. Stages the compiled .so into android-build/libs/<ABI>/
-#   2. Calls androiddeployqt to copy Qt libs and generate the Gradle project
-#   3. Runs Gradle bundleRelease/bundleDebug to produce the .aab
-#
-# Prerequisite: platforms;android-35 must be installed in the SDK:
+# Prerequisite: platforms;android-36 must be installed in the SDK:
 #   JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
-#     $HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" <<< "y"
+#     $HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" <<< "y"
 # ---------------------------------------------------------------------------
 echo ""
 echo "============================================================"
-echo "  Packaging Android App Bundle (.aab)"
+echo "  Packaging APK and Android App Bundle (.aab)"
 echo "============================================================"
 
-# For multi-ABI bundles, use the arm64 build dir as the entry point
-MAIN_ABI="${TARGET_ABI:-arm64-v8a}"
-[[ "$TARGET_ABI" == "all" ]] && MAIN_ABI="arm64-v8a"
+MAIN_ABI="$TARGET_ABI"
+if [[ "$TARGET_ABI" == "all" ]]; then
+    MAIN_ABI="arm64-v8a"
+elif [[ "$TARGET_ABI" == "armv7" ]]; then
+    MAIN_ABI="armeabi-v7a"
+fi
 BUILD_DIR="$PROJECT_ROOT/build_android_${MAIN_ABI}"
 
 cmake --build "$BUILD_DIR" --target apk -- -j"$(nproc)"
-
-# Qt puts the final AAB under: android-build/build/outputs/bundle/release/
-RELEASE_AAB="$BUILD_DIR/android-build/build/outputs/bundle/release/android-build-release.aab"
-DEBUG_AAB="$BUILD_DIR/android-build/build/outputs/bundle/debug/android-build-debug.aab"
+cmake --build "$BUILD_DIR" --target aab -- -j"$(nproc)"
 
 echo ""
-if [[ -f "$RELEASE_AAB" ]]; then
-    echo "Android App Bundle (release) created:"
-    echo "  $RELEASE_AAB"
-elif [[ -f "$DEBUG_AAB" ]]; then
-    echo "Android App Bundle (debug) created:"
-    echo "  $DEBUG_AAB"
-else
-    echo "WARNING: .aab not found; check $BUILD_DIR/android-build for Gradle output."
-    echo "  Run with --stacktrace for Gradle details:"
+found=0
+for artifact in \
+    "$BUILD_DIR/android-build/build/outputs/apk/debug/android-build-debug.apk" \
+    "$BUILD_DIR/android-build/build/outputs/apk/release/android-build-release.apk" \
+    "$BUILD_DIR/android-build/appinton-trainer-2.apk" \
+    "$BUILD_DIR/android-build/build/outputs/bundle/debug/android-build-debug.aab" \
+    "$BUILD_DIR/android-build/build/outputs/bundle/release/android-build-release.aab"
+do
+    if [[ -f "$artifact" ]]; then
+        echo "  $artifact"
+        found=1
+    fi
+done
+
+if [[ "$found" -eq 0 ]]; then
+    echo "WARNING: no APK/AAB found; check $BUILD_DIR/android-build for Gradle output."
     echo "  cd $BUILD_DIR/android-build && ./gradlew bundleRelease --stacktrace"
 fi
