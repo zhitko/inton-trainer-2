@@ -22,7 +22,11 @@ Page {
     // ── Page state ──────────────────────────────────────────────────────────
     property string referenceFilePath: ""
     property string userFilePath:      ""
-    property string titleText: referenceFilePath.substring(referenceFilePath.lastIndexOf('/') + 1).replace(".wav", "")
+    readonly property string referenceFileName: referenceFilePath.substring(referenceFilePath.lastIndexOf('/') + 1).replace(".wav", "")
+    property string titleText: {
+        var match = referenceFileName.match(/\(([^)]*)\)/)
+        return (match && match[1] !== "") ? match[1] : referenceFileName
+    }
 
     title: titleText
 
@@ -984,7 +988,7 @@ Page {
                 datasetColors: ["#d62728", "#83270b"]
                 lineWidth: root.isCompact ? 3.5 : 5
                 showCueLabels: false
-                cueNLabels: root.titleText.replace(/\([^)]*\)/g, "").replace(/\d+/, "").replace("-", "").split(",").map(s => s.trim())
+                cueNLabels: root.referenceFileName.replace(/\([^)]*\)/g, "").replace(/\d+/, "").replace("-", "").split(",").map(s => s.trim())
             }
 
 
@@ -1286,7 +1290,7 @@ Page {
                         width: Math.min(parent.width, 200)
                         compact: root.isCompact
                         filePath: root.userFilePath
-                        text: qsTr("Play\nMe")
+                        text: qsTr("Listen to\nYours")
                         opacity: root.userFilePath !== "" ? 1.0 : 0.0
                         enabled: root.userFilePath !== ""
 

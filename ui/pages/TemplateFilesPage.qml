@@ -199,7 +199,7 @@ Page {
 
                             Text {
                                 text: section
-                                font.pixelSize: AppScale.fs(15)
+                                font.pixelSize: AppScale.fs(AppScale.isCompact ? 15 : 18)
                                 font.weight: 700
                                 color: Theme.onSurface(Material.theme)
                                 Layout.fillWidth: true

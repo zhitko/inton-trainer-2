@@ -1145,10 +1145,10 @@ Reference</translation>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="1244"/>
-        <source>Play
-Me</source>
-        <translation>Play
-Me</translation>
+        <source>Listen to
+Yours</source>
+        <translation>Listen to
+Yours</translation>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="1265"/>

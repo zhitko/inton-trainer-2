@@ -1223,10 +1223,10 @@ Reference</source>
     </message>
     <message>
         <location filename="../ui/pages/TrainingPage.qml" line="1244"/>
-        <source>Play
-Me</source>
+        <source>Listen to
+Yours</source>
         <translation>Слушать
-Запись</translation>
+своё</translation>
     </message>
     <message>
         <source>Resume</source>
