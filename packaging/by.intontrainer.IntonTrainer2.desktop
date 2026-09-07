@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Intonation Trainer 2
+Comment=Practice and analyze speech intonation
+Exec=appinton-trainer-2
+Icon=by.intontrainer.IntonTrainer2
+Terminal=false
+Categories=Education;AudioVideo;Audio;
+StartupWMClass=appinton-trainer-2

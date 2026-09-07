@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QFontDatabase>
 #include <QGuiApplication>
+#include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QStandardPaths>
 #include <QStringList>
@@ -100,6 +101,8 @@ int main(int argc, char* argv[])
 #endif
 
     QGuiApplication app(argc, argv);
+    app.setWindowIcon(QIcon(QStringLiteral(
+        ":/qt/qml/inton-trainer-2/res/icons/intontrainer.png")));
 
     // Explicitly load fonts from resources to ensure they are available on all platforms (especially Windows)
     // These paths match the structure defined in qt_add_qml_module RESOURCES

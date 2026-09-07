@@ -197,6 +197,7 @@ qt_add_qml_module(appinton-trainer-2
         res/fonts/fa-brands-400.ttf
         res/fonts/fa-regular-400.ttf
         res/fonts/fa-solid-900.ttf
+        res/icons/intontrainer.png
         res/images/wave.png
 )
 
@@ -208,9 +209,20 @@ qt_add_translations(appinton-trainer-2
         qm_files
 )
 
+if(WIN32)
+    target_sources(appinton-trainer-2 PRIVATE res/icons/intontrainer.rc)
+endif()
+
+if(APPLE)
+    set_source_files_properties(res/icons/intontrainer.icns
+        PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    target_sources(appinton-trainer-2 PRIVATE res/icons/intontrainer.icns)
+endif()
+
 set_target_properties(appinton-trainer-2 PROPERTIES
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE_ICON_FILE intontrainer.icns
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
@@ -284,3 +296,8 @@ install(TARGETS appinton-trainer-2
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+install(FILES packaging/by.intontrainer.IntonTrainer2.desktop
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(DIRECTORY res/icons/hicolor/
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor
+    FILES_MATCHING PATTERN "*.png")
