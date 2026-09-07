@@ -1,0 +1,15 @@
+{
+  "theme": "neutral",
+  "fontFamily": "DejaVu Sans",
+  "htmlLabels": false,
+  "flowchart": {
+    "htmlLabels": false,
+    "curve": "linear",
+    "wrappingWidth": 180,
+    "nodeSpacing": 40,
+    "rankSpacing": 40
+  },
+  "themeVariables": {
+    "fontFamily": "DejaVu Sans"
+  }
+}

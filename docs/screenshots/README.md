@@ -1,6 +1,6 @@
 # Screenshots for the User Guide
 
-This directory should contain the following screenshots referenced in `docs/user_guide.md`:
+This directory contains the following screenshots referenced in `docs/user_guide_ch_en.md` and `docs/user_guide_ch_ru.md`:
 
 | Screenshot file | Description |
 |---|---|
@@ -16,8 +16,9 @@ This directory should contain the following screenshots referenced in `docs/user
 | `records-metrics.png` | Records screen metrics (score, date, reference) |
 | `comparison-curves.png` | Pitch / waveform comparison curves |
 | `settings-basic.png` | Basic settings (safe to change) |
-| `settings-vad.png` | VAD settings (change carefully) |
-| `settings-advanced.png` | Advanced DSP settings (expert only) |
+| `settings-screen-vad-auto.png` | Auto mode VAD setting |
+| `settings-screen-vad-guided.png` | Guided mode VAD setting |
+| `settings-screen-vad-manual.png` | Manual mode VAD setting |
 
 ### Notes
 

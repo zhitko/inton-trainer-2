@@ -1,0 +1,30 @@
+% Pandoc Xe/LuaLaTeX preamble extras for docs/*.md → PDF.
+\usepackage{float}
+\floatplacement{figure}{H}
+\usepackage{xurl}
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\sloppy\setlength{\emergencystretch}{3em}}
+
+% DejaVu has Latin + Cyrillic but no Han. Fall back to a CJK font for
+% characters such as 妈/麻/马/骂 in the IntonTrainer 2-Ch guides.
+\IfFontExistsTF{Noto Serif CJK SC}{
+  \directlua{
+    luaotfload.add_fallback("cjkfallback", {
+      "Noto Serif CJK SC:mode=harf;",
+    })
+  }
+  \setmainfont{DejaVu Serif}[RawFeature={fallback=cjkfallback}]
+  \setsansfont{DejaVu Sans}[RawFeature={fallback=cjkfallback}]
+  \setmonofont{DejaVu Sans Mono}[RawFeature={fallback=cjkfallback}]
+}{
+  \IfFontExistsTF{Droid Sans Fallback}{
+    \directlua{
+      luaotfload.add_fallback("cjkfallback", {
+        "Droid Sans Fallback:mode=harf;",
+      })
+    }
+    \setmainfont{DejaVu Serif}[RawFeature={fallback=cjkfallback}]
+    \setsansfont{DejaVu Sans}[RawFeature={fallback=cjkfallback}]
+    \setmonofont{DejaVu Sans Mono}[RawFeature={fallback=cjkfallback}]
+  }{}
+}
