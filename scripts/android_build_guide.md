@@ -287,6 +287,38 @@ The **Open Test File** button on `TrainingPage.qml` is desktop-only (`visible: !
 
 ---
 
+## Open-source licences
+
+The side menu exposes **Open-source licences**. `LicensesPage.qml` reads
+the complete licence texts from Qt resources, so the notices remain available
+offline inside every APK/AAB.
+
+The bundled notice set covers:
+
+- the application's MIT-licensed source;
+- Qt 6.11.1 under LGPLv3, including GPLv3 and LGPLv3 texts, matching Qt source,
+  and instructions for rebuilding/signing an APK with modified Qt shared
+  libraries;
+- ALGLIB 4.06.0 under GPL-2.0-or-later, including the source offer and rebuild
+  instructions;
+- SPTK 4.3 under Apache-2.0 and its WORLD, REAPER, SWIPE, Snack, and ya_getopt
+  notices;
+- Font Awesome Free 7.2.0 fonts under SIL OFL 1.1;
+- the Android NDK LLVM OpenMP runtime under Apache-2.0 with LLVM Exceptions.
+
+The application's own files remain MIT-licensed, but ALGLIB is compiled into
+the native application library. Consequently, a distributed combined
+executable is subject to the GNU GPL; do not describe the Play binary as
+MIT-only. `licenses/THIRD_PARTY_NOTICES.md` is the authoritative component
+index and source/relinking offer.
+
+Before publishing each release, tag the exact source used for the binary and
+make a source archive available from the repository. It must retain the
+application source, CMake/build scripts, and the matching ALGLIB and SPTK
+sources (or durable, unambiguous access to those exact upstream sources).
+
+---
+
 ## Google Play readiness
 
 Requirements checked against the official Google Play and Android
@@ -314,6 +346,7 @@ documentation on **8 September 2026**.
 | Launcher icons | Legacy, round, and adaptive resources added; manifest wired |
 | Play Console icon | 512×512 RGBA PNG, 220 KB: `packaging/google-play/icon-512.png` |
 | Play Console account | Verified |
+| Open-source licences | Offline in-app notices and full texts added for Qt/LGPL, ALGLIB/GPL, SPTK and embedded components, Font Awesome/OFL, and LLVM OpenMP; source/relinking offer documented |
 
 ### Required before the first Play release
 
@@ -332,7 +365,7 @@ documentation on **8 September 2026**.
 | **Closed testing, if applicable** | Personal accounts created after 13 November 2023 need at least 12 testers continuously opted in for 14 days, followed by a production-access application. Testers must remain engaged; opting out breaks continuity. |
 | **Developer verification** | Check Play Console account identity and package registration. Enforcement begins 30 September 2026 for participating stores in Brazil, Indonesia, Singapore, and Thailand, then expands globally in 2027; most existing verified Play developers need no extra identity action. |
 | **Native debug symbols** | Configure the release bundle to include full native symbols (`ndk.debugSymbolLevel = 'FULL'`) and confirm them in App Bundle Explorer. With AAB and AGP 4.1+, Play extracts included symbols automatically; upload a ZIP manually only if they are not bundled. |
-| **Licences** | Add Qt LGPL notices and relink offer where applicable, plus Font Awesome, SPTK, and alglib attributions. |
+| **Release source archive** | Publish and retain the exact source tag/archive corresponding to the uploaded binary. Include the build scripts and matching ALGLIB/SPTK sources or durable access to those exact sources; verify every packaged native library against the in-app notices. |
 | **Portrait-only decision** | Keep `screenOrientation="portrait"` only if this is intentional and phone QA confirms all content remains usable. |
 
 ### Official references

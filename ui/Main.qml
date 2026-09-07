@@ -410,6 +410,12 @@ ApplicationWindow {
                             icon: Icons.faGear,
                             page: "pages/SettingsPage.qml",
                             clear: false
+                        },
+                        {
+                            text: qsTr("Open-source licences"),
+                            icon: Icons.faScaleBalanced,
+                            page: "pages/LicensesPage.qml",
+                            clear: false
                         }
                     ]
 

@@ -579,7 +579,7 @@ Only after that should you begin exploring the advanced controls in the settings
 
 ## 13 License
 
-This project is licensed under the MIT License - see [LICENSE](https://github.com/zhitko/inton-trainer-2/blob/main/LICENSE) for details.
+The application's own source files are offered under the [MIT License](https://github.com/zhitko/inton-trainer-2/blob/main/LICENSE). The built executable also incorporates GPL-licensed ALGLIB, and Qt is dynamically linked under LGPLv3. Complete notices, source availability, and Qt relinking information are available from **Open-source licences** in the side menu.
 
 ## 14 Third-Party Libraries
 
@@ -588,8 +588,8 @@ This project is licensed under the MIT License - see [LICENSE](https://github.co
 | ------------------------------------------------------------------------------------ | -------------------------------------------------------- |
 | **[SPTK](https://github.com/sp-nitech/SPTK)** (Speech Signal Processing Toolkit 4.3) | F0 extraction (RAPT algorithm), audio feature processing |
 | **[ALGLIB](https://www.alglib.net/)** 4.06.0                                         | Spline smoothing for pitch and UMP profiles              |
-| **[Font Awesome](https://fontawesome.com/)** (Free 6.x)                              | Icon font used throughout the UI                         |
-| **[Ten-vad](https://github.com/TEN-framework/ten-vad)**                              | Additional VAD support (energy + autocorrelation-based)  |
+| **[Font Awesome](https://fontawesome.com/)** (Free 7.2.0)                            | Icon font used throughout the UI                         |
+| **[Ten-vad](https://github.com/TEN-framework/ten-vad)**                              | Vendored for evaluation; not linked into the current app |
 
 
 

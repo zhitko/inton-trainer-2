@@ -71,6 +71,32 @@ QString FileApi::getPathFromUrl(const QUrl& url)
     return url.toLocalFile();
 }
 
+QString FileApi::readTextResource(const QUrl& url)
+{
+    if (url.scheme() != QLatin1String("qrc")) {
+        LOG_WARNING() << "Rejected non-resource text URL:" << url;
+        return {};
+    }
+
+    const QString resourcePath = QDir::cleanPath(
+        QLatin1Char(':') + url.path());
+    const QString allowedPrefix =
+        QStringLiteral(":/qt/qml/inton-trainer-2/");
+    if (!resourcePath.startsWith(allowedPrefix)) {
+        LOG_WARNING() << "Rejected text resource outside application module:"
+                      << resourcePath;
+        return {};
+    }
+
+    QFile file(resourcePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        LOG_WARNING() << "Failed to open text resource:" << resourcePath;
+        return {};
+    }
+
+    return QString::fromUtf8(file.readAll());
+}
+
 bool FileApi::directoryExists(const QString& path)
 {
     LOG_DEBUG() << "Start: directoryExists - path=" << path;

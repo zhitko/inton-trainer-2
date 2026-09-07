@@ -312,7 +312,7 @@ inton-trainer-2/
 │       ├── Logger.qml
 │       └── Theme.qml
 ├── res/                                # Qt resource files
-│   ├── fonts/                          # Font Awesome 6 (brands, regular, solid)
+│   ├── fonts/                          # Font Awesome 7 (brands, regular, solid)
 │   ├── images/                         # PNG assets (wave.png)
 │   ├── src/                            # C++ source resources (api/, helpers/, services/)
 │   └── ui/                             # QML resource copies (components/, pages/, utils/)
@@ -345,7 +345,11 @@ inton-trainer-2/
 
 ## License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+The application's own source files are offered under the [MIT License](LICENSE).
+The built executable also incorporates GPL-licensed ALGLIB, so distribution of
+the combined executable is subject to the GNU GPL. Qt is dynamically linked
+under LGPLv3. See [Open-source notices](licenses/THIRD_PARTY_NOTICES.md) for
+complete attributions, source availability, and Qt relinking information.
 
 ---
 
@@ -355,8 +359,8 @@ This project is licensed under the MIT License — see [LICENSE](LICENSE) for de
 |---------|---------|
 | **[SPTK](https://github.com/sp-nitech/SPTK)** (Speech Signal Processing Toolkit 4.3) | F0 extraction (RAPT algorithm), audio feature processing |
 | **[ALGLIB](https://www.alglib.net/)** 4.06.0 | Spline smoothing for pitch and UMP profiles |
-| **[Font Awesome](https://fontawesome.com/)** (Free 6.x) | Icon font used throughout the UI |
-| **[ten-vad](https://github.com/TEN-framework/ten-vad)** | Additional VAD support (energy + autocorrelation-based) |
+| **[Font Awesome](https://fontawesome.com/)** (Free 7.2.0) | Icon font used throughout the UI |
+| **[ten-vad](https://github.com/TEN-framework/ten-vad)** | Vendored for evaluation; not linked into the current app |
 
 ---
 

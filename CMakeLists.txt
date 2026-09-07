@@ -169,6 +169,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/pages/TemplatePage.qml
         ui/pages/TrainingPage.qml
         ui/pages/SettingsPage.qml
+        ui/pages/LicensesPage.qml
         ui/components/cards/Card.qml
         ui/components/GraphCard.qml
         ui/components/FileTreeView.qml
@@ -199,6 +200,19 @@ qt_add_qml_module(appinton-trainer-2
         res/fonts/fa-solid-900.ttf
         res/icons/intontrainer.png
         res/images/wave.png
+        LICENSE
+        licenses/THIRD_PARTY_NOTICES.md
+        licenses/LGPL-3.0.txt
+        licenses/Font-Awesome-Free-LICENSE.txt
+        licenses/LLVM-OpenMP-LICENSE.txt
+        3rdparty/alglib-cpp/gpl2.txt
+        3rdparty/alglib-cpp/gpl3.txt
+        3rdparty/SPTK/LICENSE
+        3rdparty/SPTK/third_party/WORLD/LICENSE
+        3rdparty/SPTK/third_party/REAPER/LICENSE
+        3rdparty/SPTK/third_party/SWIPE/LICENSE
+        3rdparty/SPTK/third_party/Snack/LICENSE
+        3rdparty/SPTK/third_party/GETOPT/LICENSE
 )
 
 qt_add_translations(appinton-trainer-2

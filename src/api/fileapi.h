@@ -104,6 +104,12 @@ public:
     Q_INVOKABLE QString getPathFromUrl(const QUrl& url);
 
     /**
+     * Reads a text file embedded in this application's Qt resource module.
+     * Local filesystem URLs and resources outside the module are rejected.
+     */
+    Q_INVOKABLE QString readTextResource(const QUrl& url);
+
+    /**
      * Checks if the specified directory exists in the file system. The method
      * takes a directory path as input and returns true if the directory exists,
      * or false if it does not. This allows the UI to validate user input for
