@@ -151,14 +151,14 @@ LOGCAT_LOG="$BUILD_DIR/logcat.log"
 "$ADB_CMD" logcat -v time > "$LOGCAT_LOG" 2>&1 &
 LOGCAT_PID=$!
 
-"$ADB_CMD" shell am start -n "by.intontrainer/org.qtproject.qt.android.bindings.QtActivity"
+"$ADB_CMD" shell am start -n "by.intoncore.intontrainer2/org.qtproject.qt.android.bindings.QtActivity"
 
 # Wait a few seconds for the app to start (or crash), then dump relevant logs
 echo "Waiting for app startup..."
 sleep 5
 
 # Check if app process is still running
-APP_PID=$("$ADB_CMD" shell pidof by.intontrainer 2>/dev/null || echo "")
+APP_PID=$("$ADB_CMD" shell pidof by.intoncore.intontrainer2 2>/dev/null || echo "")
 if [[ -z "$APP_PID" ]]; then
     echo ""
     echo "WARNING: App process not found — it may have crashed on startup."

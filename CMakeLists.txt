@@ -238,7 +238,7 @@ if(ANDROID)
         # App name shown on launcher
         QT_ANDROID_APP_NAME "Intonation Trainer"
         # Package identifier
-        QT_ANDROID_PACKAGE_NAME "by.intontrainer"
+        QT_ANDROID_PACKAGE_NAME "by.intoncore.intontrainer2"
     )
     # Google Play (API 35+): native libs must be 16 KB page-aligned.
     target_link_options(appinton-trainer-2 PRIVATE
