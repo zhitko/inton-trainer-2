@@ -183,13 +183,13 @@
     <message>
         <location filename="../ui/Main.qml" line="220"/>
         <location filename="../ui/Main.qml" line="391"/>
-        <location filename="../ui/Main.qml" line="447"/>
+        <location filename="../ui/Main.qml" line="453"/>
         <source>Home</source>
         <translation>Home</translation>
     </message>
     <message>
         <location filename="../ui/Main.qml" line="266"/>
-        <location filename="../ui/Main.qml" line="484"/>
+        <location filename="../ui/Main.qml" line="490"/>
         <source>Advanced</source>
         <translation>Advanced</translation>
     </message>
@@ -216,16 +216,21 @@
     </message>
     <message>
         <location filename="../ui/Main.qml" line="415"/>
+        <source>User Guide</source>
+        <translation>User Guide</translation>
+    </message>
+    <message>
+        <location filename="../ui/Main.qml" line="421"/>
         <source>Open-source licences</source>
         <translation>Open-source licences</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="524"/>
+        <location filename="../ui/Main.qml" line="530"/>
         <source>Dark Mode</source>
         <translation>Dark Mode</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="542"/>
+        <location filename="../ui/Main.qml" line="548"/>
         <source>Version %1</source>
         <translation>Version %1</translation>
     </message>
@@ -1249,6 +1254,19 @@ Yours</translation>
     <message>
         <source>Advanced</source>
         <translation type="vanished">Advanced</translation>
+    </message>
+</context>
+<context>
+    <name>UserGuidePage</name>
+    <message>
+        <location filename="../ui/pages/UserGuidePage.qml" line="12"/>
+        <source>User Guide</source>
+        <translation>User Guide</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/UserGuidePage.qml" line="30"/>
+        <source>Unable to load the user guide.</source>
+        <translation>Unable to load the user guide.</translation>
     </message>
 </context>
 <context>

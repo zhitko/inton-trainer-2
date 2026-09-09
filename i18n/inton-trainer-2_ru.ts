@@ -208,13 +208,13 @@
     <message>
         <location filename="../ui/Main.qml" line="220"/>
         <location filename="../ui/Main.qml" line="391"/>
-        <location filename="../ui/Main.qml" line="447"/>
+        <location filename="../ui/Main.qml" line="453"/>
         <source>Home</source>
         <translation>Начало</translation>
     </message>
     <message>
         <location filename="../ui/Main.qml" line="266"/>
-        <location filename="../ui/Main.qml" line="484"/>
+        <location filename="../ui/Main.qml" line="490"/>
         <source>Advanced</source>
         <translation>Дополнительно</translation>
     </message>
@@ -241,16 +241,21 @@
     </message>
     <message>
         <location filename="../ui/Main.qml" line="415"/>
+        <source>User Guide</source>
+        <translation>Руководство</translation>
+    </message>
+    <message>
+        <location filename="../ui/Main.qml" line="421"/>
         <source>Open-source licences</source>
         <translation>Лицензии открытого ПО</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="524"/>
+        <location filename="../ui/Main.qml" line="530"/>
         <source>Dark Mode</source>
         <translation>Темная тема</translation>
     </message>
     <message>
-        <location filename="../ui/Main.qml" line="542"/>
+        <location filename="../ui/Main.qml" line="548"/>
         <source>Version %1</source>
         <translation>Версия %1</translation>
     </message>
@@ -1367,6 +1372,19 @@ Yours</source>
     <message>
         <source>Advanced</source>
         <translation type="vanished">Дополнительно</translation>
+    </message>
+</context>
+<context>
+    <name>UserGuidePage</name>
+    <message>
+        <location filename="../ui/pages/UserGuidePage.qml" line="12"/>
+        <source>User Guide</source>
+        <translation>Руководство</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/UserGuidePage.qml" line="30"/>
+        <source>Unable to load the user guide.</source>
+        <translation>Не удалось загрузить руководство.</translation>
     </message>
 </context>
 <context>

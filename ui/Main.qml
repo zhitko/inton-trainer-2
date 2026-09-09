@@ -412,6 +412,12 @@ ApplicationWindow {
                             clear: false
                         },
                         {
+                            text: qsTr("User Guide"),
+                            icon: Icons.faBookOpen,
+                            page: "pages/UserGuidePage.qml",
+                            clear: false
+                        },
+                        {
                             text: qsTr("Open-source licences"),
                             icon: Icons.faScaleBalanced,
                             page: "pages/LicensesPage.qml",
