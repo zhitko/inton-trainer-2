@@ -31,6 +31,10 @@
 #   - PDF uses the same layout as vector figures (via Inkscape).
 #   - screenshots/README.md is skipped (asset index, not a guide).
 #   - PDF uses LuaLaTeX so missing Han glyphs fall back to Noto Serif CJK SC.
+#   - Pandoc's DOCX --toc is an empty Word field until Word updates it; the
+#     script fills it with heading hyperlinks so LibreOffice shows a real TOC.
+#   - Russian sources (*_ru.md) use TOC title "Содержание"; others use
+#     "Table of Contents".
 
 set -euo pipefail
 
@@ -170,7 +174,8 @@ run_pandoc() {
     local cache_dir="$2"
     local outfile_rel="$3"
     local title="$4"
-    shift 4
+    local toc_title="$5"
+    shift 5
 
     local md_name
     md_name="$(basename "$md_abs")"
@@ -195,6 +200,7 @@ run_pandoc() {
             --toc \
             --toc-depth=3 \
             --metadata "title=$title" \
+            --metadata "toc-title=$toc_title" \
             -o "/data/$outfile_rel" \
             "$@"
 }
@@ -207,6 +213,10 @@ for md in "${MD_FILES[@]}"; do
     # Flatten nested paths for cache dir names
     stem_safe="${stem//\//__}"
     title="$(doc_title "$md")"
+    toc_title="Table of Contents"
+    if [[ "$rel" == *_ru.md ]]; then
+        toc_title="Содержание"
+    fi
 
     echo ""
     echo "==> $rel"
@@ -216,9 +226,11 @@ for md in "${MD_FILES[@]}"; do
         docx_md="$(preprocess_md "$md" "$stem_safe" svg)"
         docx_cache="$(dirname "$docx_md")"
         echo "  Converting to DOCX ..."
-        run_pandoc "$docx_md" "$docx_cache" "${stem}.docx" "$title" --to docx
+        run_pandoc "$docx_md" "$docx_cache" "${stem}.docx" "$title" "$toc_title" --to docx
         echo "  Converting diagrams to native Word shapes ..."
         python3 "$SCRIPT_DIR/mermaid_to_word.py" "$DOCS_DIR/${stem}.docx" --svg-dir "$docx_cache"
+        echo "  Filling table of contents ..."
+        python3 "$SCRIPT_DIR/populate_docx_toc.py" "$DOCS_DIR/${stem}.docx" --toc-depth 3 --toc-title "$toc_title"
         echo "  -> $DOCS_DIR/${stem}.docx"
     fi
 
@@ -227,7 +239,7 @@ for md in "${MD_FILES[@]}"; do
         pdf_md="$(preprocess_md "$md" "$stem_safe" pdf)"
         pdf_cache="$(dirname "$pdf_md")"
         echo "  Converting to PDF ..."
-        run_pandoc "$pdf_md" "$pdf_cache" "${stem}.pdf" "$title" \
+        run_pandoc "$pdf_md" "$pdf_cache" "${stem}.pdf" "$title" "$toc_title" \
             --to pdf \
             --pdf-engine=lualatex \
             -V mainfont="DejaVu Serif" \

@@ -49,6 +49,8 @@ You can open a template phrase, listen to the reference recording, and try to ma
 
 The app can capture live microphone input and analyze it against the reference wave file.
 
+For reliable results, use a high-quality microphone — a dedicated external mic or a good built-in laptop microphone. Cheap or noisy mics distort the recorded pitch contour and make similarity scores less trustworthy.
+
 ### 2.3 Automatic speech detection
 
 If automatic start-stop is enabled, the application can detect when you start speaking and end the recording automatically.
@@ -451,11 +453,11 @@ The app preserves your training progress in two ways:
 
 ## 7 Recommended training routine
 
-For the best experience, use the app in a quiet environment and keep the practice flow simple:
+For the best experience, use the app in a quiet environment, with a high-quality microphone, and keep the practice flow simple:
 
 1. Start with a familiar template.
 2. Listen to the reference recording carefully.
-3. Speak naturally and clearly into the microphone.
+3. Speak naturally and clearly into a high-quality microphone (external or a good built-in laptop mic). Microphone quality has a direct effect on pitch analysis.
 4. Let auto-stop finish the recording when it is enabled.
 5. Review the similarity score after each attempt.
 6. Repeat the same phrase several times before moving on.
@@ -529,19 +531,23 @@ This signal notifies that all analysis processes have been completed and the cor
 
 Do not change many settings at once. If a result seems odd, first test one variable at a time.
 
-### 9.2 Prefer calibration after environment changes
+### 9.2 Use a high-quality microphone
+
+Pitch analysis depends on a clean recording. Prefer a dedicated external microphone or a good built-in laptop microphone over a cheap or noisy one. Poor microphone quality often looks like a pronunciation problem in the score.
+
+### 9.3 Prefer calibration after environment changes
 
 If you move the microphone, change rooms, or switch headphones, run calibration again.
 
-### 9.3 Use guided mode when learning the pattern
+### 9.4 Use guided mode when learning the pattern
 
 Guided mode is a helpful structure for beginners because it creates a clear cycle: listen, prepare, speak, evaluate.
 
-### 9.4 Use advanced analysis only after the score is already visible
+### 9.5 Use advanced analysis only after the score is already visible
 
 Do not start deep tuning unless you already know which part of the result you want to inspect.
 
-### 9.5 Keep the same room and mic setup when comparing progress
+### 9.6 Keep the same room and mic setup when comparing progress
 
 Consistency makes score changes more meaningful.
 
@@ -564,7 +570,7 @@ If the app does not behave as expected, check these items first:
 For most users, the best approach is:
 
 - use the default settings,
-- keep audio conditions consistent,
+- keep audio conditions consistent and use a high-quality microphone (external or a good built-in laptop mic),
 - use guided mode for structured practice,
 - only enter advanced analysis when there is a specific reason,
 - avoid modifying DTW and DSP tuning unless you are intentionally diagnosing a technical issue.

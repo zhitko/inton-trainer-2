@@ -54,6 +54,7 @@ For most users, the percentage of similarity is sufficient and they should striv
 ## Recommended Working Style
 
 - Practice in a quiet room and speak clearly into the microphone.
+- Use a high-quality microphone — a dedicated external mic or a good built-in laptop microphone. Poor microphone quality distorts pitch tracking and makes similarity scores less reliable.
 - Select a small set of phrases and repeat each one several times before moving on to the next.
 - Do not change advanced analysis settings (VAD, DTW, DSP) unless you have obvious recognition issues or are debugging.
 - When changing rooms or microphones, run automatic calibration to ensure the app correctly identifies speech.
