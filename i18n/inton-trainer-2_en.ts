@@ -128,6 +128,11 @@
         <source>LLVM OpenMP runtime</source>
         <translation>LLVM OpenMP runtime</translation>
     </message>
+    <message>
+        <location filename="../ui/pages/LicensesPage.qml" line="237"/>
+        <source>Close</source>
+        <translation>Close</translation>
+    </message>
 </context>
 <context>
     <name>ListItem</name>

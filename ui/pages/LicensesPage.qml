@@ -178,23 +178,65 @@ Page {
         id: licenceDialog
         title: root.documentTitle
         modal: true
-        standardButtons: Dialog.Close
-        width: Math.min(root.width * 0.94, AppScale.px(760))
-        height: Math.min(root.height * 0.9, AppScale.px(760))
-        x: (root.width - width) / 2
-        y: (root.height - height) / 2
+        clip: true
+        // Popups reparent to Overlay (window space). Size against that, not the
+        // scaled page — otherwise the dialog overflows on small desktops.
+        parent: Overlay.overlay
+        anchors.centerIn: parent
+        width: {
+            const available = parent ? parent.width : root.width;
+            return Math.min(AppScale.px(760), Math.max(0, available - AppScale.px(24)));
+        }
+        height: {
+            const available = parent ? parent.height : root.height;
+            return Math.min(AppScale.px(760), Math.max(0, available - AppScale.px(24)));
+        }
 
-        contentItem: ScrollView {
+        header: Label {
+            text: licenceDialog.title
+            visible: text.length > 0
+            wrapMode: Text.Wrap
+            maximumLineCount: 2
+            elide: Text.ElideRight
+            font.pixelSize: AppScale.fs(16)
+            font.bold: true
+            color: Theme.onSurface(Material.theme)
+            padding: AppScale.px(16)
+            bottomPadding: AppScale.px(8)
+            width: licenceDialog.availableWidth
+        }
+
+        contentItem: Flickable {
+            id: licenceFlickable
             clip: true
+            boundsBehavior: Flickable.StopAtBounds
+            contentWidth: width
+            contentHeight: licenceText.implicitHeight
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AsNeeded
+            }
 
-            TextArea {
+            TextEdit {
+                id: licenceText
+                width: licenceFlickable.width
                 text: root.documentText
                 readOnly: true
                 selectByMouse: true
-                wrapMode: Text.Wrap
+                wrapMode: TextEdit.Wrap
                 color: Theme.onSurface(Material.theme)
                 font.family: "monospace"
                 font.pixelSize: AppScale.fs(11)
+            }
+        }
+
+        footer: DialogButtonBox {
+            background: Rectangle {
+                color: "transparent"
+            }
+            Button {
+                text: qsTr("Close")
+                font.pixelSize: AppScale.fs(14)
+                DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
             }
         }
     }

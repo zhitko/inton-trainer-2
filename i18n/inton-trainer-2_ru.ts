@@ -132,6 +132,11 @@
         <source>LLVM OpenMP runtime</source>
         <translation>Среда выполнения LLVM OpenMP</translation>
     </message>
+    <message>
+        <location filename="../ui/pages/LicensesPage.qml" line="237"/>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
 </context>
 <context>
     <name>ListItem</name>
