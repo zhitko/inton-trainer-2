@@ -224,6 +224,11 @@
         <source>Dark Mode</source>
         <translation>Dark Mode</translation>
     </message>
+    <message>
+        <location filename="../ui/Main.qml" line="542"/>
+        <source>Version %1</source>
+        <translation>Version %1</translation>
+    </message>
 </context>
 <context>
     <name>PlayButton</name>

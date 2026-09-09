@@ -101,6 +101,10 @@ int main(int argc, char* argv[])
 #endif
 
     QGuiApplication app(argc, argv);
+#ifndef PROJECT_VERSION
+#define PROJECT_VERSION "0.0.0"
+#endif
+    app.setApplicationVersion(QStringLiteral(PROJECT_VERSION));
     app.setWindowIcon(QIcon(QStringLiteral(
         ":/qt/qml/inton-trainer-2/res/icons/intontrainer.png")));
 

@@ -533,6 +533,18 @@ ApplicationWindow {
                         }
                     }
                 }
+
+                Label {
+                    Layout.fillWidth: true
+                    Layout.leftMargin: 16
+                    Layout.rightMargin: 16
+                    Layout.bottomMargin: 16
+                    text: qsTr("Version %1").arg(Qt.application.version)
+                    font.pixelSize: AppScale.fs(12)
+                    color: Theme.onSurfaceVariant(Material.theme)
+                    opacity: 0.7
+                    horizontalAlignment: Text.AlignHCenter
+                }
             }
         }
     }

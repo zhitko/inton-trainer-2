@@ -249,6 +249,11 @@
         <source>Dark Mode</source>
         <translation>Темная тема</translation>
     </message>
+    <message>
+        <location filename="../ui/Main.qml" line="542"/>
+        <source>Version %1</source>
+        <translation>Версия %1</translation>
+    </message>
 </context>
 <context>
     <name>PlayButton</name>

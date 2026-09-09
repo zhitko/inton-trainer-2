@@ -241,6 +241,10 @@ set_target_properties(appinton-trainer-2 PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+set_property(SOURCE main.cpp APPEND PROPERTY
+    COMPILE_DEFINITIONS PROJECT_VERSION="${PROJECT_VERSION}"
+)
+
 if(ANDROID)
     set_target_properties(appinton-trainer-2 PROPERTIES
         QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
