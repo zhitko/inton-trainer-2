@@ -251,6 +251,11 @@
     </message>
     <message>
         <location filename="../ui/Main.qml" line="421"/>
+        <source>Privacy Policy</source>
+        <translation>Политика конфиденциальности</translation>
+    </message>
+    <message>
+        <location filename="../ui/Main.qml" line="427"/>
         <source>Open-source licences</source>
         <translation>Лицензии открытого ПО</translation>
     </message>
@@ -1377,6 +1382,19 @@ Yours</source>
     <message>
         <source>Advanced</source>
         <translation type="vanished">Дополнительно</translation>
+    </message>
+</context>
+<context>
+    <name>PrivacyPolicyPage</name>
+    <message>
+        <location filename="../ui/pages/PrivacyPolicyPage.qml" line="12"/>
+        <source>Privacy Policy</source>
+        <translation>Политика конфиденциальности</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/PrivacyPolicyPage.qml" line="30"/>
+        <source>Unable to load the privacy policy.</source>
+        <translation>Не удалось загрузить политику конфиденциальности.</translation>
     </message>
 </context>
 <context>

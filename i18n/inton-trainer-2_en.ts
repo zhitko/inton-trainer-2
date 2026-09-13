@@ -226,6 +226,11 @@
     </message>
     <message>
         <location filename="../ui/Main.qml" line="421"/>
+        <source>Privacy Policy</source>
+        <translation>Privacy Policy</translation>
+    </message>
+    <message>
+        <location filename="../ui/Main.qml" line="427"/>
         <source>Open-source licences</source>
         <translation>Open-source licences</translation>
     </message>
@@ -1259,6 +1264,19 @@ Yours</translation>
     <message>
         <source>Advanced</source>
         <translation type="vanished">Advanced</translation>
+    </message>
+</context>
+<context>
+    <name>PrivacyPolicyPage</name>
+    <message>
+        <location filename="../ui/pages/PrivacyPolicyPage.qml" line="12"/>
+        <source>Privacy Policy</source>
+        <translation>Privacy Policy</translation>
+    </message>
+    <message>
+        <location filename="../ui/pages/PrivacyPolicyPage.qml" line="30"/>
+        <source>Unable to load the privacy policy.</source>
+        <translation>Unable to load the privacy policy.</translation>
     </message>
 </context>
 <context>

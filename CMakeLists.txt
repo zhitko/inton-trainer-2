@@ -170,6 +170,7 @@ qt_add_qml_module(appinton-trainer-2
         ui/pages/TrainingPage.qml
         ui/pages/SettingsPage.qml
         ui/pages/UserGuidePage.qml
+        ui/pages/PrivacyPolicyPage.qml
         ui/pages/LicensesPage.qml
         ui/components/cards/Card.qml
         ui/components/GraphCard.qml
@@ -204,6 +205,8 @@ qt_add_qml_module(appinton-trainer-2
         LICENSE
         docs/quick_guide_ch_en.md
         docs/quick_guide_ch_ru.md
+        docs/privacy_policy_en.md
+        docs/privacy_policy_ru.md
         licenses/THIRD_PARTY_NOTICES.md
         licenses/LGPL-3.0.txt
         licenses/Font-Awesome-Free-LICENSE.txt

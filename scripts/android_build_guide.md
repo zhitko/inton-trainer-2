@@ -319,10 +319,37 @@ sources (or durable, unambiguous access to those exact upstream sources).
 
 ---
 
+## Privacy policy
+
+Public HTTPS policy (required for Play Console, Data safety, and the
+User Data policy):
+
+[https://intontrainer.by/intontrainer2policy.html](https://intontrainer.by/intontrainer2policy.html)
+
+Last updated **10 September 2026**. It matches the Android packaging:
+
+- microphone used only for on-device intonation training;
+- WAV recordings, scores, and settings stored in app-private storage;
+- no upload, analytics, ads, accounts, or cloud backup;
+- `RECORD_AUDIO` only; Qt `INTERNET` stripped;
+- `android:allowBackup="false"`;
+- user can delete individual records, all records, or user data in Settings.
+
+Paste that URL into the Play Console privacy-policy field.
+
+The same notice is bundled offline in `docs/privacy_policy_en.md` and
+`docs/privacy_policy_ru.md`. `PrivacyPolicyPage.qml` loads it like the
+user guide (language follows Settings). The side menu exposes
+**Privacy Policy** between User Guide and Open-source licences. The
+APK has no `INTERNET` permission, so the page does not fetch the URL
+at runtime.
+
+---
+
 ## Google Play readiness
 
 Requirements checked against the official Google Play and Android
-documentation on **8 September 2026**.
+documentation on **13 September 2026**.
 
 ### Done in the repo
 
@@ -347,6 +374,8 @@ documentation on **8 September 2026**.
 | Play Console icon | 512×512 RGBA PNG, 220 KB: `packaging/google-play/icon-512.png` |
 | Play Console account | Verified |
 | Open-source licences | Offline in-app notices and full texts added for Qt/LGPL, ALGLIB/GPL, SPTK and embedded components, Font Awesome/OFL, and LLVM OpenMP; source/relinking offer documented |
+| Privacy policy (HTTPS) | Published at [https://intontrainer.by/intontrainer2policy.html](https://intontrainer.by/intontrainer2policy.html) (revised 10 September 2026). Covers microphone access, on-device WAV recordings and scores, local retention/deletion, no upload/sharing, no Internet permission, and `allowBackup=false`. Paste this URL into the Play Console privacy-policy field. |
+| Privacy policy in the app | Offline EN/RU markdown via `PrivacyPolicyPage.qml`; side-menu item next to User Guide / Open-source licences |
 
 ### Required before the first Play release
 
@@ -354,8 +383,7 @@ documentation on **8 September 2026**.
 |---|---|
 | **Upload key and Play App Signing** | Generate and back up the upload keystore, build a signed release AAB, and upload it. New apps are automatically enrolled in Play App Signing; keep the upload key separate and enable 2-Step Verification for Console users. |
 | **Release identity** | Confirm package `by.intoncore.intontrainer2` before the first upload. Increment `versionCode` for every later upload; the package name cannot be changed after publishing. |
-| **Privacy policy** | Publish an active public HTTPS policy and make the same policy accessible inside the app. Explain microphone access, local voice recordings, retention/deletion, no upload/sharing, and `allowBackup=false`. |
-| **Data safety** | Complete the form even if no data leaves the device. Declare the actual handling of microphone/voice recordings and keep it consistent with the app and privacy policy. Internal-only testing is exempt; closed, open, and production tracks are not. |
+| **Data safety** | Complete the form even if no data leaves the device. Declare the actual handling of microphone/voice recordings and keep it consistent with the app and [privacy policy](https://intontrainer.by/intontrainer2policy.html). Internal-only testing is exempt; closed, open, and production tracks are not. |
 | **App content declarations** | Complete Ads, App access, Target audience and content, and the IARC content-rating questionnaire. Declare no ads and unrestricted access only if that matches the release. Do not include children unless the app is intended to meet Families requirements. |
 | **Store listing text** | Supply localized app name (≤30 characters), short description (≤80), and full description (≤4,000), plus a support email. Avoid rankings, prices, repetitive keywords, and misleading claims. |
 | **Feature graphic** | Create a 1024×500 JPEG or 24-bit PNG with no alpha. It is mandatory listing artwork and is not bundled in the app. |
@@ -377,6 +405,7 @@ documentation on **8 September 2026**.
 - [Prepare an app for review](https://support.google.com/googleplay/android-developer/answer/9859455)
 - [Data safety](https://support.google.com/googleplay/android-developer/answer/10787469)
 - [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311)
+- [IntonTrainer 2 privacy policy](https://intontrainer.by/intontrainer2policy.html)
 - [New personal-account testing](https://support.google.com/googleplay/android-developer/answer/14151465)
 - [Android developer verification](https://developer.android.com/developer-verification/guides)
 - [Native debug symbols](https://support.google.com/googleplay/android-developer/answer/9848633)

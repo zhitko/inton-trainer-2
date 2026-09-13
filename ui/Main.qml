@@ -418,6 +418,12 @@ ApplicationWindow {
                             clear: false
                         },
                         {
+                            text: qsTr("Privacy Policy"),
+                            icon: Icons.faShieldHalved,
+                            page: "pages/PrivacyPolicyPage.qml",
+                            clear: false
+                        },
+                        {
                             text: qsTr("Open-source licences"),
                             icon: Icons.faScaleBalanced,
                             page: "pages/LicensesPage.qml",
