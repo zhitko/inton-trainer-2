@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="by.intoncore.intontrainer2"
+    package="by.intoncore.intontrainer2.zh"
     android:versionCode="-- %%INSERT_VERSION_CODE%% --"
     android:versionName="-- %%INSERT_VERSION_NAME%% --"
     android:installLocation="auto">
@@ -21,7 +21,7 @@
 
     <application
         android:name="org.qtproject.qt.android.bindings.QtApplication"
-        android:label="Intonation Trainer"
+        android:label="Intonation Trainer 2 (Chinese)"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
@@ -32,7 +32,7 @@
 
         <activity
             android:name="org.qtproject.qt.android.bindings.QtActivity"
-            android:label="Intonation Trainer"
+            android:label="Intonation Trainer 2 (Chinese)"
             android:screenOrientation="portrait"
             android:launchMode="singleTop"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"

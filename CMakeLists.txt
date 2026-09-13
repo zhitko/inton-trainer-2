@@ -259,10 +259,13 @@ if(ANDROID)
         QT_ANDROID_MIN_SDK_VERSION 26
         QT_ANDROID_VERSION_CODE 1
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
-        # App name shown on launcher
-        QT_ANDROID_APP_NAME "Intonation Trainer"
-        # Package identifier
-        QT_ANDROID_PACKAGE_NAME "by.intoncore.intontrainer2"
+        # App name shown on launcher. Include the trained language in
+        # parentheses so later editions (English, Russian, …) stay distinct.
+        QT_ANDROID_APP_NAME "Intonation Trainer 2 (Chinese)"
+        # Package identifier. Language suffix is required: this Chinese
+        # edition is .zh. Later Play apps use .en, .ru, .de, … — the id
+        # cannot change after the first upload.
+        QT_ANDROID_PACKAGE_NAME "by.intoncore.intontrainer2.zh"
     )
     # Google Play (API 35+): native libs must be 16 KB page-aligned.
     target_link_options(appinton-trainer-2 PRIVATE

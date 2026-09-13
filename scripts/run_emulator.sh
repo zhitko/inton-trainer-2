@@ -17,6 +17,7 @@ ANDROID_SDK="${ANDROID_SDK:-$HOME/Android/Sdk}"
 EMULATOR_CMD="$ANDROID_SDK/emulator/emulator"
 ADB_CMD="$ANDROID_SDK/platform-tools/adb"
 
+ANDROID_PACKAGE="${ANDROID_PACKAGE:-by.intoncore.intontrainer2.zh}"
 BOOT_TIMEOUT_SEC="${BOOT_TIMEOUT_SEC:-120}"
 
 # Pre-flight checks
@@ -151,14 +152,14 @@ LOGCAT_LOG="$BUILD_DIR/logcat.log"
 "$ADB_CMD" logcat -v time > "$LOGCAT_LOG" 2>&1 &
 LOGCAT_PID=$!
 
-"$ADB_CMD" shell am start -n "by.intoncore.intontrainer2/org.qtproject.qt.android.bindings.QtActivity"
+"$ADB_CMD" shell am start -n "$ANDROID_PACKAGE/org.qtproject.qt.android.bindings.QtActivity"
 
 # Wait a few seconds for the app to start (or crash), then dump relevant logs
 echo "Waiting for app startup..."
 sleep 5
 
 # Check if app process is still running
-APP_PID=$("$ADB_CMD" shell pidof by.intoncore.intontrainer2 2>/dev/null || echo "")
+APP_PID=$("$ADB_CMD" shell pidof "$ANDROID_PACKAGE" 2>/dev/null || echo "")
 if [[ -z "$APP_PID" ]]; then
     echo ""
     echo "WARNING: App process not found — it may have crashed on startup."

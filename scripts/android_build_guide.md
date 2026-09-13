@@ -1,6 +1,6 @@
 # Android Build Guide — Intonation Trainer 2
 
-Package id: `by.intoncore.intontrainer2`. Native library: `libappinton-trainer-2_<abi>.so`. Version: **1.0.0** (`versionCode` 1).
+Package id: `by.intoncore.intontrainer2.zh` (Chinese edition). Native library: `libappinton-trainer-2_<abi>.so`. Version: **1.0.0** (`versionCode` 1). Later language apps use a different suffix (`.en`, `.ru`, `.de`, …) and a separate Play listing; the package id cannot be changed after the first upload.
 
 ## Prerequisites
 
@@ -114,7 +114,7 @@ Without a keystore the AAB is still produced but is **not** signed for Play.
 | Emulator log | `$BUILD_DIR/emulator.log` (dumped if the emulator process dies) |
 | Logcat | Started before `am start`; crash-filtered dump if the process is gone |
 | APK search | `build_android_x86_64` first, then `build_android_arm64-v8a` (debug, then release, then unsigned) |
-| Launch | `adb shell am start -n by.intoncore.intontrainer2/org.qtproject.qt.android.bindings.QtActivity` |
+| Launch | `adb shell am start -n by.intoncore.intontrainer2.zh/org.qtproject.qt.android.bindings.QtActivity` |
 
 `--logcat` streams live logcat and always writes `build_android_arm64-v8a/logcat.log`, even if you installed an x86_64 APK. After a normal launch, inspect `$BUILD_DIR/logcat.log` (the dir of the APK that was found).
 
@@ -208,7 +208,7 @@ On Android, `CMakeLists.txt` copies `settings.ini` and `data/` into `android/ass
 
 ### `android/AndroidManifest.xml`
 
-- Package: `by.intoncore.intontrainer2` (permanent once uploaded to Play)
+- Package: `by.intoncore.intontrainer2.zh` (permanent once uploaded to Play)
 - Permission: **`RECORD_AUDIO` only**
 - Qt Core’s `INTERNET` / `WRITE_EXTERNAL_STORAGE` are stripped (`tools:node="remove"` and no `%%INSERT_PERMISSIONS%%` placeholder)
 - Required feature: `android.hardware.microphone`
@@ -225,7 +225,7 @@ On Android, `CMakeLists.txt` copies `settings.ini` and `data/` into `android/ass
 
 ### CMake target properties (`CMakeLists.txt`)
 
-`QT_ANDROID_PACKAGE_SOURCE_DIR`, target/compile SDK **36**, min SDK 26, package `by.intoncore.intontrainer2`, version `1.0.0`. Native link flags `-Wl,-z,max-page-size=16384` for Play’s 16 KB page-size requirement.
+`QT_ANDROID_PACKAGE_SOURCE_DIR`, target/compile SDK **36**, min SDK 26, package `by.intoncore.intontrainer2.zh`, version `1.0.0`. Native link flags `-Wl,-z,max-page-size=16384` for Play’s 16 KB page-size requirement.
 
 OpenMP: desktop uses `find_package(OpenMP)`; Android locates NDK `libomp` and links the `AndroidOMP` imported target. alglib `kernels_avx2.cpp` / `kernels_fma.cpp` / `kernels_sse2.cpp` are omitted on Android.
 
@@ -233,9 +233,9 @@ OpenMP: desktop uses `find_package(OpenMP)`; Android locates NDK `libomp` and li
 
 ## App icons
 
-The selected A1 artwork is installed as both a legacy launcher icon and an
-Android 8+ adaptive icon. The manifest already references
-`@mipmap/ic_launcher` and `@mipmap/ic_launcher_round`.
+The Chinese launcher and adaptive icons are generated from
+`packaging/google-play/icon-512-zh.png` (中文 mark). The manifest already
+references `@mipmap/ic_launcher` and `@mipmap/ic_launcher_round`.
 
 Legacy launcher resources:
 
@@ -262,10 +262,13 @@ android/res/drawable-xxxhdpi/ic_launcher_foreground.png    (432×432)
 android/res/values/colors.xml                              (#F9F9FF background)
 ```
 
-The opaque **512×512** Play Console icon is
-`packaging/google-play/icon-512.png`. The Play listing still needs a
-**1024×500** feature graphic; it is store artwork and is not packaged in the
-APK/AAB.
+The opaque **512×512** Play Console icon for this Chinese edition is
+`packaging/google-play/icon-512-zh.png`. The same file is the source for the
+Android launcher / adaptive icons under `android/res/`. Store listing copy
+(EN/RU app name, short description, full description, contact fields,
+category, and What’s new) is in `packaging/google-play/store-listing.md`. The
+Play listing still needs a **1024×500** feature graphic and phone
+screenshots; they are store artwork and are not packaged in the APK/AAB.
 
 ---
 
@@ -346,6 +349,45 @@ at runtime.
 
 ---
 
+## Google Play store listing
+
+Paste-ready copy lives in `packaging/google-play/store-listing.md`. Folder
+index: `packaging/google-play/README.md`.
+
+Default locale is **English (United States)**; add **Russian** as a
+translation. Do not put rankings, prices, “free”, or keyword stuffing in
+any field.
+
+This is the **Chinese** edition (`by.intoncore.intontrainer2.zh`). Later
+language apps should keep the same bracket pattern
+(`Intonation Trainer 2 (English)`, `(Russian)`, `(German)`) and ship as
+separate Play listings with packages `.en`, `.ru`, `.de`.
+
+| Field | English | Russian | Limit |
+|---|---|---|---|
+| Package name | `by.intoncore.intontrainer2.zh` | same | — |
+| App name | Intonation Trainer 2 (Chinese) | Тренер интонации 2 (китайский) | 30 |
+| Short description | Practice Chinese tones with on-device pitch comparison and visual feedback | Тренируйте китайские тоны, сравнивая мелодику с эталоном на устройстве | 80 |
+| Full description | in `store-listing.md` | in `store-listing.md` | 4,000 |
+| What’s new (1.0.0) | in `store-listing.md` | in `store-listing.md` | 500 |
+| Email | zhitko.vladimir@gmail.com | same | — |
+| Website | https://intontrainer.by/ | same | — |
+| Privacy policy | https://intontrainer.by/intontrainer2policy.html | same | — |
+| Category | Education | — | — |
+| Tags | Language learning | — | — |
+
+Console path: **Grow users → Store presence → Main store listing** for name
+and descriptions; **Store settings** for category, email, and website.
+
+Still missing from `packaging/google-play/` (not packaged in the APK/AAB):
+
+- Feature graphic 1024×500 JPEG or 24-bit PNG (no alpha)
+- At least 2 actual Android phone screenshots (prefer 4 portrait 1080×1920)
+
+Do not upload the desktop captures in `docs/screenshots/`.
+
+---
+
 ## Google Play readiness
 
 Requirements checked against the official Google Play and Android
@@ -371,7 +413,8 @@ documentation on **13 September 2026**.
 | Font Awesome 7 on Android | Fixed (weight + `qrc:` paths) |
 | Keystore files gitignored | `*.jks`, `*.keystore` |
 | Launcher icons | Legacy, round, and adaptive resources added; manifest wired |
-| Play Console icon | 512×512 RGBA PNG, 220 KB: `packaging/google-play/icon-512.png` |
+| Play Console icon | 512×512 RGBA PNG, 220 KB: `packaging/google-play/icon-512-zh.png` (Chinese copy of `icon-512.png`) |
+| Store listing text | EN/RU app name, short description, full description, What’s new, contact, category, and alt text in `packaging/google-play/store-listing.md` |
 | Play Console account | Verified |
 | Open-source licences | Offline in-app notices and full texts added for Qt/LGPL, ALGLIB/GPL, SPTK and embedded components, Font Awesome/OFL, and LLVM OpenMP; source/relinking offer documented |
 | Privacy policy (HTTPS) | Published at [https://intontrainer.by/intontrainer2policy.html](https://intontrainer.by/intontrainer2policy.html) (revised 10 September 2026). Covers microphone access, on-device WAV recordings and scores, local retention/deletion, no upload/sharing, no Internet permission, and `allowBackup=false`. Paste this URL into the Play Console privacy-policy field. |
@@ -382,12 +425,11 @@ documentation on **13 September 2026**.
 | Item | What to do |
 |---|---|
 | **Upload key and Play App Signing** | Generate and back up the upload keystore, build a signed release AAB, and upload it. New apps are automatically enrolled in Play App Signing; keep the upload key separate and enable 2-Step Verification for Console users. |
-| **Release identity** | Confirm package `by.intoncore.intontrainer2` before the first upload. Increment `versionCode` for every later upload; the package name cannot be changed after publishing. |
+| **Release identity** | Confirm package `by.intoncore.intontrainer2.zh` before the first upload. Increment `versionCode` for every later upload of this Chinese app. English/Russian/… editions need new packages (`.en`, `.ru`, …) and new Play listings; a package name cannot be changed after publishing. |
 | **Data safety** | Complete the form even if no data leaves the device. Declare the actual handling of microphone/voice recordings and keep it consistent with the app and [privacy policy](https://intontrainer.by/intontrainer2policy.html). Internal-only testing is exempt; closed, open, and production tracks are not. |
 | **App content declarations** | Complete Ads, App access, Target audience and content, and the IARC content-rating questionnaire. Declare no ads and unrestricted access only if that matches the release. Do not include children unless the app is intended to meet Families requirements. |
-| **Store listing text** | Supply localized app name (≤30 characters), short description (≤80), and full description (≤4,000), plus a support email. Avoid rankings, prices, repetitive keywords, and misleading claims. |
-| **Feature graphic** | Create a 1024×500 JPEG or 24-bit PNG with no alpha. It is mandatory listing artwork and is not bundled in the app. |
-| **Phone screenshots** | Upload at least 2 actual app screenshots: JPEG/24-bit PNG, 320–3840 px, with the long side no more than twice the short side. For stronger Play promotion eligibility, provide at least 4 portrait 1080×1920 screenshots. |
+| **Feature graphic** | Create a 1024×500 JPEG or 24-bit PNG with no alpha. It is mandatory listing artwork and is not bundled in the app. Keep it in `packaging/google-play/`. |
+| **Phone screenshots** | Upload at least 2 actual Android screenshots: JPEG/24-bit PNG, 320–3840 px, with the long side no more than twice the short side. For stronger Play promotion eligibility, provide at least 4 portrait 1080×1920 screenshots. Do not use the desktop captures in `docs/screenshots/`. |
 | **16 KB compatibility** | Required for 64-bit native apps targeting Android 15+ since 1 November 2025. Run the official `check_elf_alignment.sh` or inspect every packaged `.so` (Qt, app, SPTK, alglib, `libomp`), verify APK zip alignment with `zipalign -c -P 16 -v 4`, inspect the AAB with `bundletool`, and test on a 16 KB image/device. |
 | **Physical ARM64 QA** | Confirm microphone permission, recording/VAD, guided mode, packaged templates, record saving/deletion, offline behavior, and startup on a physical ARM64 device. |
 | **Closed testing, if applicable** | Personal accounts created after 13 November 2023 need at least 12 testers continuously opted in for 14 days, followed by a production-access application. Testers must remain engaged; opting out breaks continuity. |
