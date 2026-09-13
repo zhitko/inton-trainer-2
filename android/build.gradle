@@ -79,7 +79,12 @@ android {
 
     packagingOptions {
         jniLibs {
-            useLegacyPackaging = legacyPackaging
+            // gradle.properties values are strings. Groovy treats a non-empty
+            // "false" as true, which silently enabled compressed (legacy)
+            // native-lib packaging and extractNativeLibs=true. Play's 16 KB
+            // devices need uncompressed, 16 KB zip-aligned .so files when
+            // AGP >= 8.5.1. Parse the boolean explicitly.
+            useLegacyPackaging = Boolean.parseBoolean("${legacyPackaging}")
         }
     }
 

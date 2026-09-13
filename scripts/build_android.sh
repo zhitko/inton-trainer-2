@@ -99,6 +99,7 @@ build_abi() {
         -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake" \
         -DANDROID_ABI="$CMAKE_ABI" \
         -DANDROID_PLATFORM="android-26" \
+        -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON \
         -DANDROID_NDK="$ANDROID_NDK" \
         -DCMAKE_ANDROID_NDK="$ANDROID_NDK" \
         -DCMAKE_FIND_ROOT_PATH="$QT_ANDROID_DIR" \
@@ -211,4 +212,31 @@ if [[ "$BUILD_TYPE" == "release" ]]; then
     if [[ -f "$SYMBOLS_ZIP" ]]; then
         echo "  $SYMBOLS_ZIP"
     fi
+fi
+
+# 16 KB page-size compatibility (Play requirement for 64-bit apps on API 35+).
+echo ""
+echo "============================================================"
+echo "  16 KB page-size compatibility"
+echo "============================================================"
+APK_CHECK=""
+AAB_CHECK=""
+for artifact in \
+    "$BUILD_DIR/android-build/build/outputs/apk/${BUILD_TYPE}/android-build-${BUILD_TYPE}.apk" \
+    "$BUILD_DIR/android-build/build/outputs/apk/${BUILD_TYPE}/android-build-${BUILD_TYPE}-unsigned.apk" \
+    "$BUILD_DIR/android-build/appinton-trainer-2.apk"
+do
+    if [[ -f "$artifact" ]]; then
+        APK_CHECK="$artifact"
+        break
+    fi
+done
+AAB_CANDIDATE="$BUILD_DIR/android-build/build/outputs/bundle/${BUILD_TYPE}/android-build-${BUILD_TYPE}.aab"
+if [[ -f "$AAB_CANDIDATE" ]]; then
+    AAB_CHECK="$AAB_CANDIDATE"
+fi
+if [[ -z "$APK_CHECK" ]]; then
+    echo "WARNING: no APK found to check for 16 KB alignment."
+else
+    "$SCRIPT_DIR/check_16kb_alignment.sh" "$APK_CHECK" ${AAB_CHECK:+"$AAB_CHECK"}
 fi

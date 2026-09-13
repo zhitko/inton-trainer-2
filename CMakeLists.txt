@@ -273,8 +273,13 @@ if(ANDROID)
         # edition is .zh. Later Play apps use .en, .ru, .de, … — the id
         # cannot change after the first upload.
         QT_ANDROID_PACKAGE_NAME "by.intoncore.intontrainer2.zh"
+        # Uncompressed native libs, 16 KB zip-aligned by AGP 9. Required
+        # so Play-generated APKs mmap .so files on 16 KB page-size devices.
+        # Address Sanitizer builds should override this to TRUE.
+        QT_ANDROID_LEGACY_PACKAGING FALSE
     )
-    # Google Play (API 35+): native libs must be 16 KB page-aligned.
+    # Google Play (API 35+ / 16 KB page size): ELF LOAD segments must be
+    # 16 KB aligned. NDK r27 does not default to this (r28+ does).
     target_link_options(appinton-trainer-2 PRIVATE
         "-Wl,-z,max-page-size=16384"
         "-Wl,-z,common-page-size=16384"

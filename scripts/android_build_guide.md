@@ -102,6 +102,17 @@ Defaults: `arm64-v8a`, `release`. `armv7` is accepted as an alias for `armeabi-v
 
 Without a keystore the AAB is still produced but is **not** signed for Play.
 
+Release packaging also runs `scripts/check_16kb_alignment.sh` on the APK and AAB (ELF LOAD alignment, `zipalign -P 16`, AAB `PAGE_ALIGNMENT_16K`).
+
+### `scripts/check_16kb_alignment.sh`
+
+```bash
+./scripts/check_16kb_alignment.sh path/to/app.apk [path/to/app.aab]
+VERBOSE=1 ./scripts/check_16kb_alignment.sh path/to/app.apk   # list every .so
+```
+
+Fails if any 64-bit `.so` has ELF `LOAD` alignment below `2**14`, if APK zip alignment is not 16 KB, or if the AAB BundleConfig is not `PAGE_ALIGNMENT_16K` with uncompressed native libraries enabled. `armeabi-v7a` is reported but does not fail (32-bit is exempt).
+
 ### `scripts/run_emulator.sh`
 
 ```bash
@@ -153,6 +164,7 @@ cmake \
   -DCMAKE_TOOLCHAIN_FILE="$HOME/Android/Sdk/ndk/27.2.12479018/build/cmake/android.toolchain.cmake" \
   -DANDROID_ABI=arm64-v8a \
   -DANDROID_PLATFORM=android-26 \
+  -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON \
   -DANDROID_NDK="$HOME/Android/Sdk/ndk/27.2.12479018" \
   -DCMAKE_ANDROID_NDK="$HOME/Android/Sdk/ndk/27.2.12479018" \
   -DCMAKE_FIND_ROOT_PATH="$HOME/Qt/6.11.1/android_arm64_v8a" \
@@ -255,6 +267,78 @@ and [Native debug symbols](https://support.google.com/googleplay/android-develop
 
 ---
 
+## 16 KB page-size compatibility
+
+Google Play requires 64-bit native apps that target Android 15+ (API 35+) to
+support **16 KB memory pages**. Enforcement for new apps and updates started
+**1 November 2025**; from **1 February 2027** updates that are not 16 KB
+compatible cannot be released. See
+[Support 16 KB page sizes](https://developer.android.com/guide/practices/page-sizes).
+
+This project is configured for the recommended AGP 8.5.1+ path: uncompressed
+native libraries, 16 KB zip-aligned in the APK, and `PAGE_ALIGNMENT_16K` in
+the AAB so Play-generated APKs mmap `.so` files on 16 KB devices.
+
+What the repo does:
+
+1. **ELF 16 KB alignment (NDK r27).** NDK r28+ aligns by default; r27 does
+   not. `CMakeLists.txt` adds `-Wl,-z,max-page-size=16384` and
+   `-Wl,-z,common-page-size=16384` to `appinton-trainer-2`.
+   `scripts/build_android.sh` also passes `-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON`.
+   SPTK and alglib are statically linked into `libappinton-trainer-2_<abi>.so`,
+   so they inherit that alignment. There is no `PAGE_SIZE` / `4096` hard-coding
+   in app code.
+2. **Uncompressed JNI libs (AGP 9.0.0).** `android/build.gradle` parses
+   `legacyPackaging` with `Boolean.parseBoolean` so the gradle.properties
+   string `"false"` is not treated as Groovy-true. That was causing
+   compressed `.so` files and `extractNativeLibs=true`. The app target also
+   sets `QT_ANDROID_LEGACY_PACKAGING FALSE`. The release APK stores native
+   libs uncompressed (`STORE`) with `extractNativeLibs=false`.
+3. **Qt 6.11.1 prebuilts.** Official `android_arm64_v8a` libraries, including
+   FFmpeg (`libavcodec`, `libavformat`, `libavutil`, `libswresample`,
+   `libswscale`), the Android and FFmpeg multimedia plugins, and NDK
+   `libc++_shared.so` / 64-bit `libomp.so`, already report `LOAD align 2**14`.
+   (Qt 6.9 FFmpeg builds were often 4 KB; 6.11.1 is not.)
+4. **Verification.** After packaging, `build_android.sh` runs
+   `scripts/check_16kb_alignment.sh` on the APK and AAB.
+
+Confirm locally (also done automatically by the build script):
+
+```bash
+APK=build_android_arm64-v8a/android-build/build/outputs/apk/release/android-build-release-unsigned.apk
+AAB=build_android_arm64-v8a/android-build/build/outputs/bundle/release/android-build-release.aab
+./scripts/check_16kb_alignment.sh "$APK" "$AAB"
+```
+
+Expect: every `arm64-v8a` / `x86_64` `.so` `ALIGNED (2**14)`,
+`zipalign: Verification successful` with uncompressed `lib/**/*.so (OK)`
+entries (not `OK - compressed`), and AAB
+`uncompress_native_libraries.enabled=1` /
+`alignment=PAGE_ALIGNMENT_16K`.
+
+Verified on **13 September 2026** for the arm64-v8a release APK/AAB: 90
+packaged `.so` files, all `2**14`, zip 16 KB aligned, AAB
+`PAGE_ALIGNMENT_16K`. The sideload APK is larger (~96 MB) because native
+libs are uncompressed; the AAB stays compressed internally (~51 MB) and Play
+generates the device APKs.
+
+`armeabi-v7a` is exempt from the 16 KB ELF rule (32-bit). Play uploads from
+this project are **arm64-v8a only**.
+
+Runtime check on a 16 KB kernel (emulator 16 KB system image, or Pixel 8/9
+developer option **Boot with 16KB page size**):
+
+```bash
+adb shell getconf PAGE_SIZE    # must print 16384
+```
+
+Then exercise microphone recording, VAD, guided mode, and WAV playback. A
+16 KB AVD is not required to *build*; it is recommended before the first
+Play production push. 32-bit `libomp` in the NDK is still 4 KB aligned and
+must not be packaged into a 64-bit Play artifact.
+
+---
+
 ## Runtime assets
 
 On Android, `CMakeLists.txt` copies `settings.ini` and `data/` into `android/assets/` so `androiddeployqt` packs them into the APK (extracted under `AppDataLocation` on device).
@@ -286,12 +370,15 @@ On Android, `CMakeLists.txt` copies `settings.ini` and `data/` into `android/ass
 
 Qt template from 6.11.1 (`android_arm64_v8a/src/android/templates/build.gradle`)
 plus `buildTypes.release.ndk.debugSymbolLevel = 'FULL'` so the release AAB
-includes native debug symbols for Play. Re-copy the template if a future Qt
-upgrade changes AGP / Kotlin plugin versions, then re-apply that `ndk` block.
+includes native debug symbols for Play, and
+`jniLibs.useLegacyPackaging = Boolean.parseBoolean("${legacyPackaging}")` so
+native libs stay uncompressed and 16 KB zip-aligned. Re-copy the template if
+a future Qt upgrade changes AGP / Kotlin plugin versions, then re-apply the
+`ndk` block and the `Boolean.parseBoolean` packaging line.
 
 ### CMake target properties (`CMakeLists.txt`)
 
-`QT_ANDROID_PACKAGE_SOURCE_DIR`, target/compile SDK **36**, min SDK 26, package `by.intoncore.intontrainer2.zh`, version `1.0.0`. Native link flags `-Wl,-z,max-page-size=16384` for Play’s 16 KB page-size requirement. Android Release compiles with `-g` so AGP can extract FULL native symbols.
+`QT_ANDROID_PACKAGE_SOURCE_DIR`, target/compile SDK **36**, min SDK 26, package `by.intoncore.intontrainer2.zh`, version `1.0.0`, `QT_ANDROID_LEGACY_PACKAGING FALSE`. Native link flags `-Wl,-z,max-page-size=16384` / `-Wl,-z,common-page-size=16384` and CMake `-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON` for Play’s 16 KB page-size requirement. Android Release compiles with `-g` so AGP can extract FULL native symbols.
 
 OpenMP: desktop uses `find_package(OpenMP)`; Android locates NDK `libomp` and links the `AndroidOMP` imported target. alglib `kernels_avx2.cpp` / `kernels_fma.cpp` / `kernels_sse2.cpp` are omitted on Android.
 
@@ -470,7 +557,7 @@ documentation on **13 September 2026**.
 | Target / compile SDK 36 | Complies with the API 36 requirement for new apps and updates since 31 August 2026 |
 | Version 1.0.0 / `versionCode` 1 | Set |
 | Storage / media permissions removed | `RECORD_AUDIO` only; Qt `INTERNET` stripped |
-| 16 KB ELF page-size linker flags | Added on the app target; packaged libraries still require final verification |
+| 16 KB page-size compatibility | ELF `LOAD` `2**14` on all packaged 64-bit `.so` (app, Qt 6.11.1, FFmpeg, `libc++_shared`); uncompressed JNI libs (`extractNativeLibs=false`); APK `zipalign -c -P 16`; AAB `PAGE_ALIGNMENT_16K` `enabled=1`. `build_android.sh` runs `scripts/check_16kb_alignment.sh`. Verified 13 September 2026 on arm64-v8a release artifacts. |
 | Android App Bundle | `build_android.sh` produces the AAB required for new Play apps |
 | Signing env vars | `QT_ANDROID_KEYSTORE_*` (and `ANDROID_KEYSTORE_*` aliases) wired |
 | File picker | Hidden on Android |
@@ -497,7 +584,7 @@ documentation on **13 September 2026**.
 | **App content declarations** | Complete Ads, App access, Target audience and content, and the IARC content-rating questionnaire. Declare no ads and unrestricted access only if that matches the release. Do not include children unless the app is intended to meet Families requirements. |
 | **Feature graphic** | Create a 1024×500 JPEG or 24-bit PNG with no alpha. It is mandatory listing artwork and is not bundled in the app. Keep it in `packaging/google-play/`. |
 | **Phone screenshots** | Upload at least 2 actual Android screenshots: JPEG/24-bit PNG, 320–3840 px, with the long side no more than twice the short side. For stronger Play promotion eligibility, provide at least 4 portrait 1080×1920 screenshots. Do not use the desktop captures in `docs/screenshots/`. |
-| **16 KB compatibility** | Required for 64-bit native apps targeting Android 15+ since 1 November 2025. Run the official `check_elf_alignment.sh` or inspect every packaged `.so` (Qt, app, SPTK, alglib, `libomp`), verify APK zip alignment with `zipalign -c -P 16 -v 4`, inspect the AAB with `bundletool`, and test on a 16 KB image/device. |
+| **16 KB runtime QA** | Static ELF/zip/AAB checks already pass. Before production, boot a 16 KB emulator image or a Pixel 8/9 with **Boot with 16KB page size**, confirm `adb shell getconf PAGE_SIZE` is `16384`, and run recording/playback. |
 | **Physical ARM64 QA** | Confirm microphone permission, recording/VAD, guided mode, packaged templates, record saving/deletion, offline behavior, and startup on a physical ARM64 device. |
 | **Closed testing, if applicable** | Personal accounts created after 13 November 2023 need at least 12 testers continuously opted in for 14 days, followed by a production-access application. Testers must remain engaged; opting out breaks continuity. |
 | **Developer verification** | Check Play Console account identity and package registration. Enforcement begins 30 September 2026 for participating stores in Brazil, Indonesia, Singapore, and Thailand, then expands globally in 2027; most existing verified Play developers need no extra identity action. |
