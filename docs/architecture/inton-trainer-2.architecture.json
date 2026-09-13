@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Intonation Trainer 2",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "output": "inton-trainer-2.architecture.html",
+    "repository": {
+      "url": "https://github.com/zhitko/inton-trainer-2",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "2bfcf7786b1f0785781fa0a2876d7ecc2253051d"
+    }
+  },
+  "components": [
+    {
+      "id": "learner",
+      "type": "external",
+      "label": "Learner",
+      "sublabel": "Mic / speaker",
+      "pos": [40, 420],
+      "size": [150, 64]
+    },
+    {
+      "id": "qml-ui",
+      "type": "frontend",
+      "label": "Qt Quick UI",
+      "sublabel": "inton-trainer-2",
+      "tag": "QML",
+      "sources": [
+        { "path": "ui/Main.qml", "line": 10, "label": "ApplicationWindow" },
+        { "path": "ui/pages/TrainingPage.qml", "label": "Training FSM" }
+      ],
+      "pos": [270, 420],
+      "size": [150, 64]
+    },
+    {
+      "id": "audio-api",
+      "type": "backend",
+      "label": "AudioApi",
+      "sublabel": "Record / VAD",
+      "sources": [
+        { "path": "src/api/audioapi.h", "line": 39, "label": "AudioApi" }
+      ],
+      "pos": [500, 420],
+      "size": [150, 64]
+    },
+    {
+      "id": "wavfile-api",
+      "type": "backend",
+      "label": "WavFileApi",
+      "sublabel": "getPitch / getDP",
+      "sources": [
+        { "path": "src/api/wavfileapi.h", "line": 19, "label": "WavFileApi" }
+      ],
+      "pos": [730, 420],
+      "size": [150, 64]
+    },
+    {
+      "id": "analysis-api",
+      "type": "backend",
+      "label": "AnalysisApi",
+      "sublabel": "UMP compare",
+      "sources": [
+        { "path": "src/api/analysisapi.h", "line": 20, "label": "AnalysisApi" },
+        { "path": "src/api/statisticsapi.h", "line": 15, "label": "StatisticsApi" }
+      ],
+      "pos": [960, 420],
+      "size": [150, 64]
+    },
+    {
+      "id": "local-files",
+      "type": "database",
+      "label": "On-device files",
+      "sublabel": "settings / WAV / stats",
+      "sources": [
+        { "path": "src/api/helpers/settings.cpp", "line": 32, "label": "settings.ini" },
+        { "path": "src/api/helpers/statistics.h", "line": 65, "label": "statistics.json" }
+      ],
+      "pos": [1190, 420],
+      "size": [150, 64]
+    },
+    {
+      "id": "vad",
+      "type": "backend",
+      "label": "VAD services",
+      "sublabel": "Energy / autocorr",
+      "sources": [
+        { "path": "src/services/vadenergryservice.h", "label": "Energy" },
+        { "path": "src/services/vadautocorrelationservice.h", "label": "Autocorr" }
+      ],
+      "pos": [500, 80],
+      "size": [150, 64]
+    },
+    {
+      "id": "dsp-features",
+      "type": "backend",
+      "label": "Feature DSP",
+      "sublabel": "Pitch / UMP / SPTK",
+      "sources": [
+        { "path": "src/services/pitchservice.h", "line": 17, "label": "PitchService" },
+        { "path": "src/services/umpservice.h", "label": "UMPService" },
+        { "path": "src/services/specservice.h", "label": "SpecService" }
+      ],
+      "pos": [730, 80],
+      "size": [150, 64]
+    },
+    {
+      "id": "cdtw",
+      "type": "backend",
+      "label": "CDTWService",
+      "sublabel": "Constrained DTW",
+      "tag": "alignment",
+      "sources": [
+        { "path": "src/services/cdtwservice.h", "line": 18, "label": "CDTWService" }
+      ],
+      "pos": [960, 80],
+      "size": [150, 64]
+    },
+    {
+      "id": "qt-mm",
+      "type": "external",
+      "label": "Qt Multimedia",
+      "sublabel": "Capture / playback",
+      "pos": [500, 660],
+      "size": [150, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "DSP services (src/services)",
+      "wraps": ["vad", "dsp-features", "cdtw"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "learner-to-ui",
+      "from": "learner",
+      "to": "qml-ui",
+      "label": "train / review",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ui-to-audio",
+      "from": "qml-ui",
+      "to": "audio-api",
+      "label": "record / play",
+      "variant": "emphasis"
+    },
+    {
+      "id": "audio-to-wavfile",
+      "from": "audio-api",
+      "to": "wavfile-api",
+      "label": "saved WAV",
+      "variant": "emphasis"
+    },
+    {
+      "id": "wavfile-to-analysis",
+      "from": "wavfile-api",
+      "to": "analysis-api",
+      "label": "aligned UMP",
+      "variant": "emphasis"
+    },
+    {
+      "id": "analysis-to-files",
+      "from": "analysis-api",
+      "to": "local-files",
+      "label": "registerResult"
+    },
+    {
+      "id": "audio-to-vad",
+      "from": "audio-api",
+      "to": "vad",
+      "label": "VAD frames"
+    },
+    {
+      "id": "audio-to-qtmm",
+      "from": "audio-api",
+      "to": "qt-mm",
+      "label": "capture / playback",
+      "labelDy": 24
+    },
+    {
+      "id": "wavfile-to-features",
+      "from": "wavfile-api",
+      "to": "dsp-features",
+      "label": "pitch / UMP",
+      "labelDx": -40
+    },
+    {
+      "id": "wavfile-to-cdtw",
+      "from": "wavfile-api",
+      "to": "cdtw",
+      "label": "multi-stream DTW",
+      "fromSide": "top",
+      "toSide": "left"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Presentation",
+      "items": [
+        "Qt Quick module URI inton-trainer-2 keeps pages thin",
+        "QML talks to C++ via AudioApi, WavFileApi, FileApi, SettingsApi, AnalysisApi, and StatisticsApi"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Training path",
+      "items": [
+        "AudioApi records 8 kHz mono, runs VAD, then writes WAV",
+        "WavFileApi extracts pitch/UMP via SPTK, CDTW aligns, AnalysisApi scores"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "On device",
+      "items": [
+        "settings.ini via QSettings; templates and records as WAV files",
+        "SPTK provides RAPT, SWIPE, WORLD; alglib-cpp handles smoothing"
+      ]
+    }
+  ]
+}
