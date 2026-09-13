@@ -57,7 +57,10 @@ Typical outputs:
 ```
 build_android_arm64-v8a/android-build/build/outputs/apk/release/android-build-release.apk
 build_android_arm64-v8a/android-build/build/outputs/bundle/release/android-build-release.aab
+build_android_arm64-v8a/android-build/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
 ```
+
+The script also lists `BUNDLE-METADATA/com.android.tools.build.debugsymbols/` inside the release AAB. Play extracts those automatically; do not upload the ZIP unless that metadata is missing.
 
 Build directory names follow the NDK ABI: `build_android_arm64-v8a`, `build_android_x86_64`, `build_android_armeabi-v7a`.
 
@@ -196,6 +199,62 @@ See [QT_ANDROID_SIGN_AAB](https://doc.qt.io/qt-6.11/cmake-variable-qt-android-si
 
 ---
 
+## Native debug symbols
+
+Google Play can symbolicate native crashes only if the upload includes debug
+metadata for the packaged `.so` files. The release AAB is configured to
+embed **full** native symbols so Play Console extracts them automatically
+(AGP 4.1+ / the Qt 6.11 template uses AGP 9.0.0).
+
+What the repo does:
+
+1. `android/build.gradle` (copied from the Qt 6.11.1 template, then customized)
+   sets `android.buildTypes.release.ndk.debugSymbolLevel = 'FULL'`.
+2. `CMakeLists.txt` adds `-g` to Android **Release** objects so DWARF exists
+   for `libappinton-trainer-2_<abi>.so` (and SPTK objects compiled in this
+   tree). RelWithDebInfo already has `-g`. Gradle still **strips** the `.so`
+   files that ship inside the APK/AAB; the extra data goes into AAB metadata.
+3. `scripts/build_android.sh` prints the `com.android.tools.build.debugsymbols`
+   entries after a release AAB, and the path of
+   `native-debug-symbols.zip` when Gradle writes one.
+
+Confirm after a release build:
+
+```bash
+unzip -l build_android_arm64-v8a/android-build/build/outputs/bundle/release/android-build-release.aab \
+  | grep com.android.tools.build.debugsymbols
+```
+
+Expect paths such as
+`BUNDLE-METADATA/com.android.tools.build.debugsymbols/arm64-v8a/*.so.dbg`.
+After the first Play upload, also open **Release → App bundle explorer** and
+check that native debug symbols are present for the artifact.
+
+Official Qt Android libraries are already stripped (`.dynsym` only). Play
+stack traces will name frames in **our** library and any other unstripped
+`.so` (for example NDK `libomp` still has a symbol table). That is enough
+for app crashes; Qt-internal frames stay numeric.
+
+If the AAB metadata is missing (Gradle log:
+`Unable to extract native debug metadata ... already been stripped`), build
+a ZIP by hand and upload it under App bundle explorer:
+
+```bash
+ABI=arm64-v8a
+BUILD_DIR=build_android_${ABI}
+mkdir -p "/tmp/native-debug-symbols/${ABI}"
+cp "$BUILD_DIR"/libappinton-trainer-2_${ABI}.so "/tmp/native-debug-symbols/${ABI}/"
+(cd /tmp/native-debug-symbols && zip -r native-debug-symbols.zip "${ABI}")
+```
+
+Keep that ZIP under 1.6 GB. If FULL DWARF is too large, change
+`debugSymbolLevel` to `'SYMBOL_TABLE'` (function names only).
+
+See [Include native symbols in your release build](https://developer.android.com/build/include-native-symbols)
+and [Native debug symbols](https://support.google.com/googleplay/android-developer/answer/9848633).
+
+---
+
 ## Runtime assets
 
 On Android, `CMakeLists.txt` copies `settings.ini` and `data/` into `android/assets/` so `androiddeployqt` packs them into the APK (extracted under `AppDataLocation` on device).
@@ -223,9 +282,16 @@ On Android, `CMakeLists.txt` copies `settings.ini` and `data/` into `android/ass
 
 `AppTheme` uses a black `windowBackground` to avoid a light flash on launch.
 
+### `android/build.gradle`
+
+Qt template from 6.11.1 (`android_arm64_v8a/src/android/templates/build.gradle`)
+plus `buildTypes.release.ndk.debugSymbolLevel = 'FULL'` so the release AAB
+includes native debug symbols for Play. Re-copy the template if a future Qt
+upgrade changes AGP / Kotlin plugin versions, then re-apply that `ndk` block.
+
 ### CMake target properties (`CMakeLists.txt`)
 
-`QT_ANDROID_PACKAGE_SOURCE_DIR`, target/compile SDK **36**, min SDK 26, package `by.intoncore.intontrainer2.zh`, version `1.0.0`. Native link flags `-Wl,-z,max-page-size=16384` for Play’s 16 KB page-size requirement.
+`QT_ANDROID_PACKAGE_SOURCE_DIR`, target/compile SDK **36**, min SDK 26, package `by.intoncore.intontrainer2.zh`, version `1.0.0`. Native link flags `-Wl,-z,max-page-size=16384` for Play’s 16 KB page-size requirement. Android Release compiles with `-g` so AGP can extract FULL native symbols.
 
 OpenMP: desktop uses `find_package(OpenMP)`; Android locates NDK `libomp` and links the `AndroidOMP` imported target. alglib `kernels_avx2.cpp` / `kernels_fma.cpp` / `kernels_sse2.cpp` are omitted on Android.
 
@@ -419,6 +485,7 @@ documentation on **13 September 2026**.
 | Open-source licences | Offline in-app notices and full texts added for Qt/LGPL, ALGLIB/GPL, SPTK and embedded components, Font Awesome/OFL, and LLVM OpenMP; source/relinking offer documented |
 | Privacy policy (HTTPS) | Published at [https://intontrainer.by/intontrainer2policy.html](https://intontrainer.by/intontrainer2policy.html) (revised 10 September 2026). Covers microphone access, on-device WAV recordings and scores, local retention/deletion, no upload/sharing, no Internet permission, and `allowBackup=false`. Paste this URL into the Play Console privacy-policy field. |
 | Privacy policy in the app | Offline EN/RU markdown via `PrivacyPolicyPage.qml`; side-menu item next to User Guide / Open-source licences |
+| Native debug symbols | Release AAB embeds FULL native symbols (`android/build.gradle` `ndk.debugSymbolLevel = 'FULL'`, Android Release `-g`). `build_android.sh` checks `BUNDLE-METADATA/com.android.tools.build.debugsymbols`. Play extracts them from the AAB; confirm in App Bundle Explorer after the first upload |
 
 ### Required before the first Play release
 
@@ -434,7 +501,6 @@ documentation on **13 September 2026**.
 | **Physical ARM64 QA** | Confirm microphone permission, recording/VAD, guided mode, packaged templates, record saving/deletion, offline behavior, and startup on a physical ARM64 device. |
 | **Closed testing, if applicable** | Personal accounts created after 13 November 2023 need at least 12 testers continuously opted in for 14 days, followed by a production-access application. Testers must remain engaged; opting out breaks continuity. |
 | **Developer verification** | Check Play Console account identity and package registration. Enforcement begins 30 September 2026 for participating stores in Brazil, Indonesia, Singapore, and Thailand, then expands globally in 2027; most existing verified Play developers need no extra identity action. |
-| **Native debug symbols** | Configure the release bundle to include full native symbols (`ndk.debugSymbolLevel = 'FULL'`) and confirm them in App Bundle Explorer. With AAB and AGP 4.1+, Play extracts included symbols automatically; upload a ZIP manually only if they are not bundled. |
 | **Release source archive** | Publish and retain the exact source tag/archive corresponding to the uploaded binary. Include the build scripts and matching ALGLIB/SPTK sources or durable access to those exact sources; verify every packaged native library against the in-app notices. |
 | **Portrait-only decision** | Keep `screenOrientation="portrait"` only if this is intentional and phone QA confirms all content remains usable. |
 

@@ -185,3 +185,30 @@ if [[ "$found" -eq 0 ]]; then
     echo "WARNING: no APK/AAB found; check $BUILD_DIR/android-build for Gradle output."
     echo "  cd $BUILD_DIR/android-build && ./gradlew bundleRelease --stacktrace"
 fi
+
+# Native debug symbols: AGP embeds them in the AAB when debugSymbolLevel=FULL.
+# Confirm locally here; Play extracts them automatically on upload.
+if [[ "$BUILD_TYPE" == "release" ]]; then
+    AAB_RELEASE="$BUILD_DIR/android-build/build/outputs/bundle/release/android-build-release.aab"
+    SYMBOLS_ZIP="$BUILD_DIR/android-build/build/outputs/native-debug-symbols/release/native-debug-symbols.zip"
+    echo ""
+    echo "============================================================"
+    echo "  Native debug symbols"
+    echo "============================================================"
+    if [[ -f "$AAB_RELEASE" ]]; then
+        # grep -q closes the pipe early (SIGPIPE); with pipefail that looks like
+        # a miss even when the AAB does contain debugsymbols.
+        symbols=$(unzip -l "$AAB_RELEASE" | grep "com.android.tools.build.debugsymbols" || true)
+        if [[ -n "$symbols" ]]; then
+            echo "  Bundled in AAB (Play extracts these automatically):"
+            echo "$symbols" | sed 's/^/    /'
+        else
+            echo "  WARNING: $AAB_RELEASE has no BUNDLE-METADATA/com.android.tools.build.debugsymbols."
+            echo "  AGP could not extract DWARF from the packaged .so files."
+            echo "  Upload a ZIP of unstripped ABI folders only if Play Console still asks."
+        fi
+    fi
+    if [[ -f "$SYMBOLS_ZIP" ]]; then
+        echo "  $SYMBOLS_ZIP"
+    fi
+fi

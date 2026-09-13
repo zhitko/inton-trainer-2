@@ -45,6 +45,13 @@ else()
     find_package(OpenMP REQUIRED)
 endif()
 
+if(ANDROID)
+    # Keep DWARF in Release objects so AGP can embed Play native debug symbols
+    # (android/build.gradle: ndk.debugSymbolLevel = FULL). Packaged .so files
+    # are still stripped; symbols go into AAB BUNDLE-METADATA.
+    add_compile_options("$<$<CONFIG:Release>:-g>")
+endif()
+
 qt_standard_project_setup(REQUIRES 6.8 I18N_TRANSLATED_LANGUAGES en ru)
 
 qt_add_executable(appinton-trainer-2
