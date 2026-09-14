@@ -417,11 +417,27 @@ android/res/values/colors.xml                              (#F9F9FF background)
 
 The opaque **512×512** Play Console icon for this Chinese edition is
 `packaging/google-play/icon-512-zh.png`. The same file is the source for the
-Android launcher / adaptive icons under `android/res/`. Store listing copy
-(EN/RU app name, short description, full description, contact fields,
-category, and What’s new) is in `packaging/google-play/store-listing.md`. The
-Play listing still needs a **1024×500** feature graphic and phone
-screenshots; they are store artwork and are not packaged in the APK/AAB.
+Android launcher / adaptive icons under `android/res/`.
+
+The upload-ready **1024×500** feature graphic is
+`packaging/google-play/feature-graphic-zh.png` (24-bit sRGB PNG, no alpha).
+Its editable vector source is `feature-graphic-zh.svg` in the same folder.
+The graphic uses the Chinese-edition mark, the app palette, and a simplified
+pitch-comparison result. If the SVG changes, regenerate the Play asset from
+the project root:
+
+```bash
+convert packaging/google-play/feature-graphic-zh.svg \
+  -background '#f9f9ff' -alpha remove -alpha off \
+  \( packaging/google-play/icon-512-zh.png -resize 76x76 \) \
+  -geometry +62+49 -composite -alpha off \
+  PNG24:packaging/google-play/feature-graphic-zh.png
+```
+
+Store listing copy (EN/RU app name, short description, full description,
+contact fields, category, and What’s new) is in
+`packaging/google-play/store-listing.md`. Phone screenshots are still needed;
+all listing artwork is separate from the APK/AAB.
 
 ---
 
@@ -534,7 +550,6 @@ and descriptions; **Store settings** for category, email, and website.
 
 Still missing from `packaging/google-play/` (not packaged in the APK/AAB):
 
-- Feature graphic 1024×500 JPEG or 24-bit PNG (no alpha)
 - At least 2 actual Android phone screenshots (prefer 4 portrait 1080×1920)
 
 Do not upload the desktop captures in `docs/screenshots/`.
@@ -567,6 +582,7 @@ documentation on **13 September 2026**.
 | Keystore files gitignored | `*.jks`, `*.keystore` |
 | Launcher icons | Legacy, round, and adaptive resources added; manifest wired |
 | Play Console icon | 512×512 RGBA PNG, 220 KB: `packaging/google-play/icon-512-zh.png` (Chinese copy of `icon-512.png`) |
+| Feature graphic | Upload-ready 1024×500 24-bit sRGB PNG with no alpha: `packaging/google-play/feature-graphic-zh.png`; editable SVG source is alongside it |
 | Store listing text | EN/RU app name, short description, full description, What’s new, contact, category, and alt text in `packaging/google-play/store-listing.md` |
 | Play Console account | Verified |
 | Open-source licences | Offline in-app notices and full texts added for Qt/LGPL, ALGLIB/GPL, SPTK and embedded components, Font Awesome/OFL, and LLVM OpenMP; source/relinking offer documented |
@@ -582,7 +598,7 @@ documentation on **13 September 2026**.
 | **Release identity** | Confirm package `by.intoncore.intontrainer2.zh` before the first upload. Increment `versionCode` for every later upload of this Chinese app. English/Russian/… editions need new packages (`.en`, `.ru`, …) and new Play listings; a package name cannot be changed after publishing. |
 | **Data safety** | Complete the form even if no data leaves the device. Declare the actual handling of microphone/voice recordings and keep it consistent with the app and [privacy policy](https://intontrainer.by/intontrainer2policy.html). Internal-only testing is exempt; closed, open, and production tracks are not. |
 | **App content declarations** | Complete Ads, App access, Target audience and content, and the IARC content-rating questionnaire. Declare no ads and unrestricted access only if that matches the release. Do not include children unless the app is intended to meet Families requirements. |
-| **Feature graphic** | Create a 1024×500 JPEG or 24-bit PNG with no alpha. It is mandatory listing artwork and is not bundled in the app. Keep it in `packaging/google-play/`. |
+| **Feature graphic** | Upload `packaging/google-play/feature-graphic-zh.png`. It is already 1024×500, 24-bit sRGB, and has no alpha. It is mandatory listing artwork and is not bundled in the app. |
 | **Phone screenshots** | Upload at least 2 actual Android screenshots: JPEG/24-bit PNG, 320–3840 px, with the long side no more than twice the short side. For stronger Play promotion eligibility, provide at least 4 portrait 1080×1920 screenshots. Do not use the desktop captures in `docs/screenshots/`. |
 | **16 KB runtime QA** | Static ELF/zip/AAB checks already pass. Before production, boot a 16 KB emulator image or a Pixel 8/9 with **Boot with 16KB page size**, confirm `adb shell getconf PAGE_SIZE` is `16384`, and run recording/playback. |
 | **Physical ARM64 QA** | Confirm microphone permission, recording/VAD, guided mode, packaged templates, record saving/deletion, offline behavior, and startup on a physical ARM64 device. |

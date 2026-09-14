@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f9f9ff"/>
+      <stop offset="0.58" stop-color="#eef3ff"/>
+      <stop offset="1" stop-color="#e7ddf4"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#83b7ff"/>
+      <stop offset="1" stop-color="#76567f"/>
+    </linearGradient>
+    <linearGradient id="mic" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#416db6"/>
+      <stop offset="1" stop-color="#254d8d"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#243754" flood-opacity="0.17"/>
+    </filter>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#354560" flood-opacity="0.14"/>
+    </filter>
+    <clipPath id="chartClip">
+      <rect x="594" y="152" width="350" height="205" rx="19"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1024" height="500" fill="url(#background)"/>
+  <circle cx="938" cy="39" r="165" fill="#ffffff" opacity="0.24"/>
+  <circle cx="68" cy="484" r="180" fill="#dce9ff" opacity="0.42"/>
+
+  <!-- Branded editorial illustration -->
+  <path d="M286 43 C320 24 332 88 365 72 C397 57 405 103 439 85 C463 72 476 75 500 94"
+        fill="none" stroke="url(#brand)" stroke-width="5" stroke-linecap="round" opacity="0.35"/>
+  <circle cx="500" cy="94" r="5" fill="#76567f" opacity="0.45"/>
+
+  <!-- The real icon-512-zh.png is composited here by the documented render command. -->
+  <rect x="62" y="49" width="76" height="76" rx="20" fill="#ffffff"/>
+  <text x="156" y="77" fill="#334c70" font-family="sans-serif" font-size="15" font-weight="700"
+        letter-spacing="2">INTONATION TRAINER 2</text>
+  <rect x="156" y="91" width="116" height="25" rx="12.5" fill="#e4edfc"/>
+  <text x="214" y="108" text-anchor="middle" fill="#45638f" font-family="sans-serif" font-size="12"
+        font-weight="700" letter-spacing="1.2">CHINESE</text>
+
+  <!-- Message -->
+  <text x="62" y="190" fill="#243754" font-family="sans-serif" font-size="47" font-weight="700"
+        letter-spacing="-1.2">Master Chinese</text>
+  <text x="62" y="239" fill="url(#brand)" font-family="sans-serif" font-size="47" font-weight="700"
+        letter-spacing="-1.2">tones by ear</text>
+  <text x="64" y="279" fill="#61718b" font-family="sans-serif" font-size="19" font-weight="400">
+    Hear the melody. Match the contour.
+  </text>
+
+  <!-- Three-step icon story -->
+  <path d="M96 357 H404" fill="none" stroke="url(#brand)" stroke-width="3" opacity="0.24"/>
+
+  <g transform="translate(64 325)">
+    <circle cx="32" cy="32" r="32" fill="#ffffff"/>
+    <circle cx="32" cy="32" r="29" fill="#e8f1ff"/>
+    <path d="M16 33 C16 13 48 13 48 33" fill="none" stroke="#315b9c" stroke-width="4" stroke-linecap="round"/>
+    <rect x="13" y="30" width="8" height="17" rx="4" fill="#315b9c"/>
+    <rect x="43" y="30" width="8" height="17" rx="4" fill="#315b9c"/>
+    <path d="M46 46 C42 51 38 52 33 52" fill="none" stroke="#315b9c" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="30" cy="52" r="3" fill="#315b9c"/>
+    <text x="32" y="91" text-anchor="middle" fill="#41536e" font-family="sans-serif" font-size="13"
+          font-weight="700" letter-spacing="1.5">LISTEN</text>
+  </g>
+
+  <g transform="translate(218 325)">
+    <circle cx="32" cy="32" r="32" fill="#ffffff"/>
+    <circle cx="32" cy="32" r="29" fill="#eee6f5"/>
+    <rect x="24" y="14" width="16" height="28" rx="8" fill="#76567f"/>
+    <path d="M18 31 V35 C18 52 46 52 46 35 V31 M32 49 V57 M23 57 H41"
+          fill="none" stroke="#76567f" stroke-width="4" stroke-linecap="round"/>
+    <path d="M11 24 C7 28 7 37 11 41 M53 24 C57 28 57 37 53 41"
+          fill="none" stroke="#a993bc" stroke-width="3" stroke-linecap="round"/>
+    <text x="32" y="91" text-anchor="middle" fill="#41536e" font-family="sans-serif" font-size="13"
+          font-weight="700" letter-spacing="1.5">SPEAK</text>
+  </g>
+
+  <g transform="translate(372 325)">
+    <circle cx="32" cy="32" r="32" fill="#ffffff"/>
+    <circle cx="32" cy="32" r="29" fill="#e5f3eb"/>
+    <path d="M12 41 C18 40 18 21 25 24 C32 27 29 42 37 19 C42 8 48 23 53 19"
+          fill="none" stroke="#338c60" stroke-width="4" stroke-linecap="round"/>
+    <path d="M12 46 C19 44 21 31 27 33 C34 35 34 48 42 29 C46 20 50 28 53 28"
+          fill="none" stroke="#7ab89a" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+    <text x="32" y="91" text-anchor="middle" fill="#41536e" font-family="sans-serif" font-size="13"
+          font-weight="700" letter-spacing="1.2">COMPARE</text>
+  </g>
+
+  <!-- Abstract pitch-match illustration -->
+  <g>
+    <ellipse cx="770" cy="255" rx="211" ry="191" fill="#ffffff" opacity="0.72"/>
+    <ellipse cx="770" cy="255" rx="181" ry="163" fill="#edf3ff" opacity="0.68"/>
+    <circle cx="932" cy="147" r="54" fill="#e9def3" opacity="0.72"/>
+    <circle cx="590" cy="342" r="59" fill="#dceaff" opacity="0.72"/>
+
+    <!-- Rhythm columns -->
+    <rect x="610" y="151" width="45" height="190" rx="22.5" fill="#cfe0fb" opacity="0.58"/>
+    <rect x="674" y="128" width="45" height="238" rx="22.5" fill="#e1d3ec" opacity="0.56"/>
+    <rect x="738" y="166" width="45" height="171" rx="22.5" fill="#cfe8dc" opacity="0.65"/>
+    <rect x="802" y="121" width="45" height="249" rx="22.5" fill="#dce8fb" opacity="0.58"/>
+    <rect x="866" y="155" width="45" height="188" rx="22.5" fill="#e4d8ee" opacity="0.58"/>
+
+    <!-- Reference contour -->
+    <path d="M574 190 C621 132 656 132 686 181 C716 231 730 291 775 267 C814 247 825 169 865 207 C900 240 911 345 956 320"
+          fill="none" stroke="#ffffff" stroke-width="22" stroke-linecap="round" opacity="0.9"/>
+    <path d="M574 190 C621 132 656 132 686 181 C716 231 730 291 775 267 C814 247 825 169 865 207 C900 240 911 345 956 320"
+          fill="none" stroke="#6f9fee" stroke-width="11" stroke-linecap="round"/>
+
+    <!-- Learner contour -->
+    <path d="M574 201 C621 146 655 144 682 191 C712 242 730 302 774 278 C813 257 827 185 862 219 C898 252 912 352 956 331"
+          fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round" opacity="0.85"/>
+    <path d="M574 201 C621 146 655 144 682 191 C712 242 730 302 774 278 C813 257 827 185 862 219 C898 252 912 352 956 331"
+          fill="none" stroke="#76567f" stroke-width="8" stroke-linecap="round"/>
+
+    <!-- Contour endpoints and sound accents -->
+    <circle cx="574" cy="190" r="8" fill="#6f9fee" stroke="#ffffff" stroke-width="4"/>
+    <circle cx="956" cy="331" r="7" fill="#76567f" stroke="#ffffff" stroke-width="4"/>
+    <path d="M560 167 C547 176 545 196 554 208 M548 155 C527 172 524 204 539 221"
+          fill="none" stroke="#84a9e8" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+    <path d="M967 299 C981 309 984 330 975 343 M978 287 C1000 304 1003 337 987 355"
+          fill="none" stroke="#a188aa" stroke-width="4" stroke-linecap="round" opacity="0.58"/>
+
+    <!-- Floating match badge -->
+    <g>
+      <rect x="783" y="57" width="179" height="82" rx="25" fill="#ffffff"/>
+      <circle cx="819" cy="98" r="21" fill="#ddf2e7"/>
+      <path d="M809 98 L816 105 L829 90" fill="none" stroke="#338c60" stroke-width="4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="851" y="88" fill="#6d7d94" font-family="sans-serif" font-size="11" font-weight="700"
+            letter-spacing="1.2">PITCH MATCH</text>
+      <text x="850" y="122" fill="#354e72" font-family="sans-serif" font-size="34" font-weight="700">98%</text>
+    </g>
+
+    <!-- Editorial legend -->
+    <g transform="translate(643 405)">
+      <path d="M0 0 H28" stroke="#6f9fee" stroke-width="6" stroke-linecap="round"/>
+      <text x="40" y="5" fill="#52647e" font-family="sans-serif" font-size="12" font-weight="700"
+            letter-spacing="1">REFERENCE</text>
+      <path d="M148 0 H176" stroke="#76567f" stroke-width="6" stroke-linecap="round"/>
+      <text x="188" y="5" fill="#52647e" font-family="sans-serif" font-size="12" font-weight="700"
+            letter-spacing="1">YOUR VOICE</text>
+    </g>
+  </g>
+</svg>

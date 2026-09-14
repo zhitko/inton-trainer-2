@@ -122,7 +122,7 @@ Use these if Play Console asks for alt text on listing artwork.
 | Asset | Alt text |
 |---|---|
 | App icon | Intonation Trainer 2 (Chinese) mark on a light square |
-| Feature graphic | Training view with a similarity score and two overlaid pitch contours |
+| Feature graphic | Chinese tone training graphic with listening, recording, a similarity score, and overlaid pitch contours |
 | Phone screenshot 1 | Home screen with start training and progress statistics |
 | Phone screenshot 2 | Training screen with score, trend, and pitch overlay |
 | Phone screenshot 3 | Phrase library with categories and best scores |
@@ -204,7 +204,7 @@ brand across locales, use `Intonation Trainer 2 (Chinese)` here too.
 | Asset | Alt text |
 |---|---|
 | Иконка | Знак Intonation Trainer 2 (Chinese) на светлом квадрате |
-| Рекламный графический файл | Экран тренировки с процентом сходства и двумя контурами тона |
+| Рекламный графический файл | Тренировка китайских тонов: прослушивание, запись, процент сходства и два контура тона |
 | Скриншот 1 | Главный экран с кнопкой старта и статистикой прогресса |
 | Скриншот 2 | Экран тренировки с оценкой, трендом и наложением тона |
 | Скриншот 3 | Библиотека фраз с категориями и лучшими результатами |
@@ -219,7 +219,7 @@ These are listing assets, not copy. Keep them next to this file when they exist.
 | Asset | Spec |
 |---|---|
 | App icon | `icon-512-zh.png` in this folder (512×512, 32-bit PNG with alpha, ≤1024 KB). Copied from `icon-512.png`; later editions use `icon-512-en.png`, etc. |
-| Feature graphic | 1024×500 JPEG or 24-bit PNG, **no alpha** — missing |
+| Feature graphic | `feature-graphic-zh.png` (1024×500, 24-bit sRGB PNG, no alpha); editable source: `feature-graphic-zh.svg` |
 | Phone screenshots | At least 2 actual Android captures; JPEG or 24-bit PNG, 320–3840 px, long side no more than twice the short side. Prefer 4 portrait 1080×1920 shots |
 
 Do not upload the desktop captures in `docs/screenshots/` to Play. Take the
