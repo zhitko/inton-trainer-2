@@ -118,15 +118,20 @@ Initial Android release. Practice bundled Chinese-tone phrases with guided, auto
 ### Graphic alt text (optional, ≤140 characters each)
 
 Use these if Play Console asks for alt text on listing artwork.
+Phone listing order is Home → library → phrase list → reference contour →
+Settings → scored overlay. Tablet folders capture the scored overlay before
+Settings; see `screenshots/README.md`.
 
 | Asset | Alt text |
 |---|---|
 | App icon | Intonation Trainer 2 (Chinese) mark on a light square |
 | Feature graphic | Chinese tone training graphic with listening, recording, a similarity score, and overlaid pitch contours |
-| Phone screenshot 1 | Home screen with start training and progress statistics |
-| Phone screenshot 2 | Training screen with score, trend, and pitch overlay |
-| Phone screenshot 3 | Phrase library with categories and best scores |
-| Phone screenshot 4 | Saved recordings with scores and dates |
+| Phone screenshot 1 | Home screen with Start Training and progress statistics |
+| Phone screenshot 2 | Phrase library with Chinese-tone category folders |
+| Phone screenshot 3 | One-tone phrase list with practice filters |
+| Phone screenshot 4 | Training screen showing the reference pitch contour |
+| Phone screenshot 5 | Settings for language, theme, and guided recording |
+| Phone screenshot 6 | Training result with a high score and overlaid pitch contours |
 
 ---
 
@@ -205,26 +210,30 @@ brand across locales, use `Intonation Trainer 2 (Chinese)` here too.
 |---|---|
 | Иконка | Знак Intonation Trainer 2 (Chinese) на светлом квадрате |
 | Рекламный графический файл | Тренировка китайских тонов: прослушивание, запись, процент сходства и два контура тона |
-| Скриншот 1 | Главный экран с кнопкой старта и статистикой прогресса |
-| Скриншот 2 | Экран тренировки с оценкой, трендом и наложением тона |
-| Скриншот 3 | Библиотека фраз с категориями и лучшими результатами |
-| Скриншот 4 | Сохранённые записи с оценками и датами |
+| Скриншот 1 | Главный экран с кнопкой старта тренировки и статистикой прогресса |
+| Скриншот 2 | Библиотека фраз с папками категорий тонов |
+| Скриншот 3 | Список однотонных фраз с фильтрами практики |
+| Скриншот 4 | Экран тренировки с эталонным контуром тона |
+| Скриншот 5 | Настройки языка, темы и режима записи с подсказкой |
+| Скриншот 6 | Результат тренировки с высокой оценкой и наложением контуров |
 
 ---
 
-## Still required in Console (not text)
+## Listing graphics (not text)
 
-These are listing assets, not copy. Keep them next to this file when they exist.
+These files live next to this document and were uploaded to the Play listing.
+Keep replacements in the same folders. Index: `screenshots/README.md`.
 
 | Asset | Spec |
 |---|---|
 | App icon | `icon-512-zh.png` in this folder (512×512, 32-bit PNG with alpha, ≤1024 KB). Copied from `icon-512.png`; later editions use `icon-512-en.png`, etc. |
 | Feature graphic | `feature-graphic-zh.png` (1024×500, 24-bit sRGB PNG, no alpha); editable source: `feature-graphic-zh.svg` |
-| Phone screenshots | At least 2 actual Android captures; JPEG or 24-bit PNG, 320–3840 px, long side no more than twice the short side. Prefer 4 portrait 1080×1920 shots |
+| Phone screenshots | 6 portrait captures in `screenshots/phone/` (`1080×2400`) |
+| 7-inch tablet screenshots | 6 portrait captures in `screenshots/tablet7/` (`1200×1920`) |
+| 10-inch tablet screenshots | 6 portrait captures in `screenshots/tablet10/` (`1600×2560`) |
 
-Do not upload the desktop captures in `docs/screenshots/` to Play. Take the
-shots on an Android phone or a matching emulator, in portrait, with the default
-dark theme.
+Do not upload the desktop captures in `docs/screenshots/` to Play. The listing
+shots are Android emulator captures, in portrait, light theme, English UI.
 
 Official field limits:
 [Create and set up your app](https://support.google.com/googleplay/android-developer/answer/9859152),

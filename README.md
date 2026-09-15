@@ -251,6 +251,9 @@ An emulator launch script is also available:
 
 ```bash
 ./scripts/run_emulator.sh
+./scripts/run_emulator.sh --tablet 7    # Play 7-inch tablet screenshots
+./scripts/run_emulator.sh --tablet 10   # Play 10-inch tablet screenshots
+./scripts/run_emulator.sh --screenshot home
 ```
 
 Use `--logcat` mode to stream logs from a running device:

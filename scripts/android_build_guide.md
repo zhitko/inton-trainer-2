@@ -19,7 +19,7 @@ Override any of these with environment variables; the values below are the scrip
 | Java | OpenJDK 17 (`$JAVA_HOME`, default `/usr/lib/jvm/java-17-openjdk-amd64`) |
 | Tools on `PATH` | `cmake`, `ninja`, `java` |
 | OpenMP | NDK `libomp.so` (imported as `AndroidOMP`) |
-| Local AVDs | `Pixel7a`, `Pixel7a_arm64`, `Pixel7a_x86_64` |
+| Local AVDs | `Pixel7a`, `Pixel7a_arm64`, `Pixel7a_x86_64`; tablet screenshots: `PlayTablet7_x86_64`, `PlayTablet10_x86_64` (created by `run_emulator.sh --tablet`) |
 
 Install the Android 36 platform if CMake/Gradle fails looking for it:
 
@@ -117,14 +117,19 @@ Fails if any 64-bit `.so` has ELF `LOAD` alignment below `2**14`, if APK zip ali
 
 ```bash
 ./scripts/run_emulator.sh [avd_name]
+./scripts/run_emulator.sh --tablet 7
+./scripts/run_emulator.sh --tablet 10
+./scripts/run_emulator.sh --screenshot home
 ./scripts/run_emulator.sh --logcat
 ```
 
 | Behavior | Detail |
 |---|---|
 | AVD | Argument, or the first name from `emulator -list-avds` |
+| Tablets | `--tablet 7` / `--tablet 10` create and boot Play listing AVDs (`PlayTablet7_x86_64`, `PlayTablet10_x86_64`) if they do not exist, then force portrait `1200×1920` or `1600×2560` |
+| Screenshots | `--screenshot [name]` writes a PNG under `packaging/google-play/screenshots/{phone,tablet7,tablet10}/` |
 | Pre-flight | Requires executable `emulator` and `adb` under `$ANDROID_SDK` |
-| Boot timeout | `BOOT_TIMEOUT_SEC` (default 120) |
+| Boot timeout | `BOOT_TIMEOUT_SEC` (default 120; tablet boots use 240 if the default is still in effect) |
 | Emulator log | `$BUILD_DIR/emulator.log` (dumped if the emulator process dies) |
 | Logcat | Started before `am start`; crash-filtered dump if the process is gone |
 | APK search | `build_android_x86_64` first, then `build_android_arm64-v8a` (debug, then release, then unsigned) |
@@ -132,11 +137,28 @@ Fails if any 64-bit `.so` has ELF `LOAD` alignment below `2**14`, if APK zip ali
 
 `--logcat` streams live logcat and always writes `build_android_arm64-v8a/logcat.log`, even if you installed an x86_64 APK. After a normal launch, inspect `$BUILD_DIR/logcat.log` (the dir of the APK that was found).
 
+Play Console tablet slots are **7-inch** and **10-inch** (there is no 19-inch slot). Use those flags for listing screenshots. The app is portrait-locked, so tablet captures stay portrait.
+
+Tablet screenshot workflow:
+
+```bash
+./scripts/build_android.sh x86_64 debug
+./scripts/run_emulator.sh --tablet 7
+# pose Home / Training / library / Records, then:
+./scripts/run_emulator.sh --screenshot home
+./scripts/run_emulator.sh --screenshot training
+./scripts/run_emulator.sh --tablet 10
+./scripts/run_emulator.sh --screenshot home
+```
+
+`--tablet` stops a different running emulator first, so the phone AVD is not reused by accident. Combine launch and capture with `--tablet 7 --screenshot home` (press Enter when the screen is ready).
+
 The APK ABI must match the emulator ABI:
 
 | AVD | Build |
 |---|---|
 | `Pixel7a_x86_64` | `./scripts/build_android.sh x86_64 debug` |
+| `PlayTablet7_x86_64` / `PlayTablet10_x86_64` | `./scripts/build_android.sh x86_64 debug` |
 | `Pixel7a_arm64` | `./scripts/build_android.sh arm64-v8a debug` (ARM host or translation only) |
 
 ### `scripts/clean_android_build.sh`
@@ -436,8 +458,9 @@ convert packaging/google-play/feature-graphic-zh.svg \
 
 Store listing copy (EN/RU app name, short description, full description,
 contact fields, category, and What’s new) is in
-`packaging/google-play/store-listing.md`. Phone screenshots are still needed;
-all listing artwork is separate from the APK/AAB.
+`packaging/google-play/store-listing.md`. Phone, 7-inch, and 10-inch
+screenshots used on the listing are in `packaging/google-play/screenshots/`
+(see that folder’s README). All listing artwork is separate from the APK/AAB.
 
 ---
 
@@ -548,9 +571,10 @@ separate Play listings with packages `.en`, `.ru`, `.de`.
 Console path: **Grow users → Store presence → Main store listing** for name
 and descriptions; **Store settings** for category, email, and website.
 
-Still missing from `packaging/google-play/` (not packaged in the APK/AAB):
-
-- At least 2 actual Android phone screenshots (prefer 4 portrait 1080×1920)
+Listing screenshots (uploaded): 6 phone (`screenshots/phone/`, `1080×2400`),
+6 seven-inch tablet (`screenshots/tablet7/`, `1200×1920`), and 6 ten-inch
+tablet (`screenshots/tablet10/`, `1600×2560`). Screen index:
+`packaging/google-play/screenshots/README.md`.
 
 Do not upload the desktop captures in `docs/screenshots/`.
 
@@ -583,6 +607,7 @@ documentation on **13 September 2026**.
 | Launcher icons | Legacy, round, and adaptive resources added; manifest wired |
 | Play Console icon | 512×512 RGBA PNG, 220 KB: `packaging/google-play/icon-512-zh.png` (Chinese copy of `icon-512.png`) |
 | Feature graphic | Upload-ready 1024×500 24-bit sRGB PNG with no alpha: `packaging/google-play/feature-graphic-zh.png`; editable SVG source is alongside it |
+| Store listing screenshots | 6 phone + 6 seven-inch + 6 ten-inch Android captures in `packaging/google-play/screenshots/` (uploaded to the Play listing) |
 | Store listing text | EN/RU app name, short description, full description, What’s new, contact, category, and alt text in `packaging/google-play/store-listing.md` |
 | Play Console account | Verified |
 | Open-source licences | Offline in-app notices and full texts added for Qt/LGPL, ALGLIB/GPL, SPTK and embedded components, Font Awesome/OFL, and LLVM OpenMP; source/relinking offer documented |
@@ -599,7 +624,6 @@ documentation on **13 September 2026**.
 | **Data safety** | Complete the form even if no data leaves the device. Declare the actual handling of microphone/voice recordings and keep it consistent with the app and [privacy policy](https://intontrainer.by/intontrainer2policy.html). Internal-only testing is exempt; closed, open, and production tracks are not. |
 | **App content declarations** | Complete Ads, App access, Target audience and content, and the IARC content-rating questionnaire. Declare no ads and unrestricted access only if that matches the release. Do not include children unless the app is intended to meet Families requirements. |
 | **Feature graphic** | Upload `packaging/google-play/feature-graphic-zh.png`. It is already 1024×500, 24-bit sRGB, and has no alpha. It is mandatory listing artwork and is not bundled in the app. |
-| **Phone screenshots** | Upload at least 2 actual Android screenshots: JPEG/24-bit PNG, 320–3840 px, with the long side no more than twice the short side. For stronger Play promotion eligibility, provide at least 4 portrait 1080×1920 screenshots. Do not use the desktop captures in `docs/screenshots/`. |
 | **16 KB runtime QA** | Static ELF/zip/AAB checks already pass. Before production, boot a 16 KB emulator image or a Pixel 8/9 with **Boot with 16KB page size**, confirm `adb shell getconf PAGE_SIZE` is `16384`, and run recording/playback. |
 | **Physical ARM64 QA** | Confirm microphone permission, recording/VAD, guided mode, packaged templates, record saving/deletion, offline behavior, and startup on a physical ARM64 device. |
 | **Closed testing, if applicable** | Personal accounts created after 13 November 2023 need at least 12 testers continuously opted in for 14 days, followed by a production-access application. Testers must remain engaged; opting out breaks continuity. |
