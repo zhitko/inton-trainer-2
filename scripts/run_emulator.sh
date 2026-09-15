@@ -6,6 +6,7 @@
 #   ./scripts/run_emulator.sh [avd_name]
 #   ./scripts/run_emulator.sh --tablet 7     # Play 7-inch tablet AVD (1200×1920)
 #   ./scripts/run_emulator.sh --tablet 10    # Play 10-inch tablet AVD (1600×2560)
+#   ./scripts/run_emulator.sh --gesture      # Pixel 7a with gesture navigation
 #   ./scripts/run_emulator.sh --screenshot [name]
 #   ./scripts/run_emulator.sh --logcat
 # =============================================================================
@@ -17,6 +18,7 @@ usage() {
 Usage:
   ./scripts/run_emulator.sh [avd_name]
   ./scripts/run_emulator.sh --tablet 7|10
+  ./scripts/run_emulator.sh --gesture
   ./scripts/run_emulator.sh --screenshot [name]
   ./scripts/run_emulator.sh --logcat
   ./scripts/run_emulator.sh --help
@@ -26,6 +28,11 @@ created on first use from the local x86_64 Google APIs system image:
 
   PlayTablet7_x86_64   Nexus 7 (2013), portrait 1200×1920
   PlayTablet10_x86_64  Nexus 10,       portrait 1600×2560
+
+--gesture creates and boots Pixel7a_gesture_x86_64 (Pixel 7a, 1080×2400)
+and switches the in-display navbar to gesture / edge-to-edge mode. Use this
+to reproduce Pixel 5a-style SafeArea overlap. Pixel7a_x86_64 stays on
+3-button navigation for Play phone screenshots.
 
 The app is portrait-locked; tablet screenshots are captured in portrait.
 
@@ -55,6 +62,10 @@ TABLET7_DEVICE="Nexus 7 2013"
 TABLET10_DEVICE="Nexus 10"
 TABLET7_WM_SIZE="1200x1920"
 TABLET10_WM_SIZE="1600x2560"
+
+GESTURE_AVD="${GESTURE_AVD:-Pixel7a_gesture_x86_64}"
+GESTURE_DEVICE="pixel_7a"
+GESTURE_WM_SIZE="1080x2400"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -154,7 +165,7 @@ patch_avd_config() {
     fi
 }
 
-ensure_tablet_avd() {
+ensure_avd() {
     local name="$1"
     local device="$2"
     local wm_size="$3"
@@ -184,7 +195,7 @@ ensure_tablet_avd() {
         exit 1
     fi
 
-    echo "Creating tablet AVD '$name' ($device, $wm_size) from $pkg ..."
+    echo "Creating AVD '$name' ($device, $wm_size) from $pkg ..."
     local create_log
     create_log="$(mktemp)"
     # "no" answers the optional custom hardware-profile prompt.
@@ -211,6 +222,37 @@ ensure_tablet_avd() {
         exit 1
     fi
     echo "Created AVD: $name"
+}
+
+ensure_tablet_avd() {
+    ensure_avd "$1" "$2" "$3"
+}
+
+# Gesture vs 3-button is a SystemUI overlay, not an AVD hardware property.
+# Pixel phones ship with gesture nav; Play screenshot AVDs stay on 3-button.
+enable_gesture_navigation() {
+    echo "Enabling gesture navigation (edge-to-edge system bars)..."
+    "$ADB_CMD" shell cmd overlay enable-exclusive --category android.internal.systemui.navbar \
+        com.android.internal.systemui.navbar.gestural >/dev/null 2>&1 || \
+    "$ADB_CMD" shell cmd overlay enable-exclusive \
+        com.android.internal.systemui.navbar.gestural >/dev/null 2>&1 || true
+    "$ADB_CMD" shell cmd overlay disable com.android.internal.systemui.navbar.threebutton >/dev/null 2>&1 || true
+    "$ADB_CMD" shell cmd overlay disable com.android.internal.systemui.navbar.twobutton >/dev/null 2>&1 || true
+    "$ADB_CMD" shell cmd overlay enable com.android.internal.systemui.navbar.gestural >/dev/null 2>&1 || true
+    "$ADB_CMD" shell settings put secure navigation_mode 2 >/dev/null 2>&1 || true
+
+    local mode
+    mode=$("$ADB_CMD" shell settings get secure navigation_mode 2>/dev/null || echo "?")
+    mode="${mode//[$'\r\n']/}"
+    echo "navigation_mode=${mode} (2 = gesture, 0 = 3-button)"
+}
+
+uses_gesture_nav() {
+    local name="${1:-}"
+    [[ "${WANT_GESTURE:-0}" -eq 1 ]] && return 0
+    [[ "$name" == "$GESTURE_AVD" ]] && return 0
+    [[ "$name" == *_gesture* ]] && return 0
+    return 1
 }
 
 kill_emulators() {
@@ -399,6 +441,7 @@ TABLET_WM_SIZE=""
 DO_SCREENSHOT=0
 SCREENSHOT_NAME=""
 LOGCAT_ONLY=0
+WANT_GESTURE=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -408,6 +451,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --logcat)
             LOGCAT_ONLY=1
+            shift
+            ;;
+        --gesture)
+            WANT_GESTURE=1
             shift
             ;;
         --tablet)
@@ -477,7 +524,7 @@ if [[ "$LOGCAT_ONLY" -eq 1 ]]; then
 fi
 
 # Screenshot-only against whatever is already running.
-if [[ "$DO_SCREENSHOT" -eq 1 && -z "$TABLET_SIZE" && -z "$SELECTED_AVD" ]]; then
+if [[ "$DO_SCREENSHOT" -eq 1 && -z "$TABLET_SIZE" && -z "$SELECTED_AVD" && "$WANT_GESTURE" -eq 0 ]]; then
     if [[ -z "$SCREENSHOT_NAME" ]]; then
         SCREENSHOT_NAME="shot-$(date +%Y%m%d-%H%M%S)"
     fi
@@ -487,6 +534,14 @@ fi
 
 if [[ -n "$TABLET_SIZE" && -n "$SELECTED_AVD" ]]; then
     echo "ERROR: pass either --tablet 7|10 or an AVD name, not both."
+    exit 1
+fi
+if [[ -n "$TABLET_SIZE" && "$WANT_GESTURE" -eq 1 ]]; then
+    echo "ERROR: pass either --tablet or --gesture, not both."
+    exit 1
+fi
+if [[ "$WANT_GESTURE" -eq 1 && -n "$SELECTED_AVD" && "$SELECTED_AVD" != "$GESTURE_AVD" ]]; then
+    echo "ERROR: --gesture uses $GESTURE_AVD; do not pass a different AVD name."
     exit 1
 fi
 
@@ -500,8 +555,16 @@ elif [[ "$TABLET_SIZE" == "10" ]]; then
     ensure_tablet_avd "$TABLET10_AVD" "$TABLET10_DEVICE" "$TABLET10_WM_SIZE"
 fi
 
-if [[ -n "$TABLET_SIZE" && "${BOOT_TIMEOUT_SEC}" -lt 180 ]]; then
-    # First boot of a new tablet AVD is slower than a phone snapshot.
+if [[ "$WANT_GESTURE" -eq 1 ]]; then
+    SELECTED_AVD="$GESTURE_AVD"
+fi
+if uses_gesture_nav "$SELECTED_AVD"; then
+    ensure_avd "$GESTURE_AVD" "$GESTURE_DEVICE" "$GESTURE_WM_SIZE"
+    SELECTED_AVD="$GESTURE_AVD"
+fi
+
+if [[ ( -n "$TABLET_SIZE" || "$WANT_GESTURE" -eq 1 ) && "${BOOT_TIMEOUT_SEC}" -lt 180 ]]; then
+    # First boot of a new tablet/gesture AVD is slower than a phone snapshot.
     BOOT_TIMEOUT_SEC=240
 fi
 
@@ -544,7 +607,7 @@ if [[ "$need_start" -eq 1 ]]; then
     readarray -t AVDS < <(list_avds)
     if [[ ${#AVDS[@]} -eq 0 ]]; then
         echo "ERROR: No Android Virtual Devices (AVDs) found."
-        echo "Create one in Android Studio, or use: ./scripts/run_emulator.sh --tablet 7"
+        echo "Create one in Android Studio, or use: ./scripts/run_emulator.sh --gesture"
         exit 1
     fi
 
@@ -572,6 +635,10 @@ pin_adb_serial
 
 if [[ -n "$TABLET_WM_SIZE" ]]; then
     apply_tablet_display "$TABLET_WM_SIZE"
+fi
+
+if uses_gesture_nav "${SELECTED_AVD:-}" || uses_gesture_nav "$(running_avd_name)"; then
+    enable_gesture_navigation
 fi
 
 # ---------------------------------------------------------------------------
@@ -613,6 +680,13 @@ if [[ -n "$TABLET_SIZE" ]]; then
     echo "  ./scripts/run_emulator.sh --screenshot home"
     echo "  ./scripts/run_emulator.sh --screenshot training"
     echo "Files go to packaging/google-play/screenshots/tablet${TABLET_SIZE}/"
+fi
+
+if uses_gesture_nav "${SELECTED_AVD:-}"; then
+    echo ""
+    echo "Gesture-nav AVD is ready ($GESTURE_AVD, $GESTURE_WM_SIZE)."
+    echo "Confirm a home-gesture pill at the bottom, not 3-button Back/Home/Recents."
+    echo "This is the SafeArea / edge-to-edge test device (Pixel 5a-style insets)."
 fi
 
 if [[ "$DO_SCREENSHOT" -eq 1 ]]; then

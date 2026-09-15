@@ -15,6 +15,24 @@ ApplicationWindow {
     visible: true
     title: qsTr("Inton Trainer")
 
+    // Android 15+ / gesture navigation draw the window under the system bars.
+    // Keep chrome edge-to-edge, but inset interactive content with SafeArea.
+    // Do not assign flags on desktop — that would replace the default decorations.
+    Binding on flags {
+        when: Qt.platform.os === "android"
+        value: Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
+    }
+    topPadding: 0
+    leftPadding: 0
+    rightPadding: 0
+    bottomPadding: 0
+
+    // SafeArea is in window pixels; scaledRoot works in design-space pixels.
+    readonly property real safeTop: SafeArea.margins.top / AppScale.factor
+    readonly property real safeBottom: SafeArea.margins.bottom / AppScale.factor
+    readonly property real safeLeft: SafeArea.margins.left / AppScale.factor
+    readonly property real safeRight: SafeArea.margins.right / AppScale.factor
+
     SettingsApi {
         id: settingsApi
         onThemeChanged: {
@@ -60,6 +78,8 @@ ApplicationWindow {
         Logger.info("Main window initialized");
         Logger.debug("Initial theme: " + window.theme);
         Logger.debug("Screen: " + AppScale.screenWidth + "x" + AppScale.screenHeight + "  scaleFactor: " + AppScale.factor.toFixed(3));
+        Logger.debug("SafeArea: top=" + window.safeTop + " bottom=" + window.safeBottom
+                     + " left=" + window.safeLeft + " right=" + window.safeRight);
     }
 
     Material.theme: window.theme
@@ -84,6 +104,9 @@ ApplicationWindow {
             width: parent.width
             contentHeight: AppScale.isCompact ? 56 : 64
             anchors.top: parent.top
+            topPadding: window.safeTop
+            leftPadding: window.safeLeft
+            rightPadding: window.safeRight
 
             background: Rectangle {
                 anchors.fill: parent
@@ -179,11 +202,19 @@ ApplicationWindow {
         }
 
         // ── Navigation Bar ─────────────────────────────
+        // Sit above the system inset (gesture pill or 3-button). Do not add
+        // SafeArea to height: that paints our bar behind a transparent 3-button
+        // nav and makes Home/Settings look like one oversized control.
         Rectangle {
             id: navigationBar
-            width: parent.width
-            height: AppScale.isCompact ? 68 : 80
+            readonly property int barContentHeight: AppScale.isCompact ? 68 : 80
+            height: barContentHeight
             anchors.bottom: parent.bottom
+            anchors.bottomMargin: window.safeBottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: window.safeLeft
+            anchors.rightMargin: window.safeRight
             color: Theme.surfaceContainer(Material.theme)
             visible: settingsApi.showNavigationMenu
 
@@ -335,8 +366,11 @@ ApplicationWindow {
             anchors {
                 top: toolbar.bottom
                 bottom: settingsApi.showNavigationMenu ? navigationBar.top : parent.bottom
+                bottomMargin: settingsApi.showNavigationMenu ? 0 : window.safeBottom
                 left: parent.left
                 right: parent.right
+                leftMargin: window.safeLeft
+                rightMargin: window.safeRight
             }
 
             initialItem: "pages/HomePage.qml"
@@ -358,6 +392,9 @@ ApplicationWindow {
 
         Flickable {
             anchors.fill: parent
+            anchors.topMargin: window.SafeArea.margins.top
+            anchors.bottomMargin: window.SafeArea.margins.bottom
+            anchors.leftMargin: window.SafeArea.margins.left
             contentHeight: (drawerLayout.implicitHeight + 24) * AppScale.factor
             clip: true
             ScrollBar.vertical: ScrollBar {}

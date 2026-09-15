@@ -69,7 +69,7 @@ Override any of these with environment variables; the values below are the scrip
 | Java | OpenJDK 17 (`$JAVA_HOME`, default `/usr/lib/jvm/java-17-openjdk-amd64`) |
 | Tools on `PATH` | `cmake`, `ninja`, `java` |
 | OpenMP | NDK `libomp.so` (imported as `AndroidOMP`) |
-| Local AVDs | `Pixel7a`, `Pixel7a_arm64`, `Pixel7a_x86_64`; tablet screenshots: `PlayTablet7_x86_64`, `PlayTablet10_x86_64` (created by `run_emulator.sh --tablet`) |
+| Local AVDs | `Pixel7a_x86_64` (3-button nav, Play phone shots); `Pixel7a_gesture_x86_64` (gesture nav / SafeArea, created by `run_emulator.sh --gesture`); tablet screenshots: `PlayTablet7_x86_64`, `PlayTablet10_x86_64` (created by `run_emulator.sh --tablet`) |
 
 Install the Android 36 platform if CMake/Gradle fails looking for it:
 
@@ -118,10 +118,11 @@ Build directory names follow the NDK ABI: `build_android_arm64-v8a`, `build_andr
 
 ```bash
 ./scripts/build_android.sh x86_64 debug
-./scripts/run_emulator.sh Pixel7a_x86_64
+./scripts/run_emulator.sh Pixel7a_x86_64          # 3-button nav (Play screenshots)
+./scripts/run_emulator.sh --gesture               # Pixel7a_gesture_x86_64, gesture nav
 ```
 
-An ARM64 AVD cannot run on an x86_64 host. Use `Pixel7a_x86_64` for local testing.
+An ARM64 AVD cannot run on an x86_64 host. Use `Pixel7a_x86_64` or `--gesture` for local testing. `--gesture` is the emulator stand-in for a physical Pixel with gesture navigation (the system bars overlay the app, which is what the SafeArea padding in `ui/Main.qml` is for).
 
 ---
 
@@ -169,6 +170,7 @@ Fails if any 64-bit `.so` has ELF `LOAD` alignment below `2**14`, if APK zip ali
 ./scripts/run_emulator.sh [avd_name]
 ./scripts/run_emulator.sh --tablet 7
 ./scripts/run_emulator.sh --tablet 10
+./scripts/run_emulator.sh --gesture
 ./scripts/run_emulator.sh --screenshot home
 ./scripts/run_emulator.sh --logcat
 ```
@@ -177,6 +179,7 @@ Fails if any 64-bit `.so` has ELF `LOAD` alignment below `2**14`, if APK zip ali
 |---|---|
 | AVD | Argument, or the first name from `emulator -list-avds` |
 | Tablets | `--tablet 7` / `--tablet 10` create and boot Play listing AVDs (`PlayTablet7_x86_64`, `PlayTablet10_x86_64`) if they do not exist, then force portrait `1200×1920` or `1600×2560` |
+| Gesture nav | `--gesture` creates and boots `Pixel7a_gesture_x86_64` (Pixel 7a, `1080×2400`) and switches SystemUI to gesture navigation (`navigation_mode=2`). `Pixel7a_x86_64` stays on 3-button nav for Play phone screenshots. |
 | Screenshots | `--screenshot [name]` writes a PNG under `packaging/google-play/screenshots/{phone,tablet7,tablet10}/` |
 | Pre-flight | Requires executable `emulator` and `adb` under `$ANDROID_SDK` |
 | Boot timeout | `BOOT_TIMEOUT_SEC` (default 120; tablet boots use 240 if the default is still in effect) |
@@ -208,6 +211,7 @@ The APK ABI must match the emulator ABI:
 | AVD | Build |
 |---|---|
 | `Pixel7a_x86_64` | `./scripts/build_android.sh x86_64 debug` |
+| `Pixel7a_gesture_x86_64` | `./scripts/build_android.sh x86_64 debug` (same APK; `--gesture` after boot) |
 | `PlayTablet7_x86_64` / `PlayTablet10_x86_64` | `./scripts/build_android.sh x86_64 debug` |
 | `Pixel7a_arm64` | `./scripts/build_android.sh arm64-v8a debug` (ARM host or translation only) |
 
