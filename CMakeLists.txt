@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
+# Play versionName / git tag. Bump with QT_ANDROID_VERSION_CODE for each
+# Play upload. See scripts/android_build_guide.md (Release versioning).
 project(inton-trainer-2 VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -264,7 +266,7 @@ if(ANDROID)
         QT_ANDROID_TARGET_SDK_VERSION 36
         QT_ANDROID_COMPILE_SDK_VERSION 36
         QT_ANDROID_MIN_SDK_VERSION 26
-        QT_ANDROID_VERSION_CODE 1
+        QT_ANDROID_VERSION_CODE 1  # increment on every Play AAB; must match the git tag table
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
         # App name shown on launcher. Include the trained language in
         # parentheses so later editions (English, Russian, …) stay distinct.

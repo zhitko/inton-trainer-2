@@ -10,6 +10,11 @@ Do not add rankings, prices, “free”/“discount”, “#1”/“best”, key
 emojis, or decorative symbols. Keep the default listing in English; add Russian
 as a translation.
 
+**What’s new** is written per Play upload / git tag (`MAJOR.MINOR.PATCH`).
+Keep an EN+RU block for each tag. The current internal-testing release is
+**1.0.0**. When a later tag is uploaded, add a new What’s new section and
+paste it into the Console release notes for that AAB.
+
 | Field | EN | RU |
 |---|---:|---:|
 | App name | 30 / 30 | 30 / 30 |

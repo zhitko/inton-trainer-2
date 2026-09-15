@@ -247,6 +247,8 @@ The script produces an APK and an Android App Bundle (`.aab`). Release AAB:
 
 See `scripts/android_build_guide.md` for signing, target SDK 36, and Play Console steps.
 
+Google Play uploads are built from annotated git tags (`MAJOR.MINOR.PATCH`, currently `1.0.0`). Increment `QT_ANDROID_VERSION_CODE` and create a new tag for every Play AAB.
+
 An emulator launch script is also available:
 
 ```bash

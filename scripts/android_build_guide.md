@@ -1,6 +1,56 @@
 # Android Build Guide — Intonation Trainer 2
 
-Package id: `by.intoncore.intontrainer2.zh` (Chinese edition). Native library: `libappinton-trainer-2_<abi>.so`. Version: **1.0.0** (`versionCode` 1). Later language apps use a different suffix (`.en`, `.ru`, `.de`, …) and a separate Play listing; the package id cannot be changed after the first upload.
+Package id: `by.intoncore.intontrainer2.zh` (Chinese edition). Native library: `libappinton-trainer-2_<abi>.so`. Later language apps use a different suffix (`.en`, `.ru`, `.de`, …) and a separate Play listing; the package id cannot be changed after the first upload.
+
+Every Google Play upload is built from a **git tag**. Current release: tag **`1.0.0`** (`versionName` `1.0.0`, `versionCode` 1, internal testing). See [Release versioning](#release-versioning-git-tags) below.
+
+## Release versioning (git tags)
+
+Play `versionName` and the in-app version come from [Semantic Versioning](https://semver.org/) `MAJOR.MINOR.PATCH`. The git tag is that same string, **without** a `v` prefix (the first Play upload is `1.0.0`).
+
+| Field | Source | Rule |
+|---|---|---|
+| Git tag | `git tag -a MAJOR.MINOR.PATCH` | One annotated tag per Play upload. Tags are immutable; never move `1.0.0`. |
+| `versionName` | `project(... VERSION ...)` in `CMakeLists.txt` (`PROJECT_VERSION`) | Must equal the git tag. |
+| `versionCode` | `QT_ANDROID_VERSION_CODE` in `CMakeLists.txt` | Integer. **Must increase** for every new AAB of this package. Independent of the semver numbers. |
+
+Bump meaning:
+
+- **PATCH** (`1.0.0` → `1.0.1`) — bug fixes, listing/packaging-only changes, a rebuild that still needs a new Play artifact.
+- **MINOR** (`1.0.0` → `1.1.0`) — new features that stay compatible.
+- **MAJOR** (`1.0.0` → `2.0.0`) — breaking changes for users or an incompatible data/format change.
+
+Default bump is **PATCH** unless the release notes call for minor or major. Every Play upload still increments `versionCode` by 1, even when `versionName` stays in the same MAJOR.MINOR line.
+
+### Releases uploaded to Play
+
+| Git tag | `versionName` | `versionCode` | Play track |
+|---|---|---|---|
+| `1.0.0` | `1.0.0` | 1 | Internal testing |
+
+### Next Play upload
+
+1. Choose the next semver (PATCH unless a MINOR/MAJOR is warranted).
+2. Update `CMakeLists.txt`: `project(inton-trainer-2 VERSION x.y.z)` and `QT_ANDROID_VERSION_CODE` (previous + 1).
+3. Record the row in the table above. Update the version line in this intro.
+4. Add English and Russian **What’s new** for that version in `packaging/google-play/store-listing.md`.
+5. Commit the version bump, then create an annotated tag on that commit:
+
+```bash
+git tag -a 1.0.1 -m "Play release 1.0.1 (versionCode 2)"
+```
+
+6. Build the signed AAB **from the tag**, not from a dirty working tree:
+
+```bash
+git checkout 1.0.1
+./scripts/build_android.sh arm64-v8a release
+```
+
+7. Upload `build_android_arm64-v8a/android-build/build/outputs/bundle/release/android-build-release.aab` to Play. Paste the matching What’s new from `store-listing.md`.
+8. Keep the tag (and a source archive of that tag) for as long as the binary is distributed — required for the ALGLIB/GPL source offer. See `licenses/THIRD_PARTY_NOTICES.md`.
+
+Do not upload an AAB that does not correspond to a tag. If the Console rejects an artifact, fix it, bump PATCH + `versionCode`, tag again, and upload the new AAB.
 
 ## Prerequisites
 
@@ -379,7 +429,7 @@ On Android, `CMakeLists.txt` copies `settings.ini` and `data/` into `android/ass
 - Required feature: `android.hardware.microphone`
 - Portrait only (`android:screenOrientation="portrait"`)
 - Min SDK 26, target / compile SDK 36
-- Version placeholders `%%INSERT_VERSION_CODE%%` / `%%INSERT_VERSION_NAME%%` (filled from CMake: code `1`, name `1.0.0`)
+- Version placeholders `%%INSERT_VERSION_CODE%%` / `%%INSERT_VERSION_NAME%%` (filled from CMake: `QT_ANDROID_VERSION_CODE` and `PROJECT_VERSION`). Those must match the git tag for the Play upload. Current tag `1.0.0` is code `1`, name `1.0.0`.
 - `<meta-data android:name="android.app.lib_name" android:value="appinton-trainer-2"/>` is set **manually**
 - Launcher icon: `@mipmap/ic_launcher`
 - Round launcher icon: `@mipmap/ic_launcher_round`
@@ -400,7 +450,7 @@ a future Qt upgrade changes AGP / Kotlin plugin versions, then re-apply the
 
 ### CMake target properties (`CMakeLists.txt`)
 
-`QT_ANDROID_PACKAGE_SOURCE_DIR`, target/compile SDK **36**, min SDK 26, package `by.intoncore.intontrainer2.zh`, version `1.0.0`, `QT_ANDROID_LEGACY_PACKAGING FALSE`. Native link flags `-Wl,-z,max-page-size=16384` / `-Wl,-z,common-page-size=16384` and CMake `-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON` for Play’s 16 KB page-size requirement. Android Release compiles with `-g` so AGP can extract FULL native symbols.
+`QT_ANDROID_PACKAGE_SOURCE_DIR`, target/compile SDK **36**, min SDK 26, package `by.intoncore.intontrainer2.zh`, `QT_ANDROID_VERSION_NAME` from `PROJECT_VERSION` (git tag), `QT_ANDROID_VERSION_CODE` incremented per Play upload, `QT_ANDROID_LEGACY_PACKAGING FALSE`. Native link flags `-Wl,-z,max-page-size=16384` / `-Wl,-z,common-page-size=16384` and CMake `-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON` for Play’s 16 KB page-size requirement. Android Release compiles with `-g` so AGP can extract FULL native symbols.
 
 OpenMP: desktop uses `find_package(OpenMP)`; Android locates NDK `libomp` and links the `AndroidOMP` imported target. alglib `kernels_avx2.cpp` / `kernels_fma.cpp` / `kernels_sse2.cpp` are omitted on Android.
 
@@ -507,8 +557,9 @@ executable is subject to the GNU GPL; do not describe the Play binary as
 MIT-only. `licenses/THIRD_PARTY_NOTICES.md` is the authoritative component
 index and source/relinking offer.
 
-Before publishing each release, tag the exact source used for the binary and
-make a source archive available from the repository. It must retain the
+Before publishing each release, create the annotated git tag for that Play
+upload (see [Release versioning](#release-versioning-git-tags)) and keep a
+source archive of that tag available from the repository. It must retain the
 application source, CMake/build scripts, and the matching ALGLIB and SPTK
 sources (or durable, unambiguous access to those exact upstream sources).
 
@@ -561,7 +612,7 @@ separate Play listings with packages `.en`, `.ru`, `.de`.
 | App name | Intonation Trainer 2 (Chinese) | Тренер интонации 2 (китайский) | 30 |
 | Short description | Practice Chinese tones with on-device pitch comparison and visual feedback | Тренируйте китайские тоны, сравнивая мелодику с эталоном на устройстве | 80 |
 | Full description | in `store-listing.md` | in `store-listing.md` | 4,000 |
-| What’s new (1.0.0) | in `store-listing.md` | in `store-listing.md` | 500 |
+| What’s new (per git tag) | in `store-listing.md` | in `store-listing.md` | 500 |
 | Email | zhitko.vladimir@gmail.com | same | — |
 | Website | https://intontrainer.by/ | same | — |
 | Privacy policy | https://intontrainer.by/intontrainer2policy.html | same | — |
@@ -594,7 +645,7 @@ documentation on **13 September 2026**.
 | alglib x86 kernels excluded on Android | Done |
 | `android.app.lib_name` meta-data | Done |
 | Target / compile SDK 36 | Complies with the API 36 requirement for new apps and updates since 31 August 2026 |
-| Version 1.0.0 / `versionCode` 1 | Set |
+| Version 1.0.0 / `versionCode` 1 | First internal-testing upload; git tag `1.0.0` |
 | Storage / media permissions removed | `RECORD_AUDIO` only; Qt `INTERNET` stripped |
 | 16 KB page-size compatibility | ELF `LOAD` `2**14` on all packaged 64-bit `.so` (app, Qt 6.11.1, FFmpeg, `libc++_shared`); uncompressed JNI libs (`extractNativeLibs=false`); APK `zipalign -c -P 16`; AAB `PAGE_ALIGNMENT_16K` `enabled=1`. `build_android.sh` runs `scripts/check_16kb_alignment.sh`. Verified 13 September 2026 on arm64-v8a release artifacts. |
 | Android App Bundle | `build_android.sh` produces the AAB required for new Play apps |
@@ -615,12 +666,15 @@ documentation on **13 September 2026**.
 | Privacy policy in the app | Offline EN/RU markdown via `PrivacyPolicyPage.qml`; side-menu item next to User Guide / Open-source licences |
 | Native debug symbols | Release AAB embeds FULL native symbols (`android/build.gradle` `ndk.debugSymbolLevel = 'FULL'`, Android Release `-g`). `build_android.sh` checks `BUNDLE-METADATA/com.android.tools.build.debugsymbols`. Play extracts them from the AAB; confirm in App Bundle Explorer after the first upload |
 
-### Required before the first Play release
+### Remaining Play Console work
+
+Internal testing is live on git tag `1.0.0`. The items below are still needed
+before closed testing or production, and on every later tagged upload.
 
 | Item | What to do |
 |---|---|
 | **Upload key and Play App Signing** | Generate and back up the upload keystore, build a signed release AAB, and upload it. New apps are automatically enrolled in Play App Signing; keep the upload key separate and enable 2-Step Verification for Console users. |
-| **Release identity** | Confirm package `by.intoncore.intontrainer2.zh` before the first upload. Increment `versionCode` for every later upload of this Chinese app. English/Russian/… editions need new packages (`.en`, `.ru`, …) and new Play listings; a package name cannot be changed after publishing. |
+| **Release identity** | Package `by.intoncore.intontrainer2.zh` is set. Further uploads of this Chinese app use a new git tag (`MAJOR.MINOR.PATCH`) and a higher `versionCode`. English/Russian/… editions need new packages (`.en`, `.ru`, …) and new Play listings; a package name cannot be changed after publishing. |
 | **Data safety** | Complete the form even if no data leaves the device. Declare the actual handling of microphone/voice recordings and keep it consistent with the app and [privacy policy](https://intontrainer.by/intontrainer2policy.html). Internal-only testing is exempt; closed, open, and production tracks are not. |
 | **App content declarations** | Complete Ads, App access, Target audience and content, and the IARC content-rating questionnaire. Declare no ads and unrestricted access only if that matches the release. Do not include children unless the app is intended to meet Families requirements. |
 | **Feature graphic** | Upload `packaging/google-play/feature-graphic-zh.png`. It is already 1024×500, 24-bit sRGB, and has no alpha. It is mandatory listing artwork and is not bundled in the app. |
@@ -628,7 +682,7 @@ documentation on **13 September 2026**.
 | **Physical ARM64 QA** | Confirm microphone permission, recording/VAD, guided mode, packaged templates, record saving/deletion, offline behavior, and startup on a physical ARM64 device. |
 | **Closed testing, if applicable** | Personal accounts created after 13 November 2023 need at least 12 testers continuously opted in for 14 days, followed by a production-access application. Testers must remain engaged; opting out breaks continuity. |
 | **Developer verification** | Check Play Console account identity and package registration. Enforcement begins 30 September 2026 for participating stores in Brazil, Indonesia, Singapore, and Thailand, then expands globally in 2027; most existing verified Play developers need no extra identity action. |
-| **Release source archive** | Publish and retain the exact source tag/archive corresponding to the uploaded binary. Include the build scripts and matching ALGLIB/SPTK sources or durable access to those exact sources; verify every packaged native library against the in-app notices. |
+| **Release source archive** | Build each Play AAB from its annotated git tag. Retain that tag/archive for as long as the binary is distributed. Include the build scripts and matching ALGLIB/SPTK sources or durable access to those exact sources; verify every packaged native library against the in-app notices. |
 | **Portrait-only decision** | Keep `screenOrientation="portrait"` only if this is intentional and phone QA confirms all content remains usable. |
 
 ### Official references

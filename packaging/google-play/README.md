@@ -35,4 +35,12 @@ Later editions copy the master, for example `icon-512-en.png`.
 8. Paste the privacy-policy URL in **App content** / **Data safety**:
    https://intontrainer.by/intontrainer2policy.html
 
+## Release tags
+
+Every Play AAB is built from an annotated git tag (`MAJOR.MINOR.PATCH`, no
+`v` prefix). The first internal-testing upload is tag **`1.0.0`**
+(`versionCode` 1). Add a **What’s new** block for that tag in
+`store-listing.md` before uploading. Full procedure:
+`scripts/android_build_guide.md` (Release versioning).
+
 See `scripts/android_build_guide.md` for the rest of the Play readiness checklist.

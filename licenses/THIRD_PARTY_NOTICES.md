@@ -92,9 +92,11 @@ https://github.com/androidx/androidx
 
 ## Source availability
 
-Keep the source repository and the exact source tag used for every published
-binary available for at least as long as that binary is distributed. A release
-source archive must include the application source and build scripts, plus the
+Keep the source repository and the exact annotated git tag used for every
+published binary available for at least as long as that binary is distributed.
+Play uploads use Semantic Versioning tags (`MAJOR.MINOR.PATCH`, no `v`
+prefix; the first internal-testing release is `1.0.0`). A release source
+archive must include the application source and build scripts, plus the
 matching ALGLIB and SPTK source trees or unambiguous access to those exact
 sources. Requests concerning source or relinking may also be filed through the
 repository's issue tracker.
