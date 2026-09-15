@@ -22,13 +22,13 @@ Item {
         }
     }
 
-    onProgressChanged: {
-        canvas.requestPaint();
-    }
-
-    onAnimatedProgressChanged: {
-        canvas.requestPaint();
-    }
+    onProgressChanged: canvas.requestPaint()
+    onAnimatedProgressChanged: canvas.requestPaint()
+    onWidthChanged: canvas.requestPaint()
+    onHeightChanged: canvas.requestPaint()
+    onLineWidthChanged: canvas.requestPaint()
+    onColorChanged: canvas.requestPaint()
+    onBackgroundColorChanged: canvas.requestPaint()
 
     Canvas {
         id: canvas

@@ -29,7 +29,8 @@ QtObject {
     // ── Breakpoints (phone / tablet / desktop) ──────────────────────────────
     readonly property int compactWidth: 400
     readonly property int narrowWidth: 520
-    readonly property int shortHeight: 640
+    // Typical phone StackView height with toolbar + bottom nav is ~620–700.
+    readonly property int shortHeight: 720
 
     readonly property bool isCompact: viewWidth < compactWidth
     readonly property bool isNarrow: viewWidth < narrowWidth

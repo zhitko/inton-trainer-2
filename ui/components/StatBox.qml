@@ -29,34 +29,48 @@ Rectangle {
     }
 
     ColumnLayout {
-        anchors.centerIn: parent
-        spacing: 4
+        anchors.fill: parent
+        anchors.leftMargin: 6
+        anchors.rightMargin: 6
+        anchors.topMargin: 8
+        anchors.bottomMargin: 8
+        spacing: 2
 
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: root.icon
             font.family: Icons.familySolid
             font.weight: Font.Black
-            font.pixelSize: AppScale.fs(22)
+            font.pixelSize: AppScale.fs(root.height < 90 ? 18 : 22)
             color: Theme.primary(Material.theme)
         }
 
         Text {
             Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            Layout.maximumWidth: root.width - 12
             text: root.title
             font.pixelSize: AppScale.fs(12)
+            fontSizeMode: Text.Fit
+            minimumPixelSize: 8
             color: Theme.onSecondaryContainer(Material.theme)
             wrapMode: Text.WordWrap
+            maximumLineCount: 2
+            elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
-            Layout.maximumWidth: root.width - 16
         }
 
         Text {
             Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
             text: root.value
-            font.pixelSize: AppScale.fs(16)
+            font.pixelSize: AppScale.fs(root.height < 90 ? 14 : 16)
+            fontSizeMode: Text.Fit
+            minimumPixelSize: 10
             font.weight: 600
             color: Theme.onSurface(Material.theme)
+            horizontalAlignment: Text.AlignHCenter
+            elide: Text.ElideRight
         }
     }
 }

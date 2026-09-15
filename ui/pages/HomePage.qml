@@ -11,21 +11,22 @@ import "../utils"
 Page {
     id: root
     title: " "
+    padding: 0
 
     readonly property var settingsApi: ApplicationWindow.window ? ApplicationWindow.window.settingsApi : null
+    readonly property bool compactHome: AppScale.isCompact
+    readonly property bool shortHome: AppScale.isShort
 
     StatisticsApi {
         id: statisticsApi
     }
 
     Component.onCompleted: {
-        // Force update of the UI by re-evaluating bindings
         updateStatistics();
     }
 
     onVisibleChanged: {
         if (visible) {
-            // Reload statistics when page becomes visible (e.g., when going back)
             updateStatistics();
         }
     }
@@ -36,7 +37,6 @@ Page {
         totalResultsBox.value = Math.round(stats.wellTrainedFiles);
         filesCountBox.value = Math.round(stats.processedFiles) + " / " + Math.round(stats.totalFiles);
 
-        // Update overall progress circle with completeness
         overallProgressCircle.progress = stats.completeness / 100;
         overallProgressText.text = Math.round(stats.completeness) + "%";
     }
@@ -52,63 +52,42 @@ Page {
 
         ColumnLayout {
             width: Math.max(0, scrollView.availableWidth - AppScale.pagePadding * 2)
+            height: Math.max(implicitHeight, scrollView.availableHeight)
             x: AppScale.pagePadding
-            spacing: AppScale.pageSpacing
+            spacing: root.shortHome ? 8 : AppScale.pageSpacing
 
             ColumnLayout {
+                Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
-                Layout.bottomMargin: AppScale.isCompact ? 12 : 26
-                spacing: AppScale.isCompact ? 10 : 14
+                Layout.topMargin: root.shortHome ? 4 : (root.compactHome ? 8 : 16)
+                spacing: root.shortHome ? 4 : 8
 
-                // Full-bleed hero: neutral surface; wave styled via MultiEffect (clarity, no tinted bg)
-                Rectangle {
-                    id: heroBanner
+                Label {
+                    Layout.alignment: Qt.AlignHCenter
                     Layout.fillWidth: true
-                    Layout.leftMargin: -AppScale.pagePadding
-                    Layout.rightMargin: -AppScale.pagePadding
-                    Layout.preferredHeight: titleColumn.implicitHeight + (AppScale.isCompact ? 28 : 48)
-                    topLeftRadius: 0
-                    topRightRadius: 0
-                    bottomLeftRadius: Theme.shapeLarge
-                    bottomRightRadius: Theme.shapeLarge
-                    clip: true
-                    color: Theme.surface(Material.theme)
-
-                    ColumnLayout {
-                        id: titleColumn
-                        anchors.centerIn: parent
-                        width: parent.width - 32
-                        spacing: 8
-
-                        Label {
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.fillWidth: true
-                            Layout.topMargin: 10
-                            horizontalAlignment: Text.AlignHCenter
-                            wrapMode: Text.Wrap
-                            text: qsTr("Inton@Trainer 2.0")
-                            font.weight: Font.Bold
-                            font.pixelSize: AppScale.fs(AppScale.isCompact ? 24 : 30)
-                            color: Theme.onSurface(Material.theme)
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.fillWidth: true
-                            horizontalAlignment: Text.AlignHCenter
-                            wrapMode: Text.Wrap
-                            text: qsTr("Master Your Intonation")
-                            font.pixelSize: AppScale.fs(17)
-                            font.weight: Font.Medium
-                            color: Theme.onSurfaceVariant(Material.theme)
-                            opacity: 0.95
-                        }
-                    }
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    text: qsTr("Inton@Trainer 2.0")
+                    font.weight: Font.Bold
+                    font.pixelSize: AppScale.fs(root.compactHome ? 24 : 30)
+                    color: Theme.onSurface(Material.theme)
                 }
 
-                // MD3 Chip component for language selection
+                Label {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    text: qsTr("Master Your Intonation")
+                    font.pixelSize: AppScale.fs(root.shortHome ? 15 : 17)
+                    font.weight: Font.Medium
+                    color: Theme.onSurfaceVariant(Material.theme)
+                    opacity: 0.95
+                }
+
                 Chip {
                     Layout.alignment: Qt.AlignHCenter
+                    Layout.topMargin: root.shortHome ? 4 : 8
                     text: settingsApi ? settingsApi.languageTitle : ""
                     selected: true
                     icon: Icons.faGlobe
@@ -116,18 +95,27 @@ Page {
                 }
             }
 
-            // 2. Center Action Button with Waveform Visuals
             Item {
+                id: startSlot
                 Layout.fillWidth: true
-                Layout.preferredHeight: AppScale.isCompact ? 140 : 160
+                Layout.fillHeight: true
+                Layout.minimumHeight: root.compactHome ? 112 : 140
+                Layout.preferredHeight: root.compactHome ? 168 : 200
+                Layout.maximumHeight: 260
+                clip: true
 
-                // Wave image rendered behind the button
                 Image {
                     id: waveImage
-                    anchors.fill: parent
                     visible: false
+                    anchors.centerIn: parent
+                    // Bitmap is 628×100. Never stretch taller (or wider) than native
+                    // size — vertical fill was what made it look fuzzy.
+                    readonly property real nativeW: implicitWidth > 0 ? implicitWidth : 628
+                    readonly property real nativeH: implicitHeight > 0 ? implicitHeight : 100
+                    width: Math.min(parent.width, nativeW)
+                    height: width * nativeH / nativeW
                     source: "qrc:/qt/qml/inton-trainer-2/res/images/wave.png"
-                    fillMode: Image.PreserveAspectCrop
+                    fillMode: Image.PreserveAspectFit
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
                     asynchronous: true
@@ -136,7 +124,7 @@ Page {
                 }
 
                 MultiEffect {
-                    anchors.fill: parent
+                    anchors.fill: waveImage
                     source: waveImage
                     opacity: Material.theme === Material.Dark ? 0.55 : 0.45
                     contrast: 0.38
@@ -146,10 +134,8 @@ Page {
                 }
 
                 StartTrainingButton {
-                    anchors.centerIn: parent
+                    anchors.fill: parent
                     text: qsTr("Start Training")
-                    // If auto‑calibration is enabled, run the VAD calibration dialog first;
-                    // otherwise navigate directly to the template categories page.
                     onClicked: {
                         if (window.settingsApi && window.settingsApi.autoCalibrate) {
                             homeVadCalibrationDialog.open();
@@ -159,37 +145,34 @@ Page {
                     }
                 }
 
-                // VAD calibration dialog – runs before entering training flow
                 VadCalibrationDialog {
                     id: homeVadCalibrationDialog
                     onCalibrationDoneEnergy: function(threshold) {
                         if (window.settingsApi) {
                             window.settingsApi.vadThreshold = threshold;
                         }
-                        // After successful calibration, navigate to the template categories page
                         stackView.push("TemplateCategoriesPage.qml");
                     }
                     onCalibrationDoneAutocorrelation: function(threshold) {
                         if (window.settingsApi) {
                             window.settingsApi.autoCorrThreshold = threshold;
                         }
-                        // After successful calibration, navigate to the template categories page
                         stackView.push("TemplateCategoriesPage.qml");
                     }
                 }
             }
 
-            // 3. Stats Row
             RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: AppScale.isCompact ? 96 : 110
-                Layout.topMargin: AppScale.isCompact ? 12 : 26
-                spacing: AppScale.isCompact ? 8 : 12
+                Layout.preferredHeight: root.compactHome ? 88 : 110
+                Layout.maximumHeight: 120
+                spacing: root.compactHome ? 8 : 12
 
                 StatBox {
                     id: avgAccuracyBox
                     Layout.fillWidth: true
-                    Layout.preferredHeight: AppScale.isCompact ? 96 : 110
+                    Layout.fillHeight: true
+                    Layout.minimumWidth: 0
                     icon: Icons.faChartLine
                     title: qsTr("Avg Accuracy:")
                 }
@@ -197,7 +180,8 @@ Page {
                 StatBox {
                     id: totalResultsBox
                     Layout.fillWidth: true
-                    Layout.preferredHeight: AppScale.isCompact ? 96 : 110
+                    Layout.fillHeight: true
+                    Layout.minimumWidth: 0
                     icon: Icons.faTrophy
                     title: qsTr("Mastered Files:")
                 }
@@ -205,42 +189,46 @@ Page {
                 StatBox {
                     id: filesCountBox
                     Layout.fillWidth: true
-                    Layout.preferredHeight: AppScale.isCompact ? 96 : 110
+                    Layout.fillHeight: true
+                    Layout.minimumWidth: 0
                     icon: Icons.faFolderOpen
                     title: qsTr("Files Trained:")
                 }
             }
 
-            // 4. Overall Progress
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: AppScale.isShort || AppScale.isCompact ? 140 : 180
+                Layout.fillHeight: true
+                Layout.minimumHeight: root.compactHome ? 96 : 120
+                Layout.preferredHeight: root.compactHome ? 132 : 180
+                Layout.maximumHeight: 220
                 Layout.bottomMargin: AppScale.pagePadding
 
                 CircularProgress {
                     id: overallProgressCircle
+                    readonly property real ringSize: Math.min(parent.height, parent.width * 0.42, 200)
                     anchors.centerIn: parent
-                    height: parent.height * 0.95
-                    width: height
-                    lineWidth: 14
+                    width: ringSize
+                    height: ringSize
+                    lineWidth: Math.max(8, Math.round(ringSize * 0.08))
                     progress: 0.85
                     color: Theme.primary(Material.theme)
                     backgroundColor: Theme.surfaceContainerHighest(Material.theme)
 
-                    // Text inside
                     Column {
                         anchors.centerIn: parent
+                        spacing: 2
 
                         Text {
                             text: qsTr("Completion")
-                            font.pixelSize: AppScale.fs(14)
+                            font.pixelSize: AppScale.fs(overallProgressCircle.ringSize < 130 ? 12 : 14)
                             color: Theme.onSurfaceVariant(Material.theme)
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text {
                             id: overallProgressText
                             text: "85%"
-                            font.pixelSize: AppScale.fs(36)
+                            font.pixelSize: AppScale.fs(overallProgressCircle.ringSize < 130 ? 28 : 36)
                             font.bold: true
                             color: Theme.onSurface(Material.theme)
                             anchors.horizontalCenter: parent.horizontalCenter
