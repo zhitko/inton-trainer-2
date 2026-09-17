@@ -44,15 +44,22 @@ if [[ -n "${ANDROID_KEYSTORE_PASSWORD:-}" ]]; then
     export QT_ANDROID_KEYSTORE_KEY_PASS="${QT_ANDROID_KEYSTORE_KEY_PASS:-$ANDROID_KEYSTORE_PASSWORD}"
 fi
 
-SIGN_CMAKE_ARGS=()
+# Always pass ON/OFF so a previous CMake cache cannot leave --sign enabled
+# without a keystore (androiddeployqt then fails: "signing path and alias
+# values are not specified").
 if [[ -n "${QT_ANDROID_KEYSTORE_PATH:-}" ]]; then
     if [[ ! -f "$QT_ANDROID_KEYSTORE_PATH" ]]; then
         echo "ERROR: keystore not found: $QT_ANDROID_KEYSTORE_PATH"
         exit 1
     fi
+    if [[ -z "${QT_ANDROID_KEYSTORE_ALIAS:-}" ]]; then
+        echo "ERROR: QT_ANDROID_KEYSTORE_ALIAS is required when signing is enabled"
+        exit 1
+    fi
     SIGN_CMAKE_ARGS=(-DQT_ANDROID_SIGN_AAB=ON -DQT_ANDROID_SIGN_APK=ON)
     echo "Signing: enabled ($QT_ANDROID_KEYSTORE_PATH)"
 else
+    SIGN_CMAKE_ARGS=(-DQT_ANDROID_SIGN_AAB=OFF -DQT_ANDROID_SIGN_APK=OFF)
     echo "Signing: disabled (set QT_ANDROID_KEYSTORE_PATH for a Play-uploadable AAB)"
 fi
 

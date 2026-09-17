@@ -16,6 +16,7 @@ import "../utils"
 
 Page {
     id: root
+    padding: 0
 
     readonly property bool isTrainingPage: true
 
@@ -130,16 +131,16 @@ Page {
     readonly property bool isShort: AppScale.isShort
     readonly property int pagePadding: AppScale.pagePadding
     readonly property int sideSlotMinWidth: isCompact ? 56 : 72
+    // Status + hint + playback dot must stay above the nav on every phone.
+    readonly property int controlFooterMinHeight: isCompact ? (isShort ? 100 : 112) : 140
     readonly property int graphMinHeight: {
-        if (isShort && isCompact)
-            return 160;
-        if (isShort)
-            return 200;
-        if (isCompact)
-            return 220;
-        if (isNarrow)
-            return 260;
-        return 360;
+        const card = isCompact ? 56 : 80
+        const gaps = (isCompact ? 10 : 16) * 2 + pagePadding * 2
+        const floor = (isShort && isCompact) ? 120 : (isShort ? 160 : (isCompact ? 180 : (isNarrow ? 220 : 280)))
+        const available = scrollView.availableHeight
+        if (available > 0)
+            return Math.max(100, Math.min(floor, available - card - controlFooterMinHeight - gaps))
+        return floor
     }
 
     onTrainingModeChanged: {
@@ -998,11 +999,14 @@ Page {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
+                Layout.minimumHeight: root.controlFooterMinHeight
+                Layout.bottomMargin: root.pagePadding
                 spacing: root.isCompact ? 4 : 8
 
                 Item {
                     id: leftSlot
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     Layout.preferredWidth: 120
                     Layout.minimumWidth: root.sideSlotMinWidth
                     implicitHeight: Math.max(
@@ -1029,10 +1033,11 @@ Page {
                     id: centerControls
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     Layout.preferredWidth: 200
                     Layout.minimumWidth: 96
                     Layout.maximumWidth: root.isNarrow ? 100000 : 280
-                    spacing: root.isCompact ? 4 : 8
+                    spacing: root.isShort ? 2 : (root.isCompact ? 4 : 8)
                     visible: window.settingsApi ? window.settingsApi.autoStopRecording : false
 
                     // ── Recording indicator with waveform bars ─────────────────
@@ -1041,7 +1046,8 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
                         Layout.fillWidth: true
                         Layout.preferredHeight: (trainingAudioApi.isRecording || isAnyPlaybackActive)
-                                                ? (root.isCompact ? 48 : 64) : 0
+                                                ? (root.isCompact ? (root.isShort ? 40 : 48) : 64) : 0
+                        implicitHeight: Layout.preferredHeight
                         opacity: (trainingAudioApi.isRecording || isAnyPlaybackActive) ? 1.0 : 0.0
                         clip: true
 
@@ -1102,7 +1108,7 @@ Page {
                                     property real lvl: micLevelIndicator.levelHistory[micLevelIndicator.barCount - 1 - index] || 0
                                     property real logLvl: Math.log1p(lvl * 3) / Math.log1p(3)
                                     width: 2 + Math.pow(lvl, 1.8) * 3
-                                    height: Math.max(3, logLvl * (root.isCompact ? 48 : 64))
+                                    height: Math.max(3, logLvl * (root.isCompact ? (root.isShort ? 36 : 48) : 64))
                                     radius: width / 2
                                     color: micLevelIndicator.activeColor
                                     opacity: 0.25 + 0.75 * logLvl
@@ -1119,7 +1125,7 @@ Page {
                         Rectangle {
                             id: centerDot
                             anchors.centerIn: parent
-                            width: root.isCompact ? 44 : 56
+                            width: root.isCompact ? (root.isShort ? 36 : 44) : 56
                             height: width
                             radius: width / 2
                             color: micLevelIndicator.activeColor
@@ -1144,7 +1150,7 @@ Page {
                                     property real lvl: micLevelIndicator.levelHistory[micLevelIndicator.barCount - 1 - index] || 0
                                     property real logLvl: Math.log1p(lvl * 9) / Math.log1p(9)
                                     width: 3
-                                    height: Math.max(3, logLvl * (root.isCompact ? 44 : 58))
+                                    height: Math.max(3, logLvl * (root.isCompact ? (root.isShort ? 32 : 44) : 58))
                                     radius: 1.5
                                     color: micLevelIndicator.activeColor
                                     opacity: 0.25 + 0.75 * logLvl
@@ -1159,8 +1165,10 @@ Page {
                     }
 
                     Text {
+                        id: statusLabel
                         Layout.alignment: Qt.AlignHCenter
                         Layout.fillWidth: true
+                        Layout.preferredHeight: visible ? implicitHeight : 0
                         visible: !(root.trainingMode === 1 && root.guidedState === root.gsIdle) || isAnyPlaybackActive
                         text: {
                             if (root._isVadPaused) return qsTr("Paused");
@@ -1176,10 +1184,12 @@ Page {
                             return isAnyPlaybackActive ? qsTr("Playing...") :
                                    (trainingAudioApi.isRecording ? qsTr("Listening...") : qsTr("Processing..."));
                         }
-                        font.pixelSize: AppScale.fs(root.isCompact ? 18 : 26)
+                        font.pixelSize: AppScale.fs(root.isCompact ? (root.isShort ? 16 : 18) : 26)
                         font.weight: 600
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
+                        maximumLineCount: 2
+                        elide: Text.ElideRight
                         color: {
                             if (root._isVadPaused) return Theme.error(root.Material.theme);
                             if (root.trainingMode === 1) {
@@ -1197,7 +1207,7 @@ Page {
                     Item {
                         id: guidedPlayBtn
                         Layout.alignment: Qt.AlignHCenter
-                        readonly property int btnSize: root.isCompact ? 72 : 84
+                        readonly property int btnSize: root.isCompact ? (root.isShort ? 56 : 72) : 84
                         Layout.preferredWidth: btnSize
                         Layout.preferredHeight: btnSize
                         Layout.minimumWidth: btnSize
@@ -1244,9 +1254,13 @@ Page {
                     }
 
                     Text {
+                        id: hintLabel
                         Layout.alignment: Qt.AlignHCenter
                         Layout.fillWidth: true
-                        opacity: (root._isVadPaused || isAnyPlaybackActive || (root.trainingMode === 1 && root.guidedState === root.gsIdle)) ? 0.6 : 0.0
+                        Layout.preferredHeight: visible ? implicitHeight : 0
+                        Layout.bottomMargin: 2
+                        visible: hintLabel.text.length > 0
+                        opacity: 0.7
                         text: {
                             if (root._isVadPaused) return qsTr("Press Continue to continue recording.");
                             if (isAnyPlaybackActive) return qsTr("Listen carefully");
@@ -1257,10 +1271,12 @@ Page {
                             }
                             return "";
                         }
-                        font.pixelSize: AppScale.fs(root.isCompact ? 12 : 14)
+                        font.pixelSize: AppScale.fs(root.isCompact ? (root.isShort ? 11 : 12) : 14)
                         color: Theme.onSurface(root.Material.theme)
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
+                        maximumLineCount: 2
+                        elide: Text.ElideRight
                     }
                 }
 
@@ -1279,6 +1295,7 @@ Page {
                 Item {
                     id: rightSlot
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     Layout.preferredWidth: 120
                     Layout.minimumWidth: root.sideSlotMinWidth
                     implicitHeight: playUserBtn.implicitHeight
