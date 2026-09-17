@@ -180,7 +180,7 @@ Fails if any 64-bit `.so` has ELF `LOAD` alignment below `2**14`, if APK zip ali
 | AVD | Argument, or the first name from `emulator -list-avds` |
 | Tablets | `--tablet 7` / `--tablet 10` create and boot Play listing AVDs (`PlayTablet7_x86_64`, `PlayTablet10_x86_64`) if they do not exist, then force portrait `1200×1920` or `1600×2560` |
 | Gesture nav | `--gesture` creates and boots `Pixel7a_gesture_x86_64` (Pixel 7a, `1080×2400`) and switches SystemUI to gesture navigation (`navigation_mode=2`). `Pixel7a_x86_64` stays on 3-button nav for Play phone screenshots. |
-| Screenshots | `--screenshot [name]` writes a PNG under `packaging/google-play/screenshots/{phone,tablet7,tablet10}/` |
+| Screenshots | `--screenshot [name]` writes a PNG under `packaging/google-play/screenshots/{phone,tablet7,tablet10}/` (`home` → `1_home.png`, …) |
 | Pre-flight | Requires executable `emulator` and `adb` under `$ANDROID_SDK` |
 | Boot timeout | `BOOT_TIMEOUT_SEC` (default 120; tablet boots use 240 if the default is still in effect) |
 | Emulator log | `$BUILD_DIR/emulator.log` (dumped if the emulator process dies) |

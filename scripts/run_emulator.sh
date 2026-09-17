@@ -40,7 +40,13 @@ After a tablet is running, navigate to a screen and capture a PNG under
 packaging/google-play/screenshots/{phone,tablet7,tablet10}/:
 
   ./scripts/run_emulator.sh --screenshot home
+  ./scripts/run_emulator.sh --screenshot categories
+  ./scripts/run_emulator.sh --screenshot phrase_list
   ./scripts/run_emulator.sh --screenshot training
+  ./scripts/run_emulator.sh --screenshot training_result
+  ./scripts/run_emulator.sh --screenshot settings
+
+Known names write numbered files (1_home.png … 6_settings.png).
 EOF
 }
 
@@ -373,6 +379,20 @@ detect_play_slot() {
     play_slot_from_wm
 }
 
+# Map --screenshot names to Play listing filenames (1_home.png …).
+screenshot_basename() {
+    local name="$1"
+    case "$name" in
+        home|1_home) echo "1_home" ;;
+        categories|template_categories|2_categories) echo "2_categories" ;;
+        phrase_list|template_files|files|3_phrase_list) echo "3_phrase_list" ;;
+        training|4_training) echo "4_training" ;;
+        training_result|result|5_training_result) echo "5_training_result" ;;
+        settings|6_settings) echo "6_settings" ;;
+        *) echo "$name" ;;
+    esac
+}
+
 capture_screenshot() {
     local name="$1"
     local slot dest tmp
@@ -383,6 +403,7 @@ capture_screenshot() {
         exit 1
     fi
 
+    name="$(screenshot_basename "$name")"
     slot="$(detect_play_slot)"
     mkdir -p "$SCREENSHOT_ROOT/$slot"
     dest="$SCREENSHOT_ROOT/$slot/${name}.png"
@@ -678,7 +699,11 @@ if [[ -n "$TABLET_SIZE" ]]; then
     echo "Tablet $TABLET_SIZE-inch is ready for Play screenshots ($TABLET_WM_SIZE)."
     echo "Navigate to a screen, then capture:"
     echo "  ./scripts/run_emulator.sh --screenshot home"
+    echo "  ./scripts/run_emulator.sh --screenshot categories"
+    echo "  ./scripts/run_emulator.sh --screenshot phrase_list"
     echo "  ./scripts/run_emulator.sh --screenshot training"
+    echo "  ./scripts/run_emulator.sh --screenshot training_result"
+    echo "  ./scripts/run_emulator.sh --screenshot settings"
     echo "Files go to packaging/google-play/screenshots/tablet${TABLET_SIZE}/"
 fi
 

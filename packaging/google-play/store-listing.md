@@ -123,9 +123,8 @@ Initial Android release. Practice bundled Chinese-tone phrases with guided, auto
 ### Graphic alt text (optional, ≤140 characters each)
 
 Use these if Play Console asks for alt text on listing artwork.
-Phone listing order is Home → library → phrase list → reference contour →
-Settings → scored overlay. Tablet folders capture the scored overlay before
-Settings; see `screenshots/README.md`.
+Listing order is Home → library → phrase list → reference contour →
+scored overlay → Settings. Filenames: `screenshots/README.md`.
 
 | Asset | Alt text |
 |---|---|
@@ -135,8 +134,8 @@ Settings; see `screenshots/README.md`.
 | Phone screenshot 2 | Phrase library with Chinese-tone category folders |
 | Phone screenshot 3 | One-tone phrase list with practice filters |
 | Phone screenshot 4 | Training screen showing the reference pitch contour |
-| Phone screenshot 5 | Settings for language, theme, and guided recording |
-| Phone screenshot 6 | Training result with a high score and overlaid pitch contours |
+| Phone screenshot 5 | Training result with a high score and overlaid pitch contours |
+| Phone screenshot 6 | Settings for language, theme, and guided recording |
 
 ---
 
