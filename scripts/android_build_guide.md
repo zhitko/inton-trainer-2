@@ -2,7 +2,7 @@
 
 Package id: `by.intoncore.intontrainer2.zh` (Chinese edition). Native library: `libappinton-trainer-2_<abi>.so`. Later language apps use a different suffix (`.en`, `.ru`, `.de`, …) and a separate Play listing; the package id cannot be changed after the first upload.
 
-Every Google Play upload is built from a **git tag**. Current release: tag **`1.0.0`** (`versionName` `1.0.0`, `versionCode` 1, internal testing). See [Release versioning](#release-versioning-git-tags) below.
+Every Google Play upload is built from a **git tag**. Current release: tag **`1.0.1`** (`versionName` `1.0.1`, `versionCode` 2, internal testing). See [Release versioning](#release-versioning-git-tags) below.
 
 ## Release versioning (git tags)
 
@@ -27,6 +27,7 @@ Default bump is **PATCH** unless the release notes call for minor or major. Ever
 | Git tag | `versionName` | `versionCode` | Play track |
 |---|---|---|---|
 | `1.0.0` | `1.0.0` | 1 | Internal testing |
+| `1.0.1` | `1.0.1` | 2 | Internal testing |
 
 ### Next Play upload
 
@@ -37,13 +38,13 @@ Default bump is **PATCH** unless the release notes call for minor or major. Ever
 5. Commit the version bump, then create an annotated tag on that commit:
 
 ```bash
-git tag -a 1.0.1 -m "Play release 1.0.1 (versionCode 2)"
+git tag -a 1.0.2 -m "Play release 1.0.2 (versionCode 3)"
 ```
 
 6. Build the signed AAB **from the tag**, not from a dirty working tree:
 
 ```bash
-git checkout 1.0.1
+git checkout 1.0.2
 ./scripts/build_android.sh arm64-v8a release
 ```
 
@@ -433,7 +434,7 @@ On Android, `CMakeLists.txt` copies `settings.ini` and `data/` into `android/ass
 - Required feature: `android.hardware.microphone`
 - Portrait only (`android:screenOrientation="portrait"`)
 - Min SDK 26, target / compile SDK 36
-- Version placeholders `%%INSERT_VERSION_CODE%%` / `%%INSERT_VERSION_NAME%%` (filled from CMake: `QT_ANDROID_VERSION_CODE` and `PROJECT_VERSION`). Those must match the git tag for the Play upload. Current tag `1.0.0` is code `1`, name `1.0.0`.
+- Version placeholders `%%INSERT_VERSION_CODE%%` / `%%INSERT_VERSION_NAME%%` (filled from CMake: `QT_ANDROID_VERSION_CODE` and `PROJECT_VERSION`). Those must match the git tag for the Play upload. Current tag `1.0.1` is code `2`, name `1.0.1`.
 - `<meta-data android:name="android.app.lib_name" android:value="appinton-trainer-2"/>` is set **manually**
 - Launcher icon: `@mipmap/ic_launcher`
 - Round launcher icon: `@mipmap/ic_launcher_round`
@@ -650,6 +651,7 @@ documentation on **13 September 2026**.
 | `android.app.lib_name` meta-data | Done |
 | Target / compile SDK 36 | Complies with the API 36 requirement for new apps and updates since 31 August 2026 |
 | Version 1.0.0 / `versionCode` 1 | First internal-testing upload; git tag `1.0.0` |
+| Version 1.0.1 / `versionCode` 2 | Internal-testing update; git tag `1.0.1` (gesture-nav SafeArea, responsive training/home layout) |
 | Storage / media permissions removed | `RECORD_AUDIO` only; Qt `INTERNET` stripped |
 | 16 KB page-size compatibility | ELF `LOAD` `2**14` on all packaged 64-bit `.so` (app, Qt 6.11.1, FFmpeg, `libc++_shared`); uncompressed JNI libs (`extractNativeLibs=false`); APK `zipalign -c -P 16`; AAB `PAGE_ALIGNMENT_16K` `enabled=1`. `build_android.sh` runs `scripts/check_16kb_alignment.sh`. Verified 13 September 2026 on arm64-v8a release artifacts. |
 | Android App Bundle | `build_android.sh` produces the AAB required for new Play apps |
@@ -672,7 +674,7 @@ documentation on **13 September 2026**.
 
 ### Remaining Play Console work
 
-Internal testing is live on git tag `1.0.0`. The items below are still needed
+Internal testing is live; current tagged upload is git tag `1.0.1`. The items below are still needed
 before closed testing or production, and on every later tagged upload.
 
 | Item | What to do |

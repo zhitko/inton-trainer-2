@@ -39,8 +39,8 @@ Later editions copy the master, for example `icon-512-en.png`.
 
 Every Play AAB is built from an annotated git tag (`MAJOR.MINOR.PATCH`, no
 `v` prefix). The first internal-testing upload is tag **`1.0.0`**
-(`versionCode` 1). Add a **What’s new** block for that tag in
-`store-listing.md` before uploading. Full procedure:
-`scripts/android_build_guide.md` (Release versioning).
+(`versionCode` 1). The current tagged upload is **`1.0.1`** (`versionCode` 2).
+Add a **What’s new** block for that tag in `store-listing.md` before
+uploading. Full procedure: `scripts/android_build_guide.md` (Release versioning).
 
 See `scripts/android_build_guide.md` for the rest of the Play readiness checklist.

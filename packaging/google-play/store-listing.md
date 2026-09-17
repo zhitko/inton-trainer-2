@@ -12,7 +12,7 @@ as a translation.
 
 **What’s new** is written per Play upload / git tag (`MAJOR.MINOR.PATCH`).
 Keep an EN+RU block for each tag. The current internal-testing release is
-**1.0.0**. When a later tag is uploaded, add a new What’s new section and
+**1.0.1**. When a later tag is uploaded, add a new What’s new section and
 paste it into the Console release notes for that AAB.
 
 | Field | EN | RU |
@@ -21,6 +21,7 @@ paste it into the Console release notes for that AAB.
 | Short description | 74 / 80 | 70 / 80 |
 | Full description | 2,040 / 4,000 | 2,050 / 4,000 |
 | What’s new (1.0.0) | 192 / 500 | 186 / 500 |
+| What’s new (1.0.1) | 163 / 500 | 181 / 500 |
 
 ---
 
@@ -114,6 +115,12 @@ Privacy policy: https://intontrainer.by/intontrainer2policy.html
 Open-source licences and source notices are available in the app.
 ```
 
+### What’s new (version 1.0.1)
+
+```
+Layout fixes for phones with gesture navigation: content stays clear of the system bars. Training and home screens scale more reliably on small and large displays.
+```
+
 ### What’s new (version 1.0.0)
 
 ```
@@ -200,6 +207,12 @@ brand across locales, use `Intonation Trainer 2 (Chinese)` here too.
 Политика конфиденциальности: https://intontrainer.by/intontrainer2policy.html
 
 Лицензии открытого ПО и сведения об исходном коде доступны в приложении.
+```
+
+### What’s new (version 1.0.1)
+
+```
+Исправлена вёрстка на телефонах с жестовой навигацией: контент не перекрывается системными панелями. Экраны тренировки и главная лучше масштабируются на маленьких и больших экранах.
 ```
 
 ### What’s new (version 1.0.0)
