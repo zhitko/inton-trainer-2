@@ -2,7 +2,7 @@
 
 Package id: `by.intoncore.intontrainer2.zh` (Chinese edition). Native library: `libappinton-trainer-2_<abi>.so`. Later language apps use a different suffix (`.en`, `.ru`, `.de`, …) and a separate Play listing; the package id cannot be changed after the first upload.
 
-Every Google Play upload is built from a **git tag**. Current release: tag **`1.0.1`** (`versionName` `1.0.1`, `versionCode` 2, internal testing). See [Release versioning](#release-versioning-git-tags) below.
+Every Google Play upload is built from a **git tag**. Current production release: tag **`1.0.1`** (`versionName` `1.0.1`, `versionCode` 2). Public listing: [Intonation Trainer 2 (Chinese)](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh). See [Release versioning](#release-versioning-git-tags) below.
 
 ## Release versioning (git tags)
 
@@ -27,7 +27,7 @@ Default bump is **PATCH** unless the release notes call for minor or major. Ever
 | Git tag | `versionName` | `versionCode` | Play track |
 |---|---|---|---|
 | `1.0.0` | `1.0.0` | 1 | Internal testing |
-| `1.0.1` | `1.0.1` | 2 | Internal testing |
+| `1.0.1` | `1.0.1` | 2 | Production (public) |
 
 ### Next Play upload
 
@@ -599,8 +599,13 @@ at runtime.
 
 ## Google Play store listing
 
+The Chinese edition is live:
+
+https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh
+
 Paste-ready copy lives in `packaging/google-play/store-listing.md`. Folder
-index: `packaging/google-play/README.md`.
+index: `packaging/google-play/README.md`. Use those files when editing the
+listing or preparing the next tagged upload.
 
 Default locale is **English (United States)**; add **Russian** as a
 translation. Do not put rankings, prices, “free”, or keyword stuffing in
@@ -651,7 +656,7 @@ documentation on **13 September 2026**.
 | `android.app.lib_name` meta-data | Done |
 | Target / compile SDK 36 | Complies with the API 36 requirement for new apps and updates since 31 August 2026 |
 | Version 1.0.0 / `versionCode` 1 | First internal-testing upload; git tag `1.0.0` |
-| Version 1.0.1 / `versionCode` 2 | Internal-testing update; git tag `1.0.1` (gesture-nav SafeArea, responsive training/home layout) |
+| Version 1.0.1 / `versionCode` 2 | Production release; git tag `1.0.1` (gesture-nav SafeArea, responsive training/home layout). Public listing: [by.intoncore.intontrainer2.zh](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh) |
 | Storage / media permissions removed | `RECORD_AUDIO` only; Qt `INTERNET` stripped |
 | 16 KB page-size compatibility | ELF `LOAD` `2**14` on all packaged 64-bit `.so` (app, Qt 6.11.1, FFmpeg, `libc++_shared`); uncompressed JNI libs (`extractNativeLibs=false`); APK `zipalign -c -P 16`; AAB `PAGE_ALIGNMENT_16K` `enabled=1`. `build_android.sh` runs `scripts/check_16kb_alignment.sh`. Verified 13 September 2026 on arm64-v8a release artifacts. |
 | Android App Bundle | `build_android.sh` produces the AAB required for new Play apps |
@@ -670,23 +675,21 @@ documentation on **13 September 2026**.
 | Open-source licences | Offline in-app notices and full texts added for Qt/LGPL, ALGLIB/GPL, SPTK and embedded components, Font Awesome/OFL, and LLVM OpenMP; source/relinking offer documented |
 | Privacy policy (HTTPS) | Published at [https://intontrainer.by/intontrainer2policy.html](https://intontrainer.by/intontrainer2policy.html) (revised 10 September 2026). Covers microphone access, on-device WAV recordings and scores, local retention/deletion, no upload/sharing, no Internet permission, and `allowBackup=false`. Paste this URL into the Play Console privacy-policy field. |
 | Privacy policy in the app | Offline EN/RU markdown via `PrivacyPolicyPage.qml`; side-menu item next to User Guide / Open-source licences |
-| Native debug symbols | Release AAB embeds FULL native symbols (`android/build.gradle` `ndk.debugSymbolLevel = 'FULL'`, Android Release `-g`). `build_android.sh` checks `BUNDLE-METADATA/com.android.tools.build.debugsymbols`. Play extracts them from the AAB; confirm in App Bundle Explorer after the first upload |
+| Native debug symbols | Release AAB embeds FULL native symbols (`android/build.gradle` `ndk.debugSymbolLevel = 'FULL'`, Android Release `-g`). `build_android.sh` checks `BUNDLE-METADATA/com.android.tools.build.debugsymbols`. Play extracts them from the AAB |
+| Public store listing | Live at [play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh). Data safety: no data collected, no data shared. Content rating: Everyone |
 
 ### Remaining Play Console work
 
-Internal testing is live; current tagged upload is git tag `1.0.1`. The items below are still needed
-before closed testing or production, and on every later tagged upload.
+Production is live for the Chinese edition (`1.0.1`). Keep the items
+below in mind for later tagged uploads and other language editions.
 
 | Item | What to do |
 |---|---|
-| **Upload key and Play App Signing** | Generate and back up the upload keystore, build a signed release AAB, and upload it. New apps are automatically enrolled in Play App Signing; keep the upload key separate and enable 2-Step Verification for Console users. |
-| **Release identity** | Package `by.intoncore.intontrainer2.zh` is set. Further uploads of this Chinese app use a new git tag (`MAJOR.MINOR.PATCH`) and a higher `versionCode`. English/Russian/… editions need new packages (`.en`, `.ru`, …) and new Play listings; a package name cannot be changed after publishing. |
-| **Data safety** | Complete the form even if no data leaves the device. Declare the actual handling of microphone/voice recordings and keep it consistent with the app and [privacy policy](https://intontrainer.by/intontrainer2policy.html). Internal-only testing is exempt; closed, open, and production tracks are not. |
-| **App content declarations** | Complete Ads, App access, Target audience and content, and the IARC content-rating questionnaire. Declare no ads and unrestricted access only if that matches the release. Do not include children unless the app is intended to meet Families requirements. |
-| **Feature graphic** | Upload `packaging/google-play/feature-graphic-zh.png`. It is already 1024×500, 24-bit sRGB, and has no alpha. It is mandatory listing artwork and is not bundled in the app. |
-| **16 KB runtime QA** | Static ELF/zip/AAB checks already pass. Before production, boot a 16 KB emulator image or a Pixel 8/9 with **Boot with 16KB page size**, confirm `adb shell getconf PAGE_SIZE` is `16384`, and run recording/playback. |
-| **Physical ARM64 QA** | Confirm microphone permission, recording/VAD, guided mode, packaged templates, record saving/deletion, offline behavior, and startup on a physical ARM64 device. |
-| **Closed testing, if applicable** | Personal accounts created after 13 November 2023 need at least 12 testers continuously opted in for 14 days, followed by a production-access application. Testers must remain engaged; opting out breaks continuity. |
+| **Upload key and Play App Signing** | Keep the upload keystore backed up and separate from the Play signing key. Enable 2-Step Verification for Console users. |
+| **Release identity** | Package `by.intoncore.intontrainer2.zh` is set and published. Further uploads of this Chinese app use a new git tag (`MAJOR.MINOR.PATCH`) and a higher `versionCode`. English/Russian/… editions need new packages (`.en`, `.ru`, …) and new Play listings; a package name cannot be changed after publishing. |
+| **Listing copy and artwork** | When the next tag ships, paste the matching What’s new from `packaging/google-play/store-listing.md`. Keep Data safety aligned with the [privacy policy](https://intontrainer.by/intontrainer2policy.html). |
+| **16 KB runtime QA** | Static ELF/zip/AAB checks already pass. On devices that boot with 16 KB pages, confirm `adb shell getconf PAGE_SIZE` is `16384` and run recording/playback. |
+| **Physical ARM64 QA** | Confirm microphone permission, recording/VAD, guided mode, packaged templates, record saving/deletion, offline behavior, and startup on a physical ARM64 device after each Play upload. |
 | **Developer verification** | Check Play Console account identity and package registration. Enforcement begins 30 September 2026 for participating stores in Brazil, Indonesia, Singapore, and Thailand, then expands globally in 2027; most existing verified Play developers need no extra identity action. |
 | **Release source archive** | Build each Play AAB from its annotated git tag. Retain that tag/archive for as long as the binary is distributed. Include the build scripts and matching ALGLIB/SPTK sources or durable access to those exact sources; verify every packaged native library against the in-app notices. |
 | **Portrait-only decision** | Keep `screenOrientation="portrait"` only if this is intentional and phone QA confirms all content remains usable. |
@@ -701,6 +704,7 @@ before closed testing or production, and on every later tagged upload.
 - [Data safety](https://support.google.com/googleplay/android-developer/answer/10787469)
 - [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311)
 - [IntonTrainer 2 privacy policy](https://intontrainer.by/intontrainer2policy.html)
+- [Intonation Trainer 2 (Chinese) on Google Play](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh)
 - [New personal-account testing](https://support.google.com/googleplay/android-developer/answer/14151465)
 - [Android developer verification](https://developer.android.com/developer-verification/guides)
 - [Native debug symbols](https://support.google.com/googleplay/android-developer/answer/9848633)

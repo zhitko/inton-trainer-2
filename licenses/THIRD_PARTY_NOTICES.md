@@ -95,10 +95,14 @@ https://github.com/androidx/androidx
 Keep the source repository and the exact annotated git tag used for every
 published binary available for at least as long as that binary is distributed.
 Play uploads use Semantic Versioning tags (`MAJOR.MINOR.PATCH`, no `v`
-prefix; the first internal-testing release is `1.0.0`). A release source
-archive must include the application source and build scripts, plus the
-matching ALGLIB and SPTK source trees or unambiguous access to those exact
-sources. Requests concerning source or relinking may also be filed through the
-repository's issue tracker.
+prefix; the first internal-testing release is `1.0.0`). The Chinese Android
+edition is distributed on Google Play:
+https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh
+The Chinese desktop build is distributed from:
+https://intontrainer.by/#download-inton2-ch
+A release source archive must include the application source and build
+scripts, plus the matching ALGLIB and SPTK source trees or unambiguous access
+to those exact sources. Requests concerning source or relinking may also be
+filed through the repository's issue tracker.
 
 These notices are informational and do not replace the full license texts.

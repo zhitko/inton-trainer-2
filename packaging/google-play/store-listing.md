@@ -1,5 +1,8 @@
 # Google Play store listing copy
 
+Public listing (Chinese edition):
+https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh
+
 Paste these fields into Play Console:
 **Grow users → Store presence → Main store listing**, plus **Store settings**.
 
@@ -11,7 +14,7 @@ emojis, or decorative symbols. Keep the default listing in English; add Russian
 as a translation.
 
 **What’s new** is written per Play upload / git tag (`MAJOR.MINOR.PATCH`).
-Keep an EN+RU block for each tag. The current internal-testing release is
+Keep an EN+RU block for each tag. The current production release is
 **1.0.1**. When a later tag is uploaded, add a new What’s new section and
 paste it into the Console release notes for that AAB.
 
@@ -30,6 +33,7 @@ paste it into the Console release notes for that AAB.
 | Field | Value |
 |---|---|
 | Package name | `by.intoncore.intontrainer2.zh` (set when creating the Play app; cannot change later) |
+| Public listing | https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh |
 | Default language | English (United States) |
 | Additional language | Russian |
 | App type | App |

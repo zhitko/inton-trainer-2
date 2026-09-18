@@ -1,8 +1,12 @@
 # Google Play listing assets
 
 Files for the Play Console store listing of **Intonation Trainer 2 (Chinese)**
-(`by.intoncore.intontrainer2.zh`). Later language editions are separate Play
-apps, for example `by.intoncore.intontrainer2.en` with the listing name
+(`by.intoncore.intontrainer2.zh`). The Chinese edition is published at:
+
+https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh
+
+Later language editions are separate Play apps, for example
+`by.intoncore.intontrainer2.en` with the listing name
 **Intonation Trainer 2 (English)**.
 
 | File | Role |
@@ -39,8 +43,9 @@ Later editions copy the master, for example `icon-512-en.png`.
 
 Every Play AAB is built from an annotated git tag (`MAJOR.MINOR.PATCH`, no
 `v` prefix). The first internal-testing upload is tag **`1.0.0`**
-(`versionCode` 1). The current tagged upload is **`1.0.1`** (`versionCode` 2).
-Add a **What’s new** block for that tag in `store-listing.md` before
-uploading. Full procedure: `scripts/android_build_guide.md` (Release versioning).
+(`versionCode` 1). The current production release is **`1.0.1`**
+(`versionCode` 2). Add a **What’s new** block for that tag in
+`store-listing.md` before uploading. Full procedure:
+`scripts/android_build_guide.md` (Release versioning).
 
 See `scripts/android_build_guide.md` for the rest of the Play readiness checklist.

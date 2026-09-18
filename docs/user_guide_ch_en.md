@@ -4,7 +4,7 @@ This guide explains how to use IntonTrainer 2-Ch in a practical, task-oriented w
 
 ## 1 What IntonTrainer 2-Ch is
 
-**IntonTrainer 2-Ch** is a desktop application for practicing Chinese tones using reference audio templates (patterns).
+**IntonTrainer 2-Ch** is a desktop and Android application for practicing Chinese tones using reference audio templates (patterns). The desktop build is on [intontrainer.by](https://intontrainer.by/#download-inton2-ch). The Android edition is on [Google Play](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh).
 
 In Chinese, there are four basic tones:
 

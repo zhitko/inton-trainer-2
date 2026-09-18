@@ -4,6 +4,8 @@
 
 Designed for language learners, phonetics students, speech therapists, and researchers who need objective, repeatable feedback on intonation patterns.
 
+The Chinese desktop build is on [intontrainer.by](https://intontrainer.by/#download-inton2-ch). The Android edition is on [Google Play](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh).
+
 ---
 
 ## What It Does
@@ -247,6 +249,8 @@ The script produces an APK and an Android App Bundle (`.aab`). Release AAB:
 
 See `scripts/android_build_guide.md` for signing, target SDK 36, and Play Console steps.
 
+The Chinese edition is published at
+[play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh).
 Google Play uploads are built from annotated git tags (`MAJOR.MINOR.PATCH`, currently `1.0.1`). Increment `QT_ANDROID_VERSION_CODE` and create a new tag for every Play AAB.
 
 An emulator launch script is also available:
@@ -271,6 +275,8 @@ After building, the executable will be located in the build directory:
 
 - **Linux/macOS**: `./appinton-trainer-2`
 - **Windows**: `Release\appinton-trainer-2.exe`
+
+Prebuilt desktop downloads are on [intontrainer.by](https://intontrainer.by/#download-inton2-ch).
 
 ---
 

@@ -1,6 +1,8 @@
 # Play Console screenshots
 
-Android captures uploaded to the **Intonation Trainer 2 (Chinese)** store listing.
+Android captures on the public **Intonation Trainer 2 (Chinese)** listing:
+https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh
+
 Do not use the desktop images in `docs/screenshots/`.
 
 Light theme, English UI, portrait. Each folder has the same six screens.

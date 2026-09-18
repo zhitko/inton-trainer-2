@@ -4,7 +4,7 @@
 
 ## 1. Что такое IntonTrainer 2-Ch
 
-**IntonTrainer 2-Ch** - это настольное приложение для тренировки произношения тонов китайской речи с использованием эталонных аудио образцов.
+**IntonTrainer 2-Ch** - это настольное и Android-приложение для тренировки произношения тонов китайской речи с использованием эталонных аудио образцов. Настольную версию можно скачать на [intontrainer.by](https://intontrainer.by/#download-inton2-ch). Версия для Android опубликована в [Google Play](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh).
 
 В китайском языке принято выделять четыре основных тона:
 

@@ -2,7 +2,7 @@
 
 ## What is the app for?
 
-IntonTrainer 2-Ch is a program for practicing Chinese tones using reference audio recordings. The user listens to a sample, records their own phrase, and compares their intonation with the reference using a graph and similarity percentage.
+IntonTrainer 2-Ch is a program for practicing Chinese tones using reference audio recordings. The user listens to a sample, records their own phrase, and compares their intonation with the reference using a graph and similarity percentage. The desktop build is on [intontrainer.by](https://intontrainer.by/#download-inton2-ch). The Android edition is on [Google Play](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh).
 
 ## Brief: How to use (typical scenario)
 
