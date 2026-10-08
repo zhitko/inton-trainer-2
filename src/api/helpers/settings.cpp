@@ -3,11 +3,44 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QSettings>
 #include <QStandardPaths>
 
 #include "logger.h"
+
+namespace {
+
+void copyMissingFile(const QString& src, const QString& dst)
+{
+    if (!QFileInfo::exists(src) || QFileInfo::exists(dst))
+        return;
+    QDir().mkpath(QFileInfo(dst).absolutePath());
+    if (!QFile::copy(src, dst)) {
+        LOG_WARNING() << "Failed to copy" << src << "to" << dst;
+        return;
+    }
+    QFile::setPermissions(dst,
+        QFile::permissions(dst) | QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+}
+
+void copyMissingTree(const QString& src, const QString& dst)
+{
+    const QFileInfo srcInfo(src);
+    if (!srcInfo.exists())
+        return;
+    if (srcInfo.isDir()) {
+        const QDir dir(src);
+        const QStringList entries = dir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+        for (const QString& name : entries)
+            copyMissingTree(dir.filePath(name), QDir(dst).filePath(name));
+        return;
+    }
+    copyMissingFile(src, dst);
+}
+
+} // namespace
 
 AppSettings
 Settings::getDefaultSettings()
@@ -21,7 +54,37 @@ Settings::getAppDataDir()
 #ifdef Q_OS_ANDROID
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 #else
+    const QByteArray appImage = qgetenv("APPIMAGE");
+    if (!appImage.isEmpty()) {
+        const QString portableDir = QFileInfo(QString::fromLocal8Bit(appImage)).absolutePath();
+        if (QFileInfo(portableDir).isWritable())
+            return portableDir;
+        const QString fallback = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QDir().mkpath(fallback);
+        return fallback;
+    }
     return QCoreApplication::applicationDirPath();
+#endif
+}
+
+void Settings::seedBundledAppImageFiles()
+{
+#ifndef Q_OS_ANDROID
+    if (qgetenv("APPIMAGE").isEmpty())
+        return;
+
+    const QString bundled = QCoreApplication::applicationDirPath();
+    const QString dest = getAppDataDir();
+    if (QFileInfo(bundled).absoluteFilePath() == QFileInfo(dest).absoluteFilePath())
+        return;
+
+    copyMissingFile(bundled + QStringLiteral("/settings.ini"),
+        dest + QStringLiteral("/settings.ini"));
+    copyMissingTree(bundled + QStringLiteral("/data/patterns"),
+        dest + QStringLiteral("/data/patterns"));
+    copyMissingTree(bundled + QStringLiteral("/data/test"),
+        dest + QStringLiteral("/data/test"));
+    QDir().mkpath(dest + QStringLiteral("/data/records"));
 #endif
 }
 
@@ -41,6 +104,7 @@ Settings::getSettingsFilePath()
 AppSettings
 Settings::loadSettings()
 {
+    seedBundledAppImageFiles();
     AppSettings settings;
     QString filePath = getSettingsFilePath();
 

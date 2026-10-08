@@ -229,12 +229,21 @@ public:
     /**
      * Returns the base directory for application data.
      *
-     * On desktop this is QCoreApplication::applicationDirPath().
-     * On Android this is QStandardPaths::writableLocation(AppDataLocation)
-     * because the APK's assets/ are extracted there at startup by
-     * extractAndroidAssets().
+     * Unpackaged desktop build: directory of the executable.
+     * AppImage: directory containing the .AppImage file. The mounted payload
+     * cannot store settings or recordings. If that directory cannot be written,
+     * AppDataLocation is used. Bundled settings and reference patterns are
+     * copied there on first launch by seedBundledAppImageFiles().
+     * Android: writable AppDataLocation, where startup extracts bundled assets.
      */
     static QString getAppDataDir();
+
+    /**
+     * Copies bundled settings.ini and data/patterns (and data/test) out of an
+     * AppImage into getAppDataDir() when those files are not already there.
+     * No-op for unpackaged desktop builds and Android.
+     */
+    static void seedBundledAppImageFiles();
 
 private:
     /**

@@ -16,6 +16,7 @@
 #include "audioapi.h"
 #include "fileapi.h"
 #include "settingsapi.h"
+#include "helpers/settings.h"
 #include "statisticsapi.h"
 #include "wavfileapi.h"
 
@@ -128,6 +129,8 @@ int main(int argc, char* argv[])
             }
         }
     }
+
+    Settings::seedBundledAppImageFiles();
 
     qmlRegisterType<AudioApi>("by.intontrainer.audio", 1, 0, "AudioApi");
     qmlRegisterType<FileApi>("by.intontrainer.file", 1, 0, "FileApi");

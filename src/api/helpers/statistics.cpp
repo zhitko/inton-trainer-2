@@ -1,6 +1,5 @@
 #include "statistics.h"
 
-#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
@@ -9,7 +8,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QStandardPaths>
 #include <algorithm>
 #include <functional>
 #include <numeric>
@@ -37,14 +35,9 @@ bool Statistics::statisticsLoaded = false;
 QString
 Statistics::getStatisticsFilePath()
 {
-#ifdef Q_OS_ANDROID
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/statistics.json";
+    QString path = Settings::getAppDataDir() + "/statistics.json";
     QDir().mkpath(QFileInfo(path).absolutePath());
     return path;
-#else
-    QString path = QCoreApplication::applicationDirPath() + "/statistics.json";
-    return path;
-#endif
 }
 
 static QJsonObject itemToJson(const std::shared_ptr<StatisticsItem>& item)

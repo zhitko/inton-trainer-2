@@ -226,13 +226,61 @@ cmake ..
 cmake --build . --target appinton-trainer-2 -- -j2
 ```
 
-#### Windows (with MSVC)
+#### Linux AppImage
+
+`scripts/build_appimage.sh` builds an x86_64 AppImage with the program, Qt, QML modules, the FFmpeg multimedia plugin, the OpenMP runtime, translations, `settings.ini`, and the reference recordings in `data/patterns`.
+
+It needs the Qt **gcc_64** kit. The image runs on systems whose glibc is at least as new as the machine that built it. The microphone uses the host PulseAudio or PipeWire library.
 
 ```bash
-mkdir build
-cd build
-cmake -G "Visual Studio 17 2022" ..
-cmake --build . --config Release --target appinton-trainer-2
+QT_ROOT="$HOME/Qt/6.12.0" ./scripts/build_appimage.sh release
+```
+
+The image is written to:
+
+```
+build_appimage/IntonTrainer2-<version>-x86_64.AppImage
+```
+
+Keep that file in a writable directory. On first launch the app copies `settings.ini` and `data/patterns` beside it. `statistics.json` and `data/records` stay there.
+
+#### Windows
+
+`scripts/build_windows.sh` builds a 64-bit folder and zip that includes the program, Qt, QML modules, multimedia plugins, the OpenMP runtime, `settings.ini`, and the reference recordings in `data/patterns`.
+
+On Windows, run it from Git Bash with the Qt **MSVC 2022 64-bit** or **MinGW 13.1 64-bit** kit installed. On Linux it cross-compiles. 64-bit Wine (`wine64`) must be installed, and the Qt MinGW kit must sit next to the matching `gcc_64` kit.
+
+The released `aqtinstall` 3.3.0 cannot download Qt 6.12 Windows kits. It looks for `qt6_6120/qt6_6120/Updates.xml`, while Qt publishes the MinGW kit at `qt6_6120/qt6_6120_mingw/Updates.xml`. Install aqt from git, then install the kit:
+
+```bash
+sudo apt install g++-mingw-w64-x86-64 binutils-mingw-w64-x86-64 wine64
+sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+
+python3 -m pip install --user --upgrade --force-reinstall --no-cache-dir "git+https://github.com/miurahr/aqtinstall.git"
+python3 -m aqt install-qt --outputdir "$HOME/Qt" windows desktop 6.12.0 win64_mingw -m qtmultimedia qttasktree
+ln -sfn win64_mingw "$HOME/Qt/6.12.0/mingw_64"
+```
+
+The compiler must be GCC 13 with the posix thread model. aqt writes the kit to `~/Qt/6.12.0/win64_mingw`; the symlink is the path the script expects. Then:
+
+```bash
+QT_ROOT="$HOME/Qt/6.12.0" ./scripts/build_windows.sh release
+```
+
+The zip is written to:
+
+```
+build_windows/IntonTrainer2-<version>-win64.zip
+```
+
+Extract it to a writable directory and run `IntonTrainer2.exe`. Settings and recordings are stored beside the executable. Reference templates are in `data/patterns`.
+
+To compile on Windows without packaging, from a Visual Studio 2022 x64 prompt:
+
+```bash
+cmake -G "Visual Studio 17 2022" -A x64 -S . -B build
+cmake --build build --config Release --target appinton-trainer-2
 ```
 
 #### Android (arm64-v8a)
@@ -332,11 +380,12 @@ inton-trainer-2/
 ├── android/                            # Android packaging
 │   ├── AndroidManifest.xml
 │   └── res/values/styles.xml
-├── scripts/                            # Build and automation scripts
+├── scripts/                            # Android, Windows, and Linux AppImage builds
 │   ├── build_android.sh
+│   ├── build_appimage.sh
+│   ├── build_windows.sh
 │   ├── run_emulator.sh
-│   ├── android_build_guide.md
-│   └── build-appimage/                 # AppImage packaging (empty)
+│   └── android_build_guide.md
 ├── docs/                               # Documentation
 │   ├── data_flow.md
 │   ├── settings_guide_ru.md
