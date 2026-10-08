@@ -61,13 +61,13 @@ Override any of these with environment variables; the values below are the scrip
 |---|---|
 | Qt for Android | `$QT_ROOT/android_arm64_v8a` (also `android_x86_64`, `android_armv7`) |
 | Qt host tools | `$QT_ROOT/gcc_64` |
-| `QT_ROOT` | `$HOME/Qt/6.11.1` |
+| `QT_ROOT` | `$HOME/Qt/6.12.0` |
 | Android SDK | `$ANDROID_SDK` → `$HOME/Android/Sdk` |
 | Android NDK | `$ANDROID_NDK` → `$ANDROID_SDK/ndk/27.2.12479018` (Clang 18) |
 | Build tools | `36.0.0` |
 | Target / compile SDK | **36** (`platforms;android-36` must be installed) |
 | Min SDK | 26 (Android 8.0) |
-| Java | OpenJDK 17 (`$JAVA_HOME`, default `/usr/lib/jvm/java-17-openjdk-amd64`) |
+| Java | OpenJDK 21 (`$JAVA_HOME`, default `/usr/lib/jvm/java-21-openjdk-amd64`) |
 | Tools on `PATH` | `cmake`, `ninja`, `java` |
 | OpenMP | NDK `libomp.so` (imported as `AndroidOMP`) |
 | Local AVDs | `Pixel7a_x86_64` (3-button nav, Play phone shots); `Pixel7a_gesture_x86_64` (gesture nav / SafeArea, created by `run_emulator.sh --gesture`); tablet screenshots: `PlayTablet7_x86_64`, `PlayTablet10_x86_64` (created by `run_emulator.sh --tablet`) |
@@ -75,7 +75,7 @@ Override any of these with environment variables; the values below are the scrip
 Install the Android 36 platform if CMake/Gradle fails looking for it:
 
 ```bash
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 yes | "$HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36"
 ```
 
@@ -93,13 +93,13 @@ Play Store uploads should use **arm64-v8a only**.
 ./scripts/build_android.sh arm64-v8a release
 ```
 
-The script configures CMake, compiles `appinton-trainer-2`, then packages both Qt targets: **`apk`** (sideload / emulator) and **`aab`** (Play). Gradle uses Java 17 via `GRADLE_OPTS`.
+The script configures CMake, compiles `appinton-trainer-2`, then packages both Qt targets: **`apk`** (sideload / emulator) and **`aab`** (Play). Gradle uses JDK 21 via `GRADLE_OPTS`.
 
 If a manual `cmake --build ... --target apk` reports that Gradle is using
 Java 11, export both variables before retrying:
 
 ```bash
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 export GRADLE_OPTS="-Dorg.gradle.java.home=${JAVA_HOME}"
 ```
 
@@ -142,7 +142,7 @@ Defaults: `arm64-v8a`, `release`. `armv7` is accepted as an alias for `armeabi-v
 | `QT_ROOT` | Qt install root (kits live in `android_*` subdirs) |
 | `ANDROID_SDK` | SDK root (`ANDROID_HOME` is set to this) |
 | `ANDROID_NDK` | NDK root |
-| `JAVA_HOME` | JDK 17 for Gradle |
+| `JAVA_HOME` | JDK 21 for Gradle |
 | `QT_ANDROID_KEYSTORE_PATH` | Upload keystore (enables `-DQT_ANDROID_SIGN_AAB=ON`) |
 | `QT_ANDROID_KEYSTORE_ALIAS` | Key alias |
 | `QT_ANDROID_KEYSTORE_STORE_PASS` | Keystore password |
@@ -231,7 +231,7 @@ Removes every `build_android_*` directory in the project root:
 ## Manual CMake configure + build
 
 ```bash
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 export GRADLE_OPTS="-Dorg.gradle.java.home=${JAVA_HOME}"
 
 cmake \
@@ -244,10 +244,10 @@ cmake \
   -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON \
   -DANDROID_NDK="$HOME/Android/Sdk/ndk/27.2.12479018" \
   -DCMAKE_ANDROID_NDK="$HOME/Android/Sdk/ndk/27.2.12479018" \
-  -DCMAKE_FIND_ROOT_PATH="$HOME/Qt/6.11.1/android_arm64_v8a" \
-  -DCMAKE_PREFIX_PATH="$HOME/Qt/6.11.1/android_arm64_v8a" \
-  -DQT_HOST_PATH="$HOME/Qt/6.11.1/gcc_64" \
-  -DQT_HOST_PATH_CMAKE_DIR="$HOME/Qt/6.11.1/gcc_64/lib/cmake" \
+  -DCMAKE_FIND_ROOT_PATH="$HOME/Qt/6.12.0/android_arm64_v8a" \
+  -DCMAKE_PREFIX_PATH="$HOME/Qt/6.12.0/android_arm64_v8a" \
+  -DQT_HOST_PATH="$HOME/Qt/6.12.0/gcc_64" \
+  -DQT_HOST_PATH_CMAKE_DIR="$HOME/Qt/6.12.0/gcc_64/lib/cmake" \
   -DCMAKE_BUILD_TYPE=Release \
   -DANDROID_SDK_ROOT="$HOME/Android/Sdk"
 
@@ -284,7 +284,7 @@ export QT_ANDROID_KEYSTORE_KEY_PASS='<key-password>'
 
 The script passes `-DQT_ANDROID_SIGN_AAB=ON` (and `QT_ANDROID_SIGN_APK`) at configure time. The keystore env vars must stay exported during the Gradle/`androiddeployqt` step — CMake `set()` is not enough.
 
-See [QT_ANDROID_SIGN_AAB](https://doc.qt.io/qt-6.11/cmake-variable-qt-android-sign-aab.html) and [Publishing to Google Play](https://doc.qt.io/qt-6.11/android-publishing-to-googleplay.html).
+See [QT_ANDROID_SIGN_AAB](https://doc.qt.io/qt-6.12/cmake-variable-qt-android-sign-aab.html) and [Publishing to Google Play](https://doc.qt.io/qt-6.12/android-publishing-to-googleplay.html).
 
 ---
 
@@ -293,11 +293,11 @@ See [QT_ANDROID_SIGN_AAB](https://doc.qt.io/qt-6.11/cmake-variable-qt-android-si
 Google Play can symbolicate native crashes only if the upload includes debug
 metadata for the packaged `.so` files. The release AAB is configured to
 embed **full** native symbols so Play Console extracts them automatically
-(AGP 4.1+ / the Qt 6.11 template uses AGP 9.0.0).
+(AGP 4.1+ / the Qt 6.12 template uses AGP 9.2.1).
 
 What the repo does:
 
-1. `android/build.gradle` (copied from the Qt 6.11.1 template, then customized)
+1. `android/build.gradle` (copied from the Qt 6.12.0 template, then customized)
    sets `android.buildTypes.release.ndk.debugSymbolLevel = 'FULL'`.
 2. `CMakeLists.txt` adds `-g` to Android **Release** objects so DWARF exists
    for `libappinton-trainer-2_<abi>.so` (and SPTK objects compiled in this
@@ -365,17 +365,17 @@ What the repo does:
    SPTK and alglib are statically linked into `libappinton-trainer-2_<abi>.so`,
    so they inherit that alignment. There is no `PAGE_SIZE` / `4096` hard-coding
    in app code.
-2. **Uncompressed JNI libs (AGP 9.0.0).** `android/build.gradle` parses
-   `legacyPackaging` with `Boolean.parseBoolean` so the gradle.properties
-   string `"false"` is not treated as Groovy-true. That was causing
-   compressed `.so` files and `extractNativeLibs=true`. The app target also
-   sets `QT_ANDROID_LEGACY_PACKAGING FALSE`. The release APK stores native
-   libs uncompressed (`STORE`) with `extractNativeLibs=false`.
-3. **Qt 6.11.1 prebuilts.** Official `android_arm64_v8a` libraries, including
+2. **Uncompressed JNI libs (AGP 9.2.1).** The Qt 6.12 template sets
+   `jniLibs.useLegacyPackaging = legacyPackaging.toBoolean()`. Groovy
+   `String.toBoolean()` is true only for `"true"`, `"y"`, and `"1"`, so the
+   gradle.properties string `"false"` stays uncompressed packaging. The app
+   target also sets `QT_ANDROID_LEGACY_PACKAGING FALSE`. The release APK
+   stores native libs uncompressed (`STORE`) with `extractNativeLibs=false`.
+3. **Qt 6.12.0 prebuilts.** Official `android_arm64_v8a` libraries, including
    FFmpeg (`libavcodec`, `libavformat`, `libavutil`, `libswresample`,
    `libswscale`), the Android and FFmpeg multimedia plugins, and NDK
    `libc++_shared.so` / 64-bit `libomp.so`, already report `LOAD align 2**14`.
-   (Qt 6.9 FFmpeg builds were often 4 KB; 6.11.1 is not.)
+   (Qt 6.9 FFmpeg builds were often 4 KB; 6.12.0 is not.)
 4. **Verification.** After packaging, `build_android.sh` runs
    `scripts/check_16kb_alignment.sh` on the APK and AAB.
 
@@ -393,11 +393,10 @@ entries (not `OK - compressed`), and AAB
 `uncompress_native_libraries.enabled=1` /
 `alignment=PAGE_ALIGNMENT_16K`.
 
-Verified on **13 September 2026** for the arm64-v8a release APK/AAB: 90
-packaged `.so` files, all `2**14`, zip 16 KB aligned, AAB
-`PAGE_ALIGNMENT_16K`. The sideload APK is larger (~96 MB) because native
-libs are uncompressed; the AAB stays compressed internally (~51 MB) and Play
-generates the device APKs.
+Verified on **8 October 2026** for the Qt 6.12.0 arm64-v8a release APK/AAB:
+198 packaged 64-bit `.so` files, all `2**14`, zip 16 KB aligned, AAB
+`PAGE_ALIGNMENT_16K`. The sideload APK is larger because native libs are
+uncompressed; Play generates the device APKs from the AAB.
 
 `armeabi-v7a` is exempt from the 16 KB ELF rule (32-bit). Play uploads from
 this project are **arm64-v8a only**.
@@ -445,13 +444,12 @@ On Android, `CMakeLists.txt` copies `settings.ini` and `data/` into `android/ass
 
 ### `android/build.gradle`
 
-Qt template from 6.11.1 (`android_arm64_v8a/src/android/templates/build.gradle`)
+Qt template from 6.12.0 (`android_arm64_v8a/src/android/templates/build.gradle`)
 plus `buildTypes.release.ndk.debugSymbolLevel = 'FULL'` so the release AAB
-includes native debug symbols for Play, and
-`jniLibs.useLegacyPackaging = Boolean.parseBoolean("${legacyPackaging}")` so
-native libs stay uncompressed and 16 KB zip-aligned. Re-copy the template if
-a future Qt upgrade changes AGP / Kotlin plugin versions, then re-apply the
-`ndk` block and the `Boolean.parseBoolean` packaging line.
+includes native debug symbols for Play. Packaging uses the template line
+`jniLibs.useLegacyPackaging = legacyPackaging.toBoolean()` so native libs stay
+uncompressed and 16 KB zip-aligned. Re-copy the template if a future Qt
+upgrade changes the AGP version, then re-apply the `ndk` block.
 
 ### CMake target properties (`CMakeLists.txt`)
 
@@ -546,7 +544,7 @@ offline inside every APK/AAB.
 The bundled notice set covers:
 
 - the application's MIT-licensed source;
-- Qt 6.11.1 under LGPLv3, including GPLv3 and LGPLv3 texts, matching Qt source,
+- Qt 6.12.0 under LGPLv3, including GPLv3 and LGPLv3 texts, matching Qt source,
   and instructions for rebuilding/signing an APK with modified Qt shared
   libraries;
 - ALGLIB 4.06.0 under GPL-2.0-or-later, including the source offer and rebuild
@@ -658,7 +656,7 @@ documentation on **13 September 2026**.
 | Version 1.0.0 / `versionCode` 1 | First internal-testing upload; git tag `1.0.0` |
 | Version 1.0.1 / `versionCode` 2 | Production release; git tag `1.0.1` (gesture-nav SafeArea, responsive training/home layout). Public listing: [by.intoncore.intontrainer2.zh](https://play.google.com/store/apps/details?id=by.intoncore.intontrainer2.zh) |
 | Storage / media permissions removed | `RECORD_AUDIO` only; Qt `INTERNET` stripped |
-| 16 KB page-size compatibility | ELF `LOAD` `2**14` on all packaged 64-bit `.so` (app, Qt 6.11.1, FFmpeg, `libc++_shared`); uncompressed JNI libs (`extractNativeLibs=false`); APK `zipalign -c -P 16`; AAB `PAGE_ALIGNMENT_16K` `enabled=1`. `build_android.sh` runs `scripts/check_16kb_alignment.sh`. Verified 13 September 2026 on arm64-v8a release artifacts. |
+| 16 KB page-size compatibility | ELF `LOAD` `2**14` on all packaged 64-bit `.so` (app, Qt 6.12.0, FFmpeg, `libc++_shared`); uncompressed JNI libs (`extractNativeLibs=false`); APK `zipalign -c -P 16`; AAB `PAGE_ALIGNMENT_16K` `enabled=1`. `build_android.sh` runs `scripts/check_16kb_alignment.sh`. Verified 8 October 2026 on the Qt 6.12.0 arm64-v8a release artifacts (198 aligned 64-bit libraries). |
 | Android App Bundle | `build_android.sh` produces the AAB required for new Play apps |
 | Signing env vars | `QT_ANDROID_KEYSTORE_*` (and `ANDROID_KEYSTORE_*` aliases) wired |
 | File picker | Hidden on Android |

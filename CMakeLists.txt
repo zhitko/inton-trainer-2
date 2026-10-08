@@ -7,7 +7,7 @@ project(inton-trainer-2 VERSION 1.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(Qt6 6.11 REQUIRED COMPONENTS Quick Multimedia LinguistTools)
+find_package(Qt6 6.12 REQUIRED COMPONENTS Quick Multimedia LinguistTools)
 
 # ---------------------------------------------------------------------------
 # OpenMP: on Android the NDK ships libomp (clang runtime) but CMake's
@@ -54,7 +54,7 @@ if(ANDROID)
     add_compile_options("$<$<CONFIG:Release>:-g>")
 endif()
 
-qt_standard_project_setup(REQUIRES 6.8 I18N_TRANSLATED_LANGUAGES en ru)
+qt_standard_project_setup(REQUIRES 6.12 I18N_TRANSLATED_LANGUAGES en ru)
 
 qt_add_executable(appinton-trainer-2
     main.cpp
@@ -275,7 +275,7 @@ if(ANDROID)
         # edition is .zh. Later Play apps use .en, .ru, .de, … — the id
         # cannot change after the first upload.
         QT_ANDROID_PACKAGE_NAME "by.intoncore.intontrainer2.zh"
-        # Uncompressed native libs, 16 KB zip-aligned by AGP 9. Required
+        # Uncompressed native libs, 16 KB zip-aligned by AGP 9.2. Required
         # so Play-generated APKs mmap .so files on 16 KB page-size devices.
         # Address Sanitizer builds should override this to TRUE.
         QT_ANDROID_LEGACY_PACKAGING FALSE

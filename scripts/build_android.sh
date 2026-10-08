@@ -20,11 +20,11 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 # Configuration — override any of these via environment variables
 # ---------------------------------------------------------------------------
-QT_ROOT="${QT_ROOT:-$HOME/Qt/6.11.1}"
+QT_ROOT="${QT_ROOT:-$HOME/Qt/6.12.0}"
 ANDROID_SDK="${ANDROID_SDK:-$HOME/Android/Sdk}"
 ANDROID_NDK="${ANDROID_NDK:-$ANDROID_SDK/ndk/27.2.12479018}"
-# Android Gradle Plugin requires Java 17+
-JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-17-openjdk-amd64}"
+# Qt 6.12 Android packaging uses Gradle 9.5.1 / AGP 9.2.1 and requires JDK 21.
+JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -127,8 +127,9 @@ build_abi() {
 # Main
 # ---------------------------------------------------------------------------
 export JAVA_HOME
+export PATH="${JAVA_HOME}/bin:${PATH}"
 export ANDROID_HOME="$ANDROID_SDK"
-# Gradle picks up the JDK via GRADLE_OPTS (Android Gradle Plugin requires Java 17)
+# Gradle picks up the JDK via GRADLE_OPTS (Qt 6.12 requires JDK 21).
 export GRADLE_OPTS="-Dorg.gradle.java.home=${JAVA_HOME}"
 
 echo "Android SDK:   $ANDROID_SDK"
@@ -155,7 +156,7 @@ fi
 # Package APK (emulator / sideload) and AAB (Play) via Qt CMake targets
 # ---------------------------------------------------------------------------
 # Prerequisite: platforms;android-36 must be installed in the SDK:
-#   JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
+#   JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 \
 #     $HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" <<< "y"
 # ---------------------------------------------------------------------------
 echo ""

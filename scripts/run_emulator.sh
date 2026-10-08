@@ -54,7 +54,7 @@ EOF
 # Configuration
 # ---------------------------------------------------------------------------
 ANDROID_SDK="${ANDROID_SDK:-$HOME/Android/Sdk}"
-JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-17-openjdk-amd64}"
+JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
 EMULATOR_CMD="$ANDROID_SDK/emulator/emulator"
 ADB_CMD="$ANDROID_SDK/platform-tools/adb"
 AVDMANAGER_CMD="$ANDROID_SDK/cmdline-tools/latest/bin/avdmanager"

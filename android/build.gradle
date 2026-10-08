@@ -6,8 +6,7 @@ buildscript {
 
     dependencies {
         //noinspection AndroidGradlePluginVersion
-        classpath 'com.android.tools.build:gradle:9.0.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0"
+        classpath 'com.android.tools.build:gradle:9.2.1'
     }
 }
 
@@ -59,17 +58,12 @@ android {
     }
 
     tasks.withType(JavaCompile) {
-        options.incremental = true
         options.compilerArgs += ['-Xlint:all']
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-
-    lintOptions {
-        abortOnError = false
     }
 
     aaptOptions {
@@ -79,17 +73,14 @@ android {
 
     packagingOptions {
         jniLibs {
-            // gradle.properties values are strings. Groovy treats a non-empty
-            // "false" as true, which silently enabled compressed (legacy)
-            // native-lib packaging and extractNativeLibs=true. Play's 16 KB
-            // devices need uncompressed, 16 KB zip-aligned .so files when
-            // AGP >= 8.5.1. Parse the boolean explicitly.
-            useLegacyPackaging = Boolean.parseBoolean("${legacyPackaging}")
+            // gradle.properties values are strings. Groovy truthiness would
+            // treat a non-empty "false" as true and compress native libs.
+            // String.toBoolean() is true only for "true", "y", or "1".
+            useLegacyPackaging = legacyPackaging.toBoolean()
         }
     }
 
     defaultConfig {
-        resConfig "en"
         minSdkVersion qtMinSdkVersion
         targetSdkVersion qtTargetSdkVersion
         ndk.abiFilters = qtTargetAbiList.split(",")
@@ -97,7 +88,7 @@ android {
 
     // Play Console native crash symbolication. AGP extracts DWARF from the
     // unstripped .so files in jniLibs into AAB metadata and still strips the
-    // packaged libraries. Based on Qt 6.11.1 android_arm64_v8a template.
+    // packaged libraries. Based on the Qt 6.12.0 android_arm64_v8a template.
     buildTypes {
         release {
             ndk {

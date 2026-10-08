@@ -154,7 +154,7 @@ Home
 ### Build Requirements
 
 - **CMake**: 3.16 or higher
-- **Qt**: 6.11 or higher with the following modules:
+- **Qt**: 6.12 or higher with the following modules:
   - Qt Quick
   - Qt Multimedia
   - Qt Linguist Tools
@@ -165,7 +165,7 @@ Home
 ### Android Build Requirements (optional)
 
 - **Android NDK**: 26+ (with LLVM/clang toolchain)
-- **Java**: 17 (required by Gradle for AAB/APK packaging)
+- **Java**: 21 (required by Qt 6.12 Gradle packaging for AAB/APK)
 - **Android SDK**: compileSdk 35+, build tools 35+
 
 ### Runtime Requirements
@@ -238,7 +238,7 @@ cmake --build . --config Release --target appinton-trainer-2
 #### Android (arm64-v8a)
 
 ```bash
-# Requires Android NDK + SDK and Java 17
+# Requires Android NDK + SDK and JDK 21
 chmod +x scripts/build_android.sh
 ./scripts/build_android.sh
 ```
