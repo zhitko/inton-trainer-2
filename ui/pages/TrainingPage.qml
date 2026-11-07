@@ -493,7 +493,7 @@ Page {
             window.settingsApi.pitchSmoothingWindowSize,
             window.settingsApi.pitchGaussianSmoothingSigma,
             window.settingsApi.pitchSplineSmoothingPenalty,
-            false,
+            true,
             window.settingsApi.useOnlyN
         );
         Logger.debug("Reference pitch frames: " + referencePitchData.length);
@@ -573,7 +573,7 @@ Page {
             window.settingsApi.umpSmoothingWindowSize,
             window.settingsApi.umpGaussianSmoothingSigma,
             window.settingsApi.umpSplineSmoothingPenalty,
-            false,
+            true,
             false
         );
         umpGraph.waveData  = root.referenceUMP.ump;
@@ -779,6 +779,9 @@ Page {
                 ? window.settingsApi.dtwDistanceLimit : Infinity;
             if (dpResult.minFinalCost >= distanceLimit) {
                 Logger.info("Recording skipped: DTW distance (" + dpResult.minFinalCost + ") >= limit (" + distanceLimit + ")");
+                root.userUMP = null;
+                umpGraph.waveData = root.referenceUMP.ump;
+                umpGraph.cuePoints = root.referenceUMP.cuePoints;
                 return;
             }
         }
@@ -796,7 +799,7 @@ Page {
             window.settingsApi.umpSmoothingWindowSize, 
             window.settingsApi.umpGaussianSmoothingSigma, 
             window.settingsApi.umpSplineSmoothingPenalty, 
-            false,
+            true,
             window.settingsApi.useOnlyN
         );
         Logger.debug("UMP calculated with " + root.userUMP.cuePoints.length + " cue points");
