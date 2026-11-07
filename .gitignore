@@ -96,3 +96,5 @@ docs/*.docx
 docs/*.pdf
 *.jks
 *.keystore
+*.bak
+*_bak

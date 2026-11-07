@@ -83,11 +83,13 @@ Page {
                 Logger.debug("Microphone permission granted, starting recording");
                 if (root.pendingStartRecording) {
                     root.pendingStartRecording = false;
-                    root.doStartRecording();
+                    root.startRecording();
                 }
             } else {
                 Logger.warning("Microphone permission denied");
                 root.pendingStartRecording = false;
+                if (root.guidedState === root.gsPending)
+                    root.guidedState = root.gsIdle;
             }
         }
         onBeepFinished: {
@@ -98,7 +100,7 @@ Page {
                 }
             } else if (root._pendingAfterBeep) {
                 root._pendingAfterBeep = false;
-                if (!root._isExiting && !isAnyPlaybackActive
+                if (root.trainingMode === 0 && root.visible && !root._isExiting && !isAnyPlaybackActive
                         && window.settingsApi && window.settingsApi.autoStopRecording) {
                     restartRecordingTimer.start();
                 }
@@ -144,9 +146,8 @@ Page {
     }
 
     onTrainingModeChanged: {
-        guidedDelayTimer.stop();
-        guidedTimeoutTimer.stop();
-        if (root.guidedState === root.gsListening) {
+        cancelPendingRecording();
+        if (trainingAudioApi.isRecording) {
             root._isExiting = true;
             trainingAudioApi.stopRecording();
             root._isExiting = false;
@@ -164,9 +165,26 @@ Page {
     }
 
     // Starts recording without VAD calibration (calibration is performed on HomePage).
+    function canStartRecording() {
+        return root.visible && !root._isExiting && !root._isVadPaused
+            && !isAnyPlaybackActive && !trainingAudioApi.isRecording
+            && (root.trainingMode === 0 || root.guidedState === root.gsPending);
+    }
+
+    function cancelPendingRecording() {
+        pendingStartRecording = false;
+        root._pendingBeepRecording = false;
+        root._pendingAfterBeep = false;
+        restartRecordingTimer.stop();
+        guidedDelayTimer.stop();
+        guidedTimeoutTimer.stop();
+        trainingAudioApi.stopBeep();
+    }
+
     function startRecording() {
+        if (!canStartRecording() || pendingStartRecording || root._pendingBeepRecording) return;
         // On Android, request mic permission first (async). If pending,
-        // doStartRecording() will be called from the callback.
+        // startRecording() will resume the beep sequence from the callback.
         if (!trainingAudioApi.requestAudioPermission()) {
             pendingStartRecording = true;
             return;
@@ -185,11 +203,23 @@ Page {
     }
 
     function doStartRecording() {
+        if (!canStartRecording()) return;
         let minimumLength = -1;
         if (root.referenceWaveData && window.settingsApi) {
             minimumLength = Math.max(0, Math.floor(root.referenceWaveData.length * window.settingsApi.minimumRecordLengthPercent));
         }
         trainingAudioApi.startRecording(-1, minimumLength);
+        if (root.trainingMode === 1) {
+            if (trainingAudioApi.isRecording) {
+                root.guidedState = root.gsListening;
+                root.guidedTimedOut = false;
+                guidedTimeoutTimer.interval = window.settingsApi
+                    ? window.settingsApi.guidedListenTimeoutMs : 4000;
+                guidedTimeoutTimer.restart();
+            } else {
+                root.guidedState = root.gsIdle;
+            }
+        }
     }
 
     // When true, recording will start as soon as the beep finishes playing
@@ -204,8 +234,7 @@ Page {
         } else {
             _isExiting = true;
             // Cancel any pending guided activity when navigating away
-            guidedDelayTimer.stop();
-            guidedTimeoutTimer.stop();
+            cancelPendingRecording();
             root.guidedState = root.gsIdle;
             root._pendingBeepRecording = false;
             root._pendingAfterBeep = false;
@@ -226,6 +255,7 @@ Page {
 
     Component.onDestruction: {
         _isExiting = true;
+        cancelPendingRecording();
         if (trainingAudioApi.isRecording) {
             trainingAudioApi.stopRecording();
         }
@@ -233,7 +263,17 @@ Page {
 
     Connections {
         target: trainingAudioApi
-        onIsRecordingChanged: {
+        function onIsVoiceDetectedChanged() {
+            if (root.trainingMode !== 1 || root.guidedState !== root.gsListening
+                    || !trainingAudioApi.isRecording || root._isExiting) return;
+            if (trainingAudioApi.isVoiceDetected) {
+                guidedTimeoutTimer.stop();
+            } else {
+                // A too-short utterance was rejected by VAD: open a fresh window.
+                guidedTimeoutTimer.restart();
+            }
+        }
+        function onIsRecordingChanged() {
             if (!trainingAudioApi.isRecording && !root._isExiting) {
 
                 // ── AUTO MODE ──────────────────────────────────────────────
@@ -302,7 +342,8 @@ Page {
         interval: 100
         repeat: false
         onTriggered: {
-            if (root.visible && !root._isExiting && !root._isVadPaused) {
+            if (root.trainingMode === 0 && root.visible && !root._isExiting && !root._isVadPaused
+                    && window.settingsApi && window.settingsApi.autoStopRecording) {
                 root.startRecording();
             }
         }
@@ -314,12 +355,8 @@ Page {
         repeat: false
         onTriggered: {
             if (root.trainingMode !== 1 || root.guidedState !== root.gsPending) return;
-            root.guidedState = root.gsListening;
             root.guidedTimedOut = false;
             startRecording();
-            guidedTimeoutTimer.interval = window.settingsApi
-                ? window.settingsApi.guidedListenTimeoutMs : 4000;
-            guidedTimeoutTimer.start();
         }
     }
 
@@ -331,6 +368,7 @@ Page {
             if (root.trainingMode !== 1 || root.guidedState !== root.gsListening) return;
             Logger.info("Guided: listen window timed out — no speech detected");
             root._isExiting = true;  // prevent saving empty recording
+            cancelPendingRecording();
             trainingAudioApi.stopRecording();
             root._isExiting = false;
             root.guidedState = root.gsIdle;
@@ -347,10 +385,13 @@ Page {
         if (isAnyPlaybackActive) {
             // Playback started – remember if we were recording so we can resume later if appropriate.
             _wasRecordingBeforePlayback = trainingAudioApi.isRecording;
+            cancelPendingRecording();
+            root.guidedState = root.gsIdle;
             if (trainingAudioApi.isRecording) {
                 _isExiting = true; // Prevent saving an aborted recording
                 trainingAudioApi.stopRecording();
             }
+            _isExiting = !root.visible;
 
             // Only enter guided cycle when reference audio is played, not user recording
             if (root.trainingMode === 1 && playReferenceBtn.isPlaying) {
@@ -370,7 +411,7 @@ Page {
             }
 
             // Only start guided listen cycle when reference playback finished
-            if (root.trainingMode === 1 && root.guidedState === root.gsPlaying && !playReferenceBtn.isPlaying) {
+            if (root.visible && !root._isExiting && root.trainingMode === 1 && root.guidedState === root.gsPlaying && !playReferenceBtn.isPlaying) {
                 root.guidedState = root.gsPending;
                 guidedDelayTimer.interval = window.settingsApi
                     ? window.settingsApi.guidedPrePlayListenDelayMs : 150;
@@ -1214,7 +1255,7 @@ Page {
                         Layout.minimumHeight: btnSize
                         implicitWidth: btnSize
                         implicitHeight: btnSize
-                        visible: root.trainingMode === 1 && root.guidedState === root.gsIdle && !isAnyPlaybackActive
+                        visible: root.trainingMode === 1 && root.guidedState === root.gsIdle && !isAnyPlaybackActive && !trainingAudioApi.isRecording
 
                         Rectangle {
                             id: guidedOuterCircle
@@ -1387,6 +1428,7 @@ Page {
                     } else {
                         // Pause VAD
                         root._isVadPaused = true;
+                        cancelPendingRecording();
                         trainingAudioApi.stopRecording();
                     }
                 }
@@ -1451,6 +1493,8 @@ Page {
                 onClicked: {
                     // Stop recording before opening the dialog
                     _wasRecordingBeforeDialog = trainingAudioApi.isRecording;
+                    cancelPendingRecording();
+                    root.guidedState = root.gsIdle;
                     if (_wasRecordingBeforeDialog) {
                         console.log("Stopping recording before opening test file dialog");
                         _isExiting = true; // Prevent automatic restart when stopping
@@ -1481,17 +1525,19 @@ Page {
                     }
                     // Pause VAD recording after loading a file so the user can review
                     // the result before the microphone starts again.
-                    if (window.settingsApi && window.settingsApi.autoStopRecording) {
+                    if (root.trainingMode === 0 && window.settingsApi && window.settingsApi.autoStopRecording) {
                         root._isVadPaused = true;
                         // Recording is already stopped (it was stopped before opening the dialog);
                         // just leave _isExiting reset so the page stays in a clean state.
                         _isExiting = false;
                     }
+                    _isExiting = false;
                 }
                 onRejected: {
                     console.log("testFileDialog rejected");
                     // Resume recording if it was active before opening the dialog and VAD is not paused
-                    if (_wasRecordingBeforeDialog && !root._isVadPaused && window.settingsApi && window.settingsApi.autoStopRecording) {
+                    _isExiting = false;
+                    if (root.trainingMode === 0 && _wasRecordingBeforeDialog && !root._isVadPaused && window.settingsApi && window.settingsApi.autoStopRecording) {
                         console.log("Resuming recording after opening test file dialog");
                         _isExiting = false; // Allow recording to auto-restart
                         root.startRecording();

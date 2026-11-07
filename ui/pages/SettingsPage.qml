@@ -25,16 +25,6 @@ Page {
     // VAD Calibration dialog (extracted component)
     VadCalibrationDialog {
         id: vadCalibrationDialog
-        onCalibrationDoneEnergy: function (threshold) {
-            if (settingsApi) {
-                settingsApi.vadThreshold = threshold;
-            }
-        }
-        onCalibrationDoneAutocorrelation: function (threshold) {
-            if (settingsApi) {
-                settingsApi.autoCorrThreshold = threshold;
-            }
-        }
     }
 
     Material.theme: ApplicationWindow.window ? ApplicationWindow.window.theme : Material.Light

@@ -3,6 +3,7 @@
 #include "helpers/settings.h"
 #include "helpers/statistics.h"
 #include <algorithm>
+#include <cmath>
 #include <QCoreApplication>
 #include <QGuiApplication>
 #include <QFont>
@@ -355,6 +356,22 @@ double SettingsApi::autoCorrThreshold() const
     double result = m_settings.autoCorrThreshold;
     LOG_DEBUG() << "Finish: autoCorrThreshold - result=" << result;
     return result;
+}
+
+double SettingsApi::autoCorrEnergyThreshold() const
+{
+    return m_settings.autoCorrEnergyThreshold;
+}
+
+void SettingsApi::setAutoCorrEnergyThreshold(double threshold)
+{
+    if (!std::isfinite(threshold) || threshold <= 0.0)
+        return;
+    if (m_settings.autoCorrEnergyThreshold != threshold) {
+        m_settings.autoCorrEnergyThreshold = threshold;
+        save();
+        emit autoCorrEnergyThresholdChanged();
+    }
 }
 
 void SettingsApi::setAutoCorrThreshold(double threshold)

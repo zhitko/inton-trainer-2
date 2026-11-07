@@ -80,8 +80,8 @@ std::vector<double> VADAutocorrelationService::processAudioSamples(
     if (m_H.size() < m_C.size())
         m_H.resize(m_C.size(), 0.0);
 
-    // 3. First smoothing pass: U(n) = mean(C[n-K+1..n+K-1]), H(n) = |C(n)-U(n)|
-    //    All frames (including boundaries) are processed with clamped windows.
+    // Causal smoothing: never include future frames from the current audio chunk.
+    // This makes detection independent of microphone callback/buffer size.
     //
     std::vector<double> newUValues;
     for (; m_valid_U < static_cast<int>(m_C.size()); ++m_valid_U) {
@@ -89,7 +89,7 @@ std::vector<double> VADAutocorrelationService::processAudioSamples(
         // Clamp left edge at 0 for boundary frames (mirrors energy service skip behaviour
         // but produces a real value instead of leaving the slot zero).
         int lo = std::max(0, i - K_FRAMES + 1);
-        int hi = std::min(static_cast<int>(m_C.size()) - 1, i + K_FRAMES - 1);
+        int hi = i;
 
         double sumC = 0.0;
         for (int j = lo; j <= hi; ++j)
@@ -139,6 +139,7 @@ void VADAutocorrelationService::reset()
 {
     m_sampleBuf.clear();
     m_C.clear();
+    m_frameEnergies.clear();
     m_U.clear();
     m_H.clear();
     m_vadDecisions.clear();
@@ -239,12 +240,13 @@ double VADAutocorrelationService::findMaxAutocorrelation(
     double r0 = 0.0;
     for (double v : frame)
         r0 += v * v;
+    m_frameEnergies.push_back(r0);
 
     // Energy gate: forces C=0 for near-silent frames.
     // DEFAULT_ENERGY_THRESHOLD is set very low (0.0001) so quiet Windows
     // microphone input (AGC-reduced amplitude) is not silenced here.
     // Log R0 at trace level to aid per-platform threshold tuning.
-    if (r0 < m_energyThreshold) {
+    if (r0 <= 0.0 || r0 < m_energyThreshold) {
         // qDebug().nospace()
         //     << "VAD-ACF: energy gate R0=" << QString::number(r0, 'f', 6)
         //     << " < threshold=" << QString::number(m_energyThreshold, 'f', 6)

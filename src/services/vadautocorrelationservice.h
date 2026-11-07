@@ -10,7 +10,7 @@
  * with a single-stage smoothing pipeline:
  *
  *   C(n) — raw max Normalized Autocorrelation Function per frame  [0..1]
- *   U(n) — smoothed mean of C  over window [n-K+1 .. n+K-1]
+ *   U(n) — causal smoothed mean of C over window [n-K+1 .. n]
  *
  * VAD decisions are taken directly on U(n) with hysteresis.
  *
@@ -76,6 +76,7 @@ public:
      */
     void   setEnergyThreshold(double t) { m_energyThreshold = t; }
     double getEnergyThreshold() const   { return m_energyThreshold; }
+    const std::vector<double>& getFrameEnergies() const { return m_frameEnergies; }
     /** Set the audio sample rate used to convert F0 bounds to lag values. */
     void setSampleRate(double sampleRate) { m_sampleRate = sampleRate; }
 
@@ -137,6 +138,7 @@ private:
 
     // --- Smoothing pipeline (never drained — updateSavedMetrics needs full history) ---
     std::vector<double> m_C;
+    std::vector<double> m_frameEnergies;
     std::vector<double> m_U;
     std::vector<double> m_H;
 

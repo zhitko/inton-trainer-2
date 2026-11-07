@@ -7,19 +7,30 @@ import "../utils"
 
 // VAD Calibration dialog.
 // Usage:
-//   VadCalibrationDialog { id: myDialog; onCalibrationDone: function(threshold) { ... } }
+//   VadCalibrationDialog { id: myDialog; onCalibrationDone: { ... } }
 //   myDialog.open()
 //
 // The dialog starts calibration automatically when opened and closes itself
-// when calibration finishes. The resulting threshold is reported via the
-// calibrationDone(threshold) signal so the caller can store it.
+// when calibration finishes. Thresholds are saved through SettingsApi before
+// calibrationDone() is emitted once (including for hybrid calibration).
 
 Dialog {
     id: root
 
-    // Emitted when calibration finishes successfully.
-    signal calibrationDoneEnergy(real threshold)
-    signal calibrationDoneAutocorrelation(real threshold)
+    signal calibrationDone()
+    property int calibrationMethod: 0
+
+    function startCalibration() {
+        if (calibrationMethod === 1)
+            _calibrationAudioApi.calibrateVadAutocorrelation();
+        else
+            _calibrationAudioApi.calibrateVadEnergy();
+    }
+
+    function finishCalibration() {
+        root.close();
+        root.calibrationDone();
+    }
 
     title: qsTr("VAD Calibration")
     modal: true
@@ -31,22 +42,30 @@ Dialog {
     AudioApi {
         id: _calibrationAudioApi
         onCalibrationFinishedEnergy: function(threshold) {
-            root.calibrationDoneEnergy(threshold);
-            root.close();
+            if (window.settingsApi)
+                window.settingsApi.vadThreshold = threshold;
+            if (root.calibrationMethod >= 2) {
+                // Both detectors participate in hybrid decisions.
+                Qt.callLater(function() {
+                    _calibrationAudioApi.calibrateVadAutocorrelation();
+                });
+            } else {
+                root.finishCalibration();
+            }
+        }
+        onCalibrationEnergyGateChanged: function(threshold) {
+            if (window.settingsApi)
+                window.settingsApi.autoCorrEnergyThreshold = threshold;
         }
         onCalibrationFinishedAutocorrelation: function(threshold) {
-            root.calibrationDoneAutocorrelation(threshold);
-            root.close();
+            if (window.settingsApi)
+                window.settingsApi.autoCorrThreshold = threshold;
+            root.finishCalibration();
         }
         onPermissionResultReceived: function(granted) {
             if (granted) {
                 // Retry calibration after permission granted
-                const method = window.settingsApi ? window.settingsApi.vadMethod : 0;
-                if (method === 1) {
-                    _calibrationAudioApi.calibrateVadAutocorrelation();
-                } else {
-                    _calibrationAudioApi.calibrateVadEnergy();
-                }
+                root.startCalibration();
             } else {
                 Logger.warning("Microphone permission denied — cannot calibrate");
                 root.close();
@@ -57,7 +76,7 @@ Dialog {
     contentItem: ColumnLayout {
         spacing: 16
         Label {
-            text: qsTr("Please stay quiet for %1 seconds so the background noise level can be measured.").arg(window.settingsApi ? Math.round(window.settingsApi.vadCalibrationDurationMs / 1000) : 2)
+            text: qsTr("Please stay quiet for %1 seconds so the background noise level can be measured.").arg(Math.ceil((window.settingsApi ? window.settingsApi.vadCalibrationDurationMs : 2000) * (root.calibrationMethod >= 2 ? 2 : 1) / 1000))
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
             font.pixelSize: AppScale.fs(15)
@@ -86,17 +105,13 @@ Dialog {
     }
 
     onOpened: {
+        calibrationMethod = window.settingsApi ? window.settingsApi.vadMethod : 0;
         // Request microphone permission first (no-op on desktop)
         if (!_calibrationAudioApi.requestAudioPermission()) {
             // Permission request is pending — will retry calibration in
             // onPermissionResultReceived callback
             return;
         }
-        const method = window.settingsApi ? window.settingsApi.vadMethod : 0;
-        if (method === 1) {  // 1: autocorr
-            _calibrationAudioApi.calibrateVadAutocorrelation();
-        } else {  // 0: energy, 2: hybrid (default to energy)
-            _calibrationAudioApi.calibrateVadEnergy();
-        }
+        startCalibration();
     }
 }

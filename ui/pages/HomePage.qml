@@ -147,16 +147,7 @@ Page {
 
                 VadCalibrationDialog {
                     id: homeVadCalibrationDialog
-                    onCalibrationDoneEnergy: function(threshold) {
-                        if (window.settingsApi) {
-                            window.settingsApi.vadThreshold = threshold;
-                        }
-                        stackView.push("TemplateCategoriesPage.qml");
-                    }
-                    onCalibrationDoneAutocorrelation: function(threshold) {
-                        if (window.settingsApi) {
-                            window.settingsApi.autoCorrThreshold = threshold;
-                        }
+                    onCalibrationDone: {
                         stackView.push("TemplateCategoriesPage.qml");
                     }
                 }

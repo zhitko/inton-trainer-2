@@ -104,7 +104,7 @@ public slots:
      *                         for manual stop.
      * @param minimumRecordLength - Minimum number of samples required for recording.
      *                             If > 0 and recording is shorter, auto-stop resets VAD,
-     *                             manual stop is ignored. Default -1 (no minimum).
+     *                             explicit stop always closes the microphone. Default -1 (no minimum).
      */
     Q_INVOKABLE void startRecording(int durationSeconds = -1, int minimumRecordLength = -1);
     /**
@@ -151,6 +151,7 @@ public slots:
      * @param amplitude   - Amplitude 0.0–1.0 (default 0.5).
      */
     Q_INVOKABLE void playBeep(double frequencyHz = 440.0, int durationMs = 100, double amplitude = 0.5);
+    Q_INVOKABLE void stopBeep() { m_beepPlayer.stop(); }
     /**
      * Plays a two-tone "ding-dong" beep generated in memory.
      * Two tones play back-to-back with a short silence gap between them.
@@ -222,6 +223,7 @@ signals:
      * threshold value that should be saved in settings.
      */
     void calibrationFinishedAutocorrelation(double threshold);
+    void calibrationEnergyGateChanged(double threshold);
     /**
      * Emitted when the beep signal finishes playing.
      */
@@ -265,6 +267,7 @@ private:
     int m_firstSpeechFrame = -1;
     int m_lastSpeechFrame = -1;
     int m_silenceFramesCount = 0;
+    int m_speechOnsetFrames = 0;
     int m_minimumRecordLength = -1;
 
     void processVadFrame(int frameIndex, double V_n, double correlation);

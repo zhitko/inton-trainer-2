@@ -13,11 +13,23 @@ class BeepPlayer : public QObject
     Q_OBJECT
 public:
     explicit BeepPlayer(QObject *parent = nullptr) : QObject(parent) {}
+    ~BeepPlayer() override { stop(); }
+
+    void stop()
+    {
+        if (m_sink) {
+            disconnect(m_sink.get(), nullptr, m_sink.get(), nullptr);
+            m_sink->stop();
+            m_sink.reset();
+        }
+        m_buffer.reset();
+    }
 
     // Plays a single beep, or a beep + second beep if freq2 > 0
     void playBeep(double freq1, int dur1, double amp,
                   double freq2 = 0.0, int dur2 = 0)
     {
+        stop();
         QAudioFormat format;
         format.setSampleRate(44100);
         format.setChannelCount(1);
@@ -31,21 +43,28 @@ public:
             pcm += generateTone(freq2, dur2, amp, format);
         }
 
+        // Keep the microphone closed while the output pipeline and acoustic
+        // tail settle. This silence is played through the same device as the tone.
+        pcm += generateSilence(200, format);
+
         m_buffer.reset(new QBuffer(this));
         m_data = pcm;
         m_buffer->setBuffer(&m_data);
         m_buffer->open(QIODevice::ReadOnly);
 
         m_sink.reset(new QAudioSink(QMediaDevices::defaultAudioOutput(), format, this));
-        m_sink->start(m_buffer.get());
-
-        // Notify when playback finishes
-        disconnect(m_sink.get(), &QAudioSink::stateChanged, nullptr, nullptr);
-        connect(m_sink.get(), &QAudioSink::stateChanged, this, [this](QAudio::State state) {
-            if (state == QAudio::IdleState || state == QAudio::StoppedState) {
+        // Connect before start (including immediate device failures), and finish
+        // only once. Queue delivery so consumers can safely start another beep.
+        auto *sink = m_sink.get();
+        connect(sink, &QAudioSink::stateChanged, sink, [this, sink, completed = false](QAudio::State state) mutable {
+            if (!completed && (state == QAudio::IdleState || state == QAudio::StoppedState)) {
+                completed = true;
+                disconnect(sink, nullptr, sink, nullptr);
+                sink->stop();
                 emit finished();
             }
-        });
+        }, Qt::QueuedConnection);
+        m_sink->start(m_buffer.get());
     }
 
 signals:
