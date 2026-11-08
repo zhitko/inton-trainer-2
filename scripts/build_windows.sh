@@ -21,17 +21,19 @@
 #                         MSVC on Windows when that kit and Visual Studio
 #                         are both installed)
 #   JOBS                  Parallel compile jobs
-#   ALLOW_MINGW_MISMATCH  Set to 1 to allow a MinGW major version other than 13
+#   ALLOW_MINGW_MISMATCH  Set to 1 to allow other compiler-major mismatches
+#                         (packaged runtime imports must still pass validation)
 #
 # Linux cross build needs:
-#   - Qt 6.12 MinGW 13.1 64-bit kit at $QT_ROOT/mingw_64
-#     (Qt Maintenance Tool component "MinGW 13.1.0 64-bit")
-#   - g++-mingw-w64-x86-64 and binutils-mingw-w64-x86-64 (GCC 13, posix, seh)
+#   - Qt 6.12 MinGW 64-bit kit at $QT_ROOT/mingw_64
+#   - MinGW cross compiler (posix, seh): matching Qt's GCC version, or GCC 13
+#     with the bundled mingw_libstdcxx_compat.cpp compatibility marker
+#     and binutils-mingw-w64-x86-64; override compiler with MINGW_CXX
 #   - wine (windeployqt.exe is a Windows program)
 #
 # Windows build needs Git Bash and either:
 #   - Qt MSVC 2022 64-bit + Visual Studio 2022, or
-#   - Qt MinGW 13.1 64-bit and its matching MinGW under Qt/Tools
+#   - Qt MinGW 64-bit and its matching MinGW under Qt/Tools
 #
 # Extract the zip to a writable folder. settings.ini, statistics.json, and
 # data/records are stored next to the executable. Reference templates are
@@ -50,7 +52,7 @@ HOST=""
 TOOLCHAIN=""
 CROSS=0
 MULTI_CONFIG=0
-QT_WINDOWS=""
+QT_WINDOWS="${QT_WINDOWS:-}"
 QT_HOST=""
 CXX=""
 CC=""
@@ -321,13 +323,16 @@ linux_prereq_help() {
 Linux cross builds need three things:
 
   1. Qt $(basename "$QT_ROOT") MinGW 64-bit kit, installed with Qt Maintenance Tool
-     (component "MinGW 13.1.0 64-bit"). Expected directory:
+     Expected directory:
        $QT_ROOT/mingw_64
      Override with QT_WINDOWS if the kit lives somewhere else.
      The matching Linux kit must be at:
        ${QT_HOST_PATH:-$QT_ROOT/gcc_64}
 
-  2. GCC 13 MinGW cross compiler, posix threads, SEH exceptions:
+  2. MinGW cross compiler, posix threads, SEH exceptions.
+     Check QT_GCC_*_VERSION in the kit's mkspecs/qconfig.pri
+     (Qt 6.12.0 uses GCC 15.1). GCC 13 is also supported via the
+     bundled compatibility marker, with runtime entry-point validation:
        sudo apt install g++-mingw-w64-x86-64 binutils-mingw-w64-x86-64
        sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
        sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
@@ -437,7 +442,7 @@ resolve_toolchain() {
             require_wine64
             CROSS=1
         else
-            CXX="$(find_windows_mingw)" || die "MinGW g++ was not found. Install Qt's MinGW 13.1 kit or set MINGW_CXX."
+            CXX="$(find_windows_mingw)" || die "MinGW g++ was not found. Install Qt's matching MinGW kit or set MINGW_CXX."
         fi
         CXX="$(abs_path "$(command -v "$CXX")")"
         CC="${CXX/g++/gcc}"
@@ -525,7 +530,14 @@ find_windows_mingw() {
 }
 
 check_mingw_compiler() {
-    local version major thread_model
+    local version major thread_model qt_major qt_minor qt_patch qt_compiler
+    local config="$QT_WINDOWS/mkspecs/qconfig.pri"
+    [[ -f "$config" ]] || die "Qt compiler metadata not found: $config"
+    qt_major="$(sed -n 's/^QT_GCC_MAJOR_VERSION[[:space:]]*=[[:space:]]*\([0-9]*\).*/\1/p' "$config")"
+    qt_minor="$(sed -n 's/^QT_GCC_MINOR_VERSION[[:space:]]*=[[:space:]]*\([0-9]*\).*/\1/p' "$config")"
+    qt_patch="$(sed -n 's/^QT_GCC_PATCH_VERSION[[:space:]]*=[[:space:]]*\([0-9]*\).*/\1/p' "$config")"
+    [[ -n "$qt_major" && -n "$qt_minor" && -n "$qt_patch" ]] || die "Cannot determine Qt's GCC version from $config"
+    qt_compiler="$qt_major.$qt_minor.$qt_patch"
     version="$("$CXX" -dumpversion)"
     # Debian's MinGW reports "13-posix" rather than "13.2.0".
     major="${version%%[^0-9]*}"
@@ -543,12 +555,15 @@ check_mingw_compiler() {
         *__SEH__*) ;;
         *) echo "WARNING: MinGW is not using SEH exceptions. Qt 6.12 MinGW builds use posix/seh." ;;
     esac
-    if [[ "$major" != "13" && "${ALLOW_MINGW_MISMATCH:-}" != "1" ]]; then
-        die "MinGW $version does not match Qt 6.12 (GCC 13.1 posix/seh). Install the GCC 13 cross compiler, or set ALLOW_MINGW_MISMATCH=1 to continue anyway."
+    if [[ "$major" != "$qt_major" && "$major" != "13" && "${ALLOW_MINGW_MISMATCH:-}" != "1" ]]; then
+        die "MinGW $version does not match this Qt kit (GCC $qt_compiler posix/seh). Set MINGW_CXX to a matching compiler. Mixing these runtimes can cause Windows 'Entry Point Not Found' errors."
     fi
-    if [[ "$major" == "13" && "$version" != "13.1.0" && "$version" != "13.1" ]]; then
-        echo "WARNING: Qt 6.12 MinGW builds use GCC 13.1. This compiler is $version."
-        echo "         The package will ship this compiler's runtime DLLs."
+    if [[ "$version" != "$qt_compiler" ]]; then
+        echo "WARNING: This Qt kit uses GCC $qt_compiler. This compiler reports $version."
+        echo "         The package uses Qt's C++ runtime; imported runtime symbols will be checked."
+        if [[ "$major" == "13" ]]; then
+            echo "         GCC 13 uses the bundled MinGW libstdc++ compatibility marker."
+        fi
     fi
 }
 
@@ -895,8 +910,8 @@ copy_mingw_runtime() {
             echo "WARNING: $name was not found in the Qt MinGW kit"
         fi
     done
-    # OpenMP is not part of the Qt kit. libgomp from this GCC 13 builds
-    # against the same libgcc/libstdc++ imports Qt's runtime provides.
+    # OpenMP is not part of the Qt kit. Use the compiler's runtime and
+    # validate its imports against the packaged DLLs before creating the zip.
     if ! copy_one_runtime "libgomp-1.dll"; then
         echo "WARNING: libgomp-1.dll was not found next to the compiler"
     fi
@@ -1187,6 +1202,12 @@ package_app() {
 
     echo "Copying remaining DLL dependencies..."
     fill_missing_dlls
+
+    if [[ "$TOOLCHAIN" == "mingw" ]]; then
+        local objdump
+        objdump="$(mingw_tool objdump)" || die "objdump is required to validate MinGW runtime symbols"
+        "${PYTHON[@]}" "$SCRIPT_DIR/check_windows_runtime.py" "$PACKAGE_DIR" "$objdump"
+    fi
 
     require_qml "QtQuick"
     require_qml "QtQuick/Controls"

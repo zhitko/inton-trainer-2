@@ -58,6 +58,7 @@ qt_standard_project_setup(REQUIRES 6.12 I18N_TRANSLATED_LANGUAGES en ru)
 
 qt_add_executable(appinton-trainer-2
     main.cpp
+    src/mingw_libstdcxx_compat.cpp
     src/api/audioapi.h
     src/api/audioapi.cpp
     src/api/fileapi.h
